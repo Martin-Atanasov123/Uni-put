@@ -18,7 +18,7 @@ const SignUp = () => {
         //     email,
         //     password,
         // });
-        console.log(data);
+
 
         if (error) {
             setError(error.message);
