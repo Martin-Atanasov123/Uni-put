@@ -1,11 +1,13 @@
+import { Link } from "react-router-dom";
+
 const Header = () => {
     return (
         <div className="navbar bg-base-100 shadow-md px-4 sm:px-8">
             <div className="flex-1">
-                <a className="btn btn-ghost text-xl gap-2">
+                <Link to="/" className="btn btn-ghost text-xl gap-2">
                     <span className="text-primary text-2xl">🎓</span>
                     <span className="font-bold tracking-tight">UniPut</span>
-                </a>
+                </Link>
             </div>
             <div className="flex-none gap-2">
                 {/* <ul className="menu menu-horizontal px-1 hidden md:flex">
@@ -30,10 +32,10 @@ const Header = () => {
                 
                     
                 <button className="btn btn-outline btn-sm md:btn-md">
-                    Регистрация
+                    <Link to="/register">Регистрация</Link>
                 </button>
-                <button className="btn btn-primary btn-sm md:btn-md ml-2">
-                    Вход
+                <button className="btn btn-outline btn-sm md:btn-md ml-2">
+                    <Link to="/login">Вход</Link>
                 </button>
             </div>
         </div>
