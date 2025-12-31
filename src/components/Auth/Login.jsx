@@ -1,10 +1,11 @@
-import  { useState } from "react";
-// import { supabase } from "../supabaseClient";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from 'react';
+import { supabase } from '../supabaseClient'; // Увери се, че пътят е верен
+import { Mail, Lock, LogIn, AlertCircle, Loader2 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
@@ -14,108 +15,116 @@ const Login = () => {
         setLoading(true);
         setError(null);
 
-        // const { data, error } = await supabase.auth.signInWithPassword({
-        //     email,
-        //     password,
-        // });
+        const { error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        });
 
         if (error) {
-            setError("Невалиден имейл или парола.");
+            setError(error.message);
+            setLoading(false);
         } else {
-            // Успешен вход!
-            navigate("/calculator"); // Пренасочваме директно към калкулатора
+            // Успешен вход - пренасочваме към началната страница или таблото
+            navigate('/');
         }
-        setLoading(false);
     };
 
     return (
-        <div className="flex justify-center items-center min-h-[80vh] bg-base-200 px-4">
-            <div className="card w-full max-w-sm shadow-2xl bg-base-100">
-                <form onSubmit={handleLogin} className="card-body">
-                    <h2 className="text-2xl font-bold text-center mb-4">
-                        Добре дошъл отново
-                    </h2>
+        <div className="min-h-screen flex items-center justify-center bg-base-200 px-4">
+            <div className="card w-full max-w-md bg-base-100 shadow-xl border border-base-content/5">
+                <div className="card-body">
+                    {/* Заглавие и Лого */}
+                    <div className="flex flex-col items-center gap-2 mb-6">
+                        <div className="bg-primary p-3 rounded-2xl shadow-lg">
+                            <LogIn className="text-primary-content w-8 h-8" />
+                        </div>
+                        <h2 className="card-title text-2xl font-bold text-base-content">Добре дошъл отново!</h2>
+                        <p className="text-sm text-base-content/60 text-center">
+                            Влез в UniPut, за да управляваш своите балoве.
+                        </p>
+                    </div>
 
+                    {/* Грешка, ако има такава */}
                     {error && (
-                        <div className="alert alert-error text-sm py-2">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="stroke-current shrink-0 h-6 w-6"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                />
-                            </svg>
+                        <div className="alert alert-error shadow-sm mb-4 py-2 text-sm italic">
+                            <AlertCircle className="w-5 h-5" />
                             <span>{error}</span>
                         </div>
                     )}
 
-                    <div className="form-control">
-                        <label className="label">
-                            <span className="label-text font-semibold">
-                                Имейл
-                            </span>
-                        </label>
-                        <input
-                            type="email"
-                            placeholder="твоят имейл"
-                            className="input input-bordered focus:input-primary"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                    </div>
+                    <form onSubmit={handleLogin} className="space-y-4">
+                        {/* Имейл поле */}
+                        <div className="form-control w-full">
+                            <label className="label">
+                                <span className="label-text font-medium">Имейл</span>
+                            </label>
+                            <div className="relative">
+                                <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-base-content/40">
+                                    <Mail className="w-5 h-5" />
+                                </span>
+                                <input 
+                                    type="email" 
+                                    placeholder="ivan@mail.com" 
+                                    className="input input-bordered w-full pl-10 focus:input-primary transition-all"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                />
+                            </div>
+                        </div>
 
-                    <div className="form-control mt-2">
-                        <label className="label">
-                            <span className="label-text font-semibold">
-                                Парола
-                            </span>
-                        </label>
-                        <input
-                            type="password"
-                            placeholder="******"
-                            className="input input-bordered focus:input-primary"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                        <label className="label">
-                            <a
-                                href="#"
-                                className="label-text-alt link link-hover"
+                        {/* Парола поле */}
+                        <div className="form-control w-full">
+                            <label className="label">
+                                <span className="label-text font-medium">Парола</span>
+                            </label>
+                            <div className="relative">
+                                <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-base-content/40">
+                                    <Lock className="w-5 h-5" />
+                                </span>
+                                <input 
+                                    type="password" 
+                                    placeholder="••••••••" 
+                                    className="input input-bordered w-full pl-10 focus:input-primary transition-all"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <label className="label">
+                                <a href="#" className="label-text-alt link link-hover text-primary">Забравена парола?</a>
+                            </label>
+                        </div>
+
+                        {/* Бутон за вход */}
+                        <div className="form-control mt-6">
+                            <button 
+                                type="submit" 
+                                disabled={loading}
+                                className={`btn btn-primary w-full ${loading ? 'btn-disabled' : ''}`}
                             >
-                                Забравена парола?
-                            </a>
-                        </label>
-                    </div>
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        Влизане...
+                                    </>
+                                ) : (
+                                    'Влез в профила'
+                                )}
+                            </button>
+                        </div>
+                    </form>
 
-                    <div className="form-control  mt-6">
-                        <button
-                            className={`btn btn-primary ${
-                                loading ? "loading" : ""
-                            }`}
-                            disabled={loading}
-                        >
-                            Влез в профила
-                        </button>
-                    </div>
-
-                    <p className="text-center mt-4 text-sm">
-                        Нямаш профил?{" "}
-                        <Link
-                            to="/Register"
-                            className="link link-secondary font-bold"
-                        >
+                    {/* Footer на картата */}
+                    <div className="divider text-xs text-base-content/40 uppercase font-bold tracking-widest mt-8">Или</div>
+                    
+                    <p className="text-center text-sm text-base-content/60 mt-4">
+                        Нямаш профил?{' '}
+                        <Link to="/register" className="text-primary font-bold hover:underline">
                             Регистрирай се
                         </Link>
                     </p>
-                </form>
+                </div>
             </div>
         </div>
     );
