@@ -109,7 +109,7 @@ const Login = () => {
                     <p className="text-center mt-4 text-sm">
                         Нямаш профил?{" "}
                         <Link
-                            to="/signup"
+                            to="/Register"
                             className="link link-secondary font-bold"
                         >
                             Регистрирай се
