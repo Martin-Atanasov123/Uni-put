@@ -1,24 +1,43 @@
-import { Route, Routes } from "react-router";
-import Footer from "./components/Footer";
-import Header from "./components/Header";
-import Home from "./components/Home";
+import { Router, Route, Routes } from "react-router";
+// import { useState } from "react";
+
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
+
 import NotFound from "./components/404page";
+import Header from "./components/Header";
+import Home from "./components/Home";
+import Footer from "./components/Footer";
+
+import Calculator from "./components/Calculator/Calculator";
 
 function App() {
+    // const [session, setSession] = useState(null);
     return (
         <>
-            <Header />
-            <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="*" element={<NotFound />} />
+            <AuthProvider>
+                <Header />
+                <Routes>
+                    <Route path="*" element={<NotFound />} />
+                    <Route path="/" element={<Home />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
 
-                {/* <Route path="/profile" element={<Profile />} />  */}
-            </Routes>
-            <Footer />
+                    <Route
+                        path="/Calculator"
+                        element={
+                            <ProtectedRoute>
+                                <Calculator />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    {/* <Route path="/profile" element={<Profile />} />  */}
+                </Routes>
+                <Footer />
+            </AuthProvider>
         </>
     );
 }
