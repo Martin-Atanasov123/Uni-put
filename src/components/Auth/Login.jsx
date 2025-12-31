@@ -1,13 +1,16 @@
 import { useState } from 'react';
-import { supabase } from '../supabaseClient'; // Увери се, че пътят е верен
+import { supabase } from "../../supabaseClient";
+
 import { Mail, Lock, LogIn, AlertCircle, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
-const Login = () => {
+const Login = ( ) => {
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
@@ -25,8 +28,10 @@ const Login = () => {
             setLoading(false);
         } else {
             // Успешен вход - пренасочваме към началната страница или таблото
-            navigate('/');
+            navigate('/Calculator');
         }
+        setLoading(false);
+        
     };
 
     return (
