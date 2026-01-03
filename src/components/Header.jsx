@@ -1,16 +1,17 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useIsMobile } from "./hooks/useMobile";
-import { useAuth } from "../context/AuthContext"; // Внасяме хука за аутентикация
-import { supabase } from "../supabaseClient"; // Внасяме супабейз за logout функцията
+import { useAuth } from "../context/AuthContext"; 
+import { supabase } from "../supabaseClient"; 
+import { User, LogOut, Settings, LayoutDashboard } from "lucide-react"; // Добавяме икони
 
 const Header = () => {
     const isMobile = useIsMobile();
-    const { user } = useAuth(); // Вземаме текущия потребител
+    const { user } = useAuth(); 
     const navigate = useNavigate();
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
-        navigate("/login"); // Пращаме го към логин след изход
+        navigate("/login"); 
     };
 
     return (
@@ -19,68 +20,91 @@ const Header = () => {
             <div className="navbar-start">
                 {isMobile && (
                     <div className="dropdown">
-                        <label tabIndex={0} className="btn btn-circle swap swap-rotate">
-                            <input type="checkbox" />
-                            <svg className="swap-off fill-current" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 512 512"><path d="M64,384H448V341.33H64Zm0-106.67H448V234.67H64ZM64,128v42.67H448V128Z" /></svg>
-                            <svg className="swap-on fill-current" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 512 512"><polygon points="400 145.49 366.51 112 256 222.51 145.49 112 112 145.49 222.51 256 112 366.51 145.49 400 256 289.49 366.51 400 400 366.51 289.49 256 400 145.49" /></svg>
+                        <label tabIndex={0} className="btn btn-ghost btn-circle">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
                         </label>
                         <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-200 rounded-box w-52">
                             <li><Link to="/universities">Университети</Link></li>
                             <li><Link to="/calculator">Калкулатор</Link></li>
                             <div className="divider my-1"></div>
-                            
-                            {/* Мобилно меню: Логика за вход/изход */}
                             {!user ? (
                                 <>
                                     <li><Link to="/login">Вход</Link></li>
                                     <li><Link to="/register">Регистрация</Link></li>
                                 </>
                             ) : (
-                                <li><button onClick={handleLogout} className="text-error">Изход</button></li>
+                                <>
+                                    <li><Link to="/profile">Моят Профил</Link></li>
+                                    <li><button onClick={handleLogout} className="text-error">Изход</button></li>
+                                </>
                             )}
                         </ul>
                     </div>
                 )}
 
                 <Link to="/" className="btn btn-ghost text-xl gap-2 px-2">
-                    <span className="text-primary text-2xl">UniPut🎓</span>
+                    <span className="text-primary text-2xl font-black">UniPut🎓</span>
                 </Link>
             </div>
 
             {/* ЦЕНТРАЛНА ЧАСТ: Десктоп линкове */}
             <div className="navbar-center hidden lg:flex">
-                <ul className="menu menu-horizontal px-1 font-medium items-center">
-                    <li><Link to="/universities">Университети</Link></li>
-                    <li><Link to="/calculator">Калкулатор</Link></li>
-                    
-                    <div className="divider divider-horizontal mx-2"></div>
-
-                    {/* Десктоп: Логика за вход/изход */}
-                    {!user ? (
-                        <>
-                            <li><Link to="/login">Вход</Link></li>
-                            <li><Link to="/register">Регистрация</Link></li>
-                        </>
-                    ) : (
-                        <div className="flex items-center gap-4">
-                            <span className="text-sm opacity-70 italic">{user.user_metadata.username}</span>
-                            <li>
-                                <button onClick={handleLogout} className="btn btn-outline btn-error btn-sm">
-                                    Изход
-                                </button>
-                            </li>
-                        </div>
-                    )}
+                <ul className="menu menu-horizontal px-1 font-medium gap-2">
+                    <li><Link to="/universities" className="hover:text-primary transition-colors">Университети</Link></li>
+                    <li><Link to="/calculator" className="hover:text-primary transition-colors">Калкулатор</Link></li>
                 </ul>
             </div>
 
-            {/* ДЯСНА ЧАСТ: Теми */}
-            <div className="navbar-end">
-                <label className="flex cursor-pointer gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5" /><path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" /></svg>
+            {/* ДЯСНА ЧАСТ: Теми и Профил */}
+            <div className="navbar-end gap-4">
+                {/* Theme Controller */}
+                <label className="flex cursor-pointer gap-2 scale-90 md:scale-100">
                     <input type="checkbox" value="light" className="toggle theme-controller" />
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </label>
+
+                {/* Профил Секция */}
+                {!user ? (
+                    <div className="hidden md:flex gap-2">
+                        <Link to="/login" className="btn btn-ghost btn-sm">Вход</Link>
+                        <Link to="/register" className="btn btn-primary btn-sm">Регистрация</Link>
+                    </div>
+                ) : (
+                    <div className="dropdown dropdown-end">
+                        <label tabIndex={0} className="btn btn-ghost btn-circle avatar online">
+                            <div className="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                                <div className="bg-neutral text-neutral-content flex items-center justify-center h-full">
+                                    <span className="text-lg uppercase">
+                                        {user.user_metadata?.username?.charAt(0) || "U"}
+                                    </span>
+                                </div>
+                            </div>
+                        </label>
+                        <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52 border border-base-content/5">
+                            <li className="menu-title flex flex-row items-center gap-2 px-4 py-2">
+                                <span className="text-xs font-bold opacity-50 uppercase tracking-widest">Акаунт</span>
+                            </li>
+                            <li>
+                                <Link to="/profile" className="flex justify-between">
+                                    Профил
+                                    <User className="w-4 h-4 opacity-70" />
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/calculator">
+                                    Моите балове
+                                    <LayoutDashboard className="w-4 h-4 opacity-70" />
+                                </Link>
+                            </li>
+                            <div className="divider my-1"></div>
+                            <li>
+                                <button onClick={handleLogout} className="text-error flex justify-between">
+                                    Изход
+                                    <LogOut className="w-4 h-4" />
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                )}
             </div>
         </div>
     );

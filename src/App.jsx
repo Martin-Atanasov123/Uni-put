@@ -12,6 +12,7 @@ import Home from "./components/Home";
 import Footer from "./components/Footer";
 
 import Calculator from "./components/Calculator/Calculator";
+import Profile from "./components/Auth/Profile";
 
 function App() {
     // const [session, setSession] = useState(null);
@@ -33,6 +34,15 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
+                    <Route
+                        path="/profile"
+                        element={
+                            <ProtectedRoute>
+                                <Profile />
+                            </ProtectedRoute>
+                        }
+                    />
+
 
                     {/* <Route path="/profile" element={<Profile />} />  */}
                 </Routes>
