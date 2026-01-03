@@ -91,7 +91,7 @@ useEffect(() => {
                     <ChevronLeft className="w-4 h-4" /> Назад
                 </button>
 
-                <div className="card bg-base-100 shadow-2xl border border-base-content/5">
+                <div className="card bg-base-100 shadow-2xl border  border-base-content/5">
                     <div className="card-body">
                         {/* Аватар Секция */}
                         <div className="flex flex-col items-center mb-8">
