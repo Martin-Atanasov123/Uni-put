@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 export default function Home() {
     return (
         <>
@@ -6,11 +7,14 @@ export default function Home() {
                     Калкулатор за балове
                     <div className="hover-3d">
                         {/* content */}
-                        <figure className="max-w-100 rounded-2xl">
+                        <figure className="max-w-100 rounded-4xl">
+                            <Link to="/calculator">
+
                             <img
-                                src="/Gemini_Generated_Image_ovf8o6ovf8o6ovf8.png"
-                                alt="3D card"
+                                src="/calculator.png"
+                                alt="calculator 3D card"
                             />
+                            </Link>
                         </figure>
                         {/* 8 empty divs needed for the 3D effect */}
                         <div></div>
@@ -23,16 +27,15 @@ export default function Home() {
                         <div></div>
                     </div>
                 </div>
-                <div className="divider divider-horizontal">OR</div>
+                <div className="divider divider-horizontal"></div>
                 <div className="card bg-base-300 rounded-box grid  grow place-items-center">
                     Търсачка за университети
                     <div className="hover-3d">
                         {/* content */}
-                        <figure className="max-w-100 rounded-2xl">
-                            <img
-                                src="/Gemini_Generated_Image_ovf8o6ovf8o6ovf8.png"
-                                alt="3D card"
-                            />
+                        <figure className="max-w-100 rounded-4xl">
+                            <Link to="/universities">
+                                <img src="/search.png" alt="search 3D card" />
+                            </Link>
                         </figure>
                         {/* 8 empty divs needed for the 3D effect */}
                         <div></div>
