@@ -49,6 +49,7 @@ const SignUp = () => {
                     <div className="flex flex-col items-center gap-2 mb-6">
                         <div className="bg-secondary p-3 rounded-2xl shadow-lg text-secondary-content">
                             <UserPlus className="w-8 h-8" />
+                            
                         </div>
                         <h2 className="text-3xl font-black tracking-tight">Нов акаунт</h2>
                         <p className="text-sm opacity-60">Стани част от UniPut🎓</p>
@@ -68,7 +69,7 @@ const SignUp = () => {
                                 <span className="label-text font-bold uppercase text-xs">Потребителско име</span>
                             </label>
                             <div className="relative">
-                                <User className="absolute left-3 top-3 w-5 h-5 opacity-40" />
+                                <User className="absolute left-3 top-3 w-5 h-5 opacity-40 z-10 pointer-events-none color-primary-content" />
                                 <input
                                     type="text"
                                     placeholder="ivan"
@@ -86,7 +87,7 @@ const SignUp = () => {
                                 <span className="label-text font-bold uppercase text-xs">Имейл</span>
                             </label>
                             <div className="relative">
-                                <Mail className="absolute left-3 top-3 w-5 h-5 opacity-40" />
+                                <Mail className="absolute left-3 top-3 w-5 h-5 opacity-40 z-10 pointer-events-none" />
                                 <input
                                     type="email"
                                     placeholder="your@email.com"
@@ -104,7 +105,7 @@ const SignUp = () => {
                                 <span className="label-text font-bold uppercase text-xs">Парола</span>
                             </label>
                             <div className="relative">
-                                <Lock className="absolute left-3 top-3 w-5 h-5 opacity-40" />
+                                <Lock className="absolute left-3 top-3 w-5 h-5 opacity-40 z-10 pointer-events-none" />
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     placeholder="••••••••"
