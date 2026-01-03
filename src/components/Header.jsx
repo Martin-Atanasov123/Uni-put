@@ -63,7 +63,7 @@ const Header = () => {
                         </>
                     ) : (
                         <div className="flex items-center gap-4">
-                            <span className="text-sm opacity-70 italic">{user.email}</span>
+                            <span className="text-sm opacity-70 italic">{user.user_metadata.username}</span>
                             <li>
                                 <button onClick={handleLogout} className="btn btn-outline btn-error btn-sm">
                                     Изход
