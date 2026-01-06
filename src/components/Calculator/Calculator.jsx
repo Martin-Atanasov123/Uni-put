@@ -8,12 +8,18 @@ const Calculator = () => {
     const [selectedFaculty, setSelectedFaculty] = useState("");
     const [selectedSpecialty, setSelectedSpecialty] = useState("");
     const [userGrades, setUserGrades] = useState({
-        dzi_math: 0,
-        dzi_bel: 0,
-        dzi_it: 0,
-        diploma_math: 0,
-        diploma_it: 0,
-        diploma_physics: 0,
+        //тука се пишат всички оценки които се взимат : трябва да съвпадат с имената в базата
+
+
+        // dzi_math: 0,
+        dzi_mat: 0,
+        mat:0,
+        dzi_inf: 0,
+        // dzi_bel: 0,
+        // dzi_it: 0,
+        // diploma_math: 0,
+        // diploma_it: 0,
+        // diploma_physics: 0,
     });
 
     useEffect(() => {
