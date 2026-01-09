@@ -11,7 +11,7 @@ import Header from "./components/Header";
 import Home from "./components/Home";
 import Footer from "./components/Footer";
 
-import Calculator from "./components/Calculator/Calculator";
+import CalculatorPage from "./components/Calculator/Calculator";
 import Profile from "./components/Auth/Profile";
 
 function App() {
@@ -27,10 +27,10 @@ function App() {
                     <Route path="/register" element={<Register />} />
 
                     <Route
-                        path="/Calculator"
+                        path="/calculator"
                         element={
                             <ProtectedRoute>
-                                <Calculator />
+                                <CalculatorPage />
                             </ProtectedRoute>
                         }
                     />
