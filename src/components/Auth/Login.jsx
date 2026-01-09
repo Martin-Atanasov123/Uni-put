@@ -35,7 +35,7 @@ const Login = () => {
             setError(error.message);
             setLoading(false);
         } else {
-            navigate("/Calculator");
+            navigate("/calculator");
         }
         setLoading(false);
     };
