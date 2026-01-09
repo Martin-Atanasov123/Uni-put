@@ -1,181 +1,164 @@
-import React, { useState, useEffect } from "react";
-import { supabase } from "../../supabaseClient";
-import { Calculator as CalcIcon, GraduationCap, School, CheckCircle2, XCircle, Info } from "lucide-react";
 
-const Calculator = () => {
-    const [dbData, setDbData] = useState([]);
-    const [faculties, setFaculties] = useState([]);
+import { useState, useEffect } from "react";
+import { supabase } from "../supabaseClient";
+import { Calculator, ChevronRight, GraduationCap, School, AlertCircle, ArrowDownUp } from "lucide-react";
+
+// Използваме точните имена от твоя списък с променливи [cite: 2, 3, 5]
+const FIELD_LABELS = {
+    dzi_mat: "Матура по Математика",
+    dzi_inf: "Матура по Информатика",
+    dzi_it: "Матура по ИТ",
+    dzi_fizika: "Матура по Физика",
+    dzi_bel: "Матура по БЕЛ",
+    exam_mat: "Кандидатстудентски изпит по математика",
+    mat: "Диплома: Математика",
+    informatika: "Диплома: Информатика",
+    informacionni: "Диплома: ИТ",
+    dzi_bio: "Матура по Биология",
+    exam_bio: "Изпит по Биология",
+    himija: "Диплома: Химия",
+    dzi_him: "Матура по Химия",
+    // dzi_mat_obiknovena: "Матура по Математика (Обикновена)",
+};
+
+const CalculatorPage = () => {
+    // eslint-disable-next-line no-unused-vars
+    const [loading, setLoading] = useState(false);
+    const [allData, setAllData] = useState([]); 
+    const [faculties, setFaculties] = useState([]); 
     const [selectedFaculty, setSelectedFaculty] = useState("");
-    const [selectedSpecialty, setSelectedSpecialty] = useState("");
-    const [userGrades, setUserGrades] = useState({
-        //тука се пишат всички оценки които се взимат : трябва да съвпадат с имената в базата
+    const [selectedSpecialtyName, setSelectedSpecialtyName] = useState("");
+    const [currentSpecialtyObj, setCurrentSpecialtyObj] = useState(null);
 
-        dzi_mat: 0,
-        mat:0,
-        dzi_inf: 0,
-
-        dzi_math: 0,
-        dzi_bel: 0,
-        dzi_it: 0,
-        diploma_math: 0,
-        diploma_it: 0,
-        diploma_physics: 0,
-    });
+    const [grades, setGrades] = useState({}); 
+    const [errors, setErrors] = useState({}); 
+    const [substitutions, setSubstitutions] = useState({}); 
 
     useEffect(() => {
-        const fetchData = async () => {
-            const { data, error } = await supabase.from("university_admissions").select("*");
-            if (data) {
-                setDbData(data);
-                const uniqueFaculties = [...new Set(data.map((item) => item.faculty))];
-                setFaculties(uniqueFaculties);
+        const fetchFaculties = async () => {
+            setLoading(true);
+            const { data, error } = await supabase.from('university_admissions').select('faculty');
+            if (!error) {
+                const unique = [...new Set(data.map(item => item.faculty).filter(Boolean))];
+                setFaculties(unique);
             }
-            if (error) console.error("Error fetching data:", error);
+            setLoading(false);
         };
-        fetchData();
+        fetchFaculties();
     }, []);
 
-    const calculateBall = (coefficients) => {
+    useEffect(() => {
+        if (!selectedFaculty) return;
+        const fetchData = async () => {
+            setLoading(true);
+            const { data, error } = await supabase.from('university_admissions').select('*').eq('faculty', selectedFaculty);
+            if (!error) setAllData(data);
+            setLoading(false);
+        };
+        fetchData();
+    }, [selectedFaculty]);
+
+    useEffect(() => {
+        const match = allData.find(item => item.specialty === selectedSpecialtyName);
+        setCurrentSpecialtyObj(match || null);
+    }, [selectedSpecialtyName, allData]);
+
+    const handleGradeChange = (key, value) => {
+        const num = parseFloat(value);
+        let error = (value && (num < 2 || num > 6)) ? "Оценка между 2 и 6" : null;
+        setErrors(prev => ({ ...prev, [key]: error }));
+        setGrades(prev => ({ ...prev, [key]: value }));
+    };
+
+    const calculateScore = (coefficients) => {
+        if (!coefficients) return 0;
         let total = 0;
-        Object.keys(coefficients).forEach((key) => {
-            const grade = parseFloat(userGrades[key]) || 0;
-            total += grade * coefficients[key];
+        Object.entries(coefficients).forEach(([key, multiplier]) => {
+            total += (parseFloat(grades[key]) || 0) * multiplier;
         });
         return total.toFixed(2);
     };
 
-    const uniqueSpecialties = [...new Set(dbData
-        .filter((item) => item.faculty === selectedFaculty)
-        .map((item) => item.specialty))];
-
-    const finalResults = dbData.filter(
-        (item) => item.faculty === selectedFaculty && item.specialty === selectedSpecialty
-    );
+    const neededFields = currentSpecialtyObj?.coefficients ? Object.keys(currentSpecialtyObj.coefficients) : [];
 
     return (
-        <div className="max-w-4xl mx-auto p-4 pt-24 pb-12 animate-fade-in">
-            {/* Header */}
-            <div className="text-center mb-10">
-                <div className="inline-block p-3 bg-primary/10 rounded-2xl mb-4">
-                    <CalcIcon className="w-10 h-10 text-primary" />
+        <div className="min-h-screen bg-base-200 pt-24 pb-12 px-4">
+            <div className="max-w-7xl mx-auto space-y-8">
+                {/* Header */}
+                <div className="text-center space-y-2">
+                    <h1 className="text-4xl font-black text-primary flex justify-center gap-3">
+                        <Calculator className="w-10 h-10" />Калкулатор за Бал 
+                    </h1>
                 </div>
-                <h1 className="text-4xl font-black tracking-tight">Калкулатор за Прием</h1>
-                <p className="text-base-content/60 mt-2 text-lg">Изчисли своя бал и виж шансовете си за успех</p>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {/* ЛЯВА КОЛОНА: ОЦЕНКИ */}
-                <div className="md:col-span-2 space-y-6">
-                    <div className="card bg-base-100 shadow-xl border border-base-content/5">
-                        <div className="card-body">
-                            <h2 className="card-title text-xl mb-4 flex gap-2">
-                                <Info className="text-primary" /> 1. Въведи своите оценки
-                            </h2>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {Object.keys(userGrades).map((key) => (
-                                    <div key={key} className="form-control w-full">
-                                        <label className="label">
-                                            <span className="label-text font-bold uppercase text-xs opacity-70">
-                                                {key.replace("_", " ")}
-                                            </span>
-                                        </label>
-                                        <input
-                                            type="number"
-                                            step="0.01"
-                                            min="2"
-                                            max="6"
-                                            className="input input-bordered focus:input-primary transition-all font-mono"
-                                            placeholder="2.00 - 6.00"
-                                            onChange={(e) => setUserGrades({ ...userGrades, [key]: e.target.value })}
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                {/* Селектори */}
+                <div className="card bg-base-100 shadow-xl p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="form-control">
+                        <label className="label font-bold">Избери Факултет</label>
+                        <select className="select select-bordered select-primary" value={selectedFaculty} onChange={(e) => setSelectedFaculty(e.target.value)}>
+                            <option value="">-- Факултет --</option>
+                            {faculties.map((f, i) => <option key={i} value={f}>{f}</option>)}
+                        </select>
                     </div>
-
-                    {/* СЕЛЕКТИ */}
-                    <div className="card bg-primary text-primary-content shadow-xl">
-                        <div className="card-body">
-                            <h2 className="card-title text-xl mb-2 flex gap-2">
-                                <School /> 2. Избери дестинация
-                            </h2>
-                            <div className="flex flex-col sm:flex-row gap-4">
-                                <select
-                                    className="select select-bordered w-full text-base-content"
-                                    onChange={(e) => { setSelectedFaculty(e.target.value); setSelectedSpecialty(""); }}
-                                    value={selectedFaculty}
-                                >
-                                    <option value="">Избери Факултет</option>
-                                    {faculties.map((f) => <option key={f} value={f}>{f}</option>)}
-                                </select>
-
-                                <select
-                                    className="select select-bordered w-full text-base-content"
-                                    disabled={!selectedFaculty}
-                                    onChange={(e) => setSelectedSpecialty(e.target.value)}
-                                    value={selectedSpecialty}
-                                >
-                                    <option value="">Избери Специалност</option>
-                                    {uniqueSpecialties.map((s) => <option key={s} value={s}>{s}</option>)}
-                                </select>
-                            </div>
-                        </div>
+                    <div className="form-control">
+                        <label className="label font-bold">Избери Специалност</label>
+                        <select className="select select-bordered" value={selectedSpecialtyName} onChange={(e) => setSelectedSpecialtyName(e.target.value)} disabled={!selectedFaculty}>
+                            <option value="">-- Всички специалности --</option>
+                            {[...new Set(allData.map(d => d.specialty))].map((s, i) => <option key={i} value={s}>{s}</option>)}
+                        </select>
                     </div>
                 </div>
 
-                {/* ДЯСНА КОЛОНА: РЕЗУЛТАТИ */}
-                <div className="md:col-span-1">
-                    <h2 className="text-xl font-bold mb-4 px-2">Резултати</h2>
-                    <div className="space-y-4">
-                        {finalResults.length > 0 ? (
-                            finalResults.map((res) => {
-                                const myBall = calculateBall(res.coefficients);
-                                const isAccepted = myBall >= res.min_ball_2024;
-
-                                return (
-                                    <div key={res.id} className={`card w-full shadow-lg border-l-8 ${isAccepted ? 'border-success bg-success/5' : 'border-error bg-error/5'}`}>
-                                        <div className="card-body p-5">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <div className="badge badge-outline text-xs uppercase font-bold">{res.city}</div>
-                                                {isAccepted ? 
-                                                    <CheckCircle2 className="text-success w-6 h-6" /> : 
-                                                    <XCircle className="text-error w-6 h-6" />
-                                                }
-                                            </div>
-                                            <h3 className="font-bold text-lg leading-tight">{res.university_name}</h3>
-                                            
-                                            <div className="divider my-2 opacity-10"></div>
-                                            
-                                            <div className="flex justify-between items-end">
-                                                <div>
-                                                    <p className="text-xs opacity-60">Твоят бал</p>
-                                                    <p className="text-3xl font-black text-primary">{myBall}</p>
-                                                </div>
-                                                <div className="text-right">
-                                                    <p className="text-xs opacity-60 italic">Мин. 2024</p>
-                                                    <p className="font-bold">{res.min_ball_2024}</p>
-                                                </div>
-                                            </div>
-
-                                            <p className="mt-4 text-xs bg-base-100/50 p-2 rounded italic opacity-70 border border-base-content/5">
-                                                {res.formula_description}
-                                            </p>
-                                        </div>
-                                    </div>
-                                );
-                            })
-                        ) : (
-                            <div className="alert bg-base-200 border-none shadow-inner italic text-sm">
-                                <GraduationCap className="w-5 h-5 opacity-50" />
-                                <span>Избери специалност, за да изчислим класирането.</span>
-                            </div>
-                        )}
+                {/* Динамични полета за оценки */}
+                {selectedSpecialtyName && (
+                    <div className="card bg-base-100 shadow-xl p-6">
+                        <h2 className="card-title mb-6"><GraduationCap className="text-secondary" /> Нужни оценки</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {neededFields.map(fieldKey => (
+                                <div key={fieldKey} className="p-4 bg-base-200 rounded-xl relative">
+                                    <label className="label-text block text-xs font-bold mb-2 uppercase opacity-70">
+                                        {substitutions[fieldKey] ? `Заместване: ДЗИ за ${fieldKey}` : (FIELD_LABELS[fieldKey] || fieldKey)}
+                                    </label>
+                                    <input 
+                                        type="number" step="0.01" className={`input input-bordered w-full ${errors[fieldKey] ? 'input-error' : ''}`}
+                                        value={grades[fieldKey] || ""} onChange={(e) => handleGradeChange(fieldKey, e.target.value)}
+                                    />
+                                    {fieldKey.includes('exam') && (
+                                        <button className="btn btn-circle btn-xs absolute top-2 right-2" onClick={() => setSubstitutions(p => ({...p, [fieldKey]: !p[fieldKey]}))}>
+                                            <ArrowDownUp className="w-3 h-3" />
+                                        </button>
+                                    )}
+                                    {errors[fieldKey] && <p className="text-error text-[10px] mt-1">{errors[fieldKey]}</p>}
+                                </div>
+                            ))}
+                        </div>
                     </div>
+                )}
+
+                {/* Резултати в Grid по 3 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {(selectedSpecialtyName ? allData.filter(d => d.specialty === selectedSpecialtyName) : allData).map(item => {
+                        const score = calculateScore(item.coefficients);
+                        return (
+                            <div key={item.id} className="card bg-base-100 shadow-lg border-t-4 border-primary hover:scale-[1.02] transition-transform">
+                                <div className="card-body">
+                                    <span className="text-[10px] opacity-50 uppercase tracking-widest">{item.university_name}</span>
+                                    <h2 className="card-title text-lg leading-tight">{item.specialty}</h2>
+                                    <div className="divider my-1"></div>
+                                    <p className="text-xs italic opacity-60 h-12 overflow-hidden">{item.formula_description}</p>
+                                    <div className="flex justify-between items-center mt-4 bg-base-200 p-3 rounded-lg">
+                                        <span className="text-xs font-bold">ТВОЯТ БАЛ:</span>
+                                        <span className={`text-2xl font-black ${score >= item.min_ball_2024 ? 'text-success' : 'text-error'}`}>{score}</span>
+                                    </div>
+                                    <div className="text-[10px] mt-2 text-center opacity-50">Мин. бал 2024: {item.min_ball_2024}</div>
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         </div>
     );
 };
 
-export default Calculator;
+export default CalculatorPage;
