@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useIsMobile } from "./hooks/useMobile";
 import { useAuth } from "../context/AuthContext"; 
-import { supabase } from "../supabaseClient"; 
+import { supabase } from "../../src/components/supabaseClient";
 import { User, LogOut, Settings, LayoutDashboard } from "lucide-react"; // Добавяме икони
 
 const Header = () => {
