@@ -12,6 +12,7 @@ import Home from "./components/Home";
 import Footer from "./components/Footer";
 
 import CalculatorPage from "./components/Calculator/Calculator";
+import UniversitiesPage from "./components/Universities/Universities";
 import Profile from "./components/Auth/Profile";
 
 function App() {
@@ -25,7 +26,7 @@ function App() {
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
-
+                    <Route path="/universities" element={<UniversitiesPage />} />
                     <Route
                         path="/calculator"
                         element={
