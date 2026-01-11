@@ -424,7 +424,7 @@ const CalculatorPage = () => {
                     <div className="p-3 bg-primary/10 rounded-2xl text-primary shadow-xl">
                         <Calculator size={40} />
                     </div>
-                    <h1 className="text-4xl font-black tracking-tight uppercase italic underline decoration-primary">Калкулатор v3.1</h1>
+                    <h1 className="text-4xl font-black tracking-tight uppercase italic underline decoration-primary">Калкулатор </h1>
                 </div>
 
                 {/* --- SELECTORS --- */}
