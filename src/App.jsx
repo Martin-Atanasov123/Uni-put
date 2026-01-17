@@ -14,9 +14,12 @@ import Footer from "./components/Footer";
 import CalculatorPage from "./components/Calculator/Calculator";
 import UniversitiesPage from "./components/Universities/Universities";
 import Profile from "./components/Auth/Profile";
+import AdminRoute from "./components/Auth/AdminRoute";
+import AdminDashboard from "./components/AdminDashboard";
 
 function App() {
     // const [session, setSession] = useState(null);
+
     return (
         <>
             <AuthProvider>
@@ -26,7 +29,10 @@ function App() {
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
-                    <Route path="/universities" element={<UniversitiesPage />} />
+                    <Route
+                        path="/universities"
+                        element={<UniversitiesPage />}
+                    />
                     <Route
                         path="/calculator"
                         element={
@@ -43,7 +49,14 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
-
+                    <Route
+                        path="/admin"
+                        element={
+                            <AdminRoute>
+                                <AdminDashboard />
+                            </AdminRoute>
+                        }
+                    />
 
                     {/* <Route path="/profile" element={<Profile />} />  */}
                 </Routes>
