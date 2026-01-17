@@ -88,7 +88,7 @@ const Footer = () => {
                             Иновативна платформа за кандидатстудентски прием. Твоят дигитален пътеводител към висшето образование в България.
                         </p>
                         <div className="flex items-center justify-center md:justify-start gap-4 pt-2">
-                            <a href="https://github.com" target="_blank" rel="noreferrer" className="btn btn-ghost btn-circle btn-sm hover:text-primary transition-colors">
+                            <a href="https://github.com/Martin-Atanasov123/Uni-put" target="_blank" rel="noreferrer" className="btn btn-ghost btn-circle btn-sm hover:text-primary transition-colors">
                                 <Github size={20} />
                             </a>
                             <a href="https://mon.bg" target="_blank" rel="noreferrer" className="btn btn-ghost btn-circle btn-sm hover:text-primary transition-colors">
@@ -115,12 +115,12 @@ const Footer = () => {
                     <nav className="flex flex-col gap-3">
                         <h6 className="footer-title opacity-100 font-black text-secondary tracking-widest text-[10px] mb-2 uppercase">Проектът</h6>
                         <a className="link link-hover flex items-center justify-center md:justify-start gap-2 opacity-70 hover:opacity-100 font-bold text-sm italic">
-                            <Info size={14} /> За проекта
+                            <Info size={14} /> За нас
                         </a>
                         <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noreferrer" className="link link-hover flex items-center justify-center md:justify-start gap-2 opacity-70 hover:opacity-100 font-bold text-sm">
                             <ShieldCheck size={14} /> MIT Лиценз
                         </a>
-                        <span className="badge badge-primary badge-outline font-black text-[10px] mt-2 italic mx-auto md:mx-0">НОИТ 2025</span>
+                        <span className="badge badge-primary badge-outline font-black text-[10px] mt-2 italic mx-auto md:mx-0">НОИТ 2026</span>
                     </nav>
 
                     {/* Секция Правна информация */}
