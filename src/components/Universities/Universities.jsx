@@ -38,7 +38,7 @@ const UniversitiesPage = () => {
     // Филтрираща логика
     const filteredUnis = universities.filter(u => {
         const matchesSearch = u.specialty.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                             u.university_name.toLowerCase().includes(searchTerm.toLowerCase());
+        u.university_name.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesCity = selectedCity === "Всички" || u.city === selectedCity;
         return matchesSearch && matchesCity;
     });
@@ -119,20 +119,15 @@ const UniversitiesPage = () => {
                                         </p>
                                     </div>
 
-                                    <div className="flex-1">
-                                        <div className="p-4 bg-base-200 rounded-2xl border-l-4 border-primary/30 group-hover:border-primary transition-all">
-                                            <span className="text-[10px] font-black opacity-40 uppercase block mb-1">Прием:</span>
-                                            <p className="text-[11px] font-bold leading-relaxed italic">{uni.formula_description}</p>
-                                        </div>
-                                    </div>
+                                
 
                                     <div className="flex items-center justify-between pt-4 border-t border-base-200">
-                                        <div>
+                                        {/* <div>
                                             <div className="text-2xl font-black text-primary tracking-tighter italic">
                                                 {uni.min_ball_2024}
                                             </div>
                                             <div className="text-[9px] font-black opacity-30 uppercase tracking-tighter">Мин. Бал 2024</div>
-                                        </div>
+                                        </div> */}
                                         <Link 
                                             to="/calculator" 
                                             className="btn btn-circle btn-primary shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform"
@@ -153,7 +148,7 @@ const UniversitiesPage = () => {
                             <Search size={40} />
                         </div>
                         <h3 className="text-2xl font-black opacity-40 italic uppercase tracking-tighter text-center">
-                            Нищо не открихме, братле... <br />
+                            Нищо не открихме... <br />
                             Пробвай друго търсене.
                         </h3>
                     </div>
