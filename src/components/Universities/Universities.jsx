@@ -53,7 +53,7 @@ const UniversitiesPage = () => {
                         <div className="badge badge-primary font-black italic p-4 mb-2">DATABASE 2025</div>
                         <h1 className="text-5xl font-black tracking-tighter uppercase italic">
                             Открий своето <br />
-                            <span className="text-primary underline decoration-wavy">бъдеще</span>
+                            <span className="text-primary ">бъдеще</span>
                         </h1>
                     </div>
                     <div className="stats shadow-xl bg-base-200 rounded-[2rem] hidden lg:flex">
