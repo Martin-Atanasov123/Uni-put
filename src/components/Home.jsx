@@ -84,7 +84,7 @@ export default function Home() {
                             <p className="text-sm opacity-90">Не си сигурен какво да учиш? Попълни анкетата и нашият алгоритъм ще ти препоръча професия.</p>
                         </div>
                         <div className="absolute bottom-6 right-8">
-                            <span className="badge badge-accent badge-outline text-white border-white/40">Скоро</span>
+                            <span className="badge badge-accent badge-outline text-white border-white/40">Очаквай скоро</span>
                         </div>
                     </div>
 
@@ -111,7 +111,7 @@ export default function Home() {
                             <h3 className="text-2xl font-bold">Общежития</h3>
                             <p className="text-sm opacity-90">Виртуална разходка из базите. Виж условията преди да кандидатстваш.</p>
                             <button className="btn btn-sm btn-outline text-white border-white hover:bg-white hover:text-emerald-600 mt-2">
-                                Разгледай
+                                Очаквай скоро
                             </button>
                         </div>
                     </div>
