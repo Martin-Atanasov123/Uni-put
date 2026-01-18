@@ -58,7 +58,7 @@ const Header = () => {
                             <div className="bg-primary p-2 rounded-xl group-hover:rotate-12 transition-transform shadow-lg shadow-primary/30">
                                 <GraduationCap className="text-white" size={24} />
                             </div>
-                            <span className="text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent uppercase italic">
+                            <span className="text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent  italic">
                                 УниПът
                             </span>
                         </Link>
