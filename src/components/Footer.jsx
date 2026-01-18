@@ -26,7 +26,7 @@ const Footer = () => {
                     <aside className="space-y-4">
                         <div className="flex items-center justify-center md:justify-start gap-2 group">
                             <span className="text-4xl group-hover:rotate-12 transition-transform duration-300">🎓</span>
-                            <span className="text-2xl font-black tracking-tighter text-primary italic uppercase">UniPut</span>
+                            <span className="text-2xl font-black tracking-tighter text-primary italic uppercase">УниПът</span>
                         </div>
                         <p className="text-sm font-medium opacity-60 leading-relaxed">
                             Иновативна платформа за кандидатстудентски прием. Твоят дигитален пътеводител към висшето образование в България.
@@ -81,7 +81,7 @@ const Footer = () => {
                 {/* Копирайт лента */}
                 <div className="mt-16 pt-8 border-t border-base-content/5 flex flex-col md:flex-row justify-between items-center gap-4">
                     <p className="text-[10px] font-black opacity-40 uppercase tracking-[0.2em]">
-                        © {currentYear} UniPut Bulgaria. Всички права запазени.
+                        © {currentYear} УниПът Bulgaria. Всички права запазени.
                     </p>
                     
                 </div>

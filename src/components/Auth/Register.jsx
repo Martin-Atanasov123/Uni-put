@@ -52,7 +52,7 @@ const SignUp = () => {
                             
                         </div>
                         <h2 className="text-3xl font-black tracking-tight">Нов акаунт</h2>
-                        <p className="text-sm opacity-60">Стани част от UniPut🎓</p>
+                        <p className="text-sm opacity-60">Стани част от УниПът🎓</p>
                     </div>
 
                     {error && (
