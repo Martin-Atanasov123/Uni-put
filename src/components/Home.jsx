@@ -96,7 +96,7 @@ export default function Home() {
                                     <Search size={24} />
                                 </div>
                                 <h3 className="text-2xl font-bold text-base-content">Уни Търсачка</h3>
-                                <p className="text-sm opacity-60">Филтрирай по град, направление и рейтинг.</p>
+                                <p className="text-sm opacity-60">Филтрирай по град.</p>
                             </div>
                         </div>
                     </Link>
@@ -154,7 +154,7 @@ export default function Home() {
                             </div>
                             <div className="bg-base-100 p-6 rounded-3xl shadow-sm">
                                 <Trophy className="w-8 h-8 text-warning mb-2" />
-                                <div className="text-3xl font-black">98%</div>
+                                <div className="text-3xl font-black">99%</div>
                                 <div className="text-xs opacity-50 uppercase font-bold">Точност</div>
                             </div>
                             <div className="bg-base-100 p-6 rounded-3xl shadow-sm col-span-2">
