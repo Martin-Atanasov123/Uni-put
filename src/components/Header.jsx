@@ -59,7 +59,7 @@ const Header = () => {
                                 <GraduationCap className="text-white" size={24} />
                             </div>
                             <span className="text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent uppercase italic">
-                                UniPut
+                                УниПът
                             </span>
                         </Link>
 
@@ -156,7 +156,7 @@ const Header = () => {
                 
                 <div className={`absolute top-0 right-0 h-full w-[85%] max-w-sm bg-base-100 shadow-2xl p-8 transition-transform duration-500 ease-out flex flex-col ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
                     <div className="flex justify-between items-center mb-12">
-                        <span className="text-2xl font-black italic text-primary">UniPut🎓</span>
+                        <span className="text-2xl font-black italic text-primary">УниПът🎓</span>
                         <button className="btn btn-ghost btn-circle bg-base-200" onClick={() => setIsMenuOpen(false)}>
                             <X size={24} />
                         </button>
