@@ -53,7 +53,7 @@ const Login = () => {
                             Добре дошъл отново!
                         </h2>
                         <p className="text-sm text-base-content/60 text-center">
-                            Влез в UniPut, за да управляваш своите балoве.
+                            Влез в УниПът, за да управляваш своите балoве.
                         </p>
                     </div>
 
