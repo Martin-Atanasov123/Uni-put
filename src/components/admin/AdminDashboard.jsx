@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { supabase } from "./supabaseClient";
+import { supabase } from "../../lib/supabase";
 import { Database, PlusCircle, CheckCircle, AlertCircle, LayoutDashboard } from "lucide-react";
 
 const AdminDashboard = () => {
@@ -101,3 +101,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+

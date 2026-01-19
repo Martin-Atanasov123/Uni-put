@@ -1,5 +1,3 @@
-
-
 import { 
     Github, 
     ExternalLink, 
@@ -91,3 +89,4 @@ const Footer = () => {
 };
 
 export default Footer;
+
