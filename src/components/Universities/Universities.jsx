@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "../supabaseClient";
+import { supabase } from "../../lib/supabase";
 import { 
     Search, 
     MapPin, 
@@ -47,7 +47,7 @@ const UniversitiesPage = () => {
         <div className="min-h-screen bg-base-100 pt-28 pb-12 px-6">
             <div className="max-w-7xl mx-auto space-y-8">
                 
-                {/* --- HERO SECTION --- */}
+                {/* --- ГЛАВНА СЕКЦИЯ --- */}
                 <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12">
                     <div className="space-y-2">
                         <div className="badge badge-primary font-black italic p-4 mb-2">DATABASE 2025</div>
@@ -65,7 +65,7 @@ const UniversitiesPage = () => {
                     </div>
                 </div>
 
-                {/* --- SMART FILTERS --- */}
+                {/* --- УМНИ ФИЛТРИ --- */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-base-200 p-4 rounded-[2.5rem] shadow-inner sticky top-24 z-10 backdrop-blur-md bg-base-200/80">
                     <div className="relative col-span-1 md:col-span-2">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 opacity-30" size={20} />
@@ -91,7 +91,7 @@ const UniversitiesPage = () => {
                     </div>
                 </div>
 
-                {/* --- UNIVERSITY GRID --- */}
+                {/* --- РЕШЕТКА С УНИВЕРСИТЕТИ --- */}
                 {loading ? (
                     <div className="flex justify-center py-20">
                         <span className="loading loading-infinity loading-lg text-primary scale-150"></span>
@@ -103,7 +103,7 @@ const UniversitiesPage = () => {
                                 key={uni.id} 
                                 className="group bg-base-100 rounded-[2.5rem] border border-base-200 p-8 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 relative overflow-hidden"
                             >
-                                {/* Background Decor */}
+                                {/* Декоративен елемент на фона */}
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors"></div>
                                 
                                 <div className="flex flex-col h-full space-y-6">
@@ -122,12 +122,6 @@ const UniversitiesPage = () => {
                                 
 
                                     <div className="flex items-center justify-between pt-4 border-t border-base-200">
-                                        {/* <div>
-                                            <div className="text-2xl font-black text-primary tracking-tighter italic">
-                                                {uni.min_ball_2024}
-                                            </div>
-                                            <div className="text-[9px] font-black opacity-30 uppercase tracking-tighter">Мин. Бал 2024</div>
-                                        </div> */}
                                         <Link 
                                             to="/calculator" 
                                             className="btn btn-circle btn-primary shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform"
@@ -141,7 +135,7 @@ const UniversitiesPage = () => {
                     </div>
                 )}
 
-                {/* --- EMPTY STATE --- */}
+                {/* --- ПРАЗНО СЪСТОЯНИЕ --- */}
                 {!loading && filteredUnis.length === 0 && (
                     <div className="text-center py-20 space-y-4">
                         <div className="bg-base-200 w-20 h-20 rounded-full flex items-center justify-center mx-auto opacity-20">

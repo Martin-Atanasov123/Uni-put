@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { supabase } from "../supabaseClient";
+import { supabase } from "../../lib/supabase";
 import { Link, useNavigate } from "react-router-dom";
 import { UserPlus, Mail, Lock, User, Eye, EyeOff, AlertCircle } from "lucide-react";
 
@@ -49,7 +49,6 @@ const SignUp = () => {
                     <div className="flex flex-col items-center gap-2 mb-6">
                         <div className="bg-secondary p-3 rounded-2xl shadow-lg text-secondary-content">
                             <UserPlus className="w-8 h-8" />
-                            
                         </div>
                         <h2 className="text-3xl font-black tracking-tight">Нов акаунт</h2>
                         <p className="text-sm opacity-60">Стани част от УниПът🎓</p>
@@ -63,7 +62,7 @@ const SignUp = () => {
                     )}
 
                     <form onSubmit={handleSignUp} className="space-y-4">
-                        {/* USERNAME FIELD */}
+                        {/* Поле за потребителско име */}
                         <div className="form-control">
                             <label className="label">
                                 <span className="label-text font-bold uppercase text-xs">Потребителско име</span>
@@ -81,7 +80,7 @@ const SignUp = () => {
                             </div>
                         </div>
 
-                        {/* EMAIL FIELD */}
+                        {/* Поле за имейл */}
                         <div className="form-control">
                             <label className="label">
                                 <span className="label-text font-bold uppercase text-xs">Имейл</span>
@@ -99,7 +98,7 @@ const SignUp = () => {
                             </div>
                         </div>
 
-                        {/* PASSWORD FIELD WITH TOGGLE */}
+                        {/* Поле за парола с превключвател */}
                         <div className="form-control">
                             <label className="label">
                                 <span className="label-text font-bold uppercase text-xs">Парола</span>

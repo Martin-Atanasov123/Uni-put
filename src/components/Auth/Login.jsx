@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { supabase } from "../supabaseClient";
+﻿import { useState } from "react";
+import { supabase } from "../../lib/supabase";
 
 import {
     Mail,
@@ -84,7 +84,7 @@ const Login = () => {
                             </div>
                         </div>
 
-                        {/* Парола поле - ФИКСНАТО */}
+                        {/* Парола поле */}
                         <div className="form-control w-full">
                             <label className="label">
                                 <span className="label-text font-medium text-base-content">Парола</span>
@@ -113,12 +113,6 @@ const Login = () => {
                                 </button>
                             </div>
                         </div>
-
-                        {/* <div className="text-right">
-                            <a href="#" className="label-text-alt link link-hover text-primary font-medium">
-                                Забравена парола?
-                            </a>
-                        </div> */}
 
                         {/* Бутон за вход */}
                         <div className="form-control mt-6">

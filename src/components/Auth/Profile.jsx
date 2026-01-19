@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "../supabaseClient";
+import { supabase } from "../../lib/supabase";
 import { useNavigate } from "react-router-dom";
 import { 
     User, 
@@ -22,29 +22,29 @@ const Profile = () => {
     const navigate = useNavigate();
 
     // 1. Вземане на данните при зареждане
-useEffect(() => {
-    // Дефинираме я вътре
-    const getProfile = async () => {
-        try {
-            setLoading(true);
-            const { data: { user }, error } = await supabase.auth.getUser();
+    useEffect(() => {
+        // Дефинираме я вътре
+        const getProfile = async () => {
+            try {
+                setLoading(true);
+                const { data: { user }, error } = await supabase.auth.getUser();
 
-            if (error) throw error;
+                if (error) throw error;
 
-            if (user) {
-                setUser(user);
-                setUsername(user.user_metadata?.username || "");
+                if (user) {
+                    setUser(user);
+                    setUsername(user.user_metadata?.username || "");
+                }
+            } catch (error) {
+                console.error("Грешка при зареждане:", error.message);
+                navigate("/login");
+            } finally {
+                setLoading(false);
             }
-        } catch (error) {
-            console.error("Грешка при зареждане:", error.message);
-            navigate("/login");
-        } finally {
-            setLoading(false);
-        }
-    };
+        };
 
-    getProfile();
-}, [navigate]); // Добавяме navigate тук, за да сме 100% изрядни
+        getProfile();
+    }, [navigate]); // Добавяме navigate тук, за да сме 100% изрядни
 
     // 2. Функция за обновяване на името
     async function updateProfile(e) {
@@ -66,7 +66,7 @@ useEffect(() => {
         }
     }
 
-    // 3. Функция за Изход (Logout)
+    // 3. Функция за Изход
     async function handleLogout() {
         await supabase.auth.signOut();
         navigate("/login");
@@ -115,7 +115,7 @@ useEffect(() => {
                         )}
 
                         <form onSubmit={updateProfile} className="space-y-6">
-                            {/* Поле за Имейл (Read Only) */}
+                            {/* Поле за Имейл (Само за четене) */}
                             <div className="form-control">
                                 <label className="label">
                                     <span className="label-text font-bold uppercase text-xs opacity-60">Имейл адрес</span>
@@ -131,7 +131,7 @@ useEffect(() => {
                                 </div>
                             </div>
 
-                            {/* Поле за Username */}
+                            {/* Поле за потребителско име */}
                             <div className="form-control">
                                 <label className="label">
                                     <span className="label-text font-bold uppercase text-xs opacity-60">Потребителско име</span>
