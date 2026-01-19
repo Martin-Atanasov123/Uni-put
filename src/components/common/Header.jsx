@@ -1,6 +1,6 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; 
-import { supabase } from "../../src/components/supabaseClient";
+import { useAuth } from "../../context/AuthContext"; 
+import { supabase } from "../../lib/supabase";
 import { 
     User, 
     LogOut, 
@@ -12,7 +12,7 @@ import {
     Search,
     Moon,
     Sun,
-    Settings // Добавяме икона за Админ
+    Settings
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -63,7 +63,7 @@ const Header = () => {
                             </span>
                         </Link>
 
-                        {/* DESKTOP MENU */}
+                        {/* ДЕСКТОП МЕНЮ */}
                         <div className="hidden lg:flex items-center gap-1 bg-base-300/30 p-1 rounded-2xl border border-base-content/5">
                             {navLinks.map((link) => (
                                 <Link 
@@ -80,7 +80,7 @@ const Header = () => {
                                 </Link>
                             ))}
                             
-                            {/* --- ADMIN LINK ADDED HERE (Desktop Quick Access) --- */}
+                            {/* --- АДМИН ЛИНК (Бърз достъп на десктоп) --- */}
                             {isAdmin && (
                                 <Link 
                                     to="/admin" 
@@ -122,7 +122,7 @@ const Header = () => {
                                         <p className="font-black text-primary truncate">{user.user_metadata?.username || user.email}</p>
                                     </div>
 
-                                    {/* --- ADMIN LINK IN DROPDOWN --- */}
+                                    {/* --- АДМИН ЛИНК В DROPDOWN МЕНЮТО --- */}
                                     {isAdmin && (
                                         <li>
                                             <Link to="/admin" className="rounded-xl py-3 font-black text-accent hover:bg-accent/10">
@@ -179,7 +179,7 @@ const Header = () => {
                             </Link>
                         ))}
 
-                        {/* --- MOBILE ADMIN LINK --- */}
+                        {/* --- АДМИН ЛИНК (Мобилно меню) --- */}
                         {isAdmin && (
                             <Link 
                                 to="/admin"
@@ -211,3 +211,4 @@ const Header = () => {
 };
 
 export default Header;
+

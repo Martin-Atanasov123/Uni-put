@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from "react";
-import { supabase } from "../supabaseClient";
+import { supabase } from "../../lib/supabase";
 import { 
     Calculator, 
     GraduationCap, 
@@ -154,7 +153,7 @@ const CalculatorPage = () => {
         <div className="min-h-screen bg-base-100 pt-24 pb-12 px-6">
             <div className="max-w-6xl mx-auto space-y-10">
                 
-                {/* --- HEADER --- */}
+                {/* --- ЗАГЛАВИЕ --- */}
                 <div className="flex flex-col items-center text-center space-y-3">
                     <div className="p-3 bg-primary/10 rounded-2xl text-primary shadow-xl">
                         <Calculator size={40} />
@@ -162,7 +161,7 @@ const CalculatorPage = () => {
                     <h1 className="text-4xl font-black tracking-tight uppercase italic underline decoration-primary">Калкулатор </h1>
                 </div>
 
-                {/* --- SELECTORS --- */}
+                {/* --- ИЗБИРАТЕЛИ --- */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-base-200 p-3 rounded-[2.5rem] shadow-inner">
                     <select className="select select-bordered bg-base-100 border-none rounded-2xl text-lg h-14 font-bold px-6" value={selectedFaculty} onChange={(e) => {setSelectedFaculty(e.target.value); setSelectedSpecialtyName("");}}>
                         <option value="">Избери факултет...</option>
@@ -174,7 +173,7 @@ const CalculatorPage = () => {
                     </select>
                 </div>
 
-                {/* --- INPUTS --- */}
+                {/* --- ВХОДНИ ПОЛЕТА --- */}
                 {selectedSpecialtyName && currentSpecialtyObj && (
                     <div className="bg-base-100 shadow-2xl p-8 border border-base-200 rounded-[3rem] animate-in fade-in slide-in-from-top-4 duration-500">
                         <div className="flex justify-between items-center mb-10">
@@ -217,7 +216,7 @@ const CalculatorPage = () => {
                     </div>
                 )}
 
-                {/* --- RESULTS (Improved Logic) --- */}
+                {/* --- РЕЗУЛТАТИ (Подобрена логика) --- */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {allData.filter(d => d.specialty === selectedSpecialtyName).map(item => {
                         const score = calculateScore(item.coefficients);

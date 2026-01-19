@@ -1,5 +1,3 @@
-
-
 import { Link } from "react-router-dom";
 import { 
     Calculator, 
@@ -16,7 +14,7 @@ export default function Home() {
     return (
         <div className="min-h-screen bg-base-100 font-sans selection:bg-primary selection:text-white">
             
-            {/* --- HERO SECTION --- */}
+            {/* --- ГЛАВНА СЕКЦИЯ --- */}
             <section className="relative pt-32 pb-20 px-6 overflow-hidden">
                 {/* Фонови елементи (Glow effects) */}
                 <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] -z-10 animate-pulse"></div>
@@ -48,7 +46,7 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* --- BENTO GRID (Основна функционалност) --- */}
+            {/* --- РЕШЕТКА С КАРТИЧКИ (Основна функционалност) --- */}
             <section className="max-w-7xl mx-auto px-6 pb-24">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-[minmax(280px,auto)]">
                     
@@ -119,7 +117,7 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* --- STATS & INFO SECTION --- */}
+            {/* --- СТАТИСТИКИ И ИНФОРМАЦИЯ --- */}
             <section className="bg-base-200 py-20 px-6">
                 <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
@@ -145,7 +143,7 @@ export default function Home() {
                             </ul>
                         </div>
 
-                        {/* Stats Grid */}
+                        {/* Решетка със статистики */}
                         <div className="grid grid-cols-2 gap-4">
                             <div className="bg-base-100 p-6 rounded-3xl shadow-sm">
                                 <Users className="w-8 h-8 text-primary mb-2" />
@@ -177,3 +175,4 @@ export default function Home() {
         </div>
     );
 }
+

@@ -1,30 +1,28 @@
-import { Router, Route, Routes } from "react-router";
-// import { useState } from "react";
+import { Route, Routes } from "react-router";
 
-import { AuthProvider } from "./context/AuthContext";
-import ProtectedRoute from "./components/ProtectedRoute";
-import Login from "./components/Auth/Login";
-import Register from "./components/Auth/Register";
+import { AuthProvider } from "../context/AuthContext";
+import ProtectedRoute from "../routes/ProtectedRoute";
+import Login from "../components/Auth/Login";
+import Register from "../components/Auth/Register";
 
-import NotFound from "./components/404page";
-import Header from "./components/Header";
-import Home from "./components/Home";
-import Footer from "./components/Footer";
+import NotFound from "../components/common/NotFound";
+import Header from "../components/common/Header";
+import Home from "../components/common/Home";
+import Footer from "../components/common/Footer";
 
-import CalculatorPage from "./components/Calculator/Calculator";
-import UniversitiesPage from "./components/Universities/Universities";
-import Profile from "./components/Auth/Profile";
-import AdminRoute from "./components/Auth/AdminRoute";
-import AdminDashboard from "./components/AdminDashboard";
+import CalculatorPage from "../components/Calculator/Calculator";
+import UniversitiesPage from "../components/Universities/Universities";
+import Profile from "../components/Auth/Profile";
+import AdminRoute from "../routes/AdminRoute";
+import AdminDashboard from "../components/admin/AdminDashboard";
 
 function App() {
-    // const [session, setSession] = useState(null);
-
     return (
         <>
             <AuthProvider>
                 <Header />
                 <Routes>
+                    {/* Публични маршрути */}
                     <Route path="*" element={<NotFound />} />
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
@@ -33,6 +31,8 @@ function App() {
                         path="/universities"
                         element={<UniversitiesPage />}
                     />
+                    
+                    {/* Защитени маршрути (изискват вход) */}
                     <Route
                         path="/calculator"
                         element={
@@ -49,6 +49,8 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
+                    
+                    {/* Админ маршрути (изискват админ роля) */}
                     <Route
                         path="/admin"
                         element={
@@ -57,8 +59,6 @@ function App() {
                             </AdminRoute>
                         }
                     />
-
-                    {/* <Route path="/profile" element={<Profile />} />  */}
                 </Routes>
                 <Footer />
             </AuthProvider>
@@ -67,3 +67,4 @@ function App() {
 }
 
 export default App;
+
