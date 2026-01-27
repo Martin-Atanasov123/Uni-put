@@ -15,6 +15,7 @@ import UniversitiesPage from "../components/Universities/Universities";
 import Profile from "../components/Auth/Profile";
 import AdminRoute from "../routes/AdminRoute";
 import AdminDashboard from "../components/admin/AdminDashboard";
+import Survey from "../components/Survey/Survey";
 
 function App() {
     return (
@@ -30,6 +31,10 @@ function App() {
                     <Route
                         path="/universities"
                         element={<UniversitiesPage />}
+                    />
+                    <Route
+                        path="/survey"
+                        element={<Survey />}
                     />
                     
                     {/* Защитени маршрути (изискват вход) */}
