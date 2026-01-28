@@ -16,6 +16,8 @@ import Profile from "../components/Auth/Profile";
 import AdminRoute from "../routes/AdminRoute";
 import AdminDashboard from "../components/admin/AdminDashboard";
 import Survey from "../components/Survey/Survey";
+import CareerAdvisor from "../components/CareerAdvisor/CareerAdvisor";
+import TestCareer from "../components/CareerAdvisor/TestCareer";
 
 function App() {
     return (
@@ -35,6 +37,14 @@ function App() {
                     <Route
                         path="/survey"
                         element={<Survey />}
+                    />
+                    <Route
+                        path="/career-advisor"
+                        element={<CareerAdvisor />}
+                    />
+                    <Route
+                        path="/test-career"
+                        element={<TestCareer />}
                     />
                     
                     {/* Защитени маршрути (изискват вход) */}

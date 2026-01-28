@@ -40,6 +40,7 @@ const Header = () => {
     const navLinks = [
         { name: "Университети", path: "/universities", icon: <Search size={18} /> },
         { name: "Калкулатор", path: "/calculator", icon: <Calculator size={18} /> },
+        { name: "Кариерен Съветник", path: "/career-advisor", icon: <LayoutDashboard size={18} /> },
     ];
 
     const isActive = (path) => location.pathname === path;
@@ -113,7 +114,7 @@ const Header = () => {
                             <div className="dropdown dropdown-end">
                                 <label tabIndex={0} className="btn btn-ghost btn-circle avatar border-2 border-primary/20 p-0.5">
                                     <div className="w-10 rounded-full bg-neutral text-neutral-content flex items-center justify-center font-black italic">
-                                        {user.user_metadata?.username?.charAt(0) || "U"}
+                                        <User className="w-6 h-6" />
                                     </div>
                                 </label>
                                 <ul tabIndex={0} className="mt-4 p-3 shadow-2xl menu dropdown-content bg-base-100 rounded-[2rem] w-64 border border-primary/10 backdrop-blur-xl">
