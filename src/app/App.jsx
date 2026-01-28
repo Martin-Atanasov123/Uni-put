@@ -15,7 +15,7 @@ import UniversitiesPage from "../components/Universities/Universities";
 import Profile from "../components/Auth/Profile";
 import AdminRoute from "../routes/AdminRoute";
 import AdminDashboard from "../components/admin/AdminDashboard";
-import Survey from "../components/Survey/Survey";
+
 import CareerAdvisor from "../components/CareerAdvisor/CareerAdvisor";
 import TestCareer from "../components/CareerAdvisor/TestCareer";
 import ScrollToTop from "../components/common/ScrollToTop";
@@ -35,10 +35,6 @@ function App() {
                     <Route
                         path="/universities"
                         element={<UniversitiesPage />}
-                    />
-                    <Route
-                        path="/survey"
-                        element={<Survey />}
                     />
                     <Route
                         path="/career-advisor"
