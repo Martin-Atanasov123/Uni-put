@@ -18,11 +18,13 @@ import AdminDashboard from "../components/admin/AdminDashboard";
 import Survey from "../components/Survey/Survey";
 import CareerAdvisor from "../components/CareerAdvisor/CareerAdvisor";
 import TestCareer from "../components/CareerAdvisor/TestCareer";
+import ScrollToTop from "../components/common/ScrollToTop";
 
 function App() {
     return (
         <>
             <AuthProvider>
+                <ScrollToTop />
                 <Header />
                 <Routes>
                     {/* Публични маршрути */}

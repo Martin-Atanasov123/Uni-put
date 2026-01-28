@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { calculateScores, calculateRiasecCode } from '../../lib/riasec-matcher';
 import { getCareerRecommendations, getUniversityRecommendations } from '../../lib/api';
-import RiasecRadar from './RiasecRadar';
+// Премахната визуализация на профила (RiasecRadar), както е поискано
 import { 
     BookOpen, 
     Briefcase, 
@@ -12,9 +12,14 @@ import {
     Loader2, 
     Target,
     MapPin,
-    Building2
+    Building2,
+    Heart
 } from 'lucide-react';
 
+/**
+ * Основен компонент за Кариерния съветник.
+ * Съдържа анкета от няколко стъпки и логика за изчисляване на препоръки.
+ */
 const CareerAdvisor = () => {
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -23,11 +28,12 @@ const CareerAdvisor = () => {
         grade: "",
         interests: [],
         strengths: [],
+        values: [],
         environment: "",
         style: ""
     });
 
-    const totalSteps = 5;
+    const totalSteps = 6;
 
     const handleAnswer = (field, value) => {
         setAnswers(prev => ({
@@ -66,7 +72,7 @@ const CareerAdvisor = () => {
             const scores = calculateScores(answers);
             const riasecCode = calculateRiasecCode(scores);
             
-            // Parallel fetch
+            // Паралелно извличане на данни
             const [careers, universities] = await Promise.all([
                 getCareerRecommendations(scores),
                 getUniversityRecommendations(riasecCode)
@@ -79,20 +85,21 @@ const CareerAdvisor = () => {
                 universities
             });
         } catch (error) {
-            console.error("Error calculating results:", error);
+            console.error("Грешка при изчисляване на резултатите:", error);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        if (step === 5 && !results) {
+        if (step === 6 && !results) {
             calculateResults();
         }
     }, [step]);
 
-    // --- RENDER HELPERS ---
+    // --- ПОМОЩНИ ФУНКЦИИ ЗА РЕНДЕРИРАНЕ ---
     
+    // Стъпка 1: Избор на клас
     const renderStep1 = () => (
         <div className="space-y-6 animate-in fade-in slide-in-from-right duration-500">
             <h2 className="text-2xl font-bold flex items-center gap-2">
@@ -113,6 +120,7 @@ const CareerAdvisor = () => {
         </div>
     );
 
+    // Стъпка 2: Интереси
     const renderStep2 = () => (
         <div className="space-y-6 animate-in fade-in slide-in-from-right duration-500">
             <h2 className="text-2xl font-bold flex items-center gap-2">
@@ -146,6 +154,7 @@ const CareerAdvisor = () => {
         </div>
     );
 
+    // Стъпка 3: Силни страни
     const renderStep3 = () => (
         <div className="space-y-6 animate-in fade-in slide-in-from-right duration-500">
             <h2 className="text-2xl font-bold flex items-center gap-2">
@@ -177,7 +186,41 @@ const CareerAdvisor = () => {
         </div>
     );
 
+    // Стъпка 4: Ценности (НОВО)
     const renderStep4 = () => (
+        <div className="space-y-6 animate-in fade-in slide-in-from-right duration-500">
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+                <Heart className="text-error" />
+                Какво цениш най-много?
+            </h2>
+            <p className="opacity-60">Избери какво е важно за теб в работата:</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                    { id: 'Altruism', label: 'Да помагам на другите', desc: 'Алтруизъм и обществена полза' },
+                    { id: 'Creativity_Val', label: 'Да създавам', desc: 'Творческа свобода и изява' },
+                    { id: 'Money', label: 'Високи доходи', desc: 'Финансова независимост и престиж' },
+                    { id: 'Stability', label: 'Сигурност', desc: 'Стабилна работа без рискове' },
+                    { id: 'Independence', label: 'Независимост', desc: 'Да бъда сам себе си шеф' },
+                    { id: 'Innovation', label: 'Иновации', desc: 'Работа с най-новите технологии' }
+                ].map((item) => (
+                    <div 
+                        key={item.id}
+                        onClick={() => toggleSelection('values', item.id)}
+                        className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center gap-4 hover:scale-[1.02] active:scale-[0.98] ${answers.values.includes(item.id) ? 'border-error bg-error/10' : 'border-base-200 bg-base-100'}`}
+                    >
+                        <div className={`w-4 h-4 rounded-full border-2 ${answers.values.includes(item.id) ? 'bg-error border-error' : 'border-base-300'}`}></div>
+                        <div>
+                            <div className="font-bold">{item.label}</div>
+                            <div className="text-xs opacity-60">{item.desc}</div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+
+    // Стъпка 5: Работна среда (Беше Стъпка 4)
+    const renderStep5 = () => (
         <div className="space-y-8 animate-in fade-in slide-in-from-right duration-500">
             <h2 className="text-2xl font-bold flex items-center gap-2">
                 <Briefcase className="text-warning" />
@@ -216,7 +259,8 @@ const CareerAdvisor = () => {
         </div>
     );
 
-    const renderStep5 = () => {
+    // Стъпка 6: Резултати (Беше Стъпка 5)
+    const renderStep6 = () => {
         if (loading) {
             return (
                 <div className="flex flex-col items-center justify-center py-20 space-y-6">
@@ -248,13 +292,9 @@ const CareerAdvisor = () => {
                     </p>
                 </div>
 
-                {/* Radar Chart */}
-                <div className="bg-base-100 p-6 rounded-3xl shadow-lg border border-base-200">
-                    <h3 className="text-xl font-bold mb-4 text-center">Визуализация на профила</h3>
-                    <RiasecRadar scores={results.scores} />
-                </div>
+                {/* Премахната Radar Chart секция */}
 
-                {/* Recommended Careers */}
+                {/* Препоръчани Професии */}
                 <div className="space-y-6">
                     <h3 className="text-2xl font-black flex items-center gap-3">
                         <Briefcase className="text-secondary" /> 
@@ -280,7 +320,7 @@ const CareerAdvisor = () => {
                     </div>
                 </div>
 
-                {/* Recommended Universities */}
+                {/* Препоръчани Университети */}
                 <div className="space-y-6">
                     <h3 className="text-2xl font-black flex items-center gap-3">
                         <Building2 className="text-accent" /> 
@@ -304,7 +344,7 @@ const CareerAdvisor = () => {
                                 </div>
                             </div>
                         )) : (
-                             <div className="text-center py-10 opacity-50">Няма намерени университети за този профил.</div>
+                            <div className="text-center py-10 opacity-50">Няма намерени университети за този профил.</div>
                         )}
                     </div>
                 </div>
@@ -335,8 +375,9 @@ const CareerAdvisor = () => {
                         <li className={`step ${step >= 1 ? 'step-primary' : ''}`}>Клас</li>
                         <li className={`step ${step >= 2 ? 'step-primary' : ''}`}>Интереси</li>
                         <li className={`step ${step >= 3 ? 'step-primary' : ''}`}>Умения</li>
-                        <li className={`step ${step >= 4 ? 'step-primary' : ''}`}>Предпочитания</li>
-                        <li className={`step ${step >= 5 ? 'step-primary' : ''}`}>Резултати</li>
+                        <li className={`step ${step >= 4 ? 'step-primary' : ''}`}>Ценности</li>
+                        <li className={`step ${step >= 5 ? 'step-primary' : ''}`}>Среда</li>
+                        <li className={`step ${step >= 6 ? 'step-primary' : ''}`}>Резултати</li>
                     </ul>
                 </div>
 
@@ -351,9 +392,10 @@ const CareerAdvisor = () => {
                     {step === 3 && renderStep3()}
                     {step === 4 && renderStep4()}
                     {step === 5 && renderStep5()}
+                    {step === 6 && renderStep6()}
 
                     {/* Navigation Buttons */}
-                    {step < 5 && (
+                    {step < 6 && (
                         <div className="flex justify-between mt-12 pt-6 border-t border-base-200">
                             <button 
                                 onClick={prevStep} 
@@ -368,7 +410,8 @@ const CareerAdvisor = () => {
                                     (step === 1 && !answers.grade) ||
                                     (step === 2 && answers.interests.length === 0) ||
                                     (step === 3 && answers.strengths.length === 0) ||
-                                    (step === 4 && (!answers.environment || !answers.style))
+                                    (step === 4 && answers.values.length === 0) ||
+                                    (step === 5 && (!answers.environment || !answers.style))
                                 }
                             >
                                 Напред <ChevronRight />
