@@ -78,12 +78,10 @@ export default function Home() {
                             <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center">
                                 <BrainCircuit size={24} />
                             </div>
-                            <h3 className="text-2xl font-bold">AI Съветник</h3>
-                            <p className="text-sm opacity-90">Не си сигурен какво да учиш? Попълни анкетата и нашият алгоритъм ще ти препоръча професия.</p>
+                            <h3 className="text-2xl font-bold">Кариерен Съветник</h3>
+                            <p className="text-sm opacity-90">Не си сигурен какво да учиш? Попълни анкетата и нашият алгоритъм ще ти препоръча .</p>
                         </div>
-                        <div className="absolute bottom-6 right-8">
-                            <span className="badge badge-accent badge-outline text-white border-white/40">Очаквай скоро</span>
-                        </div>
+                        
                     </div>
 
                     {/* Карта 3: Търсачка (Нова визия) */}
