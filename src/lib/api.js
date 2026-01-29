@@ -103,3 +103,19 @@ export async function getAllRiasecCodes() {
     const codes = [...new Set(data.map(item => item.riasec_code))].sort();
     return codes;
 }
+
+/**
+ * Извлича всички общежития.
+ * @returns {Promise<Array>}
+ */
+export async function getAllDormitories() {
+    const { data, error } = await supabase
+        .from('dormitories')
+        .select('*');
+
+    if (error) {
+        console.error('Грешка при извличане на общежития:', error);
+        return [];
+    }
+    return data;
+}

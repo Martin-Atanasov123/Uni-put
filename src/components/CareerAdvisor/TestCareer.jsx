@@ -47,7 +47,7 @@ const TestCareer = () => {
     };
 
     return (
-        <div className="p-10 max-w-6xl mx-auto space-y-8">
+        <div className="pt-28 p-10 max-w-6xl mx-auto space-y-8">
             <h1 className="text-3xl font-bold">RIASEC Тестова Конзола</h1>
             
             <div className="flex gap-4 items-end bg-base-200 p-6 rounded-xl">

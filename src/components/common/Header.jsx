@@ -12,7 +12,8 @@ import {
     Search,
     Moon,
     Sun,
-    Settings
+    Settings,
+    Building2
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -39,6 +40,7 @@ const Header = () => {
 
     const navLinks = [
         { name: "Университети", path: "/universities", icon: <Search size={18} /> },
+        { name: "Общежития", path: "/dormitories", icon: <Building2 size={18} /> },
         { name: "Калкулатор", path: "/calculator", icon: <Calculator size={18} /> },
         { name: "Кариерен Съветник", path: "/career-advisor", icon: <LayoutDashboard size={18} /> },
     ];

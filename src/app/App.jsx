@@ -18,6 +18,7 @@ import AdminDashboard from "../components/admin/AdminDashboard";
 
 import CareerAdvisor from "../components/CareerAdvisor/CareerAdvisor";
 import TestCareer from "../components/CareerAdvisor/TestCareer";
+import Dormitories from "../components/Dormitories/Dormitories";
 import ScrollToTop from "../components/common/ScrollToTop";
 
 function App() {
@@ -43,6 +44,10 @@ function App() {
                     <Route
                         path="/test-career"
                         element={<TestCareer />}
+                    />
+                    <Route
+                        path="/dormitories"
+                        element={<Dormitories />}
                     />
                     
                     {/* Защитени маршрути (изискват вход) */}
