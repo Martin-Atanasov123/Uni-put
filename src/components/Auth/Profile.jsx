@@ -235,7 +235,7 @@ const Profile = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-base-200 px-4 py-8 md:py-12">
+        <div className="min-h-screen bg-base-200 px-4 pt-28 pb-12">
             <div className="max-w-5xl mx-auto">
                 {/* Header with Back Button */}
                 <div className="flex items-center gap-4 mb-8">
