@@ -33,7 +33,7 @@ const Footer = () => {
                             <a href="https://github.com/Martin-Atanasov123/Uni-put" target="_blank" rel="noreferrer" className="btn btn-ghost btn-circle btn-sm hover:text-primary transition-colors">
                                 <Github size={20} />
                             </a>
-                            <a href="https://mon.bg" target="_blank" rel="noreferrer" className="btn btn-ghost btn-circle btn-sm hover:text-primary transition-colors">
+                            <a href="https://www.mon.bg/visshe-obrazovanie/" target="_blank" rel="noreferrer" className="btn btn-ghost btn-circle btn-sm hover:text-primary transition-colors">
                                 <Globe size={20} />
                             </a>
                         </div>
@@ -48,7 +48,7 @@ const Footer = () => {
                         <a href="https://www.mon.bg/novini/" target="_blank" rel="noreferrer" className="link link-hover flex items-center justify-center md:justify-start gap-2 opacity-70 hover:opacity-100 hover:text-primary font-bold text-sm">
                             <ExternalLink size={14} /> Новини от МОН
                         </a>
-                        <a href="https://web.mon.bg/bg/100561" target="_blank" rel="noreferrer" className="link link-hover flex items-center justify-center md:justify-start gap-2 opacity-70 hover:opacity-100 hover:text-primary font-bold text-sm">
+                        <a href="https://www.mon.bg/obshto-obrazovanie/darzhavni-zrelostni-izpiti-dzi/izpitni-materiali-za-dzi-po-godini/" target="_blank" rel="noreferrer" className="link link-hover flex items-center justify-center md:justify-start gap-2 opacity-70 hover:opacity-100 hover:text-primary font-bold text-sm">
                             <FileText size={14} /> Държавни изпити
                         </a>
                     </nav>
@@ -79,7 +79,7 @@ const Footer = () => {
                 {/* Копирайт лента */}
                 <div className="mt-16 pt-8 border-t border-base-content/5 flex flex-col md:flex-row justify-between items-center gap-4">
                     <p className="text-[10px] font-black opacity-40 uppercase tracking-[0.2em]">
-                        © {currentYear} УниПът Bulgaria. Всички права запазени.
+                        © {currentYear} УниПът Bulgaria. Всички права са запазени.   
                     </p>
                     
                 </div>
