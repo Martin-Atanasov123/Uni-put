@@ -248,7 +248,7 @@ export default function Home() {
                                     <div className="badge badge-success text-white border-none bg-emerald-600 text-xs font-bold mb-2">НОВО</div>
                                     <h3 className="text-2xl font-bold mb-1">Общежития</h3>
                                     <p className="text-sm opacity-80">
-                                        Виртуална разходка, цени и условия.
+                                        Информация за цени ,условия и още.
                                     </p>
                                 </div>
                             </div>

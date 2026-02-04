@@ -50,12 +50,12 @@ const AdminDashboard = () => {
                 <form onSubmit={handleSave} className="bg-base-200 p-8 md:p-12 rounded-[3.5rem] shadow-2xl border border-white/5 space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {[
-                            { id: 'specialty', label: 'Специалност', placeholder: 'Софтуерно инженерство' },
+                            { id: 'city', label: 'Град на Университета', placeholder: 'София' },
                             { id: 'university_name', label: 'Университет', placeholder: 'Софийски университет' },
-                            { id: 'city', label: 'Град', placeholder: 'София' },
                             { id: 'faculty', label: 'Факултет', placeholder: 'ФМИ' },
-                            { id: 'min_ball_2024', label: 'Мин. Бал 2024', placeholder: '24.00', type: 'number' },
-                            { id: 'formula_description', label: 'Формула (Текст)', placeholder: '3*Изпит + Диплома' }
+                            { id: 'specialty', label: 'Специалност', placeholder: 'Софтуерно инженерство' },
+                            { id: 'formula_description', label: 'Формула (Текст)', placeholder: '3*Изпит + Диплома' },
+                            { id: 'min_ball_2024', label: 'Мин. Бал', placeholder: '24.00', type: 'number' }
                         ].map(field => (
                             <div key={field.id} className="form-control w-full">
                                 <label className="label font-black text-[11px] uppercase tracking-widest opacity-40">{field.label}</label>
@@ -73,11 +73,12 @@ const AdminDashboard = () => {
                     </div>
 
                     <div className="form-control w-full">
-                        <label className="label font-black text-[11px] uppercase tracking-widest opacity-40 italic text-primary">Коефициенти (JSON - Мозъкът на калкулатора)</label>
+                        <label className="label font-black text-[11px] uppercase tracking-widest opacity-60 italic text-primary">Коефициенти (JSON - формат)</label>
                         <textarea 
                             required 
                             className="textarea bg-base-100 border-none rounded-3xl font-mono text-sm h-32 p-6 focus:ring-2 ring-primary/20"
-                            placeholder='{"exam_mat": 3, "mat": 1}'
+                            placeholder='{"exam_mat": 3, "mat": 1, "exam_diploma": 2, "diploma": 1
+                            }'
                             value={formData.coefficients} 
                             onChange={e => setFormData({...formData, coefficients: e.target.value})} 
                         />
@@ -85,7 +86,7 @@ const AdminDashboard = () => {
 
                     <button type="submit" className="btn btn-primary w-full h-20 rounded-[2.5rem] font-black italic text-xl shadow-2xl shadow-primary/30 group transition-all">
                         <PlusCircle className="group-hover:rotate-90 transition-transform" /> 
-                        Впиши Нови Данни
+                        Вмъкни Нови Данни
                     </button>
 
                     {status.msg && (
