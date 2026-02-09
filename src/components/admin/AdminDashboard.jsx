@@ -18,7 +18,7 @@ const AdminDashboard = () => {
             const parsedCoefficients = JSON.parse(formData.coefficients);
             
             const { error } = await supabase
-                .from('university_admissions')
+                .from('universities')
                 .insert([{ 
                     ...formData, 
                     min_ball_2024: parseFloat(formData.min_ball_2024),
