@@ -2,61 +2,63 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
 import { 
     Calculator, 
-    GraduationCap, 
-    CheckCircle2, 
-    LayoutDashboard,
-    Zap,
+    Zap, 
+    TrendingUp, 
+    TrendingDown,
+    ArrowRight,
+    Info,
+    CheckCircle2,
     History,
     ArrowDownUp,
-    Info,
-    AlertTriangle,
     XCircle,
-    TrendingDown
+    Search,
+    ChevronDown
 } from "lucide-react";
-
-const FIELD_LABELS = {
-    dzi_mat: "ДЗИ Математика",
-    dzi_inf: "ДЗИ Информатика",
-    dzi_it: "ДЗИ ИТ",
-    exam_mat: "Изпит Математика",
-    mat: "Диплома: Математика",
-    dzi_bio: "ДЗИ Биология",
-
-    exam_bio: "Изпит Биология",
-    bio: "Диплома: Биология",
-    dzi_him: "ДЗИ Химия",
-    exam_him: "Изпит Химия",
-    himija: "Диплома: Химия",
-    tournament: "Турнир/Олимпиада",
-    dzi1_bio: "ДЗИ Биология (Профил)",
-    dzi2_bio: "ДЗИ Биология (Обща)",
-    fizika: "Диплома: Физика",
-    geografija: "Диплома: География",
-    him: "Диплома: Химия",
-    bel: "Диплома: БЕЛ"
-};
-
-const SLOT_GROUPS = {
-    exam_bio: ["exam_bio", "dzi_bio", "dzi1_bio", "dzi2_bio"],
-    exam_mat: ["exam_mat", "dzi_mat", "dzi_inf", "dzi_it", "tournament"],
-    exam_him: ["exam_him", "dzi_him"],
-    informatika: ["informatika", "informacionni", "dzi_inf", "dzi_it", "prof_exam_inf"]
-};
+import GradeInputSection from "./GradeInputSection";
+import { FIELD_LABELS, SLOT_GROUPS } from "../../lib/coefficients_config";
 
 const CalculatorPage = () => {
     const [, setLoading] = useState(false);
     const [allData, setAllData] = useState([]); 
     const [faculties, setFaculties] = useState([]); 
     const [selectedFaculty, setSelectedFaculty] = useState("");
+    
+    // Filters
+    const [selectedCity, setSelectedCity] = useState("");
+    const [selectedUniversity, setSelectedUniversity] = useState("");
+    
+    // Searchable Faculty State
+    const [facultySearch, setFacultySearch] = useState("");
+    const [isFacultyDropdownOpen, setIsFacultyDropdownOpen] = useState(false);
+
     const [selectedSpecialtyName, setSelectedSpecialtyName] = useState("");
     const [currentSpecialtyObj, setCurrentSpecialtyObj] = useState(null);
     const [grades, setGrades] = useState({}); 
     const [errors, setErrors] = useState({});
 
+    // Derived unique values for filters
+    const cities = [...new Set(allData.map(d => d.city).filter(Boolean))].sort();
+    const universities = [...new Set(allData.map(d => d.university_name).filter(Boolean))].sort();
+
+    // Filtered faculties for search
+    const filteredFaculties = faculties.filter(f => 
+        !facultySearch || f.toLowerCase().includes(facultySearch.toLowerCase())
+    );
+
+    // Filtered data based on City and University
+    const filteredData = allData.filter(d => {
+        const matchCity = !selectedCity || d.city === selectedCity;
+        const matchUni = !selectedUniversity || d.university_name === selectedUniversity;
+        return matchCity && matchUni;
+    });
+
+    // Specialties based on filtered data
+    const availableSpecialties = [...new Set(filteredData.map(d => d.specialty))].sort();
+
     useEffect(() => {
         const fetchFaculties = async () => {
             setLoading(true);
-            const { data, error } = await supabase.from('university_admissions').select('faculty');
+            const { data, error } = await supabase.from('universities').select('faculty');
             if (!error && data) setFaculties([...new Set(data.map(item => item.faculty).filter(Boolean))]);
             setLoading(false);
         };
@@ -67,7 +69,7 @@ const CalculatorPage = () => {
         if (!selectedFaculty) return;
         const fetchData = async () => {
             setLoading(true);
-            const { data, error } = await supabase.from('university_admissions').select('*').eq('faculty', selectedFaculty);
+            const { data, error } = await supabase.from('universities').select('*').eq('faculty', selectedFaculty);
             if (!error && data) setAllData(data);
             setLoading(false);
         };
@@ -75,20 +77,34 @@ const CalculatorPage = () => {
     }, [selectedFaculty]);
 
     useEffect(() => {
-        const match = allData.find(item => item.specialty === selectedSpecialtyName);
+        const match = filteredData.find(item => item.specialty === selectedSpecialtyName);
+        // If the selected specialty is no longer available in the filtered set, match might be undefined.
+        // But we want to calculate scores for ALL universities matching the filters + specialty.
+        // currentSpecialtyObj is mostly used for the INPUT FIELDS configuration (coefficients).
+        // Since coefficients are usually per specialty (or even per university), this is tricky.
+        // If we have multiple universities for the same specialty, they might have DIFFERENT coefficients?
+        // Usually, the coefficients depend on the specialty, but different unis might have slightly different formulas.
+        // However, the input fields should be the UNION of all required fields or just the fields for the first match?
+        // Let's assume for now we take the first match to determine INPUTS.
         setCurrentSpecialtyObj(match || null);
-    }, [selectedSpecialtyName, allData]);
+    }, [selectedSpecialtyName, filteredData]);
 
-    const handleGradeChange = (key, value) => {
-        const num = parseFloat(value);
-        let errorMsg = null;
-        if (value && (num < 2 || num > 6)) errorMsg = "Невалидна оценка (2-6)";
-        setErrors(prev => ({ ...prev, [key]: errorMsg }));
-        setGrades(prev => ({ ...prev, [key]: value }));
+    const handleGradesChange = (newGrades, valid) => {
+        setGrades(newGrades);
+        // We can use 'valid' to block submission or show global error if needed
     };
 
     const getBestGradeForSlot = (mainKey) => {
-        const group = SLOT_GROUPS[mainKey] || [mainKey];
+        // Find which group this key belongs to
+        let groupName = mainKey;
+        for (const [master, members] of Object.entries(SLOT_GROUPS)) {
+            if (members.includes(mainKey)) {
+                groupName = master;
+                break;
+            }
+        }
+
+        const group = SLOT_GROUPS[groupName] || [mainKey];
         let bestKey = mainKey;
         let maxVal = -1;
 
@@ -114,11 +130,13 @@ const CalculatorPage = () => {
         if (!coefficients) return 0;
         let total = 0;
         const processedGroups = new Set();
+        
         Object.keys(coefficients).forEach(key => {
             let groupId = key;
             for (const [master, members] of Object.entries(SLOT_GROUPS)) {
                 if (members.includes(key)) { groupId = master; break; }
             }
+            
             if (!processedGroups.has(groupId)) {
                 const { value } = getBestGradeForSlot(groupId);
                 total += value * (coefficients[key] || 0);
@@ -127,27 +145,6 @@ const CalculatorPage = () => {
         });
         return total.toFixed(2);
     };
-
-    const getOrderedSlots = (coefficients) => {
-        if (!coefficients) return [];
-        const examSlots = [], diplomaSlots = [], seenGroups = new Set();
-        Object.keys(coefficients).forEach(key => {
-            let groupId = key;
-            let isDiploma = !key.startsWith('exam_') && !key.startsWith('dzi_') && key !== 'tournament';
-            for (const [master, members] of Object.entries(SLOT_GROUPS)) {
-                if (members.includes(key)) { groupId = master; isDiploma = false; break; }
-            }
-            if (!seenGroups.has(groupId)) {
-                const slotData = { masterKey: groupId, originalKey: key };
-                if (isDiploma) diplomaSlots.push(slotData);
-                else examSlots.push(slotData);
-                seenGroups.add(groupId);
-            }
-        });
-        return [...examSlots, ...diplomaSlots];
-    };
-
-    const visibleSlots = getOrderedSlots(currentSpecialtyObj?.coefficients);
 
     return (
         <div className="min-h-screen bg-base-100 pt-24 pb-12 px-6">
@@ -162,63 +159,116 @@ const CalculatorPage = () => {
                 </div>
 
                 {/* --- ИЗБИРАТЕЛИ --- */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-base-200 p-3 rounded-[2.5rem] shadow-inner">
-                    <select className="select select-bordered bg-base-100 border-none rounded-2xl text-lg h-14 font-bold px-6" value={selectedFaculty} onChange={(e) => {setSelectedFaculty(e.target.value); setSelectedSpecialtyName("");}}>
-                        <option value="">Избери факултет...</option>
-                        {faculties.map((f, i) => <option key={i} value={f}>{f}</option>)}
-                    </select>
-                    <select className="select select-bordered bg-base-100 border-none rounded-2xl text-lg h-14 font-bold px-6" value={selectedSpecialtyName} onChange={(e) => setSelectedSpecialtyName(e.target.value)} disabled={!selectedFaculty}>
-                        <option value="">Избери специалност...</option>
-                        {[...new Set(allData.map(d => d.specialty))].map((s, i) => <option key={i} value={s}>{s}</option>)}
-                    </select>
+                <div className="bg-base-200 p-6 rounded-[2.5rem] shadow-inner space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Faculty (Mandatory) - Searchable */}
+                        <div className="relative">
+                            <div className="relative">
+                                <input 
+                                    type="text" 
+                                    className="input input-bordered bg-base-100 border-none rounded-2xl text-lg h-14 font-bold px-6 w-full pr-12 focus:outline-none focus:ring-2 focus:ring-primary/50" 
+                                    placeholder="Търси факултет..."
+                                    value={facultySearch} 
+                                    onChange={(e) => {
+                                        setFacultySearch(e.target.value);
+                                        if (selectedFaculty !== e.target.value) {
+                                            setSelectedFaculty(""); // Clear actual selection if typing changes
+                                            setSelectedSpecialtyName("");
+                                            setSelectedCity("");
+                                            setSelectedUniversity("");
+                                        }
+                                        setIsFacultyDropdownOpen(true);
+                                    }}
+                                    onClick={() => setIsFacultyDropdownOpen(true)}
+                                />
+                                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 opacity-50 pointer-events-none">
+                                    <ChevronDown className={`transition-transform duration-300 ${isFacultyDropdownOpen ? 'rotate-180' : ''}`} size={20} />
+                                </div>
+                            </div>
+
+                            {isFacultyDropdownOpen && (
+                                <>
+                                    <div className="fixed inset-0 z-10 cursor-default" onClick={() => setIsFacultyDropdownOpen(false)}></div>
+                                    <div className="absolute top-full left-0 right-0 mt-2 bg-base-100 rounded-2xl shadow-xl border border-base-200 max-h-60 overflow-y-auto z-20 animate-in fade-in zoom-in-95 duration-200">
+                                        {filteredFaculties.length > 0 ? (
+                                            filteredFaculties.map((f, i) => (
+                                                <button
+                                                    key={i}
+                                                    className="w-full text-left px-6 py-3 hover:bg-base-200 font-bold border-b border-base-200 last:border-none transition-colors"
+                                                    onClick={() => {
+                                                        setSelectedFaculty(f);
+                                                        setFacultySearch(f);
+                                                        setSelectedSpecialtyName("");
+                                                        setSelectedCity("");
+                                                        setSelectedUniversity("");
+                                                        setIsFacultyDropdownOpen(false);
+                                                    }}
+                                                >
+                                                    {f}
+                                                </button>
+                                            ))
+                                        ) : (
+                                            <div className="p-4 text-center opacity-50 font-bold italic">Няма намерени резултати</div>
+                                        )}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
+                        {/* Specialty (Mandatory) */}
+                        <select 
+                            className="select select-bordered bg-base-100 border-none rounded-2xl text-lg h-14 font-bold px-6 w-full" 
+                            value={selectedSpecialtyName} 
+                            onChange={(e) => setSelectedSpecialtyName(e.target.value)} 
+                            disabled={!selectedFaculty}
+                        >
+                            <option value="">Избери специалност (Задължително)</option>
+                            {availableSpecialties.map((s, i) => <option key={i} value={s}>{s}</option>)}
+                        </select>
+                    </div>
+
+                    {/* Optional Filters */}
+                    {selectedFaculty && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-base-content/5 animate-in slide-in-from-top-2">
+                            <select 
+                                className="select select-sm select-ghost w-full font-bold opacity-70" 
+                                value={selectedCity} 
+                                onChange={(e) => {
+                                    setSelectedCity(e.target.value);
+                                    if (selectedSpecialtyName && !filteredData.find(d => d.specialty === selectedSpecialtyName && (!e.target.value || d.city === e.target.value))) {
+                                        setSelectedSpecialtyName(""); // Reset specialty if current selection invalid under new filter
+                                    }
+                                }}
+                            >
+                                <option value="">Всички градове (Опционално)</option>
+                                {cities.map((c, i) => <option key={i} value={c}>{c}</option>)}
+                            </select>
+
+                            <select 
+                                className="select select-sm select-ghost w-full font-bold opacity-70" 
+                                value={selectedUniversity} 
+                                onChange={(e) => {
+                                    setSelectedUniversity(e.target.value);
+                                    if (selectedSpecialtyName && !filteredData.find(d => d.specialty === selectedSpecialtyName && (!e.target.value || d.university_name === e.target.value))) {
+                                        setSelectedSpecialtyName("");
+                                    }
+                                }}
+                            >
+                                <option value="">Всички университети (Опционално)</option>
+                                {universities.map((u, i) => <option key={i} value={u}>{u}</option>)}
+                            </select>
+                        </div>
+                    )}
                 </div>
 
                 {/* --- ВХОДНИ ПОЛЕТА --- */}
-                {selectedSpecialtyName && currentSpecialtyObj && (
-                    <div className="bg-base-100 shadow-2xl p-8 border border-base-200 rounded-[3rem] animate-in fade-in slide-in-from-top-4 duration-500">
-                        <div className="flex justify-between items-center mb-10">
-                            <h2 className="text-2xl font-black flex items-center gap-3 italic">
-                                <Zap className="text-yellow-500" fill="currentColor" size={28} /> Входни данни
-                            </h2>
-                        </div>
+                <div className="bg-base-100 shadow-2xl p-8 border border-base-200 rounded-[3rem] animate-in fade-in slide-in-from-top-4 duration-500">
+                    <GradeInputSection onGradesChange={handleGradesChange} />
+                </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {visibleSlots.map(slot => {
-                                const { key: activeKey, others } = getBestGradeForSlot(slot.masterKey);
-                                const groupMembers = SLOT_GROUPS[slot.masterKey] || [slot.masterKey];
-                                const isDiploma = !activeKey.startsWith('exam_') && !activeKey.startsWith('dzi_');
-                                const hasError = !!errors[activeKey];
-
-                                return (
-                                    <div key={slot.masterKey} className={`group p-8 rounded-[2.5rem] border-2 transition-all shadow-sm relative ${hasError ? 'border-error bg-error/5' : isDiploma ? 'bg-base-300 border-transparent opacity-90' : 'bg-base-200 border-primary/10 hover:border-primary/40'}`}>
-                                        <div className="flex justify-between items-start mb-6">
-                                            <div className="flex flex-col flex-1">
-                                                <span className={`text-[10px] font-black uppercase tracking-widest mb-1 ${hasError ? 'text-error' : 'opacity-40'}`}>
-                                                    {isDiploma ? "Оценка Диплома" : "Изпит / ДЗИ"}
-                                                </span>
-                                                <select className="select select-ghost select-xs font-black text-primary p-0 h-auto min-h-0 focus:bg-transparent text-sm" value={activeKey} onChange={(e) => handleGradeChange(e.target.value, grades[e.target.value] || "")}>
-                                                    {groupMembers.map(m => <option key={m} value={m}>{FIELD_LABELS[m] || m}</option>)}
-                                                </select>
-                                            </div>
-                                            {hasError ? <XCircle className="text-error" size={18} /> : !isDiploma && <ArrowDownUp size={16} className="text-primary opacity-40" />}
-                                        </div>
-                                        <input type="number" step="0.01" placeholder="6.00" className={`bg-transparent text-5xl font-black w-full outline-none ${hasError ? 'text-error' : 'text-base-content'}`} value={grades[activeKey] || ""} onChange={(e) => handleGradeChange(activeKey, e.target.value)} />
-                                        {hasError && <p className="text-[10px] text-error font-black mt-2 uppercase italic">{errors[activeKey]}</p>}
-                                        {others.length > 0 && !hasError && (
-                                            <div className="mt-6 pt-4 border-t border-base-300 flex items-center gap-2 text-[10px] font-bold opacity-60 italic">
-                                                <History size={12} /> Други: {others.map(k => `${grades[k]}`).join(", ")}
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                )}
-
-                {/* --- РЕЗУЛТАТИ (Подобрена логика) --- */}
+                {/* --- РЕЗУЛТАТИ --- */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {allData.filter(d => d.specialty === selectedSpecialtyName).map(item => {
+                    {filteredData.filter(d => d.specialty === selectedSpecialtyName).map(item => {
                         const score = calculateScore(item.coefficients);
                         const diff = (item.min_ball_2024 - score).toFixed(2);
                         const isPassing = score >= item.min_ball_2024;
@@ -267,3 +317,5 @@ const CalculatorPage = () => {
 };
 
 export default CalculatorPage;
+
+
