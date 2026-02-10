@@ -32,9 +32,7 @@ const CalculatorPage = () => {
     const [isFacultyDropdownOpen, setIsFacultyDropdownOpen] = useState(false);
 
     const [selectedSpecialtyName, setSelectedSpecialtyName] = useState("");
-    const [currentSpecialtyObj, setCurrentSpecialtyObj] = useState(null);
-    const [grades, setGrades] = useState({}); 
-    const [errors, setErrors] = useState({});
+    const [grades, setGrades] = useState({});
 
     // Derived unique values for filters
     const cities = [...new Set(allData.map(d => d.city).filter(Boolean))].sort();
@@ -76,20 +74,7 @@ const CalculatorPage = () => {
         fetchData();
     }, [selectedFaculty]);
 
-    useEffect(() => {
-        const match = filteredData.find(item => item.specialty === selectedSpecialtyName);
-        // If the selected specialty is no longer available in the filtered set, match might be undefined.
-        // But we want to calculate scores for ALL universities matching the filters + specialty.
-        // currentSpecialtyObj is mostly used for the INPUT FIELDS configuration (coefficients).
-        // Since coefficients are usually per specialty (or even per university), this is tricky.
-        // If we have multiple universities for the same specialty, they might have DIFFERENT coefficients?
-        // Usually, the coefficients depend on the specialty, but different unis might have slightly different formulas.
-        // However, the input fields should be the UNION of all required fields or just the fields for the first match?
-        // Let's assume for now we take the first match to determine INPUTS.
-        setCurrentSpecialtyObj(match || null);
-    }, [selectedSpecialtyName, filteredData]);
-
-    const handleGradesChange = (newGrades, valid) => {
+    const handleGradesChange = (newGrades) => {
         setGrades(newGrades);
         // We can use 'valid' to block submission or show global error if needed
     };
