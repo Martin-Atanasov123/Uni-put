@@ -56,7 +56,7 @@ const CalculatorPage = () => {
     useEffect(() => {
         const fetchFaculties = async () => {
             setLoading(true);
-            const { data, error } = await supabase.from('universities').select('faculty');
+            const { data, error } = await supabase.from('universities_duplicate').select('faculty');
             if (!error && data) setFaculties([...new Set(data.map(item => item.faculty).filter(Boolean))]);
             setLoading(false);
         };
@@ -67,7 +67,7 @@ const CalculatorPage = () => {
         if (!selectedFaculty) return;
         const fetchData = async () => {
             setLoading(true);
-            const { data, error } = await supabase.from('universities').select('*').eq('faculty', selectedFaculty);
+            const { data, error } = await supabase.from('universities_duplicate').select('*').eq('faculty', selectedFaculty);
             if (!error && data) setAllData(data);
             setLoading(false);
         };

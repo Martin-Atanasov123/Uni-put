@@ -37,7 +37,7 @@ export async function getUniversitiesByRiasec(riasecCode) {
     const firstLetter = riasecCode.charAt(0);
 
     const { data, error } = await supabase
-        .from('university_admissions')
+        .from('universities_duplicate')
         .select('*')
         .ilike('riasec_code', `${firstLetter}%`);
 
