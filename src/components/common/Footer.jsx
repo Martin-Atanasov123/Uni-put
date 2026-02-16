@@ -53,15 +53,14 @@ const Footer = () => {
                         </a>
                     </nav>
 
-                    {/* Секция Проектът */}
                     <nav className="flex flex-col gap-3">
                         <h6 className="footer-title opacity-100 font-black text-secondary tracking-widest text-[10px] mb-2 uppercase">Проектът</h6>
-                        <a className="link link-hover flex items-center justify-center md:justify-start gap-2 opacity-70 hover:opacity-100 font-bold text-sm italic">
+                        <a href="/about" className="link link-hover flex items-center justify-center md:justify-start gap-2 opacity-70 hover:opacity-100 font-bold text-sm italic">
                             <Info size={14} /> За нас
                         </a>
-                        <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noreferrer" className="link link-hover flex items-center justify-center md:justify-start gap-2 opacity-70 hover:opacity-100 font-bold text-sm">
-                            <ShieldCheck size={14} /> MIT Лиценз
-                        </a>
+                        <span className="link link-hover flex items-center justify-center md:justify-start gap-2 opacity-70 hover:opacity-100 font-bold text-sm">
+                            <ShieldCheck size={14} /> Лиценз на проекта – всеки проект се предоставя с лиценз в съответствие с изискванията на общото право на обществено ползване ГНУ (GNU General Public License version 3)
+                        </span>
                         <span className="badge badge-primary badge-outline font-black text-[10px] mt-2 italic mx-auto md:mx-0">НОИТ 2026</span>
                     </nav>
 
