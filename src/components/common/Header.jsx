@@ -13,7 +13,8 @@ import {
     Moon,
     Sun,
     Settings,
-    Building2
+    Building2,
+    Info
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -43,6 +44,7 @@ const Header = () => {
         { name: "Общежития", path: "/dormitories", icon: <Building2 size={18} /> },
         { name: "Калкулатор", path: "/calculator", icon: <Calculator size={18} /> },
         { name: "Кариерен Съветник", path: "/career-advisor", icon: <LayoutDashboard size={18} /> },
+        { name: "За нас", path: "/about", icon: <Info size={18} /> },
     ];
 
     const isActive = (path) => location.pathname === path;

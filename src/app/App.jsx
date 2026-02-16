@@ -20,6 +20,7 @@ import CareerAdvisor from "../components/CareerAdvisor/CareerAdvisor";
 import TestCareer from "../components/CareerAdvisor/TestCareer";
 import Dormitories from "../components/Dormitories/Dormitories";
 import ScrollToTop from "../components/common/ScrollToTop";
+import About from "../components/common/About";
 
 function App() {
     return (
@@ -33,6 +34,7 @@ function App() {
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route path="/about" element={<About />} />
                     <Route
                         path="/universities"
                         element={<UniversitiesPage />}
