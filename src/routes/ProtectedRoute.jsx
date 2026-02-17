@@ -1,10 +1,12 @@
+// Пази маршрути, които имат смисъл само за логнати потребители
+// (например калкулатора и профила). Предпоставка за коректна бизнес логика.
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const ProtectedRoute = ({ children }) => {
     const { user, loading } = useAuth();
 
-    // Докато проверяваме, не правим нищо (или показваме Spinner)
+    // Докато не знаем дали има сесия, избягваме мигане на екрана и грешни пренасочвания.
     if (loading)
         return (
             <div className="min-h-screen flex items-center justify-center">

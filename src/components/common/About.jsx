@@ -1,6 +1,9 @@
+// Страница „За нас“ – представяне на проекта и екипа с семантичен HTML и достъпност (WCAG).
+// Съдържа две основни секции за създателите, технически умения, опит и контакти.
 import { Mail, Github, Code2, Briefcase } from "lucide-react";
 
 const About = () => {
+    // Основен семантичен контейнер (main) с заглавие и две авторски секции.
     return (
         <main
             className="min-h-screen bg-base-100 pt-28 pb-16 px-4"

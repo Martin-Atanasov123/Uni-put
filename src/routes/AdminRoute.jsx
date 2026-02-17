@@ -1,3 +1,5 @@
+// Ограничение на админ панела – гарантира, че само потребители с роля "admin"
+// имат достъп до критичните CRUD операции и административни функции.
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 

@@ -1,15 +1,16 @@
+// Секция за въвеждане на оценки – управлява задължителни и динамични предмети,
+// валидация и съобщава към родителя дали входът е валиден (важно за калкулатора).
 import { useState, useEffect } from "react";
 import { Plus, X, AlertCircle, CheckCircle2 } from "lucide-react";
 import { FIELD_LABELS } from "../../lib/coefficients_config";
 
-// Mandatory fields config
+// Задължителни полета – без тях изчисленията за бал са безсмислени.
 const MANDATORY_FIELDS = [
     { key: "dzi_bel", label: FIELD_LABELS["dzi_bel"] || "ДЗИ БЕЛ", step: 0.01 },
     { key: "diploma", label: FIELD_LABELS["diploma"] || "Среден успех от дипломата", step: 0.01 }
 ];
 
-// Available subjects for dynamic addition
-// Filtering common subjects from the large config to avoid clutter
+// Разрешени допълнителни предмети – ограничен списък, за да не претоварваме UI.
 const AVAILABLE_SUBJECT_KEYS = [
     "dzi_mat", "dzi_bio", "dzi_him", "dzi_fiz", 
     "dzi_ist", "dzi_geo", "dzi_fil", "dzi_angliiski",
@@ -22,7 +23,7 @@ const AVAILABLE_SUBJECTS = AVAILABLE_SUBJECT_KEYS.map(key => ({
 })).filter(s => s.label);
 
 const GradeInputSection = ({ onGradesChange }) => {
-    // Initialize with mandatory fields
+    // Държим динамични предмети и стойности отделно, за да могат да се добавят/махат без загуба на контекст.
     const [dynamicFields, setDynamicFields] = useState([]);
     const [values, setValues] = useState({
         dzi_bel: "",
@@ -31,7 +32,8 @@ const GradeInputSection = ({ onGradesChange }) => {
     const [isAdding, setIsAdding] = useState(false);
     const [touched, setTouched] = useState({});
 
-    // Notify parent whenever values change
+    // При всяка промяна преизчисляваме валидност и уведомяваме родителя –
+    // така логиката за пресмятане на бал е централизирана извън UI слоя.
     useEffect(() => {
         const isValid = validateAll();
         onGradesChange(values, isValid);

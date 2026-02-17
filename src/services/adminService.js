@@ -1,0 +1,182 @@
+// Сервизен модул за административни операции върху базата данни (CRUD + кеш/експорт).
+// Цел: Осигурява унифициран достъп до таблиците чрез Supabase, с клиентско кеширане,
+// филтриране, странициране и експорт. Подходящ за използване от админ панела.
+//
+// Основни функции:
+// - list(table, options): Чете всички записи, прилага текстов филтър и странициране.
+// - create(table, payload): Създава нов запис и инвалидира кеша.
+// - update(table, idField, id, payload): Обновява запис по идентификатор и инвалидира кеша.
+// - removeMany(table, idField, ids): Масово изтриване на записи по списък от идентификатори.
+// - exportAll(table): Връща всички записи за експорт (CSV/JSON).
+//
+// Вход/Изход:
+// - table: низ с име на таблица в Supabase.
+// - options: { useCache?: boolean, page?: number, filters?: { query?: string } }
+// - payload: обект със стойности за insert/update.
+// - idField / id / ids: поле за идентификатор, стойност на идентификатор, списък от идентификатори.
+//
+// Edge случаи и бележки:
+// - Ако Supabase върне грешка, тя се хвърля (throw), за да може UI да визуализира статуса.
+// - Кешът се държи в localStorage; при обновяване/изтриване се инвалидира за съответната таблица.
+// - Филтърът е прост, пълнотекстов (join на всички стойности), който е достатъчен за малък обем данни.
+import { supabase } from "../lib/supabase";
+
+const CACHE_KEY = "admin_cache_v1";
+const PAGE_SIZE = 10;
+
+// Прочитане на кеш обекта от localStorage.
+// Връща: {} ако няма валиден кеш.
+const getCache = () => {
+  try {
+    const raw = window.localStorage.getItem(CACHE_KEY);
+    if (!raw) return {};
+    return JSON.parse(raw);
+  } catch {
+    return {};
+  }
+};
+
+const setCache = (cache) => {
+  try {
+    window.localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+  } catch {
+    return;
+  }
+};
+
+// Инвалидиране на кеша за конкретна таблица.
+const invalidateTableCache = (table) => {
+  const cache = getCache();
+  delete cache[table];
+  setCache(cache);
+};
+
+// Четене на записите от кеш за конкретна таблица.
+const readFromCache = (table) => {
+  const cache = getCache();
+  return cache[table] || null;
+};
+
+// Записване на резултатите в кеш за конкретна таблица.
+const writeToCache = (table, rows) => {
+  const cache = getCache();
+  cache[table] = {
+    timestamp: Date.now(),
+    data: rows
+  };
+  setCache(cache);
+};
+
+// Прилагане на текстови филтри върху резултатите.
+// filters.query: прост пълнотекстов филтър върху всички стойности.
+const applyFilters = (rows, filters) => {
+  if (!filters) return rows;
+  const { query } = filters;
+  if (!query) return rows;
+  const lower = query.toLowerCase();
+  return rows.filter((row) =>
+    Object.values(row)
+      .join(" ")
+      .toLowerCase()
+      .includes(lower)
+  );
+};
+
+const paginate = (rows, page) => {
+  const start = page * PAGE_SIZE;
+  const end = start + PAGE_SIZE;
+  return {
+    page,
+    pageSize: PAGE_SIZE,
+    total: rows.length,
+    pages: Math.ceil(rows.length / PAGE_SIZE),
+    items: rows.slice(start, end)
+  };
+};
+
+export const adminService = {
+  /**
+   * Списък записи със странициране и филтри
+   * @param {string} table - Таблица в Supabase
+   * @param {{ useCache?: boolean, page?: number, filters?: { query?: string } }} options
+   * @returns {{ page: number, pageSize: number, total: number, pages: number, items: any[] }}
+   */
+  async list(table, options = {}) {
+    const { useCache = true, page = 0, filters } = options;
+    let rows = [];
+
+    if (useCache) {
+      const cached = readFromCache(table);
+      if (cached) {
+        rows = cached.data;
+      }
+    }
+
+    if (!rows.length) {
+      const { data, error } = await supabase.from(table).select("*");
+      if (error) {
+        throw error;
+      }
+      rows = data || [];
+      writeToCache(table, rows);
+    }
+
+    const filtered = applyFilters(rows, filters);
+    return paginate(filtered, page);
+  },
+
+  /**
+   * Създаване на нов запис
+   * @param {string} table - Таблица в Supabase
+   * @param {object} payload - Данни за вмъкване
+   * @returns {object|null} - Създаденият запис (ако Supabase го върне), иначе null
+   */
+  async create(table, payload) {
+    const { data, error } = await supabase.from(table).insert([payload]).select();
+    if (error) throw error;
+    invalidateTableCache(table);
+    return data && data[0] ? data[0] : null;
+  },
+
+  /**
+   * Обновяване на запис по идентификатор
+   * @param {string} table - Таблица в Supabase
+   * @param {string} idField - Име на идентификаторното поле
+   * @param {string|number} id - Стойност на идентификатора
+   * @param {object} payload - Данни за обновяване
+   * @returns {object|null} - Обновеният запис (ако Supabase го върне), иначе null
+   */
+  async update(table, idField, id, payload) {
+    const { data, error } = await supabase
+      .from(table)
+      .update(payload)
+      .eq(idField, id)
+      .select();
+    if (error) throw error;
+    invalidateTableCache(table);
+    return data && data[0] ? data[0] : null;
+  },
+
+  /**
+   * Масово изтриване на записи
+   * @param {string} table - Таблица в Supabase
+   * @param {string} idField - Име на идентификаторното поле
+   * @param {Array<string|number>} ids - Списък от идентификатори
+   */
+  async removeMany(table, idField, ids) {
+    const { error } = await supabase.from(table).delete().in(idField, ids);
+    if (error) throw error;
+    invalidateTableCache(table);
+  },
+
+  /**
+   * Експорт на всички записи (за CSV/JSON/backup)
+   * @param {string} table - Таблица в Supabase
+   * @returns {Array<object>} - Списък от всички записи
+   */
+  async exportAll(table) {
+    const { data, error } = await supabase.from(table).select("*");
+    if (error) throw error;
+    return data || [];
+  }
+};

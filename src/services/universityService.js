@@ -1,20 +1,26 @@
+// Сервизен модул за работа с данни за университети и специалности.
+// Цел: Осигурява клиентско кеширане, филтриране и удобни абстракции за четене на данни от Supabase.
+// Подходящ за публичните секции (търсене, списъци, градове) и симулира сложни API заявки от бекенд.
 import { supabase } from '../lib/supabase';
 
 const CACHE_KEY = 'universities_cache';
 const CACHE_DURATION = 1000 * 60 * 60; // 1 hour
 
-/**
- * Service for handling university data operations with caching and filtering.
- * Simulates a robust backend API service.
- */
 export const universityService = {
     
     /**
-     * Search for universities with filters.
-     * @param {Object} params - Search parameters
-     * @param {string} params.query - Search text (name or specialty)
-     * @param {string} params.city - City filter
-     * @returns {Promise<Array>} - List of matching universities
+     * Търсене на университети със филтри
+     * @param {{ query?: string, city?: string }} params - Параметри за търсене
+     * @returns {Promise<Array<object>>} - Списък от съвпадащи записи
+     * 
+     * Логика:
+     * 1) Проверява кеш (localStorage) и използва данните, ако са валидни.
+     * 2) Ако няма валидни данни в кеша, чете от Supabase таблицата `university_admissions`.
+     * 3) Прилага клиентски филтър: по текст (университет/специалност) и по град.
+     * 
+     * Edge случаи:
+     * - При грешка от Supabase връща празен списък и логва грешката.
+     * - Филтрирането е case-insensitive; ако city е „Всички“, град не се ограничава.
      */
     async searchUniversities({ query = '', city = 'Всички' }) {
         try {
@@ -25,7 +31,7 @@ export const universityService = {
             // 2. Fetch if not cached or expired
             if (!data) {
                 const { data: fetchedData, error } = await supabase
-                    .from('university_admissions')
+                    .from('universities_duplicate')
                     .select('*');
                 
                 if (error) throw error;
@@ -38,7 +44,7 @@ export const universityService = {
                 this.saveToCache(data);
             }
 
-            // 3. Apply Filters (Client-side filtering to simulate complex API query)
+            // 3. Прилагане на клиентски филтри
             return data.filter(uni => {
                 const matchesQuery = !query || 
                     uni.university_name.toLowerCase().includes(query.toLowerCase()) || 
@@ -56,7 +62,8 @@ export const universityService = {
     },
 
     /**
-     * Get unique cities from the dataset
+     * Връща списък с уникални градове от набора данни
+     * @returns {Promise<string[]>}
      */
     async getCities() {
         const unis = await this.searchUniversities({});
@@ -66,6 +73,7 @@ export const universityService = {
 
     // --- Caching Mechanisms ---
 
+    // Записване на данни в кеш (localStorage), заедно с времеви маркер.
     saveToCache(data) {
         const cacheEntry = {
             timestamp: Date.now(),
@@ -74,6 +82,7 @@ export const universityService = {
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheEntry));
     },
 
+    // Четене от кеш и проверка за изтичане (TTL = 1 час).
     getFromCache() {
         const json = localStorage.getItem(CACHE_KEY);
         if (!json) return null;
