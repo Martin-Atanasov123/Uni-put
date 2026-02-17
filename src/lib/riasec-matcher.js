@@ -30,8 +30,11 @@
  * @param {Object} answers - Отговорите на потребителя от анкетата
  * @returns {Object} - Изчислените резултати { R: number, I: number, ... }
  */
+const EMPTY_SCORES = () => ({ R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 });
+
+// Базова помощна функция – използва се и от отделните канали, и от комбинирания профил.
 export function calculateScores(answers) {
-    const scores = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 };
+    const scores = EMPTY_SCORES();
 
     // Обработка на Интереси (answers.interests е масив от низове)
     if (answers.interests) {
@@ -107,6 +110,105 @@ export function calculateRiasecCode(scores) {
         .slice(0, 3) // Вземане на топ 3
         .map(([letter]) => letter) // Извличане на буквата
         .join('');
+}
+
+// Преобразува RIASEC резултатите до нормализиран вектор (0..1) по всички букви.
+export function riasecScoresToVector(scores) {
+    const vec = { ...EMPTY_SCORES(), ...scores };
+    const values = Object.values(vec);
+    const max = Math.max(...values);
+    if (!max || Number.isNaN(max)) return EMPTY_SCORES();
+    const normalized = {};
+    for (const key of Object.keys(vec)) {
+        normalized[key] = vec[key] / max;
+    }
+    return normalized;
+}
+
+// Създава вектор от 3-буквен RIASEC код, като първата буква тежи най-много.
+export function riasecCodeToVector(code) {
+    const vec = EMPTY_SCORES();
+    if (!code) return vec;
+    const weights = [0.6, 0.3, 0.1];
+    const letters = code.toUpperCase().split('').slice(0, 3);
+    letters.forEach((letter, index) => {
+        if (vec[letter] !== undefined && weights[index] !== undefined) {
+            vec[letter] += weights[index];
+        }
+    });
+    return riasecScoresToVector(vec);
+}
+
+// Косинусова близост между два RIASEC вектора – 0..1 (колкото по-близко до 1, толкова по-сходни).
+export function cosineSimilarity(userVec, itemVec) {
+    const letters = ['R', 'I', 'A', 'S', 'E', 'C'];
+    let dot = 0;
+    let normU = 0;
+    let normI = 0;
+    for (const l of letters) {
+        const u = userVec[l] || 0;
+        const i = itemVec[l] || 0;
+        dot += u * i;
+        normU += u * u;
+        normI += i * i;
+    }
+    if (!normU || !normI) return 0;
+    return dot / (Math.sqrt(normU) * Math.sqrt(normI));
+}
+
+// Изгражда обогатен RIASEC профил – комбиниран вектор, код и confidence.
+export function buildRiasecProfile(answers) {
+    const rawScores = calculateScores(answers);
+
+    const totalSelections =
+        (answers?.interests?.length || 0) +
+        (answers?.strengths?.length || 0) +
+        (answers?.values?.length || 0);
+
+    let normalizedScores = riasecScoresToVector(rawScores);
+
+    // Леко коригиране според предпочитана среда и стил на работа.
+    if (answers?.environment || answers?.style) {
+        const s = { ...normalizedScores };
+        switch (answers.environment) {
+            case 'На терен':
+                s.R += 0.1; s.C -= 0.05; break;
+            case 'Офис':
+                s.C += 0.1; s.E += 0.05; break;
+            case 'Дистанционно':
+                s.I += 0.1; s.C += 0.05; break;
+            default:
+                break;
+        }
+        switch (answers.style) {
+            case 'В екип':
+                s.S += 0.1; s.E += 0.05; s.I -= 0.05; break;
+            case 'Самостоятелно':
+                s.I += 0.1; s.R += 0.05; break;
+            default:
+                break;
+        }
+        normalizedScores = riasecScoresToVector(s);
+    }
+
+    // Confidence: комбинация от яснота на профила и обем на отговорите.
+    const values = Object.values(normalizedScores);
+    const sorted = [...values].sort((a, b) => b - a);
+    const top = sorted[0] || 0;
+    const second = sorted[1] || 0;
+    const gap = top - second;
+    const clarity = Math.max(0, Math.min(gap / 0.3, 1)); // при gap≈0.3 считаме профила за достатъчно ясен
+    const volume = Math.max(0, Math.min(totalSelections / 10, 1)); // 10+ избора → макс. принос
+    const confidence = 0.6 * clarity + 0.4 * volume;
+
+    const riasecCode = calculateRiasecCode(rawScores);
+
+    return {
+        rawScores,
+        scores: normalizedScores,
+        riasecCode,
+        confidence
+    };
 }
 
 /**

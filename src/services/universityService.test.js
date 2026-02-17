@@ -37,7 +37,7 @@ describe('UniversityService', () => {
         localStorage.clear();
     });
 
-    it('should fetch universities from API if cache is empty', async () => {
+    it('should fetch universities_duplicate from API if cache is empty', async () => {
         const mockData = [
             { id: 1, university_name: 'Uni 1', specialty: 'CS', city: 'Sofia' },
             { id: 2, university_name: 'Uni 2', specialty: 'Math', city: 'Plovdiv' }
@@ -49,7 +49,7 @@ describe('UniversityService', () => {
 
         const result = await universityService.searchUniversities({});
         
-        expect(supabase.from).toHaveBeenCalledWith('university_admissions');
+        expect(supabase.from).toHaveBeenCalledWith('universities_duplicate');
         expect(result).toHaveLength(2);
         expect(result[0].university_name).toBe('Uni 1');
     });
@@ -85,6 +85,44 @@ describe('UniversityService', () => {
         expect(result[0].university_name).toBe('Technical University');
     });
 
+    it('should match specialty by synonym when query is "право"', async () => {
+        const mockData = [
+            { id: 1, university_name: 'SU', specialty: 'Юридически науки', city: 'Sofia' },
+            { id: 2, university_name: 'UNWE', specialty: 'Правни науки', city: 'Sofia' },
+            { id: 3, university_name: 'TU', specialty: 'Computer Science', city: 'Sofia' }
+        ];
+
+        supabase.from.mockReturnValue({
+            select: vi.fn().mockResolvedValue({ data: mockData, error: null })
+        });
+
+        const result = await universityService.searchUniversities({ query: 'право' });
+        expect(result).toHaveLength(2);
+        const specs = result.map(r => r.specialty).sort();
+        expect(specs).toEqual(['Правни науки', 'Юридически науки'].sort());
+    });
+
+    it('should return fresh fetch fallback when cache misses "право"', async () => {
+        const cachedEntry = {
+            timestamp: Date.now(),
+            data: [
+                { id: 10, university_name: 'Cached Uni', specialty: 'Biology', city: 'Varna' }
+            ]
+        };
+        localStorage.setItem('universities_cache', JSON.stringify(cachedEntry));
+
+        const freshData = [
+            { id: 20, university_name: 'SU', specialty: 'Право', city: 'Sofia' }
+        ];
+
+        supabase.from.mockReturnValue({
+            select: vi.fn().mockResolvedValue({ data: freshData, error: null })
+        });
+
+        const result = await universityService.searchUniversities({ query: 'право' });
+        expect(result).toHaveLength(1);
+        expect(result[0].specialty.toLowerCase()).toContain('право');
+    });
     it('should filter results by city', async () => {
         const mockData = [
             { id: 1, university_name: 'Uni 1', specialty: 'CS', city: 'Sofia' },
