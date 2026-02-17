@@ -59,7 +59,7 @@ const Footer = () => {
                             <Info size={14} /> За нас
                         </a>
                         <span className="link link-hover flex items-center justify-center md:justify-start gap-2 opacity-70 hover:opacity-100 font-bold text-sm">
-                            <ShieldCheck size={14} /> Лиценз на проекта – всеки проект се предоставя с лиценз в съответствие с изискванията на общото право на обществено ползване ГНУ (GNU General Public License version 3)
+                            <ShieldCheck size={34} /> Лиценз на проекта ГНУ (GNU General Public License version 3)
                         </span>
                         <span className="badge badge-primary badge-outline font-black text-[10px] mt-2 italic mx-auto md:mx-0">НОИТ 2026</span>
                     </nav>
@@ -70,7 +70,7 @@ const Footer = () => {
                         <a className="link link-hover opacity-70 hover:opacity-100 font-bold text-sm">Условия за ползване</a>
                         <a className="link link-hover opacity-70 hover:opacity-100 font-bold text-sm">Поверителност</a>
                         <div className="mt-4 p-4 bg-base-300/50 rounded-2xl border border-base-content/5">
-                            <p className="text-[10px] font-bold opacity-50 leading-tight">Данните за баловете са базирани на справочниците за 2024г.</p>
+                            <p className="text-[10px] font-bold opacity-50 leading-tight">Данните за баловете са базирани на справочниците за 2025г.</p>
                         </div>
                     </nav>
                 </div>

@@ -16,6 +16,7 @@ const UniversitiesPage = () => {
     const [selectedCity, setSelectedCity] = useState("Всички");
     const [cities, setCities] = useState([]);
     const [suggestions, setSuggestions] = useState([]);
+    const [searchResults, setSearchResults] = useState(null);
     const [showSuggestions, setShowSuggestions] = useState(false);
 
     useEffect(() => {
@@ -32,33 +33,29 @@ const UniversitiesPage = () => {
 
     // Autocomplete Logic
     useEffect(() => {
-        if (searchTerm.length > 1) {
-            const matches = universities
-                .filter(u => 
-                    u.specialty.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                    u.university_name.toLowerCase().includes(searchTerm.toLowerCase())
-                )
-                .slice(0, 5); // Limit to 5 suggestions
-            setSuggestions(matches);
-            setShowSuggestions(true);
-        } else {
-            setSuggestions([]);
-            setShowSuggestions(false);
-        }
-    }, [searchTerm, universities]);
+        const doSearch = async () => {
+            if (searchTerm.length > 1) {
+                const results = await universityService.searchUniversities({ query: searchTerm, city: selectedCity === "Всички" ? "Всички" : selectedCity });
+                setSearchResults(results);
+                setSuggestions(results.slice(0, 5));
+                setShowSuggestions(true);
+            } else {
+                setSuggestions([]);
+                setShowSuggestions(false);
+                setSearchResults(null);
+            }
+        };
+        doSearch();
+    }, [searchTerm, selectedCity]);
 
     // Filtering Logic
     const filteredUnis = useMemo(() => {
-        return universities.filter(u => {
-            const matchesSearch = !searchTerm || 
-                u.specialty.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                u.university_name.toLowerCase().includes(searchTerm.toLowerCase());
-            
+        const base = searchResults ?? universities;
+        return base.filter(u => {
             const matchesCity = selectedCity === "Всички" || u.city === selectedCity;
-
-            return matchesSearch && matchesCity;
+            return matchesCity;
         });
-    }, [universities, searchTerm, selectedCity]);
+    }, [universities, searchResults, selectedCity]);
 
     const handleSuggestionClick = (text) => {
         setSearchTerm(text);
