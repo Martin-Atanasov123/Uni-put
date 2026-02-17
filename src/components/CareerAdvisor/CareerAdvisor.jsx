@@ -3,7 +3,7 @@
 // Фокусът е върху това да минимизираме когнитивното натоварване, докато
 // събираме достатъчно сигнал за алгоритъма за препоръки.
 import React, { useState, useEffect } from 'react';
-import { calculateScores, calculateRiasecCode } from '../../lib/riasec-matcher';
+import { buildRiasecProfile } from '../../lib/riasec-matcher';
 import { getCareerRecommendations, getUniversityRecommendations } from '../../lib/api';
 // Премахната визуализация на профила (RiasecRadar), както е поискано
 import { 
@@ -20,18 +20,20 @@ import {
     Heart
 } from 'lucide-react';
 
+const INITIAL_ANSWERS = {
+    grade: "",
+    interests: [],
+    strengths: [],
+    values: [],
+    environment: "",
+    style: ""
+};
+
 const CareerAdvisor = () => {
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [results, setResults] = useState(null);
-    const [answers, setAnswers] = useState({
-        grade: "",
-        interests: [],
-        strengths: [],
-        values: [],
-        environment: "",
-        style: ""
-    });
+    const [answers, setAnswers] = useState(INITIAL_ANSWERS);
 
     // Фиксиран брой стъпки – позволява ни да знаем кога да тригерираме изчисленията.
     const totalSteps = 6;
@@ -72,18 +74,18 @@ const CareerAdvisor = () => {
     const calculateResults = async () => {
         setLoading(true);
         try {
-            const scores = calculateScores(answers);
-            const riasecCode = calculateRiasecCode(scores);
+            const profile = buildRiasecProfile(answers);
             
             // Паралелен fetch – намалява времето за чакане при последната стъпка.
             const [careers, universities] = await Promise.all([
-                getCareerRecommendations(scores),
-                getUniversityRecommendations(riasecCode)
+                getCareerRecommendations(answers),
+                getUniversityRecommendations(answers, null)
             ]);
 
             setResults({
-                scores,
-                riasecCode,
+                scores: profile.scores,
+                riasecCode: profile.riasecCode,
+                confidence: profile.confidence,
                 careers,
                 universities
             });
@@ -211,9 +213,9 @@ const CareerAdvisor = () => {
                     <div 
                         key={item.id}
                         onClick={() => toggleSelection('values', item.id)}
-                        className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center gap-4 hover:scale-[1.02] active:scale-[0.98] ${answers.values.includes(item.id) ? 'border-error bg-error/10' : 'border-base-200 bg-base-100'}`}
+                        className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center gap-4 hover:scale-[1.02] active:scale-[0.98] ${answers.values.includes(item.id) ? 'border-primary bg-primary/10' : 'border-base-200 bg-base-100'}`}
                     >
-                        <div className={`w-4 h-4 rounded-full border-2 ${answers.values.includes(item.id) ? 'bg-error border-error' : 'border-base-300'}`}></div>
+                        <div className={`w-4 h-4 rounded-full border-2 ${answers.values.includes(item.id) ? 'bg-primary border-primary' : 'border-base-300'}`}></div>
                         <div>
                             <div className="font-bold">{item.label}</div>
                             <div className="text-xs opacity-60">{item.desc}</div>
@@ -300,7 +302,7 @@ const CareerAdvisor = () => {
                 {/* Премахната Radar Chart секция */}
 
                 {/* Препоръчани Професии */}
-                <div className="space-y-6">
+                {/* <div className="space-y-6">
                     <h3 className="text-2xl font-black flex items-center gap-3">
                         <Briefcase className="text-secondary" /> 
                         Препоръчани Професии
@@ -323,13 +325,13 @@ const CareerAdvisor = () => {
                             <div className="col-span-2 text-center py-10 opacity-50">Няма намерени професии за този профил.</div>
                         )}
                     </div>
-                </div>
+                </div> */}
 
                 {/* Препоръчани Университети */}
                 <div className="space-y-6">
                     <h3 className="text-2xl font-black flex items-center gap-3">
                         <Building2 className="text-accent" /> 
-                        Препоръчани Университети
+                        Препоръчани Специалности
                     </h3>
                     <div className="space-y-4">
                         {results.universities.length > 0 ? results.universities.map((uni, idx) => (
@@ -355,7 +357,15 @@ const CareerAdvisor = () => {
                 </div>
 
                 <div className="flex justify-center pt-8">
-                    <button onClick={() => { setStep(1); setResults(null); }} className="btn btn-outline rounded-full px-8">
+                    <button
+                        onClick={() => {
+                            setAnswers(INITIAL_ANSWERS);
+                            setResults(null);
+                            setLoading(false);
+                            setStep(1);
+                        }}
+                        className="btn btn-outline rounded-full px-8"
+                    >
                         Направи теста отново
                     </button>
                 </div>

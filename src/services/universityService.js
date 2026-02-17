@@ -5,6 +5,13 @@ import { supabase } from '../lib/supabase';
 
 const CACHE_KEY = 'universities_cache';
 const CACHE_DURATION = 1000 * 60 * 60; // 1 hour
+const SEARCH_LIMIT_REFRESH_MS = 1000 * 60 * 10; // 10 minutes
+
+const SPECIALTY_SYNONYMS = {
+    "право": ["право", "юридически науки", "правни науки", "law"]
+};
+
+const normalize = (s) => (s || "").toLowerCase().trim();
 
 export const universityService = {
     
@@ -24,6 +31,9 @@ export const universityService = {
      */
     async searchUniversities({ query = '', city = 'Всички' }) {
         try {
+            const normalizedQuery = normalize(query);
+            const synonyms = SPECIALTY_SYNONYMS[normalizedQuery] || [normalizedQuery].filter(Boolean);
+
             // 1. Check Cache
             const cached = this.getFromCache();
             let data = cached;
@@ -45,18 +55,44 @@ export const universityService = {
             }
 
             // 3. Прилагане на клиентски филтри
-            return data.filter(uni => {
-                const matchesQuery = !query || 
-                    uni.university_name.toLowerCase().includes(query.toLowerCase()) || 
-                    uni.specialty.toLowerCase().includes(query.toLowerCase());
+            let filtered = data.filter(uni => {
+                const uName = normalize(uni.university_name);
+                const spec = normalize(uni.specialty);
+                const matchesQuery = !normalizedQuery || 
+                    uName.includes(normalizedQuery) || 
+                    spec.includes(normalizedQuery) ||
+                    (synonyms.length > 0 && synonyms.some(s => spec.includes(s)));
                 
                 const matchesCity = city === 'Всички' || uni.city === city;
                 
                 return matchesQuery && matchesCity;
             });
 
+            // 4. Ако имаме текстово търсене, но резултатите са празни, опитай свеж fetch (fallback)
+            if (normalizedQuery && filtered.length === 0) {
+                const { data: fetchedData, error } = await supabase
+                    .from('universities_duplicate')
+                    .select('*');
+                if (!error && fetchedData) {
+                    const fresh = fetchedData.map(uni => ({ ...uni }));
+                    this.saveToCache(fresh); // обнови кеша
+                    filtered = fresh.filter(uni => {
+                        const uName = normalize(uni.university_name);
+                        const spec = normalize(uni.specialty);
+                        const matchesQuery = !normalizedQuery || 
+                            uName.includes(normalizedQuery) || 
+                            spec.includes(normalizedQuery) ||
+                            (synonyms.length > 0 && synonyms.some(s => spec.includes(s)));
+                        const matchesCity = city === 'Всички' || uni.city === city;
+                        return matchesQuery && matchesCity;
+                    });
+                }
+            }
+
+            return filtered;
+
         } catch (error) {
-            console.error('Error fetching universities:', error);
+            console.error('Error fetching universities_duplicate:', error);
             return [];
         }
     },
