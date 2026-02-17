@@ -1,3 +1,7 @@
+// Кариерен съветник – стъпкова анкета, която превежда субективни отговори
+// към RIASEC код, кариерни пътеки и подходящи университетски специалности.
+// Фокусът е върху това да минимизираме когнитивното натоварване, докато
+// събираме достатъчно сигнал за алгоритъма за препоръки.
 import React, { useState, useEffect } from 'react';
 import { calculateScores, calculateRiasecCode } from '../../lib/riasec-matcher';
 import { getCareerRecommendations, getUniversityRecommendations } from '../../lib/api';
@@ -16,10 +20,6 @@ import {
     Heart
 } from 'lucide-react';
 
-/**
- * Основен компонент за Кариерния съветник.
- * Съдържа анкета от няколко стъпки и логика за изчисляване на препоръки.
- */
 const CareerAdvisor = () => {
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -33,6 +33,7 @@ const CareerAdvisor = () => {
         style: ""
     });
 
+    // Фиксиран брой стъпки – позволява ни да знаем кога да тригерираме изчисленията.
     const totalSteps = 6;
 
     const handleAnswer = (field, value) => {
@@ -66,13 +67,15 @@ const CareerAdvisor = () => {
         }
     };
 
+    // Централна функция за оценка – конвертира отговорите в RIASEC профил
+    // и паралелно изтегля кариерни и университетски препоръки.
     const calculateResults = async () => {
         setLoading(true);
         try {
             const scores = calculateScores(answers);
             const riasecCode = calculateRiasecCode(scores);
             
-            // Паралелно извличане на данни
+            // Паралелен fetch – намалява времето за чакане при последната стъпка.
             const [careers, universities] = await Promise.all([
                 getCareerRecommendations(scores),
                 getUniversityRecommendations(riasecCode)
@@ -91,6 +94,8 @@ const CareerAdvisor = () => {
         }
     };
 
+    // Когато потребителят стигне последната стъпка, изчисляваме резултатите само веднъж,
+    // за да избегнем ненужни повторни заявки при повторно рендериране.
     useEffect(() => {
         if (step === 6 && !results) {
             calculateResults();

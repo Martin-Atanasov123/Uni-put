@@ -1,3 +1,5 @@
+// Главен компонент на приложението: дефинира рутера, глобалните провайдъри и общия layout.
+// Навигацията включва публични, защитени (изискват вход) и админ маршрути (изискват роля).
 import { Route, Routes } from "react-router";
 
 import { AuthProvider } from "../context/AuthContext";
@@ -22,6 +24,7 @@ import Dormitories from "../components/Dormitories/Dormitories";
 import ScrollToTop from "../components/common/ScrollToTop";
 import About from "../components/common/About";
 
+// Основен входен компонент – включва AuthProvider, ScrollToTop, Header, Footer и рутера.
 function App() {
     return (
         <>

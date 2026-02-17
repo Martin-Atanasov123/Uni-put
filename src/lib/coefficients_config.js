@@ -1,5 +1,5 @@
-// Coefficient keys and field labels
-// Auto-generated from normalized university data
+// Ключове и етикети на коефициенти – изведени от нормализирани университетски данни.
+// Използват се, за да мапват суровите полета от базата към четими етикети и групи.
 
 const COEFFICIENT_KEYS = [
   "angliiski_ezik", "bel", "bel_diploma", "bel_plus_cert_angliyski_b2", "bio", "bio_udostoverenie",
@@ -168,7 +168,7 @@ const FIELD_LABELS = {
   vtor_dzi_drug_predmet: "Втори ДЗИ друг предмет"
 };
 
-// Logical grouping of related coefficient keys
+// Логически групи от коефициенти – помагат при избор на подходящи полета за формули/интерфейс.
 const SLOT_GROUPS = {
   // Mathematics group
   math_group: ["exam_mat", "dzi1_mat", "dzi2_mat", "dzi_mat", "dzi_matematika", "mat",
