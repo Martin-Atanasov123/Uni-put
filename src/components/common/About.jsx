@@ -65,10 +65,7 @@ const About = () => {
                                 променят начина, по който младите хора взимат
                                 решения за образованието си. Работи с особено
                                 внимание към перформанс, достъпност и
-                                поддръжка на дългосрочни проекти. Извън
-                                програмирането се интересува от образователни
-                                политики, аналитика и менторство на ученици,
-                                които правят първите си стъпки в програмирането.
+                                поддръжка на дългосрочни проекти.
                             </p>
 
                             <div className="grid gap-4 sm:grid-cols-2">
@@ -132,7 +129,7 @@ const About = () => {
                         <div className="flex justify-center md:justify-start">
                             <div className="relative group w-full max-w-[420px] aspect-square overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-primary/10 via-primary/5 to-base-100 border border-primary/10 shadow-xl transition-transform duration-500 group-hover:scale-105 group-hover:-translate-y-1 group-hover:shadow-2xl">
                                 <img
-                                    src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlNpbWthIHBvdHJldF8gTWFydGluIEF0YW5hc292Ij48ZGVmcz48bGluZWFyZ3JhZGllbnQgaWQ9ImciIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM0Mjg3ZmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmZjM5OTMiLz48L2xpbmVhcmdhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiByeD0iNDAiIGZpbGw9InVybCgjZykiLz48dGV4dCB4PSIyMDAiIHk9IjIyMCIgZm9udC1zaXplPSI5NiIgZm9udC13ZWlnaHQ9IjcwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiI+TUE8L3RleHQ+PC9zdmc+"
+                                    src="/public/martin_snimka.jpg"
                                     alt="Снимка: Мартин Атанасов"
                                     width={400}
                                     height={400}
@@ -151,7 +148,7 @@ const About = () => {
                         <div className="flex justify-center md:justify-start">
                             <div className="relative group w-full max-w-[420px] aspect-square overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-primary/10 via-primary/5 to-base-100 border border-primary/10 shadow-xl transition-transform duration-500 group-hover:scale-105 group-hover:-translate-y-1 group-hover:shadow-2xl">
                                 <img
-                                    src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlNpbWthIHBvdHJldF8gTWFydGluIEF0YW5hc292Ij48ZGVmcz48bGluZWFyZ3JhZGllbnQgaWQ9ImciIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM0Mjg3ZmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmZjM5OTMiLz48L2xpbmVhcmdhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiByeD0iNDAiIGZpbGw9InVybCgjZykiLz48dGV4dCB4PSIyMDAiIHk9IjIyMCIgZm9udC1zaXplPSI5NiIgZm9udC13ZWlnaHQ9IjcwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiI+TUE8L3RleHQ+PC9zdmc+"
+                                    src="/public/ivun_snimka.jpg"
                                     alt="Снимка: Ивън Минков"
                                     width={400}
                                     height={400}
@@ -174,7 +171,7 @@ const About = () => {
                             </div>
 
                             <p className="text-sm md:text-base opacity-85 leading-relaxed font-serif">
-                            Ивън е ориентиран към детайла разработчик, който се грижи всяко взаимодействие в УниПът да е ясно, бързо и приятно за ползване. Той работи върху визуалната система на проекта, компонентите за търсене на университети и общежития, както и върху адаптивното поведение на интерфейса при различни устройства. Интересува се от достъпност, микроанимации и оптимизация за PageSpeed, така че платформата да се зарежда бързо дори при по-слаба връзка. Обича да експериментира с типография и минималистичен дизайн, които да подчертават съдържанието, а не да го засенчват. В свободното си време тества нови UI библиотеки, експериментира с дизайн системи и участва в проекти, насочени към образование и ориентиране на ученици.
+                            Ивън е ориентиран към детайла разработчик, който се грижи всяко взаимодействие в УниПът да е ясно, бързо и приятно за ползване. Той работи върху визуалната система на проекта, компонентите за търсене на университети и общежития, както и върху адаптивното поведение на интерфейса при различни устройства. Интересува се от достъпност, микроанимации , така че платформата да се зарежда бързо дори при по-слаба връзка. Обича да експериментира с типография и минималистичен дизайн, които да подчертават съдържанието, а не да го засенчват. В свободното си време тества нови UI библиотеки, експериментира с дизайн системи и участва в проекти, насочени към образование и ориентиране на ученици.
                             </p>
 
                             <div className="grid gap-4 sm:grid-cols-2">
