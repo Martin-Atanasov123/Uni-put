@@ -129,7 +129,7 @@ const About = () => {
                         <div className="flex justify-center md:justify-start">
                             <div className="relative group w-full max-w-[420px] aspect-square overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-primary/10 via-primary/5 to-base-100 border border-primary/10 shadow-xl transition-transform duration-500 group-hover:scale-105 group-hover:-translate-y-1 group-hover:shadow-2xl">
                                 <img
-                                    src="/public/martin_snimka.jpg"
+                                    src="/martin_snimka.jpg"
                                     alt="Снимка: Мартин Атанасов"
                                     width={400}
                                     height={400}
@@ -148,7 +148,7 @@ const About = () => {
                         <div className="flex justify-center md:justify-start">
                             <div className="relative group w-full max-w-[420px] aspect-square overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-primary/10 via-primary/5 to-base-100 border border-primary/10 shadow-xl transition-transform duration-500 group-hover:scale-105 group-hover:-translate-y-1 group-hover:shadow-2xl">
                                 <img
-                                    src="/public/ivun_snimka.jpg"
+                                    src="/ivun_snimka.jpg"
                                     alt="Снимка: Ивън Минков"
                                     width={400}
                                     height={400}
