@@ -1,201 +1,266 @@
-// Секция за въвеждане на оценки – управлява задължителни и динамични предмети,
-// валидация и съобщава към родителя дали входът е валиден (важно за калкулатора).
-import { useState, useEffect } from "react";
-import { Plus, X, AlertCircle, CheckCircle2 } from "lucide-react";
-import { FIELD_LABELS } from "../../lib/coefficients_config";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowUpDown, CheckCircle2 } from "lucide-react";
+import { FIELD_LABELS, SLOT_GROUPS } from "../../lib/coefficients_config";
+import { supabase } from "../../lib/supabase";
+import { useAuth } from "../../context/AuthContext";
 
-// Задължителни полета – без тях изчисленията за бал са безсмислени.
-const MANDATORY_FIELDS = [
-    { key: "dzi_bel", label: FIELD_LABELS["dzi_bel"] || "ДЗИ БЕЛ", step: 0.01 },
-    { key: "diploma", label: FIELD_LABELS["diploma"] || "Среден успех от дипломата", step: 0.01 }
-];
+const STORAGE_PREFIX = "uniput_grades";
 
-// Разрешени допълнителни предмети – ограничен списък, за да не претоварваме UI.
-const AVAILABLE_SUBJECT_KEYS = [
-    "dzi_mat", "dzi_bio", "dzi_him", "dzi_fiz", 
-    "dzi_ist", "dzi_geo", "dzi_fil", "dzi_angliiski",
-    "dzi_informatika", "dzi_it"
-];
+function getStorageKey(faculty, specialty) {
+    return `${STORAGE_PREFIX}:${faculty || "all"}:${specialty || "all"}`;
+}
 
-const AVAILABLE_SUBJECTS = AVAILABLE_SUBJECT_KEYS.map(key => ({
-    key,
-    label: FIELD_LABELS[key] || key
-})).filter(s => s.label);
+function clampAndFormat(value) {
+    if (value === "" || value == null) return "";
+    const n = Number(value);
+    if (Number.isNaN(n)) return "";
+    const c = Math.min(6, Math.max(2, n));
+    return c.toFixed(2);
+}
 
-const GradeInputSection = ({ onGradesChange }) => {
-    // Държим динамични предмети и стойности отделно, за да могат да се добавят/махат без загуба на контекст.
-    const [dynamicFields, setDynamicFields] = useState([]);
-    const [values, setValues] = useState({
-        dzi_bel: "",
-        diploma: ""
-    });
-    const [isAdding, setIsAdding] = useState(false);
-    const [touched, setTouched] = useState({});
+function isValidGrade(value) {
+    if (value === "" || value == null) return true;
+    const n = Number(value);
+    return !Number.isNaN(n) && n >= 2 && n <= 6;
+}
 
-    // При всяка промяна преизчисляваме валидност и уведомяваме родителя –
-    // така логиката за пресмятане на бал е централизирана извън UI слоя.
-    useEffect(() => {
-        const isValid = validateAll();
-        onGradesChange(values, isValid);
-    }, [values]);
+function buildSlots(coefficients) {
+    const keys = Object.keys(coefficients || {});
+    const map = {};
 
-    const validateValue = (val, min = 2, max = 6) => {
-        if (!val) return false;
-        const num = parseFloat(val);
-        return !isNaN(num) && num >= min && num <= max;
-    };
+    keys.forEach((key) => {
+        const label = FIELD_LABELS[key];
+        if (!label) return;
 
-    const validateAll = () => {
-        // Check mandatory fields
-        const mandatoryValid = MANDATORY_FIELDS.every(field => 
-            validateValue(values[field.key])
-        );
-        // Check dynamic fields
-        const dynamicValid = dynamicFields.every(field => 
-            validateValue(values[field.key])
-        );
-        return mandatoryValid && dynamicValid;
-    };
-
-    const handleChange = (key, value) => {
-        setValues(prev => ({ ...prev, [key]: value }));
-        setTouched(prev => ({ ...prev, [key]: true }));
-    };
-
-    const addSubject = (subjectKey) => {
-        if (dynamicFields.length >= 5) return;
-        
-        const subject = AVAILABLE_SUBJECTS.find(s => s.key === subjectKey);
-        if (subject && !dynamicFields.find(f => f.key === subjectKey)) {
-            setDynamicFields(prev => [...prev, { ...subject, id: subjectKey }]);
-            setValues(prev => ({ ...prev, [subjectKey]: "" }));
+        let slotId = key;
+        for (const [group, members] of Object.entries(SLOT_GROUPS)) {
+            if (members.includes(key)) {
+                slotId = group;
+                break;
+            }
         }
-        setIsAdding(false);
-    };
 
-    const removeSubject = (key) => {
-        setDynamicFields(prev => prev.filter(f => f.key !== key));
-        setValues(prev => {
-            const newValues = { ...prev };
-            delete newValues[key];
-            return newValues;
+        if (!map[slotId]) {
+            map[slotId] = {
+                id: slotId,
+                label,
+                alternatives: []
+            };
+        }
+
+        map[slotId].alternatives.push({
+            key,
+            label
         });
+    });
+
+    return Object.values(map);
+}
+
+const GradeInputSection = ({ coefficients = {}, faculty, specialty, onGradesChange }) => {
+    const { user } = useAuth();
+    const [valuesByKey, setValuesByKey] = useState({});
+    const [activeAltBySlot, setActiveAltBySlot] = useState({});
+    const [saving, setSaving] = useState(false);
+
+    const slots = useMemo(() => buildSlots(coefficients), [coefficients]);
+
+    useEffect(() => {
+        const key = getStorageKey(faculty, specialty);
+        try {
+            const raw = localStorage.getItem(key);
+            if (!raw) return;
+            const parsed = JSON.parse(raw);
+            if (parsed.valuesByKey) setValuesByKey(parsed.valuesByKey);
+            if (parsed.activeAltBySlot) setActiveAltBySlot(parsed.activeAltBySlot);
+        } catch {
+            return;
+        }
+    }, [faculty, specialty]);
+
+    useEffect(() => {
+        const key = getStorageKey(faculty, specialty);
+        const payload = { valuesByKey, activeAltBySlot };
+        try {
+            localStorage.setItem(key, JSON.stringify(payload));
+        } catch {
+            return;
+        }
+    }, [valuesByKey, activeAltBySlot, faculty, specialty]);
+
+    useEffect(() => {
+        if (!user) return;
+        const run = async () => {
+            setSaving(true);
+            try {
+                const existing = user.user_metadata?.grade_inputs || {};
+                await supabase.auth.updateUser({
+                    data: {
+                        grade_inputs: {
+                            ...existing,
+                            [getStorageKey(faculty, specialty)]: {
+                                valuesByKey,
+                                activeAltBySlot
+                            }
+                        }
+                    }
+                });
+            } finally {
+                setSaving(false);
+            }
+        };
+        run();
+    }, [user, valuesByKey, activeAltBySlot, faculty, specialty]);
+
+    const bestBySlot = useMemo(() => {
+        const result = {};
+        slots.forEach((slot) => {
+            let best = null;
+            let bestKey = null;
+            slot.alternatives.forEach((alt) => {
+                const n = parseFloat(valuesByKey[alt.key]);
+                if (Number.isNaN(n) || n < 2 || n > 6) return;
+                if (best == null || n > best) {
+                    best = n;
+                    bestKey = alt.key;
+                }
+            });
+            result[slot.id] = { bestGrade: best, bestKey };
+        });
+        return result;
+    }, [slots, valuesByKey]);
+
+    useEffect(() => {
+        if (onGradesChange) {
+            onGradesChange(valuesByKey, bestBySlot);
+        }
+    }, [valuesByKey, bestBySlot, onGradesChange]);
+
+    const handleChangeGrade = (key, value) => {
+        setValuesByKey((prev) => ({
+            ...prev,
+            [key]: value
+        }));
     };
 
-    const getAvailableOptions = () => {
-        return AVAILABLE_SUBJECTS.filter(s => 
-            !dynamicFields.find(f => f.key === s.key)
-        );
+    const handleBlurGrade = (key) => {
+        setValuesByKey((prev) => ({
+            ...prev,
+            [key]: clampAndFormat(prev[key])
+        }));
+    };
+
+    const handleChangeActiveAlt = (slotId, altKey) => {
+        setActiveAltBySlot((prev) => ({
+            ...prev,
+            [slotId]: altKey
+        }));
     };
 
     return (
-        <div className="w-full max-w-[600px] min-w-[320px] mx-auto space-y-6">
-            <h3 className="text-xl font-black uppercase tracking-wider opacity-60 mb-4 flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-primary" />
-                Твоите Оценки
-            </h3>
-
-            {/* Mandatory Fields */}
-            <div className="space-y-4">
-                {MANDATORY_FIELDS.map(field => {
-                    const isError = touched[field.key] && !validateValue(values[field.key]);
-                    return (
-                        <div key={field.key} className="form-control w-full">
-                            <label className="label">
-                                <span className="label-text font-bold text-base-content/70">
-                                    {field.label}
-                                    <span className="text-error ml-1">*</span>
-                                </span>
-                            </label>
-                            <input
-                                type="number"
-                                step={field.step}
-                                placeholder="0.00"
-                                className={`input input-bordered w-full font-bold text-lg ${
-                                    isError ? 'input-error' : 'input-primary'
-                                }`}
-                                value={values[field.key] || ""}
-                                onChange={(e) => handleChange(field.key, e.target.value)}
-                            />
-                            {isError && (
-                                <label className="label">
-                                    <span className="label-text-alt text-error flex items-center gap-1">
-                                        <AlertCircle className="w-3 h-3" />
-                                        Моля въведете валидна оценка (2.00 - 6.00)
-                                    </span>
-                                </label>
-                            )}
-                        </div>
-                    );
-                })}
+        <div className="space-y-4">
+            <div className="flex items-center justify-between">
+                <h3 className="text-xl font-black uppercase tracking-wider opacity-60 mb-2 flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-primary" />
+                    Входни данни
+                </h3>
+                {saving && (
+                    <span className="text-xs opacity-60">Записване...</span>
+                )}
             </div>
 
-            {/* Dynamic Fields */}
-            <div className="space-y-4">
-                {dynamicFields.map(field => {
-                    const isError = touched[field.key] && !validateValue(values[field.key]);
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {slots.map((slot) => {
+                    const slotBest = bestBySlot[slot.id];
+                    const activeKey =
+                        activeAltBySlot[slot.id] ||
+                        slotBest?.bestKey ||
+                        slot.alternatives[0]?.key;
+
+                    const activeAlt =
+                        slot.alternatives.find((a) => a.key === activeKey) ||
+                        slot.alternatives[0];
+
+                    const value = valuesByKey[activeAlt.key] ?? "";
+                    const invalid = !isValidGrade(value);
+
                     return (
-                        <div key={field.key} className="flex gap-2 items-start animate-in fade-in slide-in-from-top-2 duration-300">
-                            <div className="form-control w-full">
-                                <label className="label">
-                                    <span className="label-text font-bold text-base-content/70">{field.label}</span>
-                                </label>
+                        <div
+                            key={slot.id}
+                            className="rounded-[2rem] bg-base-200/80 border border-base-300/60 p-5 flex flex-col justify-between"
+                        >
+                            <div className="flex items-start justify-between gap-2 mb-3">
+                                <div>
+                                    <div className="text-xs font-bold uppercase opacity-60">
+                                        {slot.label}
+                                    </div>
+                                    <div className="text-[11px] opacity-60">
+                                        Активна алтернатива: {activeAlt?.label}
+                                    </div>
+                                </div>
+                                <div className="dropdown dropdown-end">
+                                    <label
+                                        tabIndex={0}
+                                        className="btn btn-xs btn-primary rounded-full gap-1"
+                                    >
+                                        <ArrowUpDown size={12} />
+                                        Смени
+                                    </label>
+                                    <ul
+                                        tabIndex={0}
+                                        className="dropdown-content z-20 menu p-2 shadow bg-base-100 rounded-2xl w-56"
+                                    >
+                                        {slot.alternatives.map((alt) => (
+                                            <li key={alt.key}>
+                                                <button
+                                                    type="button"
+                                                    className={activeKey === alt.key ? "active font-bold" : ""}
+                                                    onClick={() =>
+                                                        handleChangeActiveAlt(slot.id, alt.key)
+                                                    }
+                                                >
+                                                    {alt.label}
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
                                 <input
                                     type="number"
+                                    min="2"
+                                    max="6"
                                     step="0.01"
-                                    placeholder="0.00"
-                                    className={`input input-bordered w-full font-bold text-lg ${
-                                        isError ? 'input-error' : 'input-primary'
+                                    inputMode="decimal"
+                                    className={`input input-bordered w-full rounded-2xl text-lg font-bold ${
+                                        invalid ? "input-error" : ""
                                     }`}
-                                    value={values[field.key] || ""}
-                                    onChange={(e) => handleChange(field.key, e.target.value)}
+                                    placeholder="0.00"
+                                    value={value}
+                                    onChange={(e) =>
+                                        handleChangeGrade(activeAlt.key, e.target.value)
+                                    }
+                                    onBlur={() => handleBlurGrade(activeAlt.key)}
                                 />
+                                {invalid && (
+                                    <div className="text-xs text-error">
+                                        Моля въведете валидна оценка (2.00 - 6.00)
+                                    </div>
+                                )}
+                                <div className="text-[11px] opacity-60 flex justify-between">
+                                    <span>
+                                        Най-добра оценка:{" "}
+                                        {slotBest?.bestGrade != null
+                                            ? slotBest.bestGrade.toFixed(2)
+                                            : "липсва вход"}
+                                    </span>
+                                </div>
                             </div>
-                            <button 
-                                className="btn btn-square btn-ghost text-error mt-9"
-                                onClick={() => removeSubject(field.key)}
-                                title="Премахни"
-                            >
-                                <X className="w-5 h-5" />
-                            </button>
                         </div>
                     );
                 })}
-            </div>
-
-            {/* Add Button */}
-            <div className="pt-2">
-                {isAdding ? (
-                    <div className="join w-full animate-in zoom-in duration-200">
-                        <select 
-                            className="select select-bordered join-item w-full"
-                            onChange={(e) => {
-                                if (e.target.value) addSubject(e.target.value);
-                            }}
-                            defaultValue=""
-                        >
-                            <option value="" disabled>Избери предмет...</option>
-                            {getAvailableOptions().map(s => (
-                                <option key={s.key} value={s.key}>{s.label}</option>
-                            ))}
-                        </select>
-                        <button 
-                            className="btn join-item"
-                            onClick={() => setIsAdding(false)}
-                        >
-                            <X className="w-4 h-4" />
-                        </button>
-                    </div>
-                ) : (
-                    <button 
-                        className="btn btn-outline btn-primary w-full border-dashed border-2 hover:bg-primary/5 gap-2"
-                        onClick={() => setIsAdding(true)}
-                        disabled={dynamicFields.length >= 5}
-                    >
-                        <Plus className="w-5 h-5" />
-                        {dynamicFields.length >= 5 ? 'Достигнат лимит (5)' : 'Добави Предмет'}
-                    </button>
-                )}
             </div>
         </div>
     );
