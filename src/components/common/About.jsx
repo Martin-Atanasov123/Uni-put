@@ -37,7 +37,7 @@ const About = () => {
                     >
 
                         
-                        <div className="space-y-6 md:space-y-8">
+                        <div className="space-y-6 md:space-y-8 order-2 md:order-1">
                             <div className="space-y-2">
                                 <h2
                                     id="martin-name"
@@ -126,7 +126,7 @@ const About = () => {
                                 </a>
                             </div>
                         </div>
-                        <div className="flex justify-center md:justify-start">
+                        <div className="flex justify-center md:justify-start order-1 md:order-2">
                             <div className="relative group w-full max-w-[420px] aspect-square overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-primary/10 via-primary/5 to-base-100 border border-primary/10 shadow-xl transition-transform duration-500 group-hover:scale-105 group-hover:-translate-y-1 group-hover:shadow-2xl">
                                 <img
                                     src="/martin_snimka.jpg"
@@ -217,7 +217,7 @@ const About = () => {
                                     Имейл
                                 </a>
                                 <a
-                                    href="#"
+                                    href="https://github.com/ivun1000"
                                     className="btn btn-sm btn-ghost rounded-full gap-2"
                                     aria-label="GitHub профил на Мартин Атанасов"
                                 >
