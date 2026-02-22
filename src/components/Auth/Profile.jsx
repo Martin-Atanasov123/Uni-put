@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
 import { useNavigate } from "react-router-dom";
+import { sessionService } from "../../services/sessionService";
 import { 
     User, 
     Mail, 
@@ -213,9 +214,8 @@ const Profile = () => {
         }));
     };
 
-    // --- 6. Logout ---
     const handleLogout = async () => {
-        await supabase.auth.signOut();
+        await sessionService.logout();
         navigate("/login");
     };
 

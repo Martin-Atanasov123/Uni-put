@@ -57,13 +57,21 @@ function buildSlots(coefficients) {
     return Object.values(map);
 }
 
-const GradeInputSection = ({ coefficients = {}, faculty, specialty, onGradesChange }) => {
+const GradeInputSection = ({ coefficients = {}, faculty, specialty, initialValues = {}, onGradesChange }) => {
     const { user } = useAuth();
     const [valuesByKey, setValuesByKey] = useState({});
     const [activeAltBySlot, setActiveAltBySlot] = useState({});
     const [saving, setSaving] = useState(false);
 
     const slots = useMemo(() => buildSlots(coefficients), [coefficients]);
+
+    useEffect(() => {
+        if (!initialValues || typeof initialValues !== "object") return;
+        setValuesByKey((prev) => ({
+            ...initialValues,
+            ...prev
+        }));
+    }, [initialValues]);
 
     useEffect(() => {
         const key = getStorageKey(faculty, specialty);
