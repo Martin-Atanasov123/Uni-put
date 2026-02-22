@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "../../lib/supabase";
 import { 
     Calculator, 
@@ -12,9 +12,11 @@ import {
     ArrowDownUp,
     XCircle,
     Search,
-    ChevronDown
+    ChevronDown,
+    Edit3
 } from "lucide-react";
 import GradeInputSection from "./GradeInputSection";
+import CalculatorSetup from "./CalculatorSetup";
 import { FIELD_LABELS, SLOT_GROUPS } from "../../lib/coefficients_config";
 
 const CalculatorPage = () => {
@@ -33,6 +35,8 @@ const CalculatorPage = () => {
 
     const [selectedSpecialtyName, setSelectedSpecialtyName] = useState("");
     const [grades, setGrades] = useState({});
+    const [setupGrades, setSetupGrades] = useState({});
+    const [setupCompleted, setSetupCompleted] = useState(false);
 
     // Derived unique values for filters
     const cities = [...new Set(allData.map(d => d.city).filter(Boolean))].sort();
@@ -76,60 +80,100 @@ const CalculatorPage = () => {
 
     const handleGradesChange = (newGrades) => {
         setGrades(newGrades);
-        // We can use 'valid' to block submission or show global error if needed
     };
 
-    const getBestGradeForSlot = (mainKey) => {
-        // Find which group this key belongs to
-        let groupName = mainKey;
-        for (const [master, members] of Object.entries(SLOT_GROUPS)) {
-            if (members.includes(mainKey)) {
-                groupName = master;
-                break;
-            }
-        }
+    const handleSetupComplete = (values) => {
+        setSetupGrades(values);
+        setSetupCompleted(true);
+    };
 
-        const group = SLOT_GROUPS[groupName] || [mainKey];
-        let bestKey = mainKey;
-        let maxVal = -1;
+    const selectedCoefficients = useMemo(() => {
+        if (!selectedSpecialtyName) return null;
+        const row = filteredData.find((d) => d.specialty === selectedSpecialtyName);
+        return row?.coefficients || null;
+    }, [filteredData, selectedSpecialtyName]);
 
-        group.forEach(key => {
-            const val = parseFloat(grades[key]);
-            if (!isNaN(val) && val >= 2 && val <= 6) {
-                if (val > maxVal) {
-                    maxVal = val;
-                    bestKey = key;
-                }
+    const initialValuesForSpecialty = useMemo(() => {
+        if (!selectedCoefficients) return {};
+        const keys = Object.keys(selectedCoefficients);
+        const result = {};
+        keys.forEach((key) => {
+            if (setupGrades[key] != null) {
+                result[key] = setupGrades[key];
             }
         });
+        return result;
+    }, [selectedCoefficients, setupGrades]);
 
-        const currentVal = parseFloat(grades[bestKey]) || 0;
-        return {
-            key: bestKey,
-            value: (currentVal >= 2 && currentVal <= 6) ? currentVal : 0,
-            others: group.filter(k => k !== bestKey && (parseFloat(grades[k]) >= 2))
-        };
+    const describeGroup = (groupId) => {
+        if (FIELD_LABELS[groupId]) return FIELD_LABELS[groupId];
+        if (SLOT_GROUPS[groupId]) {
+            const firstWithLabel = SLOT_GROUPS[groupId].find((k) => FIELD_LABELS[k]);
+            if (firstWithLabel) return FIELD_LABELS[firstWithLabel];
+        }
+        return groupId;
     };
 
     const calculateScore = (coefficients) => {
-        if (!coefficients) return 0;
-        let total = 0;
-        const processedGroups = new Set();
-        
-        Object.keys(coefficients).forEach(key => {
+        if (!coefficients) return { score: 0, missingSlots: [] };
+        const termsByGroupAndCoef = {};
+
+        Object.entries(coefficients).forEach(([key, coef]) => {
+            if (!coef) return;
             let groupId = key;
             for (const [master, members] of Object.entries(SLOT_GROUPS)) {
-                if (members.includes(key)) { groupId = master; break; }
+                if (members.includes(key)) {
+                    groupId = master;
+                    break;
+                }
             }
-            
-            if (!processedGroups.has(groupId)) {
-                const { value } = getBestGradeForSlot(groupId);
-                total += value * (coefficients[key] || 0);
-                processedGroups.add(groupId);
+            const termId = `${groupId}:${coef}`;
+            if (!termsByGroupAndCoef[termId]) {
+                termsByGroupAndCoef[termId] = {
+                    groupId,
+                    coef,
+                    keys: []
+                };
             }
+            termsByGroupAndCoef[termId].keys.push(key);
         });
-        return total.toFixed(2);
+
+        let total = 0;
+        const missingSlots = [];
+
+        Object.values(termsByGroupAndCoef).forEach((term) => {
+            const { groupId, coef, keys } = term;
+            let bestValue = 0;
+            let hasValue = false;
+
+            keys.forEach((key) => {
+                const val = parseFloat(grades[key]);
+                if (!Number.isNaN(val) && val >= 2 && val <= 6) {
+                    if (!hasValue || val > bestValue) {
+                        bestValue = val;
+                        hasValue = true;
+                    }
+                }
+            });
+
+            if (!hasValue) {
+                missingSlots.push(groupId);
+                return;
+            }
+
+            total += bestValue * coef;
+        });
+
+        return { score: total, missingSlots };
     };
+
+    if (!setupCompleted) {
+        return (
+            <div className="min-h-screen bg-base-100 pt-24 pb-12 px-6">
+                <CalculatorSetup onComplete={handleSetupComplete} />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-base-100 pt-24 pb-12 px-6">
@@ -141,6 +185,14 @@ const CalculatorPage = () => {
                         <Calculator size={40} />
                     </div>
                     <h1 className="text-4xl font-black tracking-tight uppercase italic underline decoration-primary">Калкулатор </h1>
+                    <button
+                        type="button"
+                        className="btn btn-ghost btn-sm rounded-full gap-2 mt-2"
+                        onClick={() => setSetupCompleted(false)}
+                    >
+                        <Edit3 size={16} />
+                        Редактирай оценките
+                    </button>
                 </div>
 
                 {/* --- ИЗБИРАТЕЛИ --- */}
@@ -250,9 +302,10 @@ const CalculatorPage = () => {
                 {selectedSpecialtyName && filteredData.some(d => d.specialty === selectedSpecialtyName) && (
                     <div className="bg-base-100 shadow-2xl p-8 border border-base-200 rounded-[3rem] animate-in fade-in slide-in-from-top-4 duration-500">
                         <GradeInputSection 
-                            coefficients={filteredData.find(d => d.specialty === selectedSpecialtyName)?.coefficients || {}} 
+                            coefficients={selectedCoefficients || {}} 
                             faculty={selectedFaculty}
                             specialty={selectedSpecialtyName}
+                            initialValues={initialValuesForSpecialty}
                             onGradesChange={handleGradesChange} 
                         />
                     </div>
@@ -261,10 +314,12 @@ const CalculatorPage = () => {
                 {/* --- РЕЗУЛТАТИ --- */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {filteredData.filter(d => d.specialty === selectedSpecialtyName).map(item => {
-                        const score = calculateScore(item.coefficients);
+                        const { score, missingSlots } = calculateScore(item.coefficients);
+                        const roundedScore = score.toFixed(2);
                         const diff = (item.min_ball_2024 - score).toFixed(2);
                         const isPassing = score >= item.min_ball_2024;
-                        const hasStarted = score > 0;
+                        const hasStarted = score > 0 || Object.keys(grades).length > 0;
+                        const hasMissing = missingSlots.length > 0;
 
                         return (
                             <div key={item.id} className="bg-base-100 p-10 rounded-[3rem] shadow-xl border border-base-200 group transition-all hover:shadow-2xl">
@@ -275,7 +330,9 @@ const CalculatorPage = () => {
                                             <h3 className="text-2xl font-black leading-tight group-hover:text-primary transition-colors">{item.specialty}</h3>
                                         </div>
                                         <div className="text-right">
-                                            <div className={`text-5xl font-black tracking-tighter ${isPassing ? 'text-success' : 'text-primary'}`}>{score}</div>
+                                            <div className={`text-5xl font-black tracking-tighter ${isPassing ? 'text-success' : 'text-primary'}`}>
+                                                {hasMissing ? "—" : roundedScore}
+                                            </div>
                                             <div className="text-[10px] font-black opacity-30 uppercase">БАЛ</div>
                                         </div>
                                     </div>
@@ -289,15 +346,20 @@ const CalculatorPage = () => {
                                 <div className="mt-8 pt-6 border-t border-base-200 flex justify-between items-center">
                                     <div className="flex flex-col">
                                         <span className="text-xs font-black opacity-40 italic font-mono uppercase">Мин. бал 2024: {item.min_ball_2024}</span>
-                                        {!isPassing && hasStarted && (
+                                        {hasMissing && hasStarted && (
+                                            <div className="mt-1 text-[11px] text-error font-black uppercase">
+                                                Липсват оценки за: {missingSlots.map(describeGroup).join(", ")}
+                                            </div>
+                                        )}
+                                        {!hasMissing && !isPassing && hasStarted && (
                                             <div className="flex items-center gap-1.5 text-error mt-1 animate-pulse">
                                                 <TrendingDown size={14} strokeWidth={3} />
                                                 <span className="text-[11px] font-black uppercase">Нужни са още {diff} т.</span>
                                             </div>
                                         )}
                                     </div>
-                                    {isPassing && <div className="badge badge-success py-3 px-5 font-black italic text-white rounded-xl shadow-lg animate-bounce"><CheckCircle2 size={12} className="mr-1"/>ВЛИЗАШ</div>}
-                                    {!isPassing && hasStarted && <div className="badge badge-error badge-outline py-3 px-5 font-black italic rounded-xl border-2">НЕ ДОСТИГА</div>}
+                                    {!hasMissing && isPassing && <div className="badge badge-success py-3 px-5 font-black italic text-white rounded-xl shadow-lg animate-bounce"><CheckCircle2 size={12} className="mr-1"/>ВЛИЗАШ</div>}
+                                    {!hasMissing && !isPassing && hasStarted && <div className="badge badge-error badge-outline py-3 px-5 font-black italic rounded-xl border-2">НЕ ДОСТИГА</div>}
                                 </div>
                             </div>
                         );

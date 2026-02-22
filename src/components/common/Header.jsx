@@ -1,6 +1,6 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext"; 
-import { supabase } from "../../lib/supabase";
+import { sessionService } from "../../services/sessionService";
 import { 
     User, 
     LogOut, 
@@ -34,7 +34,7 @@ const Header = () => {
     }, []);
 
     const handleLogout = async () => {
-        await supabase.auth.signOut();
+        await sessionService.logout();
         setIsMenuOpen(false);
         navigate("/login"); 
     };
