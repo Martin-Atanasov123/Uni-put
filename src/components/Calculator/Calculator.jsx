@@ -247,9 +247,16 @@ const CalculatorPage = () => {
                 </div>
 
                 {/* --- ВХОДНИ ПОЛЕТА --- */}
-                <div className="bg-base-100 shadow-2xl p-8 border border-base-200 rounded-[3rem] animate-in fade-in slide-in-from-top-4 duration-500">
-                    <GradeInputSection onGradesChange={handleGradesChange} />
-                </div>
+                {selectedSpecialtyName && filteredData.some(d => d.specialty === selectedSpecialtyName) && (
+                    <div className="bg-base-100 shadow-2xl p-8 border border-base-200 rounded-[3rem] animate-in fade-in slide-in-from-top-4 duration-500">
+                        <GradeInputSection 
+                            coefficients={filteredData.find(d => d.specialty === selectedSpecialtyName)?.coefficients || {}} 
+                            faculty={selectedFaculty}
+                            specialty={selectedSpecialtyName}
+                            onGradesChange={handleGradesChange} 
+                        />
+                    </div>
+                )}
 
                 {/* --- РЕЗУЛТАТИ --- */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

@@ -14,7 +14,7 @@ const COEFFICIENT_KEYS = [
   "dzi_bio_obshto", "dzi_bio_profil", "dzi_chu_ezik", "dzi_chu_ezik_b1", "dzi_chu_ezik_b2",
   "dzi_chu_ezik_cert_b1", "dzi_chu_ezik_cert_frenski_b2", "dzi_chu_ezik_cert_nemski_b1",
   "dzi_chu_ezik_cert_nemski_b2_plus", "dzi_chu_ezik_dele_b1_combo", "dzi_chujdezik",
-  "dzi_fil", "dzi_filosofiya", "dzi_fiz", "dzi_fizika", "dzi_geo", "dzi_him", "dzi_him_obshto",
+  "dzi_fil", "dzi_filosofiya", "dzi_fiz", "dzi_fizika", "dzi_geo", "dzi_him", "dzi_hим_obshto",
   "dzi_him_profil", "dzi_himiq", "dzi_informatika", "dzi_inf", "dzi_ist", "dzi_istoriq",
   "dzi_it", "dzi_kitayski", "dzi_kitayski_b2", "dzi_koreiski", "dzi_latin", "dzi_mat",
   "dzi_matematika", "dzi_muz", "dzi_obsht", "dzi_obshtoobrazovatelen_predmet",
@@ -26,8 +26,21 @@ const COEFFICIENT_KEYS = [
   "mat", "muz", "muzika", "obsht_uspeh", "obshtoobrazovatelen_test", "obshtestvoznanie",
   "olympiad_laureate_it", "olympiad_laureate_mat_inf", "olympiad_winner_it",
   "olympiad_winner_mat_inf", "portfolio", "predpriemachestvo", "profesionalna_kvalifikaciq",
-  "prof_kv", "psihologiya_na_lichnostta", "socialna_psihologiya", "svqt_i_lichnost",
-  "tournament", "vtor_dzi_drug_predmet"
+  "prof_kv", "psihologiya_na_lichnostta", "socialna_psihologiya", "svqt_i_lichност",
+  "tournament", "vtor_dzi_drug_predmet",
+  "dzi_nai_visoka", "dzi_profilirasht_predmet", "eakt_ocenka", "exam_angliiski",
+  "exam_angliyski", "exam_etika", "exam_fizika", "exam_iq", "exam_phys", "exam_ris_1",
+  "exam_ris_2", "exam_skulptirane", "exam_sport", "exam_test", "grazhdansko_obrazovanie",
+  "him_udostoverenie", "hsk4_combo", "istoriq_diploma", "izpit_bel", "mat_diploma",
+  "matematika", "obsht_prirodonauchen_test", "obsht_tehnicheski_test", "ocenka_matematika",
+  "prakticheski_izpit_horeografiq", "profilirasht_predmet", "psihologicheska_ocenka", "ris",
+  "risuvane_cvetna_kompoziciq", "risuvane_obemno_prostranstvena_kompoziciq",
+  "risuvane_perspektiva", "stop_test", "subesedvane", "test_informatika", "test_pravo",
+  "topik3_combo", "zdipp_lazerna_i_optichna_tehnika", "zdipp_ochna_optika",
+  "zdipp_programno_osiguryavane", "zdippk_bibliotekoznanie", "zdippk_delovodstvo_arhiv",
+  "zdippk_fotografiya", "zdippk_ikonomichesko_informacionno_osigurqvane",
+  "zdippk_poligrafiya", "zdippk_posrednik_trudova_borsa", "zdippk_satrudnik_socialni_deinosti",
+  "zdippk_tekstoobrabotka", "zdippk_turizam", "zdippk_veterinaren_tehnik", "zrelosten_bel"
 ];
 
 const FIELD_LABELS = {
@@ -165,7 +178,57 @@ const FIELD_LABELS = {
   socialna_psihologiya: "Диплома: Социална психология",
   svqt_i_lichnost: "Диплома: Свят и личност",
   tournament: "Турнир",
-  vtor_dzi_drug_predmet: "Втори ДЗИ друг предмет"
+  vtor_dzi_drug_predmet: "Втори ДЗИ друг предмет",
+  dzi_nai_visoka: "Най-висока ДЗИ",
+  dzi_profilirasht_predmet: "ДЗИ профилиращ предмет",
+  eakt_ocenka: "ЕАКТ оценка",
+  exam_angliiski: "Изпит по английски език",
+  exam_angliyski: "Изпит по английски език",
+  exam_etika: "Изпит по етика",
+  exam_fizika: "Изпит по физика",
+  exam_iq: "IQ тест",
+  exam_phys: "Изпит по физика",
+  exam_ris_1: "Изпит по рисуване 1",
+  exam_ris_2: "Изпит по рисуване 2",
+  exam_skulptirane: "Изпит по скулптиране",
+  exam_sport: "Изпит по спорт",
+  exam_test: "Приемен тест",
+  grazhdansko_obrazovanie: "Диплома: Гражданско образование",
+  him_udostoverenie: "Химия удостоверение",
+  hsk4_combo: "HSK4 комбинация",
+  istoriq_diploma: "Диплома: История",
+  izpit_bel: "Изпит по БЕЛ",
+  mat_diploma: "Диплома: Математика",
+  matematika: "Диплома: Математика",
+  obsht_prirodonauchen_test: "Общ природонаучен тест",
+  obsht_tehnicheski_test: "Общ технически тест",
+  ocenka_matematika: "Оценка по математика",
+  prakticheski_izpit_horeografiq: "Практически изпит по хореография",
+  profilirasht_predmet: "Профилиращ предмет",
+  psihologicheska_ocenka: "Психологическа оценка",
+  ris: "Рисуване",
+  risuvane_cvetna_kompoziciq: "Рисуване цветна композиция",
+  risuvane_obemno_prostranstvena_kompoziciq: "Рисуване обемно-пространствена композиция",
+  risuvane_perspektiva: "Рисуване перспектива",
+  stop_test: "STOP тест",
+  subesedvane: "Събеседване",
+  test_informatika: "Тест по информатика",
+  test_pravo: "Тест по право",
+  topik3_combo: "TOPIK3 комбинация",
+  zdipp_lazerna_i_optichna_tehnika: "ЗДИПП Лазерна и оптична техника",
+  zdipp_ochna_optika: "ЗДИПП Очна оптика",
+  zdipp_programno_osiguryavane: "ЗДИПП Програмно осигуряване",
+  zdippk_bibliotekoznanie: "ЗДИППК Библиотекознание",
+  zdippk_delovodstvo_arhiv: "ЗДИППК Деловодство и архив",
+  zdippk_fotografiya: "ЗДИППК Фотография",
+  zdippk_ikonomichesko_informacionno_osigurqvane: "ЗДИППК Икономическо информационно осигуряване",
+  zdippk_poligrafiya: "ЗДИППК Полиграфия",
+  zdippk_posrednik_trudova_borsa: "ЗДИППК Посредник трудова борса",
+  zdippk_satrudnik_socialni_deinosti: "ЗДИППК Сътрудник социални дейности",
+  zdippk_tekstoobrabotka: "ЗДИППК Текстообработка",
+  zdippk_turizam: "ЗДИППК Туризъм",
+  zdippk_veterinaren_tehnik: "ЗДИППК Ветеринарен техник",
+  zrelosten_bel: "Зрелостен изпит по БЕЛ"
 };
 
 // Логически групи от коефициенти – помагат при избор на подходящи полета за формули/интерфейс.
@@ -199,7 +262,8 @@ const SLOT_GROUPS = {
   
   // English
   english_group: ["dzi1_angliiski", "dzi2_angliiski", "dzi_angliiski", 
-    "dzi_angliyski_b1", "dzi_angliyski_b2", "angliiski_ezik"],
+    "dzi_angliyski_b1", "dzi_angliyski_b2", "angliiski_ezik",
+    "exam_angliiski", "exam_angliyski"],
   
   // Asian languages
   asian_languages_group: ["dzi_yaponski", "dzi_kitayski", "dzi_kitayski_b2", "dzi_koreiski"],
@@ -211,10 +275,12 @@ const SLOT_GROUPS = {
   // IT and Informatics
   it_informatics_group: ["exam_informatika", "dzi1_informatika", "dzi2_informatika", 
     "dzi_informatika", "dzi_inf", "informatika", "dzi1_it", "dzi2_it", "dzi_it", "it",
+    "test_informatika",
     "olympiad_winner_it", "olympiad_laureate_it"],
   
   // History
-  history_group: ["exam_ist", "dzi1_ist", "dzi2_ist", "dzi_ist", "dzi_istoriq", "ist"],
+  history_group: ["exam_ist", "dzi1_ist", "dzi2_ist", "dzi_ist", "dzi_istoriq", "ist",
+    "istoriq_diploma"],
   
   // Geography
   geography_group: ["exam_geo", "dzi1_geo", "dzi2_geo", "dzi_geo", "geo"],
@@ -223,26 +289,38 @@ const SLOT_GROUPS = {
   philosophy_group: ["dzi1_fil", "dzi2_fil", "dzi_fil", "dzi_filosofiya", "fil"],
   
   // Arts
-  arts_group: ["exam_muz", "dzi_muz", "muz", "muzika", "exam_ris", "dzi_ris", "portfolio"],
+  arts_group: ["exam_muz", "dzi_muz", "muz", "muzika", "exam_ris", "dzi_ris", "portfolio",
+    "exam_ris_1", "exam_ris_2", "exam_skulptirane", "ris",
+    "risuvane_cvetna_kompoziciq", "risuvane_obemno_prostranstvena_kompoziciq",
+    "risuvane_perspektiva", "prakticheski_izpit_horeografiq"],
   
   // Diploma and general
-  diploma_group: ["diploma", "obsht_uspeh", "diploma_semestrial", "diploma_state_exams", "bel_diploma"],
+  diploma_group: ["diploma", "obsht_uspeh", "diploma_semestrial", "diploma_state_exams", "bel_diploma",
+    "mat_diploma", "matematika", "zrelosten_bel"],
   
   // Business
   business_group: ["dzi1_predpriemachestvo", "dzi_predpriemachestvo", "predpriemachestvo"],
   
   // Professional
   professional_group: ["dzi_profesiq", "profesionalna_kvalifikaciq", "prof_kv",
-    "dzi_obshtoobrazovatelen_predmet", "dzi_obsht"],
+    "dzi_obshtoobrazovatelen_predmet", "dzi_obsht",
+    "zdipp_lazerna_i_optichna_tehnika", "zdipp_ochna_optika",
+    "zdipp_programno_osiguryavane", "zdippk_bibliotekoznanie", "zdippk_delovodstvo_arhiv",
+    "zdippk_fotografiya", "zdippk_ikonomichesko_informacionno_osigurqvane",
+    "zdippk_poligrafiya", "zdippk_posrednik_trudova_borsa", "zdippk_satrudnik_socialni_deinosti",
+    "zdippk_tekstoobrabotka", "zdippk_turizam", "zdippk_veterinaren_tehnik"],
   
   // Social sciences
   social_subjects_group: ["etika_pravo", "logika_psihologiya", "obshtestvoznanie",
-    "svqt_i_lichnost", "socialna_psihologiya", "psihologiya_na_lichnostta"],
+    "svqt_i_lichnost", "socialna_psihologiya", "psihologiya_na_lichностta",
+    "grazhdansko_obrazovanie", "exam_etika", "psihologicheska_ocenka", "test_pravo"],
   
   // Competition
   competition_group: ["konkursen_izpit_1", "konkursen_izpit_2", "obshtoobrazovatelen_test",
     "ese_obsht_tema", "bonifikaciq", "izpit_drugo_vu", 
-    "vtor_dzi_drug_predmet", "dzi2_drug_predmet"]
+    "vtor_dzi_drug_predmet", "dzi2_drug_predmet",
+    "exam_iq", "exam_test", "obsht_prirodonauchen_test", "obsht_tehnicheski_test",
+    "stop_test", "subesedvane"]
 };
 
 export { COEFFICIENT_KEYS, FIELD_LABELS, SLOT_GROUPS };
