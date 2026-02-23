@@ -138,9 +138,18 @@ const AdminDashboard = () => {
         activeTable.fields.forEach((f) => {
             const v = formValues[f.id];
             if (f.type === "number" && v !== "") {
-                payload[f.id] = parseFloat(v);
+                const num = parseFloat(v);
+                payload[f.id] = Number.isNaN(num) ? null : num;
             } else if (f.type === "json" && v) {
-                payload[f.id] = JSON.parse(v);
+                try {
+                    payload[f.id] = JSON.parse(v);
+                } catch {
+                    throw new Error(`Невалиден JSON в поле: ${f.label}`);
+                }
+            } else if (f.type === "boolean") {
+                payload[f.id] = !!v;
+            } else if (f.type === "select") {
+                payload[f.id] = v === "" ? null : v;
             } else {
                 payload[f.id] = v === "" ? null : v;
             }
@@ -154,6 +163,17 @@ const AdminDashboard = () => {
         if (!activeTable) return;
         setStatus({ type: "loading", msg: "Записване..." });
         try {
+            const missing = activeTable.fields
+                .filter((f) => f.required)
+                .filter((f) => {
+                    const v = formValues[f.id];
+                    return v == null || v === "";
+                });
+            if (missing.length > 0) {
+                const names = missing.map((f) => f.label).join(", ");
+                setStatus({ type: "error", msg: `Липсват задължителни полета: ${names}` });
+                return;
+            }
             const payload = parsePayload();
             if (editingRow) {
                 await adminService.update(
@@ -558,6 +578,31 @@ const AdminDashboard = () => {
                                                     handleFormChange(field.id, e.target.value)
                                                 }
                                             />
+                                        ) : field.type === "boolean" ? (
+                                            <input
+                                                type="checkbox"
+                                                className="toggle toggle-primary"
+                                                checked={!!formValues[field.id]}
+                                                onChange={(e) =>
+                                                    handleFormChange(field.id, e.target.checked)
+                                                }
+                                            />
+                                        ) : field.type === "select" ? (
+                                            <select
+                                                className="select select-sm bg-base-100 rounded-2xl"
+                                                required={field.required}
+                                                value={formValues[field.id] || ""}
+                                                onChange={(e) =>
+                                                    handleFormChange(field.id, e.target.value)
+                                                }
+                                            >
+                                                <option value="">Изберете...</option>
+                                                {(field.options || []).map((opt) => (
+                                                    <option key={opt} value={opt}>
+                                                        {opt}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         ) : (
                                             <input
                                                 type={field.type || "text"}
