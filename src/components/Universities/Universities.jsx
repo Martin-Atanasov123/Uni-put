@@ -1,15 +1,18 @@
 import { useState, useEffect, useMemo } from "react";
-import { 
-    Search, 
-    MapPin, 
-    ChevronRight, 
-    School, 
-    Filter
+import {
+    Search,
+    MapPin,
+    ChevronRight,
+    School,
+    Filter,
+    Heart,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { universityService } from "../../services/universityService";
+import { useAuth } from "../../context/AuthContext";
 
 const UniversitiesPage = () => {
+    const { user, isFavorite, toggleFavorite } = useAuth();
     const [universities, setUniversities] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
@@ -144,41 +147,66 @@ const UniversitiesPage = () => {
                 ) : (
                     <>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredUnis.slice(0, visibleCount).map((uni) => (
-                            <div 
-                                key={uni.id} 
-                                className="group bg-base-100 rounded-[2.5rem] border border-base-200 p-8 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 relative overflow-hidden"
-                            >
-                                {/* Background Decor */}
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors"></div>
-                                
-                                <div className="flex flex-col h-full space-y-6">
-                                    <div className="space-y-1">
-                                        <div className="flex justify-between items-start">
+                        {filteredUnis.slice(0, visibleCount).map((uni) => {
+                            const favorite = isFavorite(String(uni.id));
+                            return (
+                                <div
+                                    key={uni.id}
+                                    className="group bg-base-100 rounded-[2.5rem] border border-base-200 p-8 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 relative overflow-hidden"
+                                >
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors"></div>
+
+                                    <div className="flex flex-col h-full space-y-6">
+                                        <div className="space-y-3">
                                             <div className="flex items-center gap-2 text-[10px] font-black opacity-40 uppercase tracking-widest">
                                                 <MapPin size={12} className="text-primary" /> {uni.city}
                                             </div>
-                                        </div>
-                                        
-                                        <h2 className="text-xl font-black leading-tight group-hover:text-primary transition-colors">
-                                            {uni.specialty}
-                                        </h2>
-                                        <p className="text-xs font-bold opacity-60 flex items-center gap-1">
-                                            <School size={14} /> {uni.university_name}
-                                        </p>
-                                    </div>
 
-                                    <div className="flex items-center justify-between pt-4 border-t border-base-200">
-                                        <Link 
-                                            to="/calculator" 
-                                            className="btn btn-circle btn-primary shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform"
-                                        >
-                                            <ChevronRight />
-                                        </Link>
+                                            <h2 className="text-xl font-black leading-tight group-hover:text-primary transition-colors">
+                                                {uni.specialty}
+                                            </h2>
+                                            <p className="text-xs font-bold opacity-60 flex items-center gap-1">
+                                                <School size={14} /> {uni.university_name}
+                                            </p>
+                                        </div>
+
+                                        <div className="flex items-center justify-between pt-4 border-t border-base-200 mt-auto gap-3">
+                                            <Link
+                                                to="/calculator"
+                                                className="btn btn-circle btn-primary shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform"
+                                            >
+                                                <ChevronRight />
+                                            </Link>
+                                            {user && (
+                                                <button
+                                                    type="button"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        toggleFavorite(String(uni.id));
+                                                    }}
+                                                    className={`btn btn-sm rounded-2xl font-bold gap-2 ${
+                                                        favorite
+                                                            ? "btn-error btn-outline"
+                                                            : "btn-outline border-base-300"
+                                                    }`}
+                                                    aria-label={
+                                                        favorite
+                                                            ? "Премахни от любими"
+                                                            : "Добави в любими"
+                                                    }
+                                                >
+                                                    <Heart
+                                                        size={18}
+                                                        className={favorite ? "fill-current" : ""}
+                                                    />
+                                                    {favorite ? "В любими" : "Добави в любими"}
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                     {filteredUnis.length > visibleCount && (
                         <div className="flex justify-center mt-8">

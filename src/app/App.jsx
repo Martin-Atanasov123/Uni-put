@@ -15,6 +15,7 @@ import Footer from "../components/common/Footer";
 import CalculatorPage from "../components/Calculator/Calculator";
 import UniversitiesPage from "../components/Universities/Universities";
 import Profile from "../components/Auth/Profile";
+import FavoritesPage from "../components/Favorites/Favorites";
 import AdminRoute from "../routes/AdminRoute";
 import AdminDashboard from "../components/admin/AdminDashboard";
 
@@ -53,6 +54,14 @@ function App() {
                     <Route
                         path="/dormitories"
                         element={<Dormitories />}
+                    />
+                    <Route
+                        path="/favorites"
+                        element={
+                            <ProtectedRoute>
+                                <FavoritesPage />
+                            </ProtectedRoute>
+                        }
                     />
                     
                     {/* Защитени маршрути (изискват вход) */}
