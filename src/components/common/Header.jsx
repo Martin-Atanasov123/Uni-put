@@ -1,20 +1,21 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext"; 
 import { sessionService } from "../../services/sessionService";
-import { 
-    User, 
-    LogOut, 
-    LayoutDashboard, 
-    Menu, 
-    X, 
-    GraduationCap, 
-    Calculator, 
+import {
+    User,
+    LogOut,
+    LayoutDashboard,
+    Menu,
+    X,
+    GraduationCap,
+    Calculator,
     Search,
     Moon,
     Sun,
     Settings,
     Building2,
-    Info
+    Info,
+    Heart,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -138,6 +139,7 @@ const Header = () => {
 
                                     <li><Link to="/profile" className="rounded-xl py-3 font-bold"><User size={18}/> Профил</Link></li>
                                     <li><Link to="/calculator" className="rounded-xl py-3 font-bold"><LayoutDashboard size={18}/> Моите балове</Link></li>
+                                    <li><Link to="/favorites" className="rounded-xl py-3 font-bold"><Heart size={18}/> Любими</Link></li>
                                     
                                     <div className="divider opacity-50"></div>
                                     <li><button onClick={handleLogout} className="rounded-xl py-3 font-bold text-error hover:bg-error/10"><LogOut size={18}/> Изход</button></li>
