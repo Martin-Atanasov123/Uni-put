@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "../../lib/supabase";
-import { 
-    Calculator, 
-    Zap, 
-    TrendingUp, 
+import {
+    Calculator,
+    Zap,
+    TrendingUp,
     TrendingDown,
     ArrowRight,
     Info,
@@ -12,11 +12,9 @@ import {
     ArrowDownUp,
     XCircle,
     Search,
-    ChevronDown,
-    Edit3
+    ChevronDown
 } from "lucide-react";
 import GradeInputSection from "./GradeInputSection";
-import CalculatorSetup from "./CalculatorSetup";
 import { FIELD_LABELS, SLOT_GROUPS } from "../../lib/coefficients_config";
 
 const CalculatorPage = () => {
@@ -32,35 +30,59 @@ const CalculatorPage = () => {
     // Searchable Faculty State
     const [facultySearch, setFacultySearch] = useState("");
     const [isFacultyDropdownOpen, setIsFacultyDropdownOpen] = useState(false);
-
+    const [dropdownShowAll, setDropdownShowAll] = useState(false);
     const [selectedSpecialtyName, setSelectedSpecialtyName] = useState("");
     const [grades, setGrades] = useState({});
-    const [setupGrades, setSetupGrades] = useState({});
-    const [setupCompleted, setSetupCompleted] = useState(false);
+    const [activeAltBySlot, setActiveAltBySlot] = useState({});
 
     // Derived unique values for filters
     const cities = [...new Set(allData.map(d => d.city).filter(Boolean))].sort();
     const universities = [...new Set(allData.map(d => d.university_name).filter(Boolean))].sort();
 
-    // Filtered faculties for search
-    const filteredFaculties = faculties.filter(f => 
-        !facultySearch || f.toLowerCase().includes(facultySearch.toLowerCase())
-    );
+    // Filtered faculties for search (show all when dropdownShowAll is true)
+    const filteredFaculties = useMemo(() => {
+        if (dropdownShowAll) return faculties;
+        if (!facultySearch) return faculties;
+        return faculties.filter(f =>
+            f.toLowerCase().includes(facultySearch.toLowerCase())
+        );
+    }, [faculties, facultySearch, dropdownShowAll]);
 
-    // Filtered data based on City and University
+    // Filtered data based on Faculty, City and University
     const filteredData = allData.filter(d => {
+        const matchFaculty = !selectedFaculty || d.faculty === selectedFaculty;
         const matchCity = !selectedCity || d.city === selectedCity;
         const matchUni = !selectedUniversity || d.university_name === selectedUniversity;
-        return matchCity && matchUni;
+        return matchFaculty && matchCity && matchUni;
     });
 
     // Specialties based on filtered data
     const availableSpecialties = [...new Set(filteredData.map(d => d.specialty))].sort();
 
     useEffect(() => {
+        // Debug: track selection and specialties derived
+        // Avoid noisy logs by only logging when selection changes or allData updates
+        console.log("[Calculator] Selection", {
+            selectedFaculty,
+            selectedCity,
+            selectedUniversity
+        });
+        console.log("[Calculator] Data sizes", {
+            allData: allData.length,
+            filteredData: filteredData.length,
+            availableSpecialtiesCount: availableSpecialties.length
+        });
+    }, [selectedFaculty, selectedCity, selectedUniversity, allData.length]);
+
+    useEffect(() => {
         const fetchFaculties = async () => {
             setLoading(true);
             const { data, error } = await supabase.from('universities_duplicate').select('faculty');
+            if (error) {
+                console.error("[Calculator] fetchFaculties error", error);
+            } else {
+                console.log("[Calculator] fetchFaculties result", data?.length || 0);
+            }
             if (!error && data) setFaculties([...new Set(data.map(item => item.faculty).filter(Boolean))]);
             setLoading(false);
         };
@@ -71,39 +93,44 @@ const CalculatorPage = () => {
         if (!selectedFaculty) return;
         const fetchData = async () => {
             setLoading(true);
-            const { data, error } = await supabase.from('universities_duplicate').select('*').eq('faculty', selectedFaculty);
+            console.log("[Calculator] fetchData for faculty", selectedFaculty);
+            const { data, error } = await supabase
+                .from('universities_duplicate')
+                .select('*')
+                .eq('faculty', selectedFaculty);
+            if (error) {
+                console.error("[Calculator] fetchData error", error);
+            } else {
+                console.log("[Calculator] fetchData rows", data?.length || 0);
+            }
             if (!error && data) setAllData(data);
             setLoading(false);
         };
         fetchData();
     }, [selectedFaculty]);
 
-    const handleGradesChange = (newGrades) => {
+    const handleGradesChange = (newGrades, newActiveAltBySlot) => {
         setGrades(newGrades);
+        setActiveAltBySlot(newActiveAltBySlot || {});
     };
 
-    const handleSetupComplete = (values) => {
-        setSetupGrades(values);
-        setSetupCompleted(true);
-    };
-
-    const selectedCoefficients = useMemo(() => {
-        if (!selectedSpecialtyName) return null;
-        const row = filteredData.find((d) => d.specialty === selectedSpecialtyName);
-        return row?.coefficients || null;
+    const rowsForSelectedSpecialty = useMemo(() => {
+        if (!selectedSpecialtyName) return [];
+        return filteredData.filter((d) => d.specialty === selectedSpecialtyName);
     }, [filteredData, selectedSpecialtyName]);
 
-    const initialValuesForSpecialty = useMemo(() => {
-        if (!selectedCoefficients) return {};
-        const keys = Object.keys(selectedCoefficients);
-        const result = {};
-        keys.forEach((key) => {
-            if (setupGrades[key] != null) {
-                result[key] = setupGrades[key];
-            }
+    const coefficientsForInputs = useMemo(() => {
+        const merged = {};
+        rowsForSelectedSpecialty.forEach((row) => {
+            const coefficients = row?.coefficients || {};
+            Object.entries(coefficients).forEach(([key, coef]) => {
+                const n = Number(coef);
+                if (!n) return;
+                merged[key] = 1;
+            });
         });
-        return result;
-    }, [selectedCoefficients, setupGrades]);
+        return merged;
+    }, [rowsForSelectedSpecialty]);
 
     const describeGroup = (groupId) => {
         if (FIELD_LABELS[groupId]) return FIELD_LABELS[groupId];
@@ -114,40 +141,61 @@ const CalculatorPage = () => {
         return groupId;
     };
 
-    const calculateScore = (coefficients) => {
+    const getGroupIdForKey = (key) => {
+        let groupId = key;
+        for (const [master, members] of Object.entries(SLOT_GROUPS)) {
+            if (members.includes(key)) {
+                groupId = master;
+                break;
+            }
+        }
+        return groupId;
+    };
+
+    const describeMissingTerm = (termKeys) => {
+        const labels = [];
+        const seen = new Set();
+
+        termKeys.forEach((key) => {
+            const label = FIELD_LABELS[key] || describeGroup(getGroupIdForKey(key));
+            if (!seen.has(label)) {
+                seen.add(label);
+                labels.push(label);
+            }
+        });
+
+        return labels.join(" / ");
+    };
+
+    const calculateScore = (coefficients, gradeSource, activeAltMap) => {
         if (!coefficients) return { score: 0, missingSlots: [] };
-        const termsByGroupAndCoef = {};
+        const termsByCoef = {};
 
         Object.entries(coefficients).forEach(([key, coef]) => {
-            if (!coef) return;
-            let groupId = key;
-            for (const [master, members] of Object.entries(SLOT_GROUPS)) {
-                if (members.includes(key)) {
-                    groupId = master;
-                    break;
-                }
-            }
-            const termId = `${groupId}:${coef}`;
-            if (!termsByGroupAndCoef[termId]) {
-                termsByGroupAndCoef[termId] = {
-                    groupId,
-                    coef,
+            const coefNum = Number(coef);
+            if (!coefNum) return;
+            const termId = String(coefNum);
+            if (!termsByCoef[termId]) {
+                termsByCoef[termId] = {
+                    coef: coefNum,
                     keys: []
                 };
             }
-            termsByGroupAndCoef[termId].keys.push(key);
+            termsByCoef[termId].keys.push(key);
         });
 
         let total = 0;
         const missingSlots = [];
 
-        Object.values(termsByGroupAndCoef).forEach((term) => {
-            const { groupId, coef, keys } = term;
+        Object.values(termsByCoef).forEach((term) => {
+            const { coef, keys } = term;
             let bestValue = 0;
             let hasValue = false;
 
             keys.forEach((key) => {
-                const val = parseFloat(grades[key]);
+                const groupId = getGroupIdForKey(key);
+                const activeKey = (activeAltMap && activeAltMap[groupId]) || key;
+                const val = parseFloat(gradeSource[activeKey]);
                 if (!Number.isNaN(val) && val >= 2 && val <= 6) {
                     if (!hasValue || val > bestValue) {
                         bestValue = val;
@@ -157,7 +205,7 @@ const CalculatorPage = () => {
             });
 
             if (!hasValue) {
-                missingSlots.push(groupId);
+                missingSlots.push(keys);
                 return;
             }
 
@@ -167,13 +215,12 @@ const CalculatorPage = () => {
         return { score: total, missingSlots };
     };
 
-    if (!setupCompleted) {
-        return (
-            <div className="min-h-screen bg-base-100 pt-24 pb-12 px-6">
-                <CalculatorSetup onComplete={handleSetupComplete} />
-            </div>
-        );
-    }
+    const hasAnyValidGrade = useMemo(() => {
+        return Object.values(grades).some((v) => {
+            const n = parseFloat(v);
+            return !Number.isNaN(n) && n >= 2 && n <= 6;
+        });
+    }, [grades]);
 
     return (
         <div className="min-h-screen bg-base-100 pt-24 pb-12 px-6">
@@ -185,14 +232,6 @@ const CalculatorPage = () => {
                         <Calculator size={40} />
                     </div>
                     <h1 className="text-4xl font-black tracking-tight uppercase italic underline decoration-primary">Калкулатор </h1>
-                    <button
-                        type="button"
-                        className="btn btn-ghost btn-sm rounded-full gap-2 mt-2"
-                        onClick={() => setSetupCompleted(false)}
-                    >
-                        <Edit3 size={16} />
-                        Редактирай оценките
-                    </button>
                 </div>
 
                 {/* --- ИЗБИРАТЕЛИ --- */}
@@ -208,24 +247,49 @@ const CalculatorPage = () => {
                                     value={facultySearch} 
                                     onChange={(e) => {
                                         setFacultySearch(e.target.value);
-                                        if (selectedFaculty !== e.target.value) {
-                                            setSelectedFaculty(""); // Clear actual selection if typing changes
+                                        setDropdownShowAll(false); // switch to filter mode on typing
+                                        setIsFacultyDropdownOpen(true);
+                                    }}
+                                    onClick={() => {
+                                        setIsFacultyDropdownOpen(true);
+                                        setDropdownShowAll(true); // show full list on click
+                                    }}
+                                    onFocus={() => {
+                                        setIsFacultyDropdownOpen(true);
+                                        setDropdownShowAll(true);
+                                    }}
+                                />
+                                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        className="btn btn-ghost btn-xs rounded-full"
+                                        onClick={() => {
+                                            setFacultySearch("");
+                                            setSelectedFaculty("");
                                             setSelectedSpecialtyName("");
                                             setSelectedCity("");
                                             setSelectedUniversity("");
-                                        }
-                                        setIsFacultyDropdownOpen(true);
-                                    }}
-                                    onClick={() => setIsFacultyDropdownOpen(true)}
-                                />
-                                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 opacity-50 pointer-events-none">
-                                    <ChevronDown className={`transition-transform duration-300 ${isFacultyDropdownOpen ? 'rotate-180' : ''}`} size={20} />
+                                            setIsFacultyDropdownOpen(true);
+                                            setDropdownShowAll(true);
+                                        }}
+                                        aria-label="Изчисти"
+                                        title="Изчисти"
+                                    >
+                                        <XCircle size={16} className="opacity-60" />
+                                    </button>
+                                    <ChevronDown className={`opacity-50 transition-transform duration-300 ${isFacultyDropdownOpen ? 'rotate-180' : ''}`} size={20} />
                                 </div>
                             </div>
 
                             {isFacultyDropdownOpen && (
                                 <>
-                                    <div className="fixed inset-0 z-10 cursor-default" onClick={() => setIsFacultyDropdownOpen(false)}></div>
+                                    <div
+                                        className="fixed inset-0 z-10 cursor-default"
+                                        onClick={() => {
+                                            setIsFacultyDropdownOpen(false);
+                                            setDropdownShowAll(false);
+                                        }}
+                                    ></div>
                                     <div className="absolute top-full left-0 right-0 mt-2 bg-base-100 rounded-2xl shadow-xl border border-base-200 max-h-60 overflow-y-auto z-20 animate-in fade-in zoom-in-95 duration-200">
                                         {filteredFaculties.length > 0 ? (
                                             filteredFaculties.map((f, i) => (
@@ -239,6 +303,7 @@ const CalculatorPage = () => {
                                                         setSelectedCity("");
                                                         setSelectedUniversity("");
                                                         setIsFacultyDropdownOpen(false);
+                                                        setDropdownShowAll(false);
                                                     }}
                                                 >
                                                     {f}
@@ -299,13 +364,12 @@ const CalculatorPage = () => {
                 </div>
 
                 {/* --- ВХОДНИ ПОЛЕТА --- */}
-                {selectedSpecialtyName && filteredData.some(d => d.specialty === selectedSpecialtyName) && (
+                {selectedSpecialtyName && rowsForSelectedSpecialty.length > 0 && (
                     <div className="bg-base-100 shadow-2xl p-8 border border-base-200 rounded-[3rem] animate-in fade-in slide-in-from-top-4 duration-500">
                         <GradeInputSection 
-                            coefficients={selectedCoefficients || {}} 
+                            coefficients={coefficientsForInputs} 
                             faculty={selectedFaculty}
                             specialty={selectedSpecialtyName}
-                            initialValues={initialValuesForSpecialty}
                             onGradesChange={handleGradesChange} 
                         />
                     </div>
@@ -313,12 +377,12 @@ const CalculatorPage = () => {
 
                 {/* --- РЕЗУЛТАТИ --- */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {filteredData.filter(d => d.specialty === selectedSpecialtyName).map(item => {
-                        const { score, missingSlots } = calculateScore(item.coefficients);
-                        const roundedScore = score.toFixed(2);
+                    {rowsForSelectedSpecialty.map(item => {
+                        const { score, missingSlots } = calculateScore(item.coefficients, grades, activeAltBySlot);
+                        const roundedScore = Math.round(score);
                         const diff = (item.min_ball_2024 - score).toFixed(2);
                         const isPassing = score >= item.min_ball_2024;
-                        const hasStarted = score > 0 || Object.keys(grades).length > 0;
+                        const hasStarted = score > 0 || hasAnyValidGrade;
                         const hasMissing = missingSlots.length > 0;
 
                         return (
@@ -348,7 +412,7 @@ const CalculatorPage = () => {
                                         <span className="text-xs font-black opacity-40 italic font-mono uppercase">Мин. бал 2024: {item.min_ball_2024}</span>
                                         {hasMissing && hasStarted && (
                                             <div className="mt-1 text-[11px] text-error font-black uppercase">
-                                                Липсват оценки за: {missingSlots.map(describeGroup).join(", ")}
+                                                Липсват оценки за: {missingSlots.map(describeMissingTerm).join(", ")}
                                             </div>
                                         )}
                                         {!hasMissing && !isPassing && hasStarted && (
