@@ -24,13 +24,28 @@ function isValidGrade(value) {
     return !Number.isNaN(n) && n >= 2 && n <= 6;
 }
 
+function rankAltLabel(label) {
+    const t = String(label || "");
+    if (/^ДЗИ\s/.test(t)) return 0;
+    if (/^ДЗИ[¹²]/.test(t)) return 1;
+    if (t.startsWith("Изпит")) return 2;
+    if (t.startsWith("Диплома:")) return 3;
+    return 4;
+}
+
+function compareAlternatives(a, b) {
+    const ra = rankAltLabel(a.label);
+    const rb = rankAltLabel(b.label);
+    if (ra !== rb) return ra - rb;
+    return a.label.length - b.label.length;
+}
+
 function buildSlots(coefficients) {
     const keys = Object.keys(coefficients || {});
     const map = {};
 
     keys.forEach((key) => {
-        const label = FIELD_LABELS[key];
-        if (!label) return;
+        const label = FIELD_LABELS[key] || key;
 
         let slotId = key;
         for (const [group, members] of Object.entries(SLOT_GROUPS)) {
@@ -43,7 +58,6 @@ function buildSlots(coefficients) {
         if (!map[slotId]) {
             map[slotId] = {
                 id: slotId,
-                label,
                 alternatives: []
             };
         }
@@ -54,7 +68,14 @@ function buildSlots(coefficients) {
         });
     });
 
-    return Object.values(map);
+    return Object.values(map).map((slot) => {
+        const alternatives = [...slot.alternatives].sort(compareAlternatives);
+        return {
+            ...slot,
+            label: alternatives[0]?.label || slot.alternatives[0]?.label || slot.id,
+            alternatives
+        };
+    });
 }
 
 const GradeInputSection = ({ coefficients = {}, faculty, specialty, initialValues = {}, onGradesChange }) => {
@@ -120,29 +141,11 @@ const GradeInputSection = ({ coefficients = {}, faculty, specialty, initialValue
         run();
     }, [user, valuesByKey, activeAltBySlot, faculty, specialty]);
 
-    const bestBySlot = useMemo(() => {
-        const result = {};
-        slots.forEach((slot) => {
-            let best = null;
-            let bestKey = null;
-            slot.alternatives.forEach((alt) => {
-                const n = parseFloat(valuesByKey[alt.key]);
-                if (Number.isNaN(n) || n < 2 || n > 6) return;
-                if (best == null || n > best) {
-                    best = n;
-                    bestKey = alt.key;
-                }
-            });
-            result[slot.id] = { bestGrade: best, bestKey };
-        });
-        return result;
-    }, [slots, valuesByKey]);
-
     useEffect(() => {
         if (onGradesChange) {
-            onGradesChange(valuesByKey, bestBySlot);
+            onGradesChange(valuesByKey, activeAltBySlot);
         }
-    }, [valuesByKey, bestBySlot, onGradesChange]);
+    }, [valuesByKey, activeAltBySlot, onGradesChange]);
 
     const handleChangeGrade = (key, value) => {
         setValuesByKey((prev) => ({
@@ -179,10 +182,8 @@ const GradeInputSection = ({ coefficients = {}, faculty, specialty, initialValue
 
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {slots.map((slot) => {
-                    const slotBest = bestBySlot[slot.id];
                     const activeKey =
                         activeAltBySlot[slot.id] ||
-                        slotBest?.bestKey ||
                         slot.alternatives[0]?.key;
 
                     const activeAlt =
@@ -260,8 +261,10 @@ const GradeInputSection = ({ coefficients = {}, faculty, specialty, initialValue
                                 <div className="text-[11px] opacity-60 flex justify-between">
                                     <span>
                                         Най-добра оценка:{" "}
-                                        {slotBest?.bestGrade != null
-                                            ? slotBest.bestGrade.toFixed(2)
+                                        {!Number.isNaN(parseFloat(value)) &&
+                                        parseFloat(value) >= 2 &&
+                                        parseFloat(value) <= 6
+                                            ? Number(value).toFixed(2)
                                             : "липсва вход"}
                                     </span>
                                 </div>
