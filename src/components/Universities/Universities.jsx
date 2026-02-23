@@ -18,6 +18,7 @@ const UniversitiesPage = () => {
     const [suggestions, setSuggestions] = useState([]);
     const [searchResults, setSearchResults] = useState(null);
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const [visibleCount, setVisibleCount] = useState(60);
 
     useEffect(() => {
         const loadData = async () => {
@@ -56,6 +57,10 @@ const UniversitiesPage = () => {
             return matchesCity;
         });
     }, [universities, searchResults, selectedCity]);
+
+    useEffect(() => {
+        setVisibleCount(60);
+    }, [searchTerm, selectedCity]);
 
     const handleSuggestionClick = (text) => {
         setSearchTerm(text);
@@ -137,8 +142,9 @@ const UniversitiesPage = () => {
                         <span className="loading loading-infinity loading-lg text-primary scale-150"></span>
                     </div>
                 ) : (
+                    <>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredUnis.map((uni) => (
+                        {filteredUnis.slice(0, visibleCount).map((uni) => (
                             <div 
                                 key={uni.id} 
                                 className="group bg-base-100 rounded-[2.5rem] border border-base-200 p-8 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 relative overflow-hidden"
@@ -174,6 +180,18 @@ const UniversitiesPage = () => {
                             </div>
                         ))}
                     </div>
+                    {filteredUnis.length > visibleCount && (
+                        <div className="flex justify-center mt-8">
+                            <button
+                                type="button"
+                                className="btn btn-primary rounded-2xl px-8"
+                                onClick={() => setVisibleCount((c) => c + 60)}
+                            >
+                                Покажи още
+                            </button>
+                        </div>
+                    )}
+                    </>
                 )}
 
                 {/* --- EMPTY STATE --- */}

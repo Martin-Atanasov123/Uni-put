@@ -7,19 +7,17 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.89.0",
     "@tailwindcss/vite": "^4.1.18",
-    "leaflet": "^1.9.4",
     "lucide-react": "^0.562.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-leaflet": "^5.0.0",
     "react-router": "^7.11.0",
-    "react-router-dom": "^7.11.0",
-    "recharts": "^3.7.0"
+    "react-router-dom": "^7.11.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",

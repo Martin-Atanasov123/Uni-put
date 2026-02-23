@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "../../lib/supabase";
+import { useLocation } from "react-router-dom";
 import {
     Calculator,
     Zap,
@@ -31,6 +32,7 @@ const CalculatorPage = () => {
     const [facultySearch, setFacultySearch] = useState("");
     const [isFacultyDropdownOpen, setIsFacultyDropdownOpen] = useState(false);
     const [dropdownShowAll, setDropdownShowAll] = useState(false);
+    const location = useLocation();
     const [selectedSpecialtyName, setSelectedSpecialtyName] = useState("");
     const [grades, setGrades] = useState({});
     const [activeAltBySlot, setActiveAltBySlot] = useState({});
@@ -72,20 +74,45 @@ const CalculatorPage = () => {
             filteredData: filteredData.length,
             availableSpecialtiesCount: availableSpecialties.length
         });
-    }, [selectedFaculty, selectedCity, selectedUniversity, allData.length]);
+    }, [selectedFaculty, selectedCity, selectedUniversity, allData.length, filteredData.length, availableSpecialties.length]);
 
     useEffect(() => {
         const fetchFaculties = async () => {
             setLoading(true);
+            /**
+             * Взима списък с факултети от Supabase.
+             * Причина за имплементация: UI трябва да показва динамичен списък от база, не хардкодиран.
+             * Странични ефекти: При грешка логира и оставя текущото състояние; няма кеш тук.
+             */
             const { data, error } = await supabase.from('universities_duplicate').select('faculty');
             if (error) {
                 console.error("[Calculator] fetchFaculties error", error);
             } else {
                 console.log("[Calculator] fetchFaculties result", data?.length || 0);
             }
-            if (!error && data) setFaculties([...new Set(data.map(item => item.faculty).filter(Boolean))]);
+            if (!error && data) {
+                const list = [...new Set(data.map(item => item.faculty).filter(Boolean))];
+                setFaculties(list);
+                try {
+                    localStorage.setItem("uniput_faculties_cache", JSON.stringify(list));
+                } catch (e) {
+                    console.warn("[Calculator] cache faculties write failed", e);
+                }
+            }
             setLoading(false);
         };
+        // Кеш: зареждане при старт
+        try {
+            const raw = localStorage.getItem("uniput_faculties_cache");
+            if (raw) {
+                const cached = JSON.parse(raw);
+                if (Array.isArray(cached) && cached.length > 0) {
+                    setFaculties(cached);
+                }
+            }
+        } catch (e) {
+            console.warn("[Calculator] cache faculties read failed", e);
+        }
         fetchFaculties();
     }, []);
 
@@ -108,6 +135,22 @@ const CalculatorPage = () => {
         };
         fetchData();
     }, [selectedFaculty]);
+
+    useEffect(() => {
+        setIsFacultyDropdownOpen(false);
+        setDropdownShowAll(false);
+    }, [location.pathname]);
+
+    useEffect(() => {
+        const onKey = (e) => {
+            if (e.key === "Escape") {
+                setIsFacultyDropdownOpen(false);
+                setDropdownShowAll(false);
+            }
+        };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, []);
 
     const handleGradesChange = (newGrades, newActiveAltBySlot) => {
         setGrades(newGrades);
@@ -167,6 +210,16 @@ const CalculatorPage = () => {
         return labels.join(" / ");
     };
 
+    /**
+     * Смята крайния бал по дадени коефициенти и оценки.
+     * - Групира ключовете по коефициент (напр. 3*, 1*).
+     * - За всяка група взима най-добрата валидна оценка от активната алтернатива.
+     * - Връща сбор и списък липсващи слотове.
+     * @param {Record<string, number|string>} coefficients
+     * @param {Record<string, string|number>} gradeSource
+     * @param {Record<string, string>} activeAltMap
+     * @returns {{ score: number, missingSlots: string[][] }}
+     */
     const calculateScore = (coefficients, gradeSource, activeAltMap) => {
         if (!coefficients) return { score: 0, missingSlots: [] };
         const termsByCoef = {};
@@ -376,59 +429,65 @@ const CalculatorPage = () => {
                 )}
 
                 {/* --- РЕЗУЛТАТИ --- */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {rowsForSelectedSpecialty.map(item => {
+                {(() => {
+                    console.time("calc:rows");
+                    const displayedResults = rowsForSelectedSpecialty.map(item => {
                         const { score, missingSlots } = calculateScore(item.coefficients, grades, activeAltBySlot);
                         const roundedScore = Math.round(score);
                         const diff = (item.min_ball_2024 - score).toFixed(2);
                         const isPassing = score >= item.min_ball_2024;
                         const hasStarted = score > 0 || hasAnyValidGrade;
                         const hasMissing = missingSlots.length > 0;
-
-                        return (
-                            <div key={item.id} className="bg-base-100 p-10 rounded-[3rem] shadow-xl border border-base-200 group transition-all hover:shadow-2xl">
-                                <div className="space-y-6">
-                                    <div className="flex justify-between items-start">
-                                        <div>
-                                            <span className="text-[10px] font-black opacity-40 uppercase tracking-tighter block mb-1">{item.university_name}</span>
-                                            <h3 className="text-2xl font-black leading-tight group-hover:text-primary transition-colors">{item.specialty}</h3>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className={`text-5xl font-black tracking-tighter ${isPassing ? 'text-success' : 'text-primary'}`}>
-                                                {hasMissing ? "—" : roundedScore}
+                        return { item, score, roundedScore, diff, isPassing, hasStarted, hasMissing, missingSlots };
+                    });
+                    console.timeEnd("calc:rows");
+                    return (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            {displayedResults.map(({ item, roundedScore, isPassing, hasMissing, hasStarted, diff, missingSlots }) => (
+                                <div key={item.id} className="bg-base-100 p-10 rounded-[3rem] shadow-xl border border-base-200 group transition-all hover:shadow-2xl">
+                                    <div className="space-y-6">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <span className="text-[10px] font-black opacity-40 uppercase tracking-tighter block mb-1">{item.university_name}</span>
+                                                <h3 className="text-2xl font-black leading-tight group-hover:text-primary transition-colors">{item.specialty}</h3>
                                             </div>
-                                            <div className="text-[10px] font-black opacity-30 uppercase">БАЛ</div>
+                                            <div className="text-right">
+                                                <div className={`text-5xl font-black tracking-tighter ${isPassing ? 'text-success' : 'text-primary'}`}>
+                                                    {hasMissing ? "—" : roundedScore}
+                                                </div>
+                                                <div className="text-[10px] font-black opacity-30 uppercase">БАЛ</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="p-5 bg-base-200 rounded-[2rem] text-[13px] font-bold opacity-80 flex gap-4 border-l-4 border-primary">
+                                            <Info size={20} className="shrink-0 text-primary mt-0.5" />
+                                            <span><strong>Метод:</strong> {item.formula_description}</span>
                                         </div>
                                     </div>
-                                    
-                                    <div className="p-5 bg-base-200 rounded-[2rem] text-[13px] font-bold opacity-80 flex gap-4 border-l-4 border-primary">
-                                        <Info size={20} className="shrink-0 text-primary mt-0.5" />
-                                        <span><strong>Метод:</strong> {item.formula_description}</span>
+
+                                    <div className="mt-8 pt-6 border-t border-base-200 flex justify-between items-center">
+                                        <div className="flex flex-col">
+                                            <span className="text-xs font-black opacity-40 italic font-mono uppercase">Мин. бал 2024: {item.min_ball_2024}</span>
+                                            {hasMissing && hasStarted && (
+                                                <div className="mt-1 text-[11px] text-error font-black uppercase">
+                                                    Липсват оценки за: {missingSlots.map(describeMissingTerm).join(", ")}
+                                                </div>
+                                            )}
+                                            {!hasMissing && !isPassing && hasStarted && (
+                                                <div className="flex items-center gap-1.5 text-error mt-1 animate-pulse">
+                                                    <TrendingDown size={14} strokeWidth={3} />
+                                                    <span className="text-[11px] font-black uppercase">Нужни са още {diff} т.</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        {!hasMissing && isPassing && <div className="badge badge-success py-3 px-5 font-black italic text-white rounded-xl shadow-lg animate-bounce"><CheckCircle2 size={12} className="mr-1"/>ВЛИЗАШ</div>}
+                                        {!hasMissing && !isPassing && hasStarted && <div className="badge badge-error badge-outline py-3 px-5 font-black italic rounded-xl border-2">НЕ ДОСТИГА</div>}
                                     </div>
                                 </div>
-
-                                <div className="mt-8 pt-6 border-t border-base-200 flex justify-between items-center">
-                                    <div className="flex flex-col">
-                                        <span className="text-xs font-black opacity-40 italic font-mono uppercase">Мин. бал 2024: {item.min_ball_2024}</span>
-                                        {hasMissing && hasStarted && (
-                                            <div className="mt-1 text-[11px] text-error font-black uppercase">
-                                                Липсват оценки за: {missingSlots.map(describeMissingTerm).join(", ")}
-                                            </div>
-                                        )}
-                                        {!hasMissing && !isPassing && hasStarted && (
-                                            <div className="flex items-center gap-1.5 text-error mt-1 animate-pulse">
-                                                <TrendingDown size={14} strokeWidth={3} />
-                                                <span className="text-[11px] font-black uppercase">Нужни са още {diff} т.</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                    {!hasMissing && isPassing && <div className="badge badge-success py-3 px-5 font-black italic text-white rounded-xl shadow-lg animate-bounce"><CheckCircle2 size={12} className="mr-1"/>ВЛИЗАШ</div>}
-                                    {!hasMissing && !isPassing && hasStarted && <div className="badge badge-error badge-outline py-3 px-5 font-black italic rounded-xl border-2">НЕ ДОСТИГА</div>}
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
+                            ))}
+                        </div>
+                    );
+                })()}
             </div>
         </div>
     );

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpDown, CheckCircle2 } from "lucide-react";
 import { FIELD_LABELS, SLOT_GROUPS } from "../../lib/coefficients_config";
 import { supabase } from "../../lib/supabase";
@@ -40,6 +40,12 @@ function compareAlternatives(a, b) {
     return a.label.length - b.label.length;
 }
 
+/**
+ * Генерира слотове (предмети) и техните алтернативи на база coefficients.
+ * Причина: UI трябва да знае кои входни полета да покаже и кои ключове
+ * принадлежат към един и същи предмет (OR логика).
+ * Потенциални ефекти: Ако SLOT_GROUPS е променен, UI се пренарежда.
+ */
 function buildSlots(coefficients) {
     const keys = Object.keys(coefficients || {});
     const map = {};
@@ -78,7 +84,7 @@ function buildSlots(coefficients) {
     });
 }
 
-const GradeInputSection = ({ coefficients = {}, faculty, specialty, initialValues = {}, onGradesChange }) => {
+const GradeInputSection = ({ coefficients = {}, faculty, specialty, onGradesChange }) => {
     const { user } = useAuth();
     const [valuesByKey, setValuesByKey] = useState({});
     const [activeAltBySlot, setActiveAltBySlot] = useState({});
@@ -86,13 +92,7 @@ const GradeInputSection = ({ coefficients = {}, faculty, specialty, initialValue
 
     const slots = useMemo(() => buildSlots(coefficients), [coefficients]);
 
-    useEffect(() => {
-        if (!initialValues || typeof initialValues !== "object") return;
-        setValuesByKey((prev) => ({
-            ...initialValues,
-            ...prev
-        }));
-    }, [initialValues]);
+    // Премахнато първоначално вливане от initialValues, за да се избегне цикъл от ререндери
 
     useEffect(() => {
         const key = getStorageKey(faculty, specialty);
@@ -117,20 +117,28 @@ const GradeInputSection = ({ coefficients = {}, faculty, specialty, initialValue
         }
     }, [valuesByKey, activeAltBySlot, faculty, specialty]);
 
+    const userRef = useRef(user);
     useEffect(() => {
-        if (!user) return;
+        userRef.current = user;
+    }, [user]);
+
+    const lastSavedRef = useRef("");
+    useEffect(() => {
+        if (!userRef.current) return;
+        const payload = { valuesByKey, activeAltBySlot };
+        const payloadKey = `${faculty || "all"}:${specialty || "all"}:${JSON.stringify(payload)}`;
+        if (lastSavedRef.current === payloadKey) return;
+        lastSavedRef.current = payloadKey;
+
         const run = async () => {
             setSaving(true);
             try {
-                const existing = user.user_metadata?.grade_inputs || {};
+                const existing = userRef.current.user_metadata?.grade_inputs || {};
                 await supabase.auth.updateUser({
                     data: {
                         grade_inputs: {
                             ...existing,
-                            [getStorageKey(faculty, specialty)]: {
-                                valuesByKey,
-                                activeAltBySlot
-                            }
+                            [getStorageKey(faculty, specialty)]: payload
                         }
                     }
                 });
@@ -139,7 +147,7 @@ const GradeInputSection = ({ coefficients = {}, faculty, specialty, initialValue
             }
         };
         run();
-    }, [user, valuesByKey, activeAltBySlot, faculty, specialty]);
+    }, [valuesByKey, activeAltBySlot, faculty, specialty]);
 
     useEffect(() => {
         if (onGradesChange) {
@@ -161,6 +169,10 @@ const GradeInputSection = ({ coefficients = {}, faculty, specialty, initialValue
         }));
     };
 
+    /**
+     * Смяна на активна алтернатива за даден слот – определя кое поле взима участие
+     * в сметката. Записва избора локално и синхронизира чрез onGradesChange към родителя.
+     */
     const handleChangeActiveAlt = (slotId, altKey) => {
         setActiveAltBySlot((prev) => ({
             ...prev,
