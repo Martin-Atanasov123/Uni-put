@@ -48,7 +48,7 @@ export default function Home() {
                 <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[120px] -z-10 animate-pulse"></div>
                 
                 <div className="max-w-6xl mx-auto text-center space-y-8 relative z-10">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30 text-xs font-bold text-primary uppercase tracking-wider shadow-sm hover:scale-105 transition-transform cursor-default">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary border border-primary/60 text-xs font-bold text-primary-content uppercase tracking-wider shadow-sm hover:scale-105 transition-transform cursor-default">
                         <Sparkles size={14} />
                         Изцяло обновена платформа 2025
                     </div>
@@ -86,8 +86,10 @@ export default function Home() {
                             { label: "Точност", value: 99, suffix: "%", icon: Trophy },
                         ].map((stat, i) => (
                             <div key={i} className="flex flex-col items-center gap-1 group cursor-default">
-                                <div className="text-3xl font-black text-base-content group-hover:text-primary transition-colors flex items-center gap-1">
-                                    <StatCounter end={stat.value} />
+                                <div className="text-3xl font-black text-base-content group-hover:text-primary transition-colors flex items-center justify-center gap-1 tabular-nums">
+                                    <span className="inline-block min-w-[5ch] text-center">
+                                        <StatCounter end={stat.value} />
+                                    </span>
                                     {stat.suffix}
                                 </div>
                                 <div className="text-xs uppercase font-bold text-base-content/70 flex items-center gap-1">
@@ -246,7 +248,7 @@ export default function Home() {
                                 <div>
                                     <div className="badge badge-success text-white border-none bg-emerald-600 text-xs font-bold mb-2">НОВО</div>
                                     <h3 className="text-2xl font-bold mb-1">Общежития</h3>
-                                    <p className="text-sm opacity-80">
+                                    <p className="text-sm text-white/95">
                                         Информация за цени ,условия и още.
                                     </p>
                                 </div>
