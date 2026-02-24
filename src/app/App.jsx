@@ -1,29 +1,30 @@
 // Главен компонент на приложението: дефинира рутера, глобалните провайдъри и общия layout.
 // Навигацията включва публични, защитени (изискват вход) и админ маршрути (изискват роля).
 import { Route, Routes } from "react-router";
+import { Suspense, lazy } from "react";
 
 import { AuthProvider } from "../context/AuthContext";
 import ProtectedRoute from "../routes/ProtectedRoute";
-import Login from "../components/Auth/Login";
-import Register from "../components/Auth/Register";
 
-import NotFound from "../components/common/NotFound";
 import Header from "../components/common/Header";
-import Home from "../components/common/Home";
 import Footer from "../components/common/Footer";
 
-import CalculatorPage from "../components/Calculator/Calculator";
-import UniversitiesPage from "../components/Universities/Universities";
-import Profile from "../components/Auth/Profile";
-import FavoritesPage from "../components/Favorites/Favorites";
 import AdminRoute from "../routes/AdminRoute";
-import AdminDashboard from "../components/admin/AdminDashboard";
-
-import CareerAdvisor from "../components/CareerAdvisor/CareerAdvisor";
-import TestCareer from "../components/CareerAdvisor/TestCareer";
-import Dormitories from "../components/Dormitories/Dormitories";
 import ScrollToTop from "../components/common/ScrollToTop";
-import About from "../components/common/About";
+
+const NotFound = lazy(() => import("../components/common/NotFound"));
+const Home = lazy(() => import("../components/common/Home"));
+const Login = lazy(() => import("../components/Auth/Login"));
+const Register = lazy(() => import("../components/Auth/Register"));
+const About = lazy(() => import("../components/common/About"));
+const UniversitiesPage = lazy(() => import("../components/Universities/Universities"));
+const CareerAdvisor = lazy(() => import("../components/CareerAdvisor/CareerAdvisor"));
+const TestCareer = lazy(() => import("../components/CareerAdvisor/TestCareer"));
+const Dormitories = lazy(() => import("../components/Dormitories/Dormitories"));
+const FavoritesPage = lazy(() => import("../components/Favorites/Favorites"));
+const CalculatorPage = lazy(() => import("../components/Calculator/Calculator"));
+const Profile = lazy(() => import("../components/Auth/Profile"));
+const AdminDashboard = lazy(() => import("../components/admin/AdminDashboard"));
 
 // Основен входен компонент – включва AuthProvider, ScrollToTop, Header, Footer и рутера.
 function App() {
@@ -34,32 +35,32 @@ function App() {
                 <Header />
                 <Routes>
                     {/* Публични маршрути */}
-                    <Route path="*" element={<NotFound />} />
-                    <Route path="/" element={<Home />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/about" element={<About />} />
+                    <Route path="*" element={<Suspense fallback={null}><NotFound /></Suspense>} />
+                    <Route path="/" element={<Suspense fallback={null}><Home /></Suspense>} />
+                    <Route path="/login" element={<Suspense fallback={null}><Login /></Suspense>} />
+                    <Route path="/register" element={<Suspense fallback={null}><Register /></Suspense>} />
+                    <Route path="/about" element={<Suspense fallback={null}><About /></Suspense>} />
                     <Route
                         path="/universities"
-                        element={<UniversitiesPage />}
+                        element={<Suspense fallback={null}><UniversitiesPage /></Suspense>}
                     />
                     <Route
                         path="/career-advisor"
-                        element={<CareerAdvisor />}
+                        element={<Suspense fallback={null}><CareerAdvisor /></Suspense>}
                     />
                     <Route
                         path="/test-career"
-                        element={<TestCareer />}
+                        element={<Suspense fallback={null}><TestCareer /></Suspense>}
                     />
                     <Route
                         path="/dormitories"
-                        element={<Dormitories />}
+                        element={<Suspense fallback={null}><Dormitories /></Suspense>}
                     />
                     <Route
                         path="/favorites"
                         element={
                             <ProtectedRoute>
-                                <FavoritesPage />
+                                <Suspense fallback={null}><FavoritesPage /></Suspense>
                             </ProtectedRoute>
                         }
                     />
@@ -69,7 +70,7 @@ function App() {
                         path="/calculator"
                         element={
                             <ProtectedRoute>
-                                <CalculatorPage />
+                                <Suspense fallback={null}><CalculatorPage /></Suspense>
                             </ProtectedRoute>
                         }
                     />
@@ -77,7 +78,7 @@ function App() {
                         path="/profile"
                         element={
                             <ProtectedRoute>
-                                <Profile />
+                                <Suspense fallback={null}><Profile /></Suspense>
                             </ProtectedRoute>
                         }
                     />
@@ -87,7 +88,7 @@ function App() {
                         path="/admin"
                         element={
                             <AdminRoute>
-                                <AdminDashboard />
+                                <Suspense fallback={null}><AdminDashboard /></Suspense>
                             </AdminRoute>
                         }
                     />
