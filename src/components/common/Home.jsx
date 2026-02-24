@@ -48,7 +48,7 @@ export default function Home() {
                 <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[120px] -z-10 animate-pulse"></div>
                 
                 <div className="max-w-6xl mx-auto text-center space-y-8 relative z-10">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-base-200/80 border border-base-300 text-xs font-bold text-primary uppercase tracking-wider shadow-sm hover:scale-105 transition-transform cursor-default">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30 text-xs font-bold text-primary uppercase tracking-wider shadow-sm hover:scale-105 transition-transform cursor-default">
                         <Sparkles size={14} />
                         Изцяло обновена платформа 2025
                     </div>
@@ -90,7 +90,7 @@ export default function Home() {
                                     <StatCounter end={stat.value} />
                                     {stat.suffix}
                                 </div>
-                                <div className="text-xs uppercase font-bold text-base-content/40 flex items-center gap-1">
+                                <div className="text-xs uppercase font-bold text-base-content/70 flex items-center gap-1">
                                     <stat.icon size={12} />
                                     {stat.label}
                                 </div>
@@ -151,7 +151,7 @@ export default function Home() {
                                     <item.icon size={40} className={item.color} />
                                 </div>
                                 <div className="text-center space-y-2 px-4">
-                                    <div className="text-xs font-black opacity-30">СТЪПКА {item.step}</div>
+                                    <div className="text-xs font-black opacity-60">СТЪПКА {item.step}</div>
                                     <h3 className="text-xl font-bold">{item.title}</h3>
                                     <p className="text-sm opacity-60 leading-relaxed">{item.desc}</p>
                                 </div>
