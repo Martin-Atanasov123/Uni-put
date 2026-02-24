@@ -376,6 +376,7 @@ const CalculatorPage = () => {
                             value={selectedSpecialtyName} 
                             onChange={(e) => setSelectedSpecialtyName(e.target.value)} 
                             disabled={!selectedFaculty}
+                            aria-label="Избери специалност"
                         >
                             <option value="">Избери специалност (Задължително)</option>
                             {availableSpecialties.map((s, i) => <option key={i} value={s}>{s}</option>)}
@@ -433,35 +434,35 @@ const CalculatorPage = () => {
                     console.time("calc:rows");
                     const displayedResults = rowsForSelectedSpecialty.map(item => {
                         const { score, missingSlots } = calculateScore(item.coefficients, grades, activeAltBySlot);
-                        const roundedScore = Math.round(score);
+                        const formattedScore = Number.isFinite(score) ? score.toFixed(2) : "0.00";
                         const diff = (item.min_ball_2024 - score).toFixed(2);
                         const isPassing = score >= item.min_ball_2024;
                         const hasStarted = score > 0 || hasAnyValidGrade;
                         const hasMissing = missingSlots.length > 0;
-                        return { item, score, roundedScore, diff, isPassing, hasStarted, hasMissing, missingSlots };
+                        return { item, score, formattedScore, diff, isPassing, hasStarted, hasMissing, missingSlots };
                     });
                     console.timeEnd("calc:rows");
                     return (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            {displayedResults.map(({ item, roundedScore, isPassing, hasMissing, hasStarted, diff, missingSlots }) => (
+                            {displayedResults.map(({ item, formattedScore, isPassing, hasMissing, hasStarted, diff, missingSlots }) => (
                                 <div key={item.id} className="bg-base-100 p-10 rounded-[3rem] shadow-xl border border-base-200 group transition-all hover:shadow-2xl">
                                     <div className="space-y-6">
                                         <div className="flex justify-between items-start">
                                             <div>
-                                                <span className="text-[10px] font-black opacity-40 uppercase tracking-tighter block mb-1">{item.university_name}</span>
+                                                <span className="text-[11px] md:text-xs font-medium opacity-50 uppercase tracking-wide block mb-1">{item.university_name}</span>
                                                 <h3 className="text-2xl font-black leading-tight group-hover:text-primary transition-colors">{item.specialty}</h3>
                                             </div>
                                             <div className="text-right">
                                                 <div className={`text-5xl font-black tracking-tighter ${isPassing ? 'text-success' : 'text-primary'}`}>
-                                                    {hasMissing ? "—" : roundedScore}
+                                                    {hasMissing ? "—" : formattedScore}
                                                 </div>
                                                 <div className="text-[10px] font-black opacity-30 uppercase">БАЛ</div>
                                             </div>
                                         </div>
                                         
-                                        <div className="p-5 bg-base-200 rounded-[2rem] text-[13px] font-bold opacity-80 flex gap-4 border-l-4 border-primary">
+                                        <div className="p-5 bg-base-200 rounded-[2rem] text-[clamp(12px,1.1vw,13px)] font-semibold opacity-80 flex gap-4 border-l-4 border-primary">
                                             <Info size={20} className="shrink-0 text-primary mt-0.5" />
-                                            <span><strong>Метод:</strong> {item.formula_description}</span>
+                                            <span className="min-w-0 break-words whitespace-pre-wrap"><strong>Метод:</strong> {item.formula_description}</span>
                                         </div>
                                     </div>
 

@@ -14,8 +14,7 @@ function clampAndFormat(value) {
     if (value === "" || value == null) return "";
     const n = Number(value);
     if (Number.isNaN(n)) return "";
-    const c = Math.min(6, Math.max(2, n));
-    return c.toFixed(2);
+    return n.toFixed(2);
 }
 
 function isValidGrade(value) {
@@ -213,7 +212,7 @@ const GradeInputSection = ({ coefficients = {}, faculty, specialty, onGradesChan
                             <div className="flex items-start justify-between gap-2 mb-3">
                                 <div>
                                     <div className="text-xs font-bold uppercase opacity-60">
-                                        {slot.label}
+                                        {activeAlt?.label || slot.label}
                                     </div>
                                     <div className="text-[11px] opacity-60">
                                         Активна алтернатива: {activeAlt?.label}
@@ -251,8 +250,6 @@ const GradeInputSection = ({ coefficients = {}, faculty, specialty, onGradesChan
                             <div className="space-y-2">
                                 <input
                                     type="number"
-                                    min="2"
-                                    max="6"
                                     step="0.01"
                                     inputMode="decimal"
                                     className={`input input-bordered w-full rounded-2xl text-lg font-bold ${
