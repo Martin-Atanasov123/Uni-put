@@ -41,7 +41,7 @@ const Footer = () => {
 
                     {/* Секция Ресурси (Външни линкове) */}
                     <nav className="flex flex-col gap-3">
-                        <h6 className="footer-title opacity-100 font-black text-secondary tracking-widest text-[10px] mb-2 uppercase">Официални Ресурси</h6>
+                        <h2 className="footer-title opacity-100 font-black text-secondary tracking-widest text-[10px] mb-2 uppercase">Официални Ресурси</h2>
                         <a href="https://www.mon.bg/obshto-obrazovanie/darzhavni-zrelostni-izpiti-dzi" target="_blank" rel="noreferrer" className="link link-hover flex items-center justify-center md:justify-start gap-2 opacity-70 hover:opacity-100 hover:text-primary font-bold text-sm">
                             <BookOpen size={14} /> Инфорация за ДЗИ
                         </a>
@@ -54,19 +54,19 @@ const Footer = () => {
                     </nav>
 
                     <nav className="flex flex-col gap-3">
-                        <h6 className="footer-title opacity-100 font-black text-secondary tracking-widest text-[10px] mb-2 uppercase">Проектът</h6>
+                        <h2 className="footer-title opacity-100 font-black text-secondary tracking-widest text-[10px] mb-2 uppercase">Проектът</h2>
                         <a href="/about" className="link link-hover flex items-center justify-center md:justify-start gap-2 opacity-70 hover:opacity-100 font-bold text-sm italic">
                             <Info size={14} /> За нас
                         </a>
                         <span className="link link-hover flex items-center justify-center md:justify-start gap-2 opacity-70 hover:opacity-100 font-bold text-sm">
                             <ShieldCheck size={34} /> Лиценз на проекта ГНУ (GNU General Public License version 3)
                         </span>
-                        <span className="badge badge-primary badge-outline font-black text-[10px] mt-2 italic mx-auto md:mx-0">НОИТ 2026</span>
+                        <span className="badge badge-primary font-black text-[10px] mt-2 italic mx-auto md:mx-0 text-primary-content border-none">НОИТ 2026</span>
                     </nav>
 
                     {/* Секция Правна информация */}
                     <nav className="flex flex-col gap-3">
-                        <h6 className="footer-title opacity-100 font-black text-secondary tracking-widest text-[10px] mb-2 uppercase">Правна част</h6>
+                        <h2 className="footer-title opacity-100 font-black text-secondary tracking-widest text-[10px] mb-2 uppercase">Правна част</h2>
                         <a className="link link-hover opacity-70 hover:opacity-100 font-bold text-sm">Условия за ползване</a>
                         <a className="link link-hover opacity-70 hover:opacity-100 font-bold text-sm">Поверителност</a>
                         <div className="mt-4 p-4 bg-base-300/50 rounded-2xl border border-base-content/5">
@@ -77,7 +77,7 @@ const Footer = () => {
 
                 {/* Копирайт лента */}
                 <div className="mt-16 pt-8 border-t border-base-content/5 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-[10px] font-black opacity-40 uppercase tracking-[0.2em]">
+                    <p className="text-[10px] font-black opacity-70 uppercase tracking-[0.2em]">
                         © {currentYear} УниПът Bulgaria. Всички права са запазени.   
                     </p>
                     
