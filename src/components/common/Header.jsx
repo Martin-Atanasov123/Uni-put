@@ -150,6 +150,7 @@ const Header = () => {
                         <button 
                             className="lg:hidden btn btn-ghost btn-circle"
                             onClick={() => setIsMenuOpen(true)}
+                            aria-label="Отвори меню"
                         >
                             <Menu size={24} />
                         </button>
@@ -164,7 +165,7 @@ const Header = () => {
                 <div className={`absolute top-0 right-0 h-full w-[85%] max-w-sm bg-base-100 shadow-2xl p-8 transition-transform duration-500 ease-out flex flex-col ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
                     <div className="flex justify-between items-center mb-12">
                         <span className="text-2xl font-black italic text-primary">УниПът🎓</span>
-                        <button className="btn btn-ghost btn-circle bg-base-200" onClick={() => setIsMenuOpen(false)}>
+                        <button className="btn btn-ghost btn-circle bg-base-200" onClick={() => setIsMenuOpen(false)} aria-label="Затвори меню">
                             <X size={24} />
                         </button>
                     </div>
