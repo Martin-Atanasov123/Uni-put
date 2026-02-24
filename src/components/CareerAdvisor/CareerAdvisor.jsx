@@ -2,7 +2,7 @@
 // към RIASEC код, кариерни пътеки и подходящи университетски специалности.
 // Фокусът е върху това да минимизираме когнитивното натоварване, докато
 // събираме достатъчно сигнал за алгоритъма за препоръки.
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { buildRiasecProfile } from '../../lib/riasec-matcher';
 import { getCareerRecommendations, getUniversityRecommendations } from '../../lib/api';
 // Премахната визуализация на профила (RiasecRadar), както е поискано
@@ -71,12 +71,10 @@ const CareerAdvisor = () => {
 
     // Централна функция за оценка – конвертира отговорите в RIASEC профил
     // и паралелно изтегля кариерни и университетски препоръки.
-    const calculateResults = async () => {
+    const calculateResults = useCallback(async () => {
         setLoading(true);
         try {
             const profile = buildRiasecProfile(answers);
-            
-            // Паралелен fetch – намалява времето за чакане при последната стъпка.
             const [careers, universities] = await Promise.all([
                 getCareerRecommendations(answers),
                 getUniversityRecommendations(answers, null)
@@ -94,7 +92,7 @@ const CareerAdvisor = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [answers]);
 
     // Когато потребителят стигне последната стъпка, изчисляваме резултатите само веднъж,
     // за да избегнем ненужни повторни заявки при повторно рендериране.
@@ -102,7 +100,7 @@ const CareerAdvisor = () => {
         if (step === 6 && !results) {
             calculateResults();
         }
-    }, [step]);
+    }, [step, results, calculateResults]);
 
     // --- ПОМОЩНИ ФУНКЦИИ ЗА РЕНДЕРИРАНЕ ---
     
@@ -338,7 +336,7 @@ const CareerAdvisor = () => {
                             <div key={idx} className="bg-base-100 p-6 rounded-2xl shadow-md border border-base-200 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
                                 <div>
                                     <h4 className="font-bold text-lg">{uni.specialty}</h4>
-                                    <p className="opacity-70 flex items-center gap-1 text-sm mt-1">
+                                    <p className="opacity-70 font-medium flex items-center gap-1 text-sm mt-1">
                                         <Building2 size={14} /> {uni.university_name}
                                     </p>
                                     <p className="opacity-50 flex items-center gap-1 text-xs mt-1">

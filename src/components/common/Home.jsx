@@ -81,8 +81,8 @@ export default function Home() {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mt-12 pt-8 border-t border-base-200/50">
                         {[
                             { label: "Университета", value: 51, icon: Building2 },
-                            { label: "Специалности", value: 400, icon: BookOpen },
-                            { label: "Потребители", value: 12500, icon: Users },
+                            { label: "Специалности", value: 400, suffix: "+", icon: BookOpen },
+                            { label: "Потребители", value: 120,suffix: "+", icon: Users },
                             { label: "Точност", value: 99, suffix: "%", icon: Trophy },
                         ].map((stat, i) => (
                             <div key={i} className="flex flex-col items-center gap-1 group cursor-default">
@@ -165,7 +165,6 @@ export default function Home() {
             <section className="max-w-7xl mx-auto px-6 py-24">
                 <div className="flex items-center justify-between mb-12">
                     <h2 className="text-3xl font-black">Инструменти</h2>
-                    <Link to="/tools" className="btn btn-ghost btn-sm">Всички инструменти <ArrowRight size={16} /></Link>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 auto-rows-[minmax(250px,auto)]">
@@ -183,12 +182,12 @@ export default function Home() {
                                 <div>
                                     <h3 className="text-2xl font-bold mb-1">Бал Калкулатор</h3>
                                     <p className="text-sm opacity-60 line-clamp-2">
-                                        Най-точният инструмент. Сравни бала си с миналогодишните приеми.
+                                        Сравни бала си с миналогодишните приеми.
                                     </p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-2 text-primary font-bold text-sm mt-6">
-                                Стартирай <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                Сметни  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                             </div>
                         </div>
                     </Link>
@@ -202,7 +201,7 @@ export default function Home() {
                                     <BrainCircuit size={28} />
                                 </div>
                                 <div>
-                                    <div className="badge badge-warning text-xs font-bold mb-2">Изпробвай сега</div>
+                                    {/* <div className="badge badge-warning text-xs font-bold mb-2">Изпробвай сега</div> */}
                                     <h3 className="text-2xl font-bold mb-1">Кариерен Съветник</h3>
                                     <p className="text-sm opacity-80 line-clamp-2">
                                         Не знаеш какво да учиш? Направи теста и разбери силните си страни.
@@ -231,7 +230,7 @@ export default function Home() {
                                 </div>
                             </div>
                             <div className="flex items-center gap-2 font-bold text-sm mt-6">
-                                Търси <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                Потърси сега<ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                             </div>
                         </div>
                     </Link>

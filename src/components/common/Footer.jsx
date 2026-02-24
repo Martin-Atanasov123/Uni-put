@@ -30,10 +30,10 @@ const Footer = () => {
                             Иновативна платформа за кандидатстудентски прием. Твоят дигитален пътеводител към висшето образование в България.
                         </p>
                         <div className="flex items-center justify-center md:justify-start gap-4 pt-2">
-                            <a href="https://github.com/Martin-Atanasov123/Uni-put" target="_blank" rel="noreferrer" className="btn btn-ghost btn-circle btn-sm hover:text-primary transition-colors">
+                            <a href="https://github.com/Martin-Atanasov123/Uni-put" target="_blank" rel="noreferrer" className="btn btn-ghost btn-circle btn-sm hover:text-primary transition-colors" aria-label="GitHub репозитория на УниПът">
                                 <Github size={20} />
                             </a>
-                            <a href="https://www.mon.bg/visshe-obrazovanie/" target="_blank" rel="noreferrer" className="btn btn-ghost btn-circle btn-sm hover:text-primary transition-colors">
+                            <a href="https://www.mon.bg/visshe-obrazovanie/" target="_blank" rel="noreferrer" className="btn btn-ghost btn-circle btn-sm hover:text-primary transition-colors" aria-label="Министерство на образованието и науката – Висше образование">
                                 <Globe size={20} />
                             </a>
                         </div>

@@ -1,7 +1,7 @@
 // Административен панел (CRUD) за управление на данни по конфигурация.
 // Включва: динамични формуляри, таблица със селекция/филтър/пагинация,
 // bulk действия, експорт в CSV и резервно копие в JSON, както и локален одит лог.
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { Database, CheckCircle, AlertCircle, LayoutDashboard, Filter, Trash2, Edit2, PlusCircle, Download, RefreshCw } from "lucide-react";
 import { ADMIN_TABLES } from "../../admin/adminConfig";
 import { adminService } from "../../services/adminService";
@@ -10,7 +10,6 @@ const AdminDashboard = () => {
     // Състояние на екрана: активна таблица, странициране, търсачка, селекция,
     // текущо редактиран ред, стойности на формата, статуси, одит лог, loading.
     const [activeTableId, setActiveTableId] = useState(ADMIN_TABLES[0].id);
-    const [pageState, setPageState] = useState({});
     const [query, setQuery] = useState("");
     const [selection, setSelection] = useState([]);
     const [editingRow, setEditingRow] = useState(null);
@@ -25,7 +24,6 @@ const AdminDashboard = () => {
         [activeTableId]
     );
 
-    const currentPage = pageState[activeTableId]?.page || 0;
     const [dataPage, setDataPage] = useState({
         items: [],
         total: 0,
@@ -71,12 +69,11 @@ const AdminDashboard = () => {
     };
 
     // Главна функция за четене на данни от adminService.list (кеш/филтър/странициране)
-    const loadData = async (opts = {}) => {
+    const loadData = useCallback(async (opts = {}) => {
         if (!activeTable) return;
         setLoading(true);
-        setStatus({ type: null, msg: "" });
         try {
-            const page = opts.page ?? currentPage;
+            const page = opts.page ?? dataPage.page;
             const result = await adminService.list(activeTable.table, {
                 page,
                 filters: { query },
@@ -84,16 +81,12 @@ const AdminDashboard = () => {
             });
             setDataPage(result);
             setSelection([]);
-            setPageState((prev) => ({
-                ...prev,
-                [activeTable.id]: { page: result.page }
-            }));
         } catch (err) {
             setStatus({ type: "error", msg: "Грешка при зареждане: " + err.message });
         } finally {
             setLoading(false);
         }
-    };
+    }, [activeTable, dataPage.page, query]);
 
     useEffect(() => {
         loadAuditLog();
@@ -101,7 +94,7 @@ const AdminDashboard = () => {
 
     useEffect(() => {
         loadData({ page: 0 });
-    }, [activeTableId, query]);
+    }, [activeTableId, query, loadData]);
 
     const openCreate = () => {
         if (!activeTable) return;

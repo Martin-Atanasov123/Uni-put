@@ -26,7 +26,6 @@ const FavoritesPage = () => {
                 );
                 setAllFavoritesData(mapped);
             } catch (e) {
-                // eslint-disable-next-line no-console
                 console.error("[favorites] load failed", e);
                 setAllFavoritesData([]);
             } finally {
