@@ -54,7 +54,7 @@ const FIELD_LABELS = {
   chu_ezik: "Диплома: Чужд език",
   chujdezik: "Чужд език",
   contest_elementarna_mat_boyanov: "Състезание елементарна мат (Боянов)",
-  diploma: "Средна от диплома",
+  diploma: "Диплома",
   diploma_semestrial: "Семестриален успех",
   diploma_state_exams: "Държавни изпити",
   dzi1_angliiski: "ДЗИ¹ Английски език",
