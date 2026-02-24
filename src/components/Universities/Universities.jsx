@@ -116,7 +116,7 @@ const UniversitiesPage = () => {
                                         <School size={16} className="opacity-50" />
                                         <div>
                                             <div className="font-bold text-sm">{s.specialty}</div>
-                                            <div className="text-xs opacity-50">{s.university_name}</div>
+                                            <div className="text-xs font-medium opacity-50">{s.university_name}</div>
                                         </div>
                                     </div>
                                 ))}
@@ -165,7 +165,7 @@ const UniversitiesPage = () => {
                                             <h2 className="text-xl font-black leading-tight group-hover:text-primary transition-colors">
                                                 {uni.specialty}
                                             </h2>
-                                            <p className="text-xs font-bold opacity-60 flex items-center gap-1">
+                                            <p className="text-sm font-medium opacity-60 flex items-center gap-1">
                                                 <School size={14} /> {uni.university_name}
                                             </p>
                                         </div>

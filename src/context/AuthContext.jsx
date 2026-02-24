@@ -66,12 +66,10 @@ export const AuthProvider = ({ children }) => {
             });
             if (error) {
                 setFavorites(prev);
-                // eslint-disable-next-line no-console
                 console.error("[favorites] updateUser failed", error);
             }
         } catch (e) {
             setFavorites(prev);
-            // eslint-disable-next-line no-console
             console.error("[favorites] unexpected error", e);
         }
     };

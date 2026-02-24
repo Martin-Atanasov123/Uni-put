@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, within } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import CalculatorPage from "./Calculator";
 
 // Mock Supabase
@@ -51,7 +52,11 @@ describe("Calculator specialties filtering by faculty", () => {
   });
 
   it("shows different specialties when different faculties are selected", async () => {
-    render(<CalculatorPage />);
+    render(
+      <MemoryRouter>
+        <CalculatorPage />
+      </MemoryRouter>
+    );
 
     // Click into faculty search to open full list
     const input = screen.getByPlaceholderText(/Търси факултет/i);
