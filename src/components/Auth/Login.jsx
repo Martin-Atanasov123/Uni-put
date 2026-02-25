@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { supabase } from "../../lib/supabase";
 
 import {
@@ -111,6 +111,14 @@ const Login = () => {
                                         <Eye className="w-5 h-5 opacity-50" />
                                     )}
                                 </button>
+                            </div>
+                            <div className="flex justify-end mt-1">
+                                <Link
+                                    to="/forgot-password"
+                                    className="text-xs text-primary hover:underline font-medium"
+                                >
+                                    Забравена парола?
+                                </Link>
                             </div>
                         </div>
 
