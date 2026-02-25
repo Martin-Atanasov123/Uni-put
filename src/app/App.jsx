@@ -16,6 +16,8 @@ import ScrollToTop from "../components/common/ScrollToTop";
 
 const Login = lazy(() => import("../components/Auth/Login"));
 const Register = lazy(() => import("../components/Auth/Register"));
+const ForgotPassword = lazy(() => import("../components/Auth/ForgotPassword"));
+const UpdatePassword = lazy(() => import("../components/Auth/UpdatePassword"));
 const About = lazy(() => import("../components/common/About"));
 const UniversitiesPage = lazy(() => import("../components/Universities/Universities"));
 const CareerAdvisor = lazy(() => import("../components/CareerAdvisor/CareerAdvisor"));
@@ -40,6 +42,8 @@ function App() {
                         <Route path="/" element={<Home />} />
                         <Route path="/login" element={<Suspense fallback={null}><Login /></Suspense>} />
                         <Route path="/register" element={<Suspense fallback={null}><Register /></Suspense>} />
+                        <Route path="/forgot-password" element={<Suspense fallback={null}><ForgotPassword /></Suspense>} />
+                        <Route path="/update-password" element={<Suspense fallback={null}><UpdatePassword /></Suspense>} />
                         <Route path="/about" element={<Suspense fallback={null}><About /></Suspense>} />
                         <Route
                             path="/universities"
