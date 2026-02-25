@@ -106,6 +106,10 @@ const Dormitories = () => {
 };
 
 const DormCard = ({ dorm }) => {
+    // Exchange rate BGN to EUR
+    const BGN_TO_EUR = 1.95583;
+    const toEur = (bgn) => Math.round(bgn / BGN_TO_EUR);
+
     // Calculator logic
     const deposit = dorm.deposit_amount || 0;
     const rent = dorm.monthly_rent_avg || 0;
@@ -188,20 +192,20 @@ const DormCard = ({ dorm }) => {
                     <div className="space-y-2 text-sm">
                         <div className="flex justify-between opacity-70">
                             <span>Наем</span>
-                            <span className="font-mono">{rent} лв.</span>
+                            <span className="font-mono">{toEur(rent)} €</span>
                         </div>
                         <div className="flex justify-between opacity-70">
                             <span>Депозит</span>
-                            <span className="font-mono">{deposit} лв.</span>
+                            <span className="font-mono">{toEur(deposit)} €</span>
                         </div>
                         <div className="flex justify-between opacity-70">
                             <span>Сметки (прибл.)</span>
-                            <span className="font-mono">{utility} лв.</span>
+                            <span className="font-mono">{toEur(utility)} €</span>
                         </div>
                         <div className="divider my-1"></div>
                         <div className="flex justify-between font-black text-primary text-lg">
                             <span>Първи месец:</span>
-                            <span>{totalFirstMonth} лв.</span>
+                            <span>{toEur(totalFirstMonth)} €</span>
                         </div>
                     </div>
                 </div>
