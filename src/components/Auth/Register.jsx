@@ -1,3 +1,7 @@
+// Компонент: Регистрация
+// Описание: Създава нов потребител в Supabase Auth и записва метаданни (username).
+// Вход: няма пропсове; използва локално състояние за email/username/password.
+// Изход: пренасочване към начална страница при успех; визуализация на грешки при неуспех.
 import React, { useState } from "react";
 import { supabase } from "../../lib/supabase";
 import { Link, useNavigate } from "react-router-dom";

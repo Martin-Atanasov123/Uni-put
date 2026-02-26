@@ -1,3 +1,11 @@
+// Модул: Входни оценки (секция)
+// Описание: Генерира динамични полета за въвеждане на оценки по ключове/слотове
+//   и управлява избор на алтернативи (например ДЗИ/Изпит/Диплома) за една и съща група.
+// Вход: { coefficients, faculty, specialty, onGradesChange }
+//   - coefficients: Record<string, number> картографира ключ → коефициент
+//   - faculty/specialty: използват се за ключове в локалното и потребителско съхранение
+//   - onGradesChange: callback за родителя с текущи стойности и активни алтернативи
+// Изход: визуални полета, синхронизация към родителя, локален кеш и запис в user_metadata
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpDown, CheckCircle2 } from "lucide-react";
 import { FIELD_LABELS, SLOT_GROUPS } from "../../lib/coefficients_config";
