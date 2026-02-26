@@ -1,3 +1,8 @@
+// Компонент: Нова парола
+// Описание: Приема потребителя след клик на линк в имейла (Supabase токен),
+//   валидира въведените стойности и обновява паролата чрез Supabase Auth.
+// Вход: няма пропсове; използва локално състояние и проверка за активна сесия.
+// Изход: статус съобщения; пренасочване към /login при успех.
 import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
 import { Lock, Eye, EyeOff, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
