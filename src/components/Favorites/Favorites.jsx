@@ -1,3 +1,8 @@
+// Компонент: Любими специалности
+// Описание: Показва списък от запазени специалности/университети за текущия потребител,
+//   с филтри по град и текстово търсене. Данните се извличат от сервизните методи.
+// Вход: няма пропсове; използва контекст (favorites) и услуги (universityService).
+// Изход: филтриран списък; възможност за премахване/добавяне към любими.
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { universityService } from "../../services/universityService";
@@ -210,4 +215,3 @@ const FavoritesPage = () => {
 };
 
 export default FavoritesPage;
-
