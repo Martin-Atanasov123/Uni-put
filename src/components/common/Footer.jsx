@@ -8,9 +8,13 @@ import {
     FileText,
     Heart
 } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 const Footer = () => {
     const currentYear = new Date().getFullYear();
+    const location = useLocation();
+
+    if (location.pathname.startsWith("/admin")) return null;
 
     return (
         <footer className="bg-base-200 text-base-content mt-20 relative overflow-hidden">
