@@ -130,7 +130,7 @@ const DormCard = ({ dorm }) => {
                             <School size={10} /> {dorm.university_id}
                         </div>
                         <h2 className="card-title text-xl font-black group-hover:text-primary transition-colors">
-                            Блок {dorm.block_number}
+                            {dorm.block_number}
                         </h2>
                         <div className="flex items-center gap-1 text-sm opacity-60 mt-1">
                             <MapPin size={14} /> {dorm.city}
