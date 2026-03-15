@@ -14,9 +14,161 @@ import {
     Sparkles,
     GraduationCap,
     MapPin,
-    BookOpen
+    BookOpen,
+    Star,
+    ChevronLeft,
+    ChevronRight,
+    Quote
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+
+// --- КОМПОНЕНТ: РЕВЮТА (СЛАЙДЕР) ---
+const REVIEWS = [
+    { name: "Мария Георгиева", text: "Изключително полезен сайт! Помогна ми да се ориентирам в бала си за СУ.", rating: 5 },
+    { name: "Иван Петров", text: "Калкулаторът е много точен. Вече съм студент благодарение на УниПът!", rating: 5 },
+    { name: "Елена Димова", text: "Дизайнът е супер, много лесно се работи с търсачката.", rating: 4 },
+    { name: "Стефан Колев", text: "Най-накрая платформа, която обединява всичко за кандидат-студентите.", rating: 5 },
+    { name: "Анелия Иванова", text: "Тестът за кариерно ориентиране ми даде страхотни идеи за бъдещето.", rating: 5 },
+    { name: "Георги Стоянов", text: "Секцията за общежития е много подробна. Спести ми часове ровене.", rating: 5 },
+    { name: "Виктория Николова", text: "Много полезно приложение. Препоръчвам на всички дванадесетокласници.", rating: 4 },
+    { name: "Мартин Димитров", text: "Бързо, лесно и надеждно. Информационната база е огромна.", rating: 5 },
+    { name: "Симона Кръстева", text: "Благодарение на УниПът намерих специалност, за която дори не бях мислила.", rating: 5 },
+    { name: "Петър Ангелов", text: "Страхотна инициатива! Платформата е на световно ниво.", rating: 5 },
+];
+
+const ReviewsSlider = () => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [isTransitioning, setIsTransitioning] = useState(true);
+    const timeoutRef = useRef(null);
+    const sliderRef = useRef(null);
+    
+    // We duplicate the reviews for the infinite effect
+    const extendedReviews = [...REVIEWS, ...REVIEWS, ...REVIEWS];
+    const startIndex = REVIEWS.length; // Start at the middle set
+
+    useEffect(() => {
+        setCurrentIndex(startIndex);
+    }, []);
+
+    const resetTimeout = () => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+
+    useEffect(() => {
+        resetTimeout();
+        timeoutRef.current = setTimeout(() => {
+            nextSlide();
+        }, 4000);
+        return () => resetTimeout();
+    }, [currentIndex]);
+
+    const nextSlide = () => {
+        setIsTransitioning(true);
+        setCurrentIndex((prev) => prev + 1);
+    };
+
+    const prevSlide = () => {
+        setIsTransitioning(true);
+        setCurrentIndex((prev) => prev - 1);
+    };
+
+    const handleTransitionEnd = () => {
+        // If we reach the end of the middle set or the beginning of it, 
+        // jump back to the middle without animation
+        if (currentIndex >= REVIEWS.length * 2) {
+            setIsTransitioning(false);
+            setCurrentIndex(REVIEWS.length);
+        } else if (currentIndex <= REVIEWS.length - 1) {
+            setIsTransitioning(false);
+            setCurrentIndex(REVIEWS.length * 2 - 1);
+        }
+    };
+
+    // Calculate how many items to show based on screen width
+    const getVisibleItems = () => {
+        if (typeof window === "undefined") return 3;
+        if (window.innerWidth < 768) return 1;
+        if (window.innerWidth < 1024) return 2;
+        return 3;
+    };
+
+    const [visibleItems, setVisibleItems] = useState(getVisibleItems());
+
+    useEffect(() => {
+        const handleResize = () => setVisibleItems(getVisibleItems());
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    const itemWidth = 100 / visibleItems;
+
+    return (
+        <section className="py-24 bg-base-200/30 overflow-hidden relative" id="reviews-section">
+            <div className="max-w-7xl mx-auto px-6">
+                <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+                    <div className="space-y-2">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest">
+                            <Quote size={12} />
+                            Отзиви
+                        </div>
+                        <h2 className="text-4xl font-black italic">Доволни клиенти и ревюта</h2>
+                    </div>
+                    <div className="flex gap-2">
+                        <button onClick={prevSlide} className="btn btn-circle btn-outline btn-sm hover:bg-primary hover:border-primary border-base-content/20 transition-all shadow-sm">
+                            <ChevronLeft size={20} />
+                        </button>
+                        <button onClick={nextSlide} className="btn btn-circle btn-outline btn-sm hover:bg-primary hover:border-primary border-base-content/20 transition-all shadow-sm">
+                            <ChevronRight size={20} />
+                        </button>
+                    </div>
+                </div>
+
+                <div className="relative w-full overflow-hidden">
+                    <div 
+                        data-testid="reviews-slider"
+                        className={`flex gap-6 ${isTransitioning ? "transition-transform duration-700 ease-in-out" : ""}`}
+                        style={{ 
+                            transform: `translateX(-${currentIndex * (itemWidth + 0.5)}%)`,
+                        }}
+                        onTransitionEnd={handleTransitionEnd}
+                    >
+                        {extendedReviews.map((review, i) => (
+                            <div 
+                                key={i} 
+                                className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] shrink-0 bg-base-100 p-8 rounded-[2rem] border border-base-300 shadow-sm flex flex-col justify-between hover:shadow-xl transition-all duration-300 group"
+                            >
+                                <div className="space-y-4">
+                                    <div className="flex gap-1 text-warning group-hover:scale-105 transition-transform origin-left">
+                                        {[...Array(5)].map((_, starI) => (
+                                            <Star 
+                                                key={starI} 
+                                                size={16} 
+                                                fill={starI < review.rating ? "currentColor" : "none"} 
+                                                className={starI < review.rating ? "" : "text-base-300"}
+                                            />
+                                        ))}
+                                    </div>
+                                    <p className="text-lg font-medium leading-relaxed italic opacity-80 group-hover:opacity-100 transition-opacity">
+                                        "{review.text}"
+                                    </p>
+                                </div>
+                                <div className="mt-8 flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center text-white font-black shadow-lg shadow-primary/20 rotate-3 group-hover:rotate-0 transition-transform">
+                                        {review.name.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-base-content">{review.name}</p>
+                                        <p className="text-[10px] opacity-50 font-black uppercase tracking-widest">Потребител на УниПът</p>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+};
 
 // --- КОМПОНЕНТ: БРОЯЧ НА СТАТИСТИКИ ---
 const StatCounter = ({ end, duration = 2000 }) => {
@@ -261,6 +413,8 @@ export default function Home() {
                 </div>
             </section>
 
+            {/* --- ОТЗИВИ (СЛАЙДЕР) --- */}
+            <ReviewsSlider />
 
         </div>
     );
