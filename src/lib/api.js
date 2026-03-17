@@ -1,19 +1,108 @@
 import { supabase } from './supabase';
-import { buildRiasecProfile, riasecScoresToVector, riasecCodeToVector, cosineSimilarity } from './riasec-matcher';
+import { 
+    calculateScores,
+    calculateHybridCompatibility
+} from './riasec-matcher';
+
+/**
+ * Matching за специалности и професии на базата на RIASEC резултати.
+ * Използва новите таблици specialty_riasec_mapping и careers_riasec_mapping.
+ */
+export async function getRiasecMatches(userScores) {
+    if (!userScores) return { specialties: [], careers: [] };
+    console.log('RIASEC Matching: Start matching for scores:', userScores);
+
+    try {
+        // 1. Извличане на специалности с RIASEC mapping
+        // Използваме два отделни обръщения, ако JOIN-ът се провали поради липсващ Foreign Key
+        console.log('RIASEC Matching: Fetching specialties from specialty_riasec_mapping...');
+        let { data: specialtiesData, error: specError } = await supabase
+            .from('specialty_riasec_mapping')
+            .select('*, universities_duplicate(id, university_name, city, min_ball_2024)');
+
+        // Ако JOIN заявката се провали (напр. PGRST200), опитваме без JOIN
+        if (specError && specError.code === 'PGRST200') {
+            console.warn('RIASEC Matching: Join failed, falling back to separate queries.');
+            const { data: standaloneSpecs, error: standaloneError } = await supabase
+                .from('specialty_riasec_mapping')
+                .select('*');
+            
+            if (standaloneError) throw standaloneError;
+            specialtiesData = standaloneSpecs;
+        } else if (specError) {
+            throw specError;
+        }
+
+        console.log(`RIASEC Matching: Found ${specialtiesData?.length || 0} specialties in DB.`);
+
+        // 2. Извличане на професии с RIASEC mapping
+        console.log('RIASEC Matching: Fetching careers from careers_riasec_mapping...');
+        const { data: careersData, error: careerError } = await supabase
+            .from('careers_riasec_mapping')
+            .select('*');
+
+        if (careerError) {
+            console.error('RIASEC Matching Error (careers):', careerError);
+            throw careerError;
+        }
+        console.log(`RIASEC Matching: Found ${careersData?.length || 0} careers in DB.`);
+
+        // 3. Изчисляване на съвместимост (Hybrid Logic)
+        const specialties = (specialtiesData || [])
+            .map(item => {
+                const compatibility = calculateHybridCompatibility(userScores, item);
+                return {
+                    id: item.id,
+                    name: item.specialty_base_name,
+                    riasec_code: item.riasec_code,
+                    category: item.category,
+                    compatibility: compatibility,
+                    universities_count: item.universities_duplicate?.length || 0,
+                    universities: item.universities_duplicate || []
+                };
+            })
+            .filter(item => item.compatibility >= 50) // Намаляваме прага до 50% за повече резултати
+            .sort((a, b) => b.compatibility - a.compatibility)
+            .slice(0, 20);
+
+        console.log(`RIASEC Matching: Filtered to ${specialties.length} matching specialties (>=50%).`);
+
+        const careers = (careersData || [])
+            .map(item => ({
+                id: item.id,
+                name: item.career_name_bg,
+                career_name_en: item.career_name_en,
+                riasec_code: item.riasec_code,
+                category: item.category,
+                salary: item.salary_range_bgn,
+                required_education: item.required_education,
+                growth_outlook: item.growth_outlook,
+                compatibility: calculateHybridCompatibility(userScores, item)
+            }))
+            .filter(item => item.compatibility >= 50)
+            .sort((a, b) => b.compatibility - a.compatibility)
+            .slice(0, 20);
+
+        console.log(`RIASEC Matching: Found ${careers.length} matching careers.`);
+
+        return { specialties, careers };
+
+    } catch (error) {
+        console.error('RIASEC matching final error:', error);
+        return { specialties: [], careers: [] };
+    }
+}
 
 /**
  * Извлича професии, които частично съвпадат с RIASEC кода (напр. същата първа буква).
- * @param {string} riasecCode - 3-буквеният код
- * @returns {Promise<Array>}
+ * Използва новата таблица careers_riasec_mapping.
  */
 export async function getCareersByRiasec(riasecCode) {
     if (!riasecCode) return [];
     const firstLetter = riasecCode.charAt(0);
     
-    // Извличане на професии, където RIASEC кодът започва със същата доминантна буква.
-    // Това е добра оптимизация, за да се избегне изтеглянето на всички записи.
     const { data, error } = await supabase
-        .from('career_profiles')
+        .from('careers_riasec_mapping')
         .select('*')
         .ilike('riasec_code', `${firstLetter}%`);
 
@@ -25,24 +114,20 @@ export async function getCareersByRiasec(riasecCode) {
 }
 
 /**
- * Извлича университети, съвпадащи с RIASEC кода.
- * @param {string} riasecCode 
- * @returns {Promise<Array>}
+ * Извлича специалности, съвпадащи с RIASEC кода.
+ * Използва новата таблица specialty_riasec_mapping.
  */
-export async function getUniversitiesByRiasec(riasecCode) {
+export async function getSpecialtiesByRiasec(riasecCode) {
     if (!riasecCode) return [];
-    
-    // За университетите също използваме съвпадение по първа буква за по-широк кръг резултати,
-    // след което ще ги сортираме.
     const firstLetter = riasecCode.charAt(0);
 
     const { data, error } = await supabase
-        .from('universities_duplicate')
-        .select('*')
+        .from('specialty_riasec_mapping')
+        .select('*, universities_duplicate(id)')
         .ilike('riasec_code', `${firstLetter}%`);
 
     if (error) {
-        console.error('Грешка при извличане на университети:', error);
+        console.error('Грешка при извличане на специалности:', error);
         return [];
     }
     return data;
@@ -50,167 +135,42 @@ export async function getUniversitiesByRiasec(riasecCode) {
 
 /**
  * Получава препоръки за кариера на базата на пълните резултати.
- * @param {Object} riasecScores - { R: 10, I: 5, ... }
+ * @param {Object} answers - Отговори на потребителя
  * @returns {Promise<Array>} - Топ съвпадащи професии
  */
 export async function getCareerRecommendations(answers) {
-    const profile = buildRiasecProfile(answers);
-    const userVector = riasecScoresToVector(profile.scores);
-    const userCode = profile.riasecCode;
+    const rawScores = calculateScores(answers);
+    const { careers } = await getRiasecMatches(rawScores);
     
-    // 1. Вземане на кандидати (широко търсене)
-    let candidates = await getCareersByRiasec(userCode);
-    
-    // Ако не са намерени кандидати по първа буква (рядко), опитваме да изтеглим произволни/всички
-    if (candidates.length === 0) {
-        const { data } = await supabase.from('career_profiles').select('*').limit(100);
-        candidates = data || [];
-    }
-
-    // 2. Класиране (Ранжиране) – използваме cosine similarity като психологически мач
-    const ranked = candidates
-        .map((item) => {
-            const itemVector = riasecCodeToVector(item.riasec_code || '');
-            const psychologicalMatch = cosineSimilarity(userVector, itemVector);
-
-            // За професии нямаме академичен бал, затова го оставяме неутрален.
-            const academicMatch = 0.5;
-
-            // При липса на специфични данни за среда/стил – умерено неутрално съвпадение.
-            const environmentFit = 0.5;
-
-            const admissionProbability = 0.5;
-
-            const finalScore =
-                0.5 * psychologicalMatch +
-                0.25 * academicMatch +
-                0.15 * environmentFit +
-                0.10 * admissionProbability;
-
-            return {
-                ...item,
-                matchScore: Math.round(finalScore * 100),
-                _details: {
-                    psychologicalMatch,
-                    academicMatch,
-                    environmentFit,
-                    admissionProbability,
-                    confidence: profile.confidence
-                }
-            };
-        })
-        .sort((a, b) => b.matchScore - a.matchScore);
-    
-    // 3. Връщане на топ резултатите (напр. топ 10)
-    return ranked.slice(0, 10);
+    return careers.map(c => ({
+        ...c,
+        matchScore: c.compatibility // Унифициране на именуването за обратна съвместимост
+    }));
 }
 
 /**
- * Получава препоръки за университети на базата на код.
- * @param {string} riasecCode 
+ * Получава препоръки за университети/специалности на базата на отговори.
+ * @param {Object} answers - Отговори на потребителя
  * @returns {Promise<Array>}
  */
-export async function getUniversityRecommendations(answers, userScore) {
-    const profile = buildRiasecProfile(answers);
-    const userVector = riasecScoresToVector(profile.scores);
-    const riasecCode = profile.riasecCode;
-
-    // 1. Вземане на кандидати – първо по доминантна буква
-    let candidates = await getUniversitiesByRiasec(riasecCode);
-
-    // 2. Ако резултатите са малко, разширяваме търсенето
-    if (candidates.length < 20) {
-        const secondLetter = riasecCode.charAt(1);
-        if (secondLetter) {
-            const { data: secondary } = await supabase
-                .from('universities_duplicate')
-                .select('*')
-                .ilike('riasec_code', `%${secondLetter}%`)
-                .limit(200);
-            if (secondary) {
-                const byId = new Map();
-                [...candidates, ...secondary].forEach((c) => {
-                    if (!byId.has(c.id)) byId.set(c.id, c);
-                });
-                candidates = Array.from(byId.values());
-            }
-        }
-    }
-
-    if (candidates.length < 10) {
-        const { data: fallback } = await supabase
-            .from('universities_duplicate')
-            .select('*')
-            .limit(300);
-        if (fallback) {
-            const byId = new Map();
-            [...candidates, ...fallback].forEach((c) => {
-                if (!byId.has(c.id)) byId.set(c.id, c);
+export async function getUniversityRecommendations(answers) {
+    const rawScores = calculateScores(answers);
+    const { specialties } = await getRiasecMatches(rawScores);
+    
+    // Преобразуваме структурата за обратна съвместимост с калкулатора
+    const results = [];
+    specialties.forEach(spec => {
+        spec.universities.forEach(uni => {
+            results.push({
+                ...uni,
+                specialty: spec.name,
+                matchScore: spec.compatibility,
+                riasec_code: spec.riasec_code
             });
-            candidates = Array.from(byId.values());
-        }
-    }
+        });
+    });
 
-    const ranked = candidates
-        .map((item) => {
-            const itemVector = riasecCodeToVector(item.riasec_code || '');
-            const psychologicalMatch = cosineSimilarity(userVector, itemVector);
-
-            const minScore = typeof item.min_score === 'number' ? item.min_score : null;
-            const avgScore = typeof item.avg_score === 'number' ? item.avg_score : null;
-
-            let academicMatch = 0.5;
-            let admissionProbability = 0.5;
-
-            if (typeof userScore === 'number' && minScore !== null) {
-                if (userScore < minScore) {
-                    academicMatch = 0;
-                    admissionProbability = 0.05;
-                } else {
-                    const target = avgScore || minScore;
-                    const ratio = userScore / target;
-                    if (ratio >= 1.1) {
-                        academicMatch = 1;
-                    } else if (ratio >= 1.0) {
-                        academicMatch = 0.8 + 0.2 * ((ratio - 1) / 0.1);
-                    } else if (ratio >= 0.9) {
-                        academicMatch = 0.4 + 0.4 * ((ratio - 0.9) / 0.1);
-                    } else {
-                        academicMatch = 0.1 + 0.3 * (ratio / 0.9);
-                    }
-
-                    const x = userScore - target;
-                    const k = 0.8;
-                    const prob = 1 / (1 + Math.exp(-k * x));
-                    admissionProbability = userScore < minScore ? Math.min(prob, 0.1) : prob;
-                }
-            }
-
-            const environmentFit = 0.5;
-
-            const finalScore =
-                0.5 * psychologicalMatch +
-                0.25 * academicMatch +
-                0.15 * environmentFit +
-                0.10 * admissionProbability;
-
-            return {
-                ...item,
-                matchScore: Math.round(finalScore * 100),
-                _details: {
-                    psychologicalMatch,
-                    academicMatch,
-                    environmentFit,
-                    admissionProbability,
-                    confidence: profile.confidence,
-                    userScore
-                }
-            };
-        })
-        .sort((a, b) => b.matchScore - a.matchScore);
-
-    // 3. Връщане на топ резултатите
-    return ranked.slice(0, 10);
+    return results.sort((a, b) => b.matchScore - a.matchScore).slice(0, 15);
 }
 
 /**
@@ -218,7 +178,7 @@ export async function getUniversityRecommendations(answers, userScore) {
  */
 export async function getAllRiasecCodes() {
     const { data, error } = await supabase
-        .from('career_profiles')
+        .from('careers_riasec_mapping')
         .select('riasec_code')
         .not('riasec_code', 'is', null);
         
