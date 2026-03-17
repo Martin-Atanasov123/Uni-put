@@ -1,278 +1,309 @@
-// Кариерен съветник – стъпкова анкета, която превежда субективни отговори
-// към RIASEC код, кариерни пътеки и подходящи университетски специалности.
-// Фокусът е върху това да минимизираме когнитивното натоварване, докато
-// събираме достатъчно сигнал за алгоритъма за препоръки.
-import React, { useState, useEffect, useCallback } from 'react';
-import { buildRiasecProfile } from '../../lib/riasec-matcher';
-import { getCareerRecommendations, getUniversityRecommendations } from '../../lib/api';
-// Премахната визуализация на профила (RiasecRadar), както е поискано
+// Кариерен съветник – RIASEC въпросник за определяне на професионални интереси.
+// Поддържа три версии: Кратка (30), Стандартна (60) и Разширена (90) въпроса.
+import { useState, useEffect, useMemo } from 'react';
+import { calculateScores, calculateRiasecCode } from '../../lib/riasec-matcher';
+import { getRiasecMatches } from '../../lib/api';
 import { 
-    BookOpen, 
-    Briefcase, 
     CheckCircle2, 
-    GraduationCap, 
     ChevronRight, 
     ChevronLeft, 
-    Loader2, 
     Target,
-    MapPin,
-    Building2,
-    Heart
+    Zap,
+    Layout,
+    Layers,
+    ClipboardList,
+    AlertCircle
 } from 'lucide-react';
 
-const INITIAL_ANSWERS = {
-    grade: "",
-    interests: [],
-    strengths: [],
-    values: [],
-    environment: "",
-    style: ""
-};
+import RIASECResults from './RIASECResults';
 
 const CareerAdvisor = () => {
-    const [step, setStep] = useState(1);
+    // --- State ---
+    const [step, setStep] = useState('version'); // 'version', 'quiz', 'results'
     const [loading, setLoading] = useState(false);
+    const [questions, setQuestions] = useState([]);
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    const [answers, setAnswers] = useState({});
     const [results, setResults] = useState(null);
-    const [answers, setAnswers] = useState(INITIAL_ANSWERS);
+    const [quizVersion, setQuizVersion] = useState(null); // 'short', 'standard', 'extended'
+    const [scaleLabels, setScaleLabels] = useState({});
 
-    // Фиксиран брой стъпки – позволява ни да знаем кога да тригерираме изчисленията.
-    const totalSteps = 6;
-
-    const handleAnswer = (field, value) => {
-        setAnswers(prev => ({
-            ...prev,
-            [field]: value
-        }));
-    };
-
-    const toggleSelection = (field, value) => {
-        setAnswers(prev => {
-            const current = prev[field] || [];
-            if (current.includes(value)) {
-                return { ...prev, [field]: current.filter(item => item !== value) };
-            } else {
-                return { ...prev, [field]: [...current, value] };
+    // --- Load Questions ---
+    useEffect(() => {
+        const loadQuestions = async () => {
+            try {
+                const response = await fetch('/shcema/riasec_questions.json');
+                const data = await response.json();
+                setQuestions(data.questions);
+                setScaleLabels(data.scaleLabels);
+            } catch (error) {
+                console.error("Грешка при зареждане на въпросите:", error);
             }
-        });
+        };
+        loadQuestions();
+    }, []);
+
+    // --- Filtered Questions based on Version ---
+    const filteredQuestions = useMemo(() => {
+        if (!questions.length || !quizVersion) return [];
+        
+        if (quizVersion === 'short') {
+            // Кратка версия: 30 въпроса (първите 5 от всеки тип)
+            const types = ['R', 'I', 'A', 'S', 'E', 'C'];
+            const shortSet = [];
+            types.forEach(type => {
+                const typeQuestions = questions.filter(q => q.type === type).slice(0, 5);
+                shortSet.push(...typeQuestions);
+            });
+            return shortSet;
+        }
+        
+        if (quizVersion === 'standard') {
+            // Стандартна версия: 60 въпроса (всички налични в момента)
+            return questions.slice(0, 60);
+        }
+
+        if (quizVersion === 'extended') {
+            // Разширена версия: 90 въпроса (засега използваме 60, докато се добавят още)
+            return questions;
+        }
+
+        return questions;
+    }, [questions, quizVersion]);
+
+    // --- Handlers ---
+    const handleVersionSelect = (version) => {
+        setQuizVersion(version);
+        setStep('quiz');
+        setCurrentQuestionIndex(0);
+        setAnswers({});
+        window.scrollTo(0, 0);
     };
 
-    const nextStep = () => {
-        if (step < totalSteps) {
-            setStep(prev => prev + 1);
-            window.scrollTo(0, 0);
+    const handleAnswer = (value) => {
+        const questionId = filteredQuestions[currentQuestionIndex].id;
+        setAnswers(prev => ({ ...prev, [questionId]: value }));
+
+        if (currentQuestionIndex < filteredQuestions.length - 1) {
+            // Автоматично напред след кратко забавяне за по-добър UX
+            setTimeout(() => {
+                setCurrentQuestionIndex(prev => prev + 1);
+                window.scrollTo(0, 0);
+            }, 300);
         }
     };
 
-    const prevStep = () => {
-        if (step > 1) {
-            setStep(prev => prev - 1);
+    const handleBack = () => {
+        if (currentQuestionIndex > 0) {
+            setCurrentQuestionIndex(prev => prev - 1);
+        } else {
+            setStep('version');
         }
     };
 
-    // Централна функция за оценка – конвертира отговорите в RIASEC профил
-    // и паралелно изтегля кариерни и университетски препоръки.
-    const calculateResults = useCallback(async () => {
+    const calculateFinalResults = async () => {
         setLoading(true);
+        setStep('results');
         try {
-            const profile = buildRiasecProfile(answers);
-            const [careers, universities] = await Promise.all([
-                getCareerRecommendations(answers),
-                getUniversityRecommendations(answers, null)
-            ]);
+            // Използваме само въпросите от текущата версия за изчислението
+            const scores = calculateScores(answers, filteredQuestions);
+            const riasecCode = calculateRiasecCode(scores);
+            
+            // Търсене на съвпадения в базата данни
+            const { specialties, careers } = await getRiasecMatches(scores);
 
             setResults({
-                scores: profile.scores,
-                riasecCode: profile.riasecCode,
-                confidence: profile.confidence,
-                careers,
-                universities
+                scores,
+                riasecCode,
+                specialties,
+                careers
             });
         } catch (error) {
             console.error("Грешка при изчисляване на резултатите:", error);
         } finally {
             setLoading(false);
         }
-    }, [answers]);
+    };
 
-    // Когато потребителят стигне последната стъпка, изчисляваме резултатите само веднъж,
-    // за да избегнем ненужни повторни заявки при повторно рендериране.
-    useEffect(() => {
-        if (step === 6 && !results) {
-            calculateResults();
-        }
-    }, [step, results, calculateResults]);
+    // --- Renderers ---
 
-    // --- ПОМОЩНИ ФУНКЦИИ ЗА РЕНДЕРИРАНЕ ---
-    
-    // Стъпка 1: Избор на клас
-    const renderStep1 = () => (
-        <div className="space-y-6 animate-in fade-in slide-in-from-right duration-500">
-            <h2 className="text-2xl font-bold flex items-center gap-2">
-                <GraduationCap className="text-primary" />
-                В кой клас си?
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {['8', '9', '10', '11', '12', 'Завършил'].map((grade) => (
+    // 1. Избор на версия
+    const renderVersionSelection = () => (
+        <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="text-center space-y-4">
+                <h2 className="text-3xl font-black tracking-tight">Избери версия на теста</h2>
+                <p className="opacity-60 max-w-lg mx-auto">
+                    Колкото повече въпроси отговориш, толкова по-точен ще бъде твоят кариерен профил.
+                </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[
+                    { 
+                        id: 'short', 
+                        name: 'Кратка', 
+                        questions: 30, 
+                        time: '3-5 мин', 
+                        icon: Zap, 
+                        color: 'text-warning',
+                        desc: 'Бърз преглед на твоите основни интереси.'
+                    },
+                    { 
+                        id: 'standard', 
+                        name: 'Стандартна', 
+                        questions: 60, 
+                        time: '8-12 мин', 
+                        icon: Layout, 
+                        color: 'text-primary',
+                        desc: 'Балансирана версия за прецизни резултати.',
+                        recommended: true
+                    },
+                    { 
+                        id: 'extended', 
+                        name: 'Разширена', 
+                        questions: 90, 
+                        time: '15-20 мин', 
+                        icon: Layers, 
+                        color: 'text-accent',
+                        desc: 'Дълбок анализ на твоя професионален потенциал.'
+                    }
+                ].map((v) => (
                     <button
-                        key={grade}
-                        onClick={() => handleAnswer('grade', grade)}
-                        className={`btn h-auto py-6 text-lg rounded-2xl ${answers.grade === grade ? 'btn-primary' : 'btn-outline border-base-300'}`}
+                        key={v.id}
+                        onClick={() => handleVersionSelect(v.id)}
+                        className={`relative group p-8 rounded-[2rem] border-2 transition-all hover:scale-[1.02] active:scale-[0.98] text-left flex flex-col gap-6 ${v.recommended ? 'border-primary bg-primary/5' : 'border-base-200 bg-base-100'}`}
                     >
-                        {grade} клас
+                        {v.recommended && (
+                            <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-content text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg">
+                                Препоръчано
+                            </span>
+                        )}
+                        <div className={`w-14 h-14 rounded-2xl bg-base-200 flex items-center justify-center ${v.color}`}>
+                            <v.icon size={32} />
+                        </div>
+                        <div className="space-y-1">
+                            <h3 className="text-xl font-black">{v.name} версия</h3>
+                            <p className="text-sm opacity-50 leading-relaxed">{v.desc}</p>
+                        </div>
+                        <div className="mt-auto pt-4 border-t border-base-content/5 flex items-center justify-between">
+                            <div className="flex flex-col">
+                                <span className="text-xs font-black opacity-40 uppercase">Въпроси</span>
+                                <span className="font-bold">{v.questions}</span>
+                            </div>
+                            <div className="flex flex-col text-right">
+                                <span className="text-xs font-black opacity-40 uppercase">Време</span>
+                                <span className="font-bold">{v.time}</span>
+                            </div>
+                        </div>
                     </button>
                 ))}
             </div>
         </div>
     );
 
-    // Стъпка 2: Интереси
-    const renderStep2 = () => (
-        <div className="space-y-6 animate-in fade-in slide-in-from-right duration-500">
-            <h2 className="text-2xl font-bold flex items-center gap-2">
-                <Target className="text-secondary" />
-                Какво те влече?
-            </h2>
-            <p className="opacity-60">Избери всички, които ти допадат:</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[
-                    { id: 'Technology', label: 'Технологии', desc: 'Компютри, джаджи, софтуер', icon: '💻' },
-                    { id: 'Art', label: 'Изкуство', desc: 'Рисуване, музика, дизайн', icon: '🎨' },
-                    { id: 'Science', label: 'Наука', desc: 'Биология, физика, експерименти', icon: '🔬' },
-                    { id: 'Social', label: 'Социални дейности', desc: 'Помощ на хора, преподаване', icon: '🤝' },
-                    { id: 'Business', label: 'Бизнес', desc: 'Лидерство, продажби, управление', icon: '💼' },
-                    { id: 'Nature', label: 'Природа', desc: 'Животни, растения, екология', icon: '🌿' }
-                ].map((item) => (
-                    <div 
-                        key={item.id}
-                        onClick={() => toggleSelection('interests', item.id)}
-                        className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center gap-4 hover:scale-[1.02] active:scale-[0.98] ${answers.interests.includes(item.id) ? 'border-primary bg-primary/10' : 'border-base-200 bg-base-100'}`}
-                    >
-                        <div className="text-3xl">{item.icon}</div>
-                        <div>
-                            <div className="font-bold text-lg">{item.label}</div>
-                            <div className="text-xs opacity-60">{item.desc}</div>
-                        </div>
-                        {answers.interests.includes(item.id) && <CheckCircle2 className="ml-auto text-primary" />}
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
+    // 2. Въпросник
+    const renderQuiz = () => {
+        if (!filteredQuestions.length) return null;
+        const currentQ = filteredQuestions[currentQuestionIndex];
+        const progress = ((currentQuestionIndex + 1) / filteredQuestions.length) * 100;
 
-    // Стъпка 3: Силни страни
-    const renderStep3 = () => (
-        <div className="space-y-6 animate-in fade-in slide-in-from-right duration-500">
-            <h2 className="text-2xl font-bold flex items-center gap-2">
-                <BookOpen className="text-accent" />
-                Твоите силни страни?
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[
-                    { id: 'Logic', label: 'Логика', desc: 'Аналитично мислене, структуриране' },
-                    { id: 'Creativity', label: 'Креативност', desc: 'Създаване на нови неща, въображение' },
-                    { id: 'Communication', label: 'Комуникация', desc: 'Общуване, презентиране, писане' },
-                    { id: 'Math', label: 'Математика', desc: 'Числа, формули, статистика' },
-                    { id: 'Organization', label: 'Организация', desc: 'Планиране, ред, детайли' },
-                    { id: 'Problem-solving', label: 'Решаване на проблеми', desc: 'Намиране на решения в трудни ситуации' }
-                ].map((item) => (
-                    <div 
-                        key={item.id}
-                        onClick={() => toggleSelection('strengths', item.id)}
-                        className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center gap-4 hover:scale-[1.02] active:scale-[0.98] ${answers.strengths.includes(item.id) ? 'border-accent bg-accent/10' : 'border-base-200 bg-base-100'}`}
-                    >
-                        <div className={`w-4 h-4 rounded-full border-2 ${answers.strengths.includes(item.id) ? 'bg-accent border-accent' : 'border-base-300'}`}></div>
-                        <div>
-                            <div className="font-bold">{item.label}</div>
-                            <div className="text-xs opacity-60">{item.desc}</div>
-                        </div>
+        return (
+            <div className="space-y-12 animate-in fade-in duration-500">
+                {/* Progress */}
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between px-2">
+                        <span className="text-xs font-black uppercase tracking-widest opacity-40">
+                            Въпрос {currentQuestionIndex + 1} от {filteredQuestions.length}
+                        </span>
+                        <span className="text-xs font-black text-primary">
+                            {Math.round(progress)}% завършени
+                        </span>
                     </div>
-                ))}
-            </div>
-        </div>
-    );
-
-    // Стъпка 4: Ценности (НОВО)
-    const renderStep4 = () => (
-        <div className="space-y-6 animate-in fade-in slide-in-from-right duration-500">
-            <h2 className="text-2xl font-bold flex items-center gap-2">
-                <Heart className="text-error" />
-                Какво цениш най-много?
-            </h2>
-            <p className="opacity-60">Избери какво е важно за теб в работата:</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[
-                    { id: 'Altruism', label: 'Да помагам на другите', desc: 'Алтруизъм и обществена полза' },
-                    { id: 'Creativity_Val', label: 'Да създавам', desc: 'Творческа свобода и изява' },
-                    { id: 'Money', label: 'Високи доходи', desc: 'Финансова независимост и престиж' },
-                    { id: 'Stability', label: 'Сигурност', desc: 'Стабилна работа без рискове' },
-                    { id: 'Independence', label: 'Независимост', desc: 'Да бъда сам себе си шеф' },
-                    { id: 'Innovation', label: 'Иновации', desc: 'Работа с най-новите технологии' }
-                ].map((item) => (
-                    <div 
-                        key={item.id}
-                        onClick={() => toggleSelection('values', item.id)}
-                        className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center gap-4 hover:scale-[1.02] active:scale-[0.98] ${answers.values.includes(item.id) ? 'border-primary bg-primary/10' : 'border-base-200 bg-base-100'}`}
-                    >
-                        <div className={`w-4 h-4 rounded-full border-2 ${answers.values.includes(item.id) ? 'bg-primary border-primary' : 'border-base-300'}`}></div>
-                        <div>
-                            <div className="font-bold">{item.label}</div>
-                            <div className="text-xs opacity-60">{item.desc}</div>
-                        </div>
+                    <div className="h-3 w-full bg-base-200 rounded-full overflow-hidden p-1">
+                        <div 
+                            className="h-full bg-primary rounded-full transition-all duration-500 shadow-sm" 
+                            style={{ width: `${progress}%` }}
+                        ></div>
                     </div>
-                ))}
-            </div>
-        </div>
-    );
+                </div>
 
-    // Стъпка 5: Работна среда (Беше Стъпка 4)
-    const renderStep5 = () => (
-        <div className="space-y-8 animate-in fade-in slide-in-from-right duration-500">
-            <h2 className="text-2xl font-bold flex items-center gap-2">
-                <Briefcase className="text-warning" />
-                Работни предпочитания
-            </h2>
-            
-            <div className="space-y-4">
-                <h3 className="font-bold opacity-70">Къде предпочиташ да работиш?</h3>
-                <div className="grid grid-cols-2 gap-3">
-                    {['Офис', 'Лаборатория', 'На терен', 'Дистанционно'].map(opt => (
-                        <button
-                            key={opt}
-                            onClick={() => handleAnswer('environment', opt)}
-                            className={`btn h-auto py-4 rounded-xl ${answers.environment === opt ? 'btn-warning' : 'btn-ghost bg-base-200'}`}
+                {/* Question Card */}
+                <div className="space-y-8 py-10">
+                    <div className="space-y-3 text-center">
+                        <div className="badge badge-outline border-base-content/10 font-black text-[10px] uppercase tracking-widest px-4 py-3">
+                           {currentQ.category || "Интереси"}
+                        </div>
+                        <h2 className="text-2xl md:text-4xl font-black leading-tight max-w-2xl mx-auto">
+                            {currentQ.text}
+                        </h2>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-3 max-w-xl mx-auto">
+                        {[1, 2, 3, 4, 5].map((val) => (
+                            <button
+                                key={val}
+                                onClick={() => handleAnswer(val)}
+                                className={`
+                                    flex items-center justify-between p-5 rounded-2xl border-2 transition-all font-bold text-lg
+                                    ${answers[currentQ.id] === val 
+                                        ? 'border-primary bg-primary/10 text-primary' 
+                                        : 'border-base-200 bg-base-100 hover:border-primary/30'}
+                                `}
+                            >
+                                <span className="flex items-center gap-4">
+                                    <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm ${answers[currentQ.id] === val ? 'bg-primary text-primary-content' : 'bg-base-200'}`}>
+                                        {val}
+                                    </span>
+                                    {scaleLabels[val]}
+                                </span>
+                                {answers[currentQ.id] === val && <CheckCircle2 size={24} />}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Footer Nav */}
+                <div className="flex items-center justify-between pt-10 border-t border-base-content/5">
+                    <button 
+                        onClick={handleBack}
+                        className="btn btn-ghost gap-2 rounded-xl font-black uppercase tracking-widest text-xs"
+                    >
+                        <ChevronLeft size={18} /> Назад
+                    </button>
+                    
+                    {currentQuestionIndex === filteredQuestions.length - 1 && answers[currentQ.id] ? (
+                        <button 
+                            onClick={calculateFinalResults}
+                            className="btn btn-primary px-10 rounded-2xl font-black shadow-xl shadow-primary/30 gap-2"
                         >
-                            {opt}
+                            Виж резултатите <ChevronRight size={18} />
                         </button>
-                    ))}
+                    ) : (
+                        <button 
+                            disabled={!answers[currentQ.id]}
+                            onClick={() => setCurrentQuestionIndex(prev => prev + 1)}
+                            className="btn btn-ghost gap-2 rounded-xl font-black uppercase tracking-widest text-xs"
+                        >
+                            Напред <ChevronRight size={18} />
+                        </button>
+                    )}
                 </div>
             </div>
+        );
+    };
 
-            <div className="space-y-4">
-                <h3 className="font-bold opacity-70">Стил на работа</h3>
-                <div className="grid grid-cols-2 gap-3">
-                    {['Самостоятелно', 'В екип'].map(opt => (
-                        <button
-                            key={opt}
-                            onClick={() => handleAnswer('style', opt)}
-                            className={`btn h-auto py-4 rounded-xl ${answers.style === opt ? 'btn-warning' : 'btn-ghost bg-base-200'}`}
-                        >
-                            {opt}
-                        </button>
-                    ))}
-                </div>
-            </div>
-        </div>
-    );
-
-    // Стъпка 6: Резултати (Беше Стъпка 5)
-    const renderStep6 = () => {
+    // 3. Резултати
+    const renderResults = () => {
         if (loading) {
             return (
-                <div className="flex flex-col items-center justify-center py-20 space-y-6">
-                    <Loader2 className="w-16 h-16 text-primary animate-spin" />
-                    <div className="text-center space-y-2">
-                        <h3 className="text-2xl font-black">Анализираме отговорите ти...</h3>
-                        <p className="opacity-50">Изчисляване на RIASEC профил и търсене на съвпадения</p>
+                <div className="flex flex-col items-center justify-center py-24 space-y-8 animate-in fade-in duration-700">
+                    <div className="relative">
+                        <div className="w-24 h-24 rounded-full border-4 border-primary/10 border-t-primary animate-spin"></div>
+                        <Target className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-primary" size={32} />
+                    </div>
+                    <div className="text-center space-y-3">
+                        <h3 className="text-3xl font-black tracking-tight">Генерираме твоя профил...</h3>
+                        <p className="opacity-50 font-medium">Анализираме отговорите и търсим най-добрите съвпадения.</p>
                     </div>
                 </div>
             );
@@ -281,160 +312,81 @@ const CareerAdvisor = () => {
         if (!results) return null;
 
         return (
-            <div className="space-y-12 animate-in fade-in zoom-in-95 duration-700">
-                {/* Header Result */}
-                <div className="text-center space-y-4">
-                    <div className="inline-block p-4 bg-primary/10 rounded-full text-primary mb-4">
-                        <Target size={48} />
-                    </div>
-                    <h2 className="text-4xl font-black">Твоят RIASEC код: <span className="text-primary">{results.riasecCode}</span></h2>
-                    <p className="max-w-md mx-auto opacity-70">
-                        Базирано на твоите интереси и силни страни, ти си най-силен в областите:
-                        {results.riasecCode.split('').map(char => {
-                            const map = { R: ' Реалистичен', I: ' Изследователски', A: ' Артистичен', S: ' Социален', E: ' Предприемачески', C: ' Конвенционален' };
-                            return <span key={char} className="font-bold block text-lg">{map[char]} ({char})</span>
-                        })}
-                    </p>
-                </div>
-
-                {/* Премахната Radar Chart секция */}
-
-                {/* Препоръчани Професии */}
-                {/* <div className="space-y-6">
-                    <h3 className="text-2xl font-black flex items-center gap-3">
-                        <Briefcase className="text-secondary" /> 
-                        Препоръчани Професии
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {results.careers.length > 0 ? results.careers.map((career, idx) => (
-                            <div key={idx} className="card bg-base-100 shadow-xl border-l-4 border-secondary hover:shadow-2xl transition-all">
-                                <div className="card-body">
-                                    <div className="flex justify-between items-start">
-                                        <h4 className="card-title text-lg">{career.occupation_bg || career.occupation_en}</h4>
-                                        <div className="badge badge-secondary font-bold">{career.matchScore}% съвпадение</div>
-                                    </div>
-                                    <p className="text-sm opacity-60 italic">{career.occupation_en}</p>
-                                    <div className="flex gap-2 mt-2">
-                                        <div className="badge badge-ghost badge-sm">{career.riasec_code}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        )) : (
-                            <div className="col-span-2 text-center py-10 opacity-50">Няма намерени професии за този профил.</div>
-                        )}
-                    </div>
-                </div> */}
-
-                {/* Препоръчани Университети */}
-                <div className="space-y-6">
-                    <h3 className="text-2xl font-black flex items-center gap-3">
-                        <Building2 className="text-accent" /> 
-                        Препоръчани Специалности
-                    </h3>
-                    <div className="space-y-4">
-                        {results.universities.length > 0 ? results.universities.map((uni, idx) => (
-                            <div key={idx} className="bg-base-100 p-6 rounded-2xl shadow-md border border-base-200 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-                                <div>
-                                    <h4 className="font-bold text-lg">{uni.specialty}</h4>
-                                    <p className="opacity-70 font-medium flex items-center gap-1 text-sm mt-1">
-                                        <Building2 size={14} /> {uni.university_name}
-                                    </p>
-                                    <p className="opacity-50 flex items-center gap-1 text-xs mt-1">
-                                        <MapPin size={12} /> {uni.city}
-                                    </p>
-                                </div>
-                                <div className="flex flex-col items-end gap-2 min-w-[100px]">
-                                    <div className="badge badge-accent badge-lg text-white font-bold">{uni.matchScore}%</div>
-                                    {uni.min_score && <div className="text-xs font-bold opacity-60">Мин. бал: {uni.min_score}</div>}
-                                </div>
-                            </div>
-                        )) : (
-                            <div className="text-center py-10 opacity-50">Няма намерени университети за този профил.</div>
-                        )}
-                    </div>
-                </div>
-
-                <div className="flex justify-center pt-8">
-                    <button
-                        onClick={() => {
-                            setAnswers(INITIAL_ANSWERS);
-                            setResults(null);
-                            setLoading(false);
-                            setStep(1);
-                        }}
-                        className="btn btn-outline rounded-full px-8"
-                    >
-                        Направи теста отново
-                    </button>
-                </div>
-            </div>
+            <RIASECResults 
+                results={results} 
+                onRestart={() => {
+                    setStep('version');
+                    setResults(null);
+                    setAnswers({});
+                    setCurrentQuestionIndex(0);
+                }} 
+            />
         );
     };
 
     return (
-        <div className="min-h-screen bg-base-200 pt-28 pb-20">
-            <div className="container mx-auto px-4 py-8 max-w-4xl">
-                {/* Header */}
-                <div className="text-center mb-12">
-                    <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">Кариерен Съветник</h1>
-                    <p className="text-lg opacity-60 max-w-2xl mx-auto">
-                        Отговори на няколко въпроса и нашият AI алгоритъм ще намери най-подходящите професии и университети за теб.
-                    </p>
-                </div>
-
-                {/* Progress Steps */}
-                <div className="mb-12 overflow-x-auto pb-4">
-                    <ul className="steps steps-horizontal w-full min-w-[500px]">
-                        <li className={`step ${step >= 1 ? 'step-primary' : ''}`}>Клас</li>
-                        <li className={`step ${step >= 2 ? 'step-primary' : ''}`}>Интереси</li>
-                        <li className={`step ${step >= 3 ? 'step-primary' : ''}`}>Умения</li>
-                        <li className={`step ${step >= 4 ? 'step-primary' : ''}`}>Ценности</li>
-                        <li className={`step ${step >= 5 ? 'step-primary' : ''}`}>Среда</li>
-                        <li className={`step ${step >= 6 ? 'step-primary' : ''}`}>Резултати</li>
-                    </ul>
-                </div>
+        <div className="min-h-screen bg-base-200 selection:bg-primary/20 pt-28 pb-20">
+            <div className="container mx-auto px-4 max-w-5xl">
+                {/* Header Section */}
+                {step !== 'results' && (
+                    <div className="text-center space-y-6 mb-16">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-[0.2em]">
+                            <Zap size={12} /> RIASEC Career Advisor
+                        </div>
+                        <h1 className="text-5xl md:text-6xl font-black tracking-tight leading-none">
+                            Открий своето <span className="text-primary italic">призвание</span>
+                        </h1>
+                        <p className="text-lg opacity-60 max-w-2xl mx-auto font-medium">
+                            Научно обоснован метод за определяне на твоите професионални интереси и намиране на перфектната кариера.
+                        </p>
+                    </div>
+                )}
 
                 {/* Main Content Card */}
-                <div className="bg-base-100 rounded-[2.5rem] shadow-2xl p-6 md:p-12 relative overflow-hidden min-h-[400px]">
+                <div className={`
+                    bg-base-100 rounded-[3rem] shadow-2xl p-6 md:p-16 relative overflow-hidden transition-all duration-500
+                    ${step === 'results' ? 'p-0 bg-transparent shadow-none' : ''}
+                `}>
                     {/* Background decorations */}
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-secondary/5 rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
-
-                    {step === 1 && renderStep1()}
-                    {step === 2 && renderStep2()}
-                    {step === 3 && renderStep3()}
-                    {step === 4 && renderStep4()}
-                    {step === 5 && renderStep5()}
-                    {step === 6 && renderStep6()}
-
-                    {/* Navigation Buttons */}
-                    {step < 6 && (
-                        <div className="flex justify-between mt-12 pt-6 border-t border-base-200">
-                            <button 
-                                onClick={prevStep} 
-                                className={`btn btn-ghost gap-2 rounded-xl ${step === 1 ? 'invisible' : ''}`}
-                            >
-                                <ChevronLeft /> Назад
-                            </button>
-                            <button 
-                                onClick={nextStep} 
-                                className="btn btn-primary rounded-xl px-8 shadow-lg shadow-primary/30 gap-2"
-                                disabled={
-                                    (step === 1 && !answers.grade) ||
-                                    (step === 2 && answers.interests.length === 0) ||
-                                    (step === 3 && answers.strengths.length === 0) ||
-                                    (step === 4 && answers.values.length === 0) ||
-                                    (step === 5 && (!answers.environment || !answers.style))
-                                }
-                            >
-                                Напред <ChevronRight />
-                            </button>
-                        </div>
+                    {step !== 'results' && (
+                        <>
+                            <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none blur-3xl"></div>
+                            <div className="absolute bottom-0 left-0 w-64 h-64 bg-secondary/5 rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none blur-2xl"></div>
+                        </>
                     )}
+
+                    {step === 'version' && renderVersionSelection()}
+                    {step === 'quiz' && renderQuiz()}
+                    {step === 'results' && renderResults()}
                 </div>
+
+                {/* Additional Info (Only on start page) */}
+                {step === 'version' && (
+                    <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 opacity-80">
+                        <div className="flex gap-6 p-8 rounded-3xl bg-base-100/50 border border-base-content/5">
+                            <div className="w-12 h-12 rounded-2xl bg-success/10 text-success flex items-center justify-center shrink-0">
+                                <ClipboardList size={24} />
+                            </div>
+                            <div className="space-y-2">
+                                <h4 className="font-black uppercase tracking-widest text-xs opacity-50">Как работи?</h4>
+                                <p className="text-sm leading-relaxed">Алгоритъмът измерва 6 измерения на личността: Реалистичен, Изследователски, Артистичен, Социален, Предприемчив и Конвенционален.</p>
+                            </div>
+                        </div>
+                        <div className="flex gap-6 p-8 rounded-3xl bg-base-100/50 border border-base-content/5">
+                            <div className="w-12 h-12 rounded-2xl bg-info/10 text-info flex items-center justify-center shrink-0">
+                                <AlertCircle size={24} />
+                            </div>
+                            <div className="space-y-2">
+                                <h4 className="font-black uppercase tracking-widest text-xs opacity-50">Съвет</h4>
+                                <p className="text-sm leading-relaxed">Отговаряй честно според това как се чувстваш, а не според това как смяташ, че "трябва" да се отговори.</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
 };
 
 export default CareerAdvisor;
+

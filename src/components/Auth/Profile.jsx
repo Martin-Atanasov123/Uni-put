@@ -1,12 +1,12 @@
-// Компонент: Профил и настройки
-// Описание: Зарежда профил от Supabase, визуализира основни данни и позволява
-//   промени в потребителска информация, имейл, поверителност и известия.
-// Вход: няма пропсове; използва Supabase за данни и навигация при липса на сесия.
-// Изход: UI състояние, нотификации за успех/грешка; update операции към Supabase.
-import { useState, useEffect } from "react";
+// Компонент: Профил и настройки (Модерен Дизайн)
+// Описание: Зарежда профил от Supabase, визуализира основни данни, любими университети 
+//   и история на баловете. Позволява промени в потребителска информация и сигурност.
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "../../lib/supabase";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { sessionService } from "../../services/sessionService";
+import { useAuth } from "../../context/AuthContext";
+import { universityService } from "../../services/universityService";
 import { 
     User, 
     Mail, 
@@ -23,53 +23,54 @@ import {
     EyeOff,
     Globe,
     Activity,
-    Smartphone
+    Smartphone,
+    Heart,
+    Calculator,
+    Calendar,
+    ArrowRight,
+    MapPin,
+    GraduationCap,
+    Star,
+    Trash2,
+    Settings,
+    Edit3
 } from "lucide-react";
 
 const Profile = () => {
     const navigate = useNavigate();
+    const { user: authUser, favorites, toggleFavorite } = useAuth();
     
     // UI State
-    const [activeTab, setActiveTab] = useState("general");
+    const [activeTab, setActiveTab] = useState("overview");
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
     const [message, setMessage] = useState({ type: "", text: "" });
+    const [showPassword, setShowPassword] = useState(false);
 
-    // User Data State
+    // Data State
     const [user, setUser] = useState(null);
+    const [favoriteDetails, setFavoriteDetails] = useState([]);
+    const [calculatorHistory, setCalculatorHistory] = useState([]);
     const [formData, setFormData] = useState({
         username: "",
         bio: "",
         email: "",
         newEmail: "",
-        currentPassword: "", // For re-auth
-        privacy: {
-            isPublic: false,
-            showActivity: true
-        },
-        notifications: {
-            emailUpdates: true,
-            securityAlerts: true,
-            marketing: false
-        }
+        currentPassword: "",
+        privacy: { isPublic: false, showActivity: true },
+        notifications: { emailUpdates: true, securityAlerts: true, marketing: false }
     });
 
-    // Password Visibility
-    const [showPassword, setShowPassword] = useState(false);
-
-    // --- 1. Fetch Profile ---
+    // --- 1. Fetch Profile & Related Data ---
     useEffect(() => {
-        const getProfile = async () => {
+        const fetchData = async () => {
             try {
                 setLoading(true);
                 const { data: { user }, error } = await supabase.auth.getUser();
-
                 if (error) throw error;
 
                 if (user) {
                     setUser(user);
-                    
-                    // Parse metadata
                     const metadata = user.user_metadata || {};
                     
                     setFormData(prev => ({
@@ -87,17 +88,28 @@ const Profile = () => {
                             marketing: metadata.notifications?.marketing ?? false
                         }
                     }));
+
+                    // Fetch Favorite Details
+                    if (favorites.length > 0) {
+                        const allUnis = await universityService.searchUniversities({});
+                        const details = allUnis.filter(u => favorites.includes(u.id.toString()));
+                        setFavoriteDetails(details.slice(0, 3)); // Show top 3 in overview
+                    }
+
+                    // Fetch Calculator History from LocalStorage (Mock or actual if implemented)
+                    const history = JSON.parse(localStorage.getItem("calculator_history") || "[]");
+                    setCalculatorHistory(history.slice(0, 3));
                 }
             } catch (error) {
-                console.error("Error loading profile:", error.message);
+                console.error("Error loading profile data:", error.message);
                 navigate("/login");
             } finally {
                 setLoading(false);
             }
         };
 
-        getProfile();
-    }, [navigate]);
+        fetchData();
+    }, [navigate, favorites]);
 
     // --- Helpers ---
     const showMessage = (type, text) => {
@@ -105,20 +117,19 @@ const Profile = () => {
         setTimeout(() => setMessage({ type: "", text: "" }), 5000);
     };
 
-    // --- 2. Update General Info (Username, Bio) ---
+    const handleLogout = async () => {
+        await sessionService.logout();
+        navigate("/login");
+    };
+
+    // --- Handlers ---
     const updateGeneralInfo = async (e) => {
         e.preventDefault();
         setUpdating(true);
-        setMessage({ type: "", text: "" });
-
         try {
             const { error } = await supabase.auth.updateUser({
-                data: { 
-                    username: formData.username,
-                    bio: formData.bio
-                }
+                data: { username: formData.username, bio: formData.bio }
             });
-
             if (error) throw error;
             showMessage("success", "Профилът е обновен успешно!");
         } catch (error) {
@@ -128,479 +139,316 @@ const Profile = () => {
         }
     };
 
-    // --- 3. Change Email ---
-    const handleChangeEmail = async (e) => {
-        e.preventDefault();
-        setUpdating(true);
-        setMessage({ type: "", text: "" });
-
-        // Basic validation
-        if (!formData.newEmail || !formData.newEmail.includes("@")) {
-            showMessage("error", "Моля, въведете валиден имейл адрес.");
-            setUpdating(false);
-            return;
-        }
-
-        if (!formData.currentPassword) {
-            showMessage("error", "Моля, въведете текущата си парола за потвърждение.");
-            setUpdating(false);
-            return;
-        }
-
-        try {
-            // 1. Re-authenticate
-            const { error: signInError } = await supabase.auth.signInWithPassword({
-                email: user.email,
-                password: formData.currentPassword
-            });
-
-            if (signInError) throw new Error("Грешна парола. Моля, опитайте отново.");
-
-            // 2. Update Email
-            const { error: updateError } = await supabase.auth.updateUser({
-                email: formData.newEmail
-            });
-
-            if (updateError) throw updateError;
-
-            showMessage("success", "Изпратен е линк за потвърждение на новия имейл адрес!");
-            setFormData(prev => ({ ...prev, newEmail: "", currentPassword: "" }));
-        } catch (error) {
-            showMessage("error", error.message);
-        } finally {
-            setUpdating(false);
-        }
-    };
-
-    // --- 4. Reset Password ---
-    const handleResetPassword = async () => {
-        setUpdating(true);
-        try {
-            const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
-                redirectTo: `${window.location.origin}/update-password`, // Assuming this route exists or just standard reset
-            });
-            if (error) throw error;
-            showMessage("success", "Изпратен е имейл за възстановяване на паролата.");
-        } catch (error) {
-            showMessage("error", error.message);
-        } finally {
-            setUpdating(false);
-        }
-    };
-
-    // --- 5. Update Settings (Privacy/Notifications) ---
-    const updateSettings = async (section) => {
-        setUpdating(true);
-        try {
-            const updateData = {};
-            if (section === 'privacy') updateData.privacy = formData.privacy;
-            if (section === 'notifications') updateData.notifications = formData.notifications;
-
-            const { error } = await supabase.auth.updateUser({
-                data: updateData
-            });
-
-            if (error) throw error;
-            showMessage("success", "Настройките са запазени!");
-        } catch (error) {
-            showMessage("error", error.message);
-        } finally {
-            setUpdating(false);
-        }
-    };
-
-    const handleSettingChange = (section, key, value) => {
-        setFormData(prev => ({
-            ...prev,
-            [section]: {
-                ...prev[section],
-                [key]: value
-            }
-        }));
-    };
-
-    const handleLogout = async () => {
-        await sessionService.logout();
-        navigate("/login");
-    };
-
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-base-200">
-                <Loader2 className="w-12 h-12 animate-spin text-primary" />
+            <div className="min-h-screen flex items-center justify-center bg-base-100">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="w-12 h-12 animate-spin text-primary" />
+                    <p className="font-black animate-pulse opacity-50 uppercase tracking-widest text-xs">Зареждане на профил...</p>
+                </div>
             </div>
         );
     }
 
     const tabs = [
-        { id: "general", label: "Общи", icon: User },
+        { id: "overview", label: "Преглед", icon: Activity },
+        { id: "settings", label: "Настройки", icon: Settings },
         { id: "security", label: "Сигурност", icon: Shield },
         { id: "privacy", label: "Поверителност", icon: Lock },
-        { id: "notifications", label: "Известия", icon: Bell },
     ];
 
     return (
-        <div className="min-h-screen bg-base-200 px-4 pt-28 pb-12">
-            <div className="max-w-5xl mx-auto">
-                {/* Header with Back Button */}
-                <div className="flex items-center gap-4 mb-8">
-                    <button 
-                        onClick={() => navigate(-1)} 
-                        className="btn btn-circle btn-ghost hover:bg-base-300"
-                        aria-label="Назад"
-                    >
-                        <ChevronLeft className="w-6 h-6" />
-                    </button>
-                    <div>
-                        <h1 className="text-3xl font-black text-base-content">Настройки на профила</h1>
-                        <p className="opacity-60 text-sm">Управлявайте вашата лична информация и предпочитания</p>
-                    </div>
+        <div className="min-h-screen bg-base-200/50 selection:bg-primary/30">
+            {/* Top Decorative Banner */}
+            <div className="h-48 md:h-64 bg-gradient-to-br from-primary via-secondary to-accent relative overflow-hidden">
+                <div className="absolute inset-0 opacity-20 mix-blend-overlay">
+                    <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.2),transparent_70%)] animate-pulse"></div>
                 </div>
+            </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                    {/* Navigation Sidebar */}
-                    <div className="lg:col-span-1 space-y-2">
-                        <div className="bg-base-100 rounded-3xl p-4 shadow-lg sticky top-24">
-                            {tabs.map((tab) => {
-                                const Icon = tab.icon;
-                                return (
-                                    <button
-                                        key={tab.id}
-                                        onClick={() => setActiveTab(tab.id)}
-                                        className={`flex items-center w-full gap-3 px-4 py-3 rounded-2xl transition-all font-bold text-sm mb-1
-                                            ${activeTab === tab.id 
-                                                ? "bg-primary text-primary-content shadow-md" 
-                                                : "hover:bg-base-200 text-base-content/70"}`}
-                                    >
-                                        <Icon size={18} />
-                                        {tab.label}
-                                    </button>
-                                )
-                            })}
-                             <div className="divider my-2"></div>
-                             <button 
-                                onClick={handleLogout}
-                                className="flex items-center w-full gap-3 px-4 py-3 rounded-2xl transition-all font-bold text-sm text-error hover:bg-error/10"
-                            >
-                                <LogOut size={18} />
-                                Изход
-                            </button>
+            <div className="max-w-6xl mx-auto px-4 -mt-24 md:-mt-32 relative z-10 pb-20">
+                {/* Main Profile Card */}
+                <div className="bg-base-100 rounded-[2.5rem] shadow-2xl shadow-primary/5 border border-base-content/5 overflow-hidden">
+                    <div className="p-6 md:p-10">
+                        {/* Header Section */}
+                        <div className="flex flex-col md:flex-row items-center md:items-end gap-6 mb-12">
+                            <div className="relative group">
+                                <div className="w-32 h-32 md:w-40 md:h-40 rounded-[2rem] bg-base-200 p-1 ring-4 ring-base-100 shadow-xl overflow-hidden">
+                                    <div className="w-full h-full rounded-[1.8rem] bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center text-primary">
+                                        <User size={64} strokeWidth={1.5} />
+                                    </div>
+                                </div>
+                                <button className="absolute -bottom-2 -right-2 btn btn-circle btn-primary btn-sm shadow-lg border-2 border-base-100 hover:scale-110 transition-transform">
+                                    <Edit3 size={14} />
+                                </button>
+                            </div>
+
+                            <div className="flex-1 text-center md:text-left space-y-2">
+                                <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                                    <h1 className="text-3xl md:text-4xl font-black tracking-tight">{formData.username || "Потребител"}</h1>
+                                    <span className="badge badge-primary font-black text-[10px] uppercase tracking-widest px-3 py-3 shadow-sm shadow-primary/20">
+                                        Кандидат-студент
+                                    </span>
+                                </div>
+                                <p className="text-base-content/60 font-medium flex items-center justify-center md:justify-start gap-2">
+                                    <Mail size={16} className="opacity-40" /> {user?.email}
+                                </p>
+                                <p className="text-sm opacity-50 italic max-w-md mx-auto md:mx-0">
+                                    {formData.bio || "Все още няма добавена биография..."}
+                                </p>
+                            </div>
+
+                            <div className="flex gap-2">
+                                <button onClick={handleLogout} className="btn btn-ghost btn-sm rounded-xl font-black text-error hover:bg-error/10">
+                                    <LogOut size={16} /> Изход
+                                </button>
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Content Area */}
-                    <div className="lg:col-span-3">
-                        <div className="card bg-base-100 shadow-xl rounded-[2rem] border border-base-200">
-                            <div className="card-body p-6 md:p-8">
-                                
-                                {/* Messages */}
-                                {message.text && (
-                                    <div className={`alert ${message.type === "success" ? "alert-success" : "alert-error"} mb-6 rounded-2xl animate-in fade-in slide-in-from-top-2`}>
-                                        {message.type === "success" ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
-                                        <span>{message.text}</span>
-                                    </div>
-                                )}
+                        {/* Navigation Tabs */}
+                        <div className="flex overflow-x-auto gap-2 p-1 bg-base-200/50 rounded-2xl mb-10 no-scrollbar">
+                            {tabs.map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-black transition-all whitespace-nowrap
+                                        ${activeTab === tab.id 
+                                            ? "bg-base-100 text-primary shadow-sm ring-1 ring-base-content/5" 
+                                            : "opacity-50 hover:opacity-100 hover:bg-base-100/50"}`}
+                                >
+                                    <tab.icon size={16} />
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
 
-                                {/* --- TAB: GENERAL --- */}
-                                {activeTab === "general" && (
-                                    <div className="space-y-8 animate-in fade-in zoom-in-95 duration-300">
-                                        <div className="flex flex-col md:flex-row items-center gap-6 pb-6 border-b border-base-200">
-                                            <div className="avatar placeholder relative group">
-                                                <div className="bg-primary text-primary-content rounded-full w-24 md:w-32 text-4xl font-bold shadow-2xl ring-4 ring-base-100 flex items-center justify-center">
-                                                    <User className="w-12 h-12" />
-                                                </div>
-                                            </div>
+                        {/* Messages */}
+                        {message.text && (
+                            <div className={`alert ${message.type === "success" ? "alert-success bg-success/10 text-success border-success/20" : "alert-error bg-error/10 text-error border-error/20"} mb-8 rounded-2xl animate-in fade-in slide-in-from-top-4 duration-500`}>
+                                {message.type === "success" ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
+                                <span className="font-bold">{message.text}</span>
+                            </div>
+                        )}
 
-                                            <div className="text-center md:text-left space-y-1">
-                                                <h2 className="text-2xl font-black">{formData.username || "Потребител"}</h2>
-                                                <p className="opacity-50 font-medium flex items-center justify-center md:justify-start gap-2">
-                                                    {user?.email}
-                                                    {user?.email_confirmed_at && (
-                                                        <span className="badge badge-success badge-xs gap-1 py-2 px-3 text-[10px] font-bold uppercase text-white">
-                                                            <CheckCircle2 size={10} /> Потвърден
-                                                        </span>
-                                                    )}
-                                                </p>
-                                                <div className="badge badge-ghost mt-2">Студент</div>
-                                            </div>
+                        {/* Content Area */}
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+                            
+                            {/* --- TAB: OVERVIEW --- */}
+                            {activeTab === "overview" && (
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                    {/* Stats Grid */}
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="bg-primary/5 p-6 rounded-3xl border border-primary/10 group hover:bg-primary/10 transition-colors">
+                                            <Heart className="text-primary mb-4 group-hover:scale-110 transition-transform" size={32} />
+                                            <p className="text-3xl font-black">{favorites.length}</p>
+                                            <p className="text-xs font-black uppercase tracking-widest opacity-40">Любими</p>
                                         </div>
-
-                                        <form onSubmit={updateGeneralInfo} className="space-y-6">
-                                            <div className="form-control w-full">
-                                                <label className="label">
-                                                    <span className="label-text font-bold">Потребителско име</span>
-                                                </label>
-                                                <div className="relative">
-                                                    <User className="absolute left-4 top-1/2 -translate-y-1/2 opacity-30" size={18} />
-                                                    <input 
-                                                        type="text" 
-                                                        className="input input-bordered w-full pl-12 rounded-2xl" 
-                                                        placeholder="Вашето име"
-                                                        value={formData.username}
-                                                        onChange={(e) => setFormData({...formData, username: e.target.value})}
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="form-control w-full">
-                                                <label className="label">
-                                                    <span className="label-text font-bold">Биография</span>
-                                                    <span className="label-text-alt opacity-50">Кратко описание за вас</span>
-                                                </label>
-                                                <textarea 
-                                                    className="textarea textarea-bordered h-24 rounded-2xl" 
-                                                    placeholder="Разкажете нещо за себе си..."
-                                                    value={formData.bio}
-                                                    onChange={(e) => setFormData({...formData, bio: e.target.value})}
-                                                ></textarea>
-                                            </div>
-
-                                            <div className="flex justify-end gap-3 pt-4">
-                                                <button type="button" onClick={() => setFormData(prev => ({...prev, username: user.user_metadata?.username || "", bio: user.user_metadata?.bio || ""}))} className="btn btn-ghost rounded-xl">Отказ</button>
-                                                <button type="submit" disabled={updating} className="btn btn-primary rounded-xl px-8 shadow-lg shadow-primary/30">
-                                                    {updating && <Loader2 className="animate-spin" size={18} />}
-                                                    Запази
-                                                </button>
-                                            </div>
-                                        </form>
+                                        <div className="bg-secondary/5 p-6 rounded-3xl border border-secondary/10 group hover:bg-secondary/10 transition-colors">
+                                            <Calculator className="text-secondary mb-4 group-hover:scale-110 transition-transform" size={32} />
+                                            <p className="text-3xl font-black">{calculatorHistory.length}</p>
+                                            <p className="text-xs font-black uppercase tracking-widest opacity-40">Изчислени бала</p>
+                                        </div>
                                     </div>
-                                )}
 
-                                {/* --- TAB: SECURITY --- */}
-                                {activeTab === "security" && (
-                                    <div className="space-y-8 animate-in fade-in zoom-in-95 duration-300">
-                                        
-                                        {/* Change Email Section */}
-                                        <section className="space-y-4">
-                                            <h3 className="text-xl font-black flex items-center gap-2">
-                                                <Mail className="text-primary" /> Промяна на имейл
-                                            </h3>
-                                            <div className="bg-base-200/50 p-6 rounded-3xl space-y-4 border border-base-200">
-                                                <div className="form-control">
-                                                    <label className="label"><span className="label-text font-bold">Нов имейл адрес</span></label>
-                                                    <input 
-                                                        type="email" 
-                                                        className="input input-bordered rounded-xl" 
-                                                        placeholder="new@example.com"
-                                                        value={formData.newEmail}
-                                                        onChange={(e) => setFormData({...formData, newEmail: e.target.value})}
-                                                    />
-                                                </div>
-                                                <div className="form-control">
-                                                    <label className="label"><span className="label-text font-bold">Текуща парола (за потвърждение)</span></label>
-                                                    <div className="relative">
-                                                        <input 
-                                                            type={showPassword ? "text" : "password"}
-                                                            className="input input-bordered w-full rounded-xl pr-10" 
-                                                            placeholder="••••••••"
-                                                            value={formData.currentPassword}
-                                                            onChange={(e) => setFormData({...formData, currentPassword: e.target.value})}
-                                                        />
-                                                        <button 
-                                                            type="button"
-                                                            onClick={() => setShowPassword(!showPassword)}
-                                                            className="absolute right-3 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100"
-                                                        >
-                                                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                                                        </button>
+                                    {/* Favorite Universities Preview */}
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between px-2">
+                                            <h3 className="text-lg font-black italic">Последно добавени любими</h3>
+                                            <Link to="/favorites" className="text-xs font-black text-primary hover:underline flex items-center gap-1">
+                                                Виж всички <ArrowRight size={12} />
+                                            </Link>
+                                        </div>
+                                        <div className="space-y-3">
+                                            {favoriteDetails.length > 0 ? favoriteDetails.map((uni) => (
+                                                <div key={uni.id} className="flex items-center gap-4 p-4 bg-base-200/30 rounded-2xl border border-base-content/5 hover:border-primary/20 transition-all group">
+                                                    <div className="w-12 h-12 rounded-xl bg-base-100 flex items-center justify-center text-primary shadow-sm">
+                                                        <GraduationCap size={24} />
                                                     </div>
-                                                </div>
-                                                <div className="flex justify-end pt-2">
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="font-bold truncate text-sm">{uni.university_name}</p>
+                                                        <p className="text-[10px] opacity-50 flex items-center gap-1 uppercase tracking-tighter">
+                                                            <MapPin size={10} /> {uni.city}
+                                                        </p>
+                                                    </div>
                                                     <button 
-                                                        onClick={handleChangeEmail} 
-                                                        disabled={!formData.newEmail || !formData.currentPassword || updating}
-                                                        className="btn btn-primary btn-sm rounded-lg"
+                                                        onClick={() => toggleFavorite(uni.id.toString())}
+                                                        className="btn btn-ghost btn-circle btn-sm text-error opacity-0 group-hover:opacity-100 transition-opacity"
                                                     >
-                                                        {updating && <Loader2 className="animate-spin" size={14} />}
-                                                        Обнови имейл
+                                                        <Trash2 size={14} />
                                                     </button>
                                                 </div>
+                                            )) : (
+                                                <div className="p-10 bg-base-200/20 rounded-[2rem] border border-dashed border-base-content/10 flex flex-col items-center gap-4 text-center">
+                                                    <Heart size={32} className="opacity-10" />
+                                                    <p className="text-sm opacity-40 font-medium italic">Нямате добавени любими университети</p>
+                                                    <Link to="/universities" className="btn btn-primary btn-xs rounded-lg">Търсене</Link>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* --- TAB: SETTINGS --- */}
+                            {activeTab === "settings" && (
+                                <form onSubmit={updateGeneralInfo} className="max-w-2xl space-y-8">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="form-control">
+                                            <label className="label"><span className="label-text font-black uppercase tracking-widest text-[10px] opacity-50">Потребителско име</span></label>
+                                            <div className="relative">
+                                                <User className="absolute left-4 top-1/2 -translate-y-1/2 opacity-30" size={18} />
+                                                <input 
+                                                    type="text" 
+                                                    className="input input-bordered w-full pl-12 rounded-2xl bg-base-200/50 focus:bg-base-100 transition-all font-bold" 
+                                                    value={formData.username}
+                                                    onChange={(e) => setFormData({...formData, username: e.target.value})}
+                                                />
                                             </div>
-                                        </section>
+                                        </div>
+                                        <div className="form-control">
+                                            <label className="label"><span className="label-text font-black uppercase tracking-widest text-[10px] opacity-50">Имейл (Само за четене)</span></label>
+                                            <div className="relative">
+                                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 opacity-30" size={18} />
+                                                <input 
+                                                    type="text" 
+                                                    className="input input-bordered w-full pl-12 rounded-2xl bg-base-200/20 opacity-50 font-bold cursor-not-allowed" 
+                                                    value={user?.email} 
+                                                    disabled 
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                        <div className="divider"></div>
+                                    <div className="form-control">
+                                        <label className="label"><span className="label-text font-black uppercase tracking-widest text-[10px] opacity-50">Биография</span></label>
+                                        <textarea 
+                                            className="textarea textarea-bordered h-32 rounded-3xl bg-base-200/50 focus:bg-base-100 transition-all font-medium p-6" 
+                                            placeholder="Разкажете ни малко за вашите цели..."
+                                            value={formData.bio}
+                                            onChange={(e) => setFormData({...formData, bio: e.target.value})}
+                                        ></textarea>
+                                    </div>
 
-                                        {/* Reset Password Section */}
-                                        <section className="space-y-4">
-                                            <h3 className="text-xl font-black flex items-center gap-2">
-                                                <Shield className="text-primary" /> Парола
-                                            </h3>
-                                            <div className="flex items-center justify-between bg-base-200/50 p-6 rounded-3xl border border-base-200">
+                                    <div className="flex justify-end gap-3 pt-6 border-t border-base-content/5">
+                                        <button type="submit" disabled={updating} className="btn btn-primary px-10 rounded-2xl font-black shadow-xl shadow-primary/20">
+                                            {updating && <Loader2 className="animate-spin" size={18} />}
+                                            Запази промените
+                                        </button>
+                                    </div>
+                                </form>
+                            )}
+
+                            {/* --- TAB: SECURITY --- */}
+                            {activeTab === "security" && (
+                                <div className="max-w-2xl space-y-10">
+                                    <div className="p-8 bg-base-200/30 rounded-[2rem] border border-base-content/5 space-y-6">
+                                        <div className="flex items-center gap-4 mb-2">
+                                            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                                                <Shield size={24} />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-xl font-black">Сигурност на акаунта</h3>
+                                                <p className="text-xs opacity-50">Управлявайте вашата парола и методи за вход</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="divider opacity-5"></div>
+
+                                        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                                            <div className="space-y-1">
+                                                <p className="font-black text-lg">Парола</p>
+                                                <p className="text-sm opacity-50">Последна промяна: преди 2 месеца</p>
+                                            </div>
+                                            <button 
+                                                onClick={() => navigate("/forgot-password")}
+                                                className="btn btn-outline btn-primary px-8 rounded-xl font-black text-xs uppercase tracking-widest"
+                                            >
+                                                Промени парола
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-8 bg-error/5 rounded-[2rem] border border-error/10 space-y-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 rounded-2xl bg-error/10 text-error flex items-center justify-center">
+                                                <AlertCircle size={24} />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-xl font-black text-error">Опасна зона</h3>
+                                                <p className="text-xs opacity-50">Действия, които не могат да бъдат отменени</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center justify-between bg-base-100 p-6 rounded-2xl border border-error/20">
+                                            <div>
+                                                <p className="font-bold">Изтриване на акаунт</p>
+                                                <p className="text-xs opacity-50">Всички ваши данни ще бъдат премахнати завинаги.</p>
+                                            </div>
+                                            <button className="btn btn-error btn-sm rounded-lg text-white font-black">Изтрий</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* --- TAB: PRIVACY --- */}
+                            {activeTab === "privacy" && (
+                                <div className="max-w-2xl space-y-6">
+                                    <div className="bg-base-200/30 rounded-[2.5rem] p-4 border border-base-content/5">
+                                        <label className="flex items-center justify-between p-6 hover:bg-base-100/50 rounded-[2rem] cursor-pointer transition-all group">
+                                            <div className="flex items-center gap-5">
+                                                <div className="w-14 h-14 bg-primary/10 text-primary rounded-[1.5rem] flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                    <Globe size={28} strokeWidth={1.5} />
+                                                </div>
                                                 <div>
-                                                    <p className="font-bold">Нулиране на паролата</p>
-                                                    <p className="text-xs opacity-60 max-w-xs mt-1">Ще получите имейл с инструкции за задаване на нова парола.</p>
-                                                </div>
-                                                <button 
-                                                    onClick={handleResetPassword}
-                                                    disabled={updating}
-                                                    className="btn btn-outline btn-sm rounded-lg"
-                                                >
-                                                    Изпрати имейл
-                                                </button>
-                                            </div>
-                                        </section>
-                                        
-                                        <div className="divider"></div>
-                                        
-                                        {/* Linked Accounts (Visual Only for now) */}
-                                        <section className="space-y-4">
-                                            <h3 className="text-xl font-black flex items-center gap-2">
-                                                <Globe className="text-primary" /> Свързани акаунти
-                                            </h3>
-                                            <div className="bg-base-200/50 p-4 rounded-3xl border border-base-200 opacity-60">
-                                                <div className="flex items-center gap-4 p-2">
-                                                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
-                                                        <span className="font-bold text-lg">G</span>
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <p className="font-bold">Google</p>
-                                                        <p className="text-xs">Не е свързан</p>
-                                                    </div>
-                                                    <button disabled className="btn btn-xs btn-ghost">Свържи</button>
+                                                    <span className="text-lg font-black block">Публичен профил</span>
+                                                    <span className="text-xs opacity-50 font-medium">Позволете на другите да виждат вашите любими университети.</span>
                                                 </div>
                                             </div>
-                                        </section>
+                                            <input 
+                                                type="checkbox" 
+                                                className="toggle toggle-primary toggle-lg"
+                                                checked={formData.privacy.isPublic}
+                                                onChange={(e) => setFormData({...formData, privacy: {...formData.privacy, isPublic: e.target.checked}})}
+                                            />
+                                        </label>
 
+                                        <div className="divider my-0 opacity-5 mx-8"></div>
+
+                                        <label className="flex items-center justify-between p-6 hover:bg-base-100/50 rounded-[2rem] cursor-pointer transition-all group">
+                                            <div className="flex items-center gap-5">
+                                                <div className="w-14 h-14 bg-secondary/10 text-secondary rounded-[1.5rem] flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                    <Activity size={28} strokeWidth={1.5} />
+                                                </div>
+                                                <div>
+                                                    <span className="text-lg font-black block">Статус на активност</span>
+                                                    <span className="text-xs opacity-50 font-medium">Показвай кога последно сте влизали в платформата.</span>
+                                                </div>
+                                            </div>
+                                            <input 
+                                                type="checkbox" 
+                                                className="toggle toggle-secondary toggle-lg"
+                                                checked={formData.privacy.showActivity}
+                                                onChange={(e) => setFormData({...formData, privacy: {...formData.privacy, showActivity: e.target.checked}})}
+                                            />
+                                        </label>
                                     </div>
-                                )}
-
-                                {/* --- TAB: PRIVACY --- */}
-                                {activeTab === "privacy" && (
-                                    <div className="space-y-8 animate-in fade-in zoom-in-95 duration-300">
-                                        <h3 className="text-2xl font-black mb-6">Настройки за поверителност</h3>
-                                        
-                                        <div className="bg-base-200/30 rounded-[2rem] p-2">
-                                            <label className="flex items-center justify-between p-6 hover:bg-base-200 rounded-[1.5rem] cursor-pointer transition-all">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="p-3 bg-primary/10 text-primary rounded-xl">
-                                                        <Globe size={24} />
-                                                    </div>
-                                                    <div>
-                                                        <span className="font-bold block">Публичен профил</span>
-                                                        <span className="text-xs opacity-60">Разрешете на другите да виждат основната ви информация.</span>
-                                                    </div>
-                                                </div>
-                                                <input 
-                                                    type="checkbox" 
-                                                    className="toggle toggle-primary"
-                                                    checked={formData.privacy.isPublic}
-                                                    onChange={(e) => handleSettingChange('privacy', 'isPublic', e.target.checked)}
-                                                />
-                                            </label>
-
-                                            <div className="divider my-0 opacity-10 mx-6"></div>
-
-                                            <label className="flex items-center justify-between p-6 hover:bg-base-200 rounded-[1.5rem] cursor-pointer transition-all">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="p-3 bg-secondary/10 text-secondary rounded-xl">
-                                                        <Activity size={24} />
-                                                    </div>
-                                                    <div>
-                                                        <span className="font-bold block">Показвай активността</span>
-                                                        <span className="text-xs opacity-60">Другите ще виждат кога сте онлайн.</span>
-                                                    </div>
-                                                </div>
-                                                <input 
-                                                    type="checkbox" 
-                                                    className="toggle toggle-secondary"
-                                                    checked={formData.privacy.showActivity}
-                                                    onChange={(e) => handleSettingChange('privacy', 'showActivity', e.target.checked)}
-                                                />
-                                            </label>
-                                        </div>
-
-                                        <div className="flex justify-end">
-                                            <button 
-                                                onClick={() => updateSettings('privacy')} 
-                                                disabled={updating}
-                                                className="btn btn-primary rounded-xl px-8"
-                                            >
-                                                {updating && <Loader2 className="animate-spin" size={18} />}
-                                                Запази настройките
-                                            </button>
-                                        </div>
+                                    <div className="flex justify-end pt-4">
+                                        <button className="btn btn-primary px-10 rounded-2xl font-black shadow-lg shadow-primary/20">
+                                            Запази настройките
+                                        </button>
                                     </div>
-                                )}
+                                </div>
+                            )}
 
-                                {/* --- TAB: NOTIFICATIONS --- */}
-                                {activeTab === "notifications" && (
-                                    <div className="space-y-8 animate-in fade-in zoom-in-95 duration-300">
-                                        <h3 className="text-2xl font-black mb-6">Известия</h3>
-
-                                        <div className="space-y-4">
-                                            <div className="form-control bg-base-200/30 p-4 rounded-2xl">
-                                                <label className="label cursor-pointer">
-                                                    <div className="flex items-center gap-4">
-                                                        <Mail className="opacity-50" />
-                                                        <div>
-                                                            <span className="label-text font-bold text-lg">Имейл известия</span>
-                                                            <p className="text-xs opacity-50">Получавайте важни актуализации на имейла си.</p>
-                                                        </div>
-                                                    </div>
-                                                    <input 
-                                                        type="checkbox" 
-                                                        className="checkbox checkbox-primary" 
-                                                        checked={formData.notifications.emailUpdates}
-                                                        onChange={(e) => handleSettingChange('notifications', 'emailUpdates', e.target.checked)}
-                                                    />
-                                                </label>
-                                            </div>
-
-                                            <div className="form-control bg-base-200/30 p-4 rounded-2xl">
-                                                <label className="label cursor-pointer">
-                                                    <div className="flex items-center gap-4">
-                                                        <Shield className="opacity-50" />
-                                                        <div>
-                                                            <span className="label-text font-bold text-lg">Сигурност</span>
-                                                            <p className="text-xs opacity-50">Известия при опити за вход от нови устройства.</p>
-                                                        </div>
-                                                    </div>
-                                                    <input 
-                                                        type="checkbox" 
-                                                        className="checkbox checkbox-primary" 
-                                                        checked={formData.notifications.securityAlerts}
-                                                        onChange={(e) => handleSettingChange('notifications', 'securityAlerts', e.target.checked)}
-                                                    />
-                                                </label>
-                                            </div>
-
-                                            <div className="form-control bg-base-200/30 p-4 rounded-2xl">
-                                                <label className="label cursor-pointer">
-                                                    <div className="flex items-center gap-4">
-                                                        <Smartphone className="opacity-50" />
-                                                        <div>
-                                                            <span className="label-text font-bold text-lg">Маркетинг</span>
-                                                            <p className="text-xs opacity-50">Новини за нови функции и промоции.</p>
-                                                        </div>
-                                                    </div>
-                                                    <input 
-                                                        type="checkbox" 
-                                                        className="checkbox" 
-                                                        checked={formData.notifications.marketing}
-                                                        onChange={(e) => handleSettingChange('notifications', 'marketing', e.target.checked)}
-                                                    />
-                                                </label>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex justify-end pt-4">
-                                            <button 
-                                                onClick={() => updateSettings('notifications')} 
-                                                disabled={updating}
-                                                className="btn btn-primary rounded-xl px-8"
-                                            >
-                                                {updating && <Loader2 className="animate-spin" size={18} />}
-                                                Запази предпочитанията
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
-
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* Global Smooth Styles */}
+            <style dangerouslySetInnerHTML={{ __html: `
+                .no-scrollbar::-webkit-scrollbar { display: none; }
+                .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+            `}} />
         </div>
     );
 };
