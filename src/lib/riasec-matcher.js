@@ -1,46 +1,50 @@
 /**
  * Изчислява RIASEC резултатите на базата на отговорите на потребителя.
  * 
- * Логика на точкуване (базирана на SCORING_METHODOLOGY.md):
+ * Логика на точкуване (базирана на docs/SCORING_METHODOLOGY.md):
  * - Всеки тип (R, I, A, S, E, C) има N въпроса.
  * - Отговорите са от 1 до 5.
  * - Raw Score = Сума от всички отговори за даден тип.
  * - Normalized Score = ((raw - min) / (max - min)) * 100
  * 
  * @param {Object} answers - Обект с отговори { questionId: value }
- * @param {Array} questions - Масив от въпроси от riasec_questions.json
+ * @param {Array} questions - Масив от въпроси от src/data/riasec_questions.json
  * @returns {Object} - Изчислените нормализирани резултати { R: number, I: number, ... }
  */
 const EMPTY_SCORES = () => ({ R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 });
 
 export function calculateScores(answers, questions = []) {
     const rawScores = EMPTY_SCORES();
-    const questionsPerType = {};
+    const questionsPerType = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 };
 
     // Ако нямаме въпроси (fallback към старата логика за съвместимост)
-    if (questions.length === 0) {
+    if (!questions || questions.length === 0) {
         // Стара логика от CareerAdvisor.jsx стъпките
-        if (answers.interests) {
+        if (answers && answers.interests && Array.isArray(answers.interests)) {
             answers.interests.forEach(interest => {
                 switch (interest) {
-                    case 'Technology': scores.I += 3; scores.C += 2; break;
-                    case 'Art': scores.A += 3; scores.I += 2; break;
-                    case 'Science': scores.I += 3; scores.R += 2; break;
-                    case 'Social': scores.S += 3; scores.A += 2; break;
-                    case 'Business': scores.E += 3; scores.C += 2; break;
-                    case 'Nature': scores.R += 3; scores.I += 2; break;
+                    case 'Technology': rawScores.I += 3; rawScores.C += 2; break;
+                    case 'Art': rawScores.A += 3; rawScores.I += 2; break;
+                    case 'Science': rawScores.I += 3; rawScores.R += 2; break;
+                    case 'Social': rawScores.S += 3; rawScores.A += 2; break;
+                    case 'Business': rawScores.E += 3; rawScores.C += 2; break;
+                    case 'Nature': rawScores.R += 3; rawScores.I += 2; break;
                 }
             });
+            // За старата логика приемаме фиксиран брой "въпроси" за нормализация, 
+            // ако искаме да връщаме 0-100. Но тук връщаме rawScores за съвместимост.
+            return rawScores;
         }
-        // ... (други стари категории)
         return rawScores;
     }
 
     // Нова логика на базата на въпроси
     questions.forEach(q => {
         const val = answers[q.id] || 3; // 3 е неутрален
-        rawScores[q.type] += val;
-        questionsPerType[q.type] = (questionsPerType[q.type] || 0) + 1;
+        if (Object.prototype.hasOwnProperty.call(rawScores, q.type)) {
+            rawScores[q.type] += val;
+            questionsPerType[q.type] += 1;
+        }
     });
 
     // Нормализация (0-100)
@@ -52,7 +56,7 @@ export function calculateScores(answers, questions = []) {
         const raw = rawScores[type];
         
         // Формула: ((raw - min) / (max - min)) * 100
-        const normalized = ((raw - min) / (max - min)) * 100;
+        const normalized = max === min ? 0 : ((raw - min) / (max - min)) * 100;
         normalizedScores[type] = Math.round(normalized);
     });
 
@@ -65,6 +69,8 @@ export function calculateScores(answers, questions = []) {
  * @returns {string} - 3-буквеният код (напр. "ICS")
  */
 export function calculateRiasecCode(scores) {
+    if (!scores) return "";
+    
     return Object.entries(scores)
         .sort(([, scoreA], [, scoreB]) => {
             // Първо по резултат
@@ -170,4 +176,3 @@ export function calculateMatchScore(userCode, itemCode) {
     // Максималният резултат може да е над 100, затова го ограничаваме
     return Math.min(100, score);
 }
-

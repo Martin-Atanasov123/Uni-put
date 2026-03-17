@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { calculateScores, calculateRiasecCode } from '../../lib/riasec-matcher';
 import { getRiasecMatches } from '../../lib/api';
+import riasecData from '../../data/riasec_questions.json';
 import { 
     CheckCircle2, 
     ChevronRight, 
@@ -30,17 +31,10 @@ const CareerAdvisor = () => {
 
     // --- Load Questions ---
     useEffect(() => {
-        const loadQuestions = async () => {
-            try {
-                const response = await fetch('/shcema/riasec_questions.json');
-                const data = await response.json();
-                setQuestions(data.questions);
-                setScaleLabels(data.scaleLabels);
-            } catch (error) {
-                console.error("Грешка при зареждане на въпросите:", error);
-            }
-        };
-        loadQuestions();
+        if (riasecData) {
+            setQuestions(riasecData.questions);
+            setScaleLabels(riasecData.scaleLabels);
+        }
     }, []);
 
     // --- Filtered Questions based on Version ---

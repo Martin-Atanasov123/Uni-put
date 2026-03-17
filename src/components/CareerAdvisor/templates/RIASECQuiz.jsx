@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import questionsData from './riasec_questions.json';
+import questionsData from '../../../data/riasec_questions.json';
 
 /**
  * RIASEC Calculator - Изчислява RIASEC профил от отговори
