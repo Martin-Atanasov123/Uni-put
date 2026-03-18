@@ -95,8 +95,8 @@ export function calculateHybridCompatibility(userScores, item) {
     
     // 1. Евклидова съвместимост (базирана на вектора)
     let euclideanScore = 0;
-    if (item.riasec_scores) {
-        euclideanScore = calculateEuclideanCompatibility(userScores, item.riasec_scores);
+    if (item.riasec_scores_normalized) {
+        euclideanScore = calculateEuclideanCompatibility(userScores, item.riasec_scores_normalized);
     }
     
     // 2. Позиционна съвместимост (базирана на кода)
