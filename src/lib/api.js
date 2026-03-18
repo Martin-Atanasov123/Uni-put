@@ -204,3 +204,5 @@ export async function getAllDormitories() {
     }
     return data;
 }
+// Alias to fix the import mismatch in TestCareer.jsx
+export const getUniversitiesByRiasec = getSpecialtiesByRiasec;
