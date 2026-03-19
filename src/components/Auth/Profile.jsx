@@ -1,7 +1,7 @@
 // Компонент: Профил и настройки (Модерен Дизайн)
 // Описание: Зарежда профил от Supabase, визуализира основни данни, любими университети 
 //   и история на баловете. Позволява промени в потребителска информация и сигурност.
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
 import { useNavigate, Link } from "react-router-dom";
 import { sessionService } from "../../services/sessionService";
@@ -38,14 +38,13 @@ import {
 
 const Profile = () => {
     const navigate = useNavigate();
-    const { user: authUser, favorites, toggleFavorite } = useAuth();
+    const { favorites, toggleFavorite } = useAuth();
     
     // UI State
     const [activeTab, setActiveTab] = useState("overview");
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
     const [message, setMessage] = useState({ type: "", text: "" });
-    const [showPassword, setShowPassword] = useState(false);
 
     // Data State
     const [user, setUser] = useState(null);

@@ -100,7 +100,7 @@ const AdminDashboard = () => {
         // Reset to page 0 when table or query changes
         setCurrentPage(0);
         loadData({ page: 0 });
-    }, [activeTableId, query]); // Removed loadData from dependencies to avoid loop
+    }, [activeTableId, query, loadData]);
 
     // --- Real-time Subscription ---
     useEffect(() => {
