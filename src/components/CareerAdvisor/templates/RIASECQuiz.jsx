@@ -66,7 +66,7 @@ class RIASECCalculator {
       .sort((a, b) => b[1] - a[1])  // Сортира descending
       .slice(0, 3);  // Взема топ 3
     
-    return sorted.map(([type, score]) => type).join('');
+    return sorted.map(([type]) => type).join('');
   }
 
   /**

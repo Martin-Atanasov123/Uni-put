@@ -1,6 +1,6 @@
 // Кариерен съветник – RIASEC въпросник за определяне на професионални интереси.
 // Поддържа три версии: Кратка (30), Стандартна (60) и Разширена (90) въпроса.
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useLayoutEffect, useRef } from 'react';
 import { calculateScores, calculateRiasecCode } from '../../lib/riasec-matcher';
 import { getRiasecMatches } from '../../lib/api';
 import riasecData from '../../data/riasec_questions.json';
@@ -24,10 +24,24 @@ const CareerAdvisor = () => {
     const [loading, setLoading] = useState(false);
     const [questions, setQuestions] = useState([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const [answers, setAnswers] = useState({});
+    const [answers, setAnswers] = useState(() => {
+        const saved = localStorage.getItem('riasec_answers');
+        return saved ? JSON.parse(saved) : {};
+    });
     const [results, setResults] = useState(null);
     const [quizVersion, setQuizVersion] = useState(null); // 'short', 'standard', 'extended'
     const [scaleLabels, setScaleLabels] = useState({});
+    const [isTransitioning, setIsTransitioning] = useState(false);
+    const [showWarning, setShowWarning] = useState(false);
+    const questionCardRef = useRef(null);
+    const preservedScrollYRef = useRef(null);
+    const shouldScrollToQuestionRef = useRef(false);
+    const [isQuestionVisible, setIsQuestionVisible] = useState(true);
+
+    // --- Persistence ---
+    useEffect(() => {
+        localStorage.setItem('riasec_answers', JSON.stringify(answers));
+    }, [answers]);
 
     // --- Load Questions ---
     useEffect(() => {
@@ -65,25 +79,75 @@ const CareerAdvisor = () => {
         return questions;
     }, [questions, quizVersion]);
 
+    useLayoutEffect(() => {
+        if (step !== 'quiz') return;
+
+        if (preservedScrollYRef.current !== null) {
+            window.scrollTo({ top: preservedScrollYRef.current, behavior: 'auto' });
+            preservedScrollYRef.current = null;
+        }
+
+        if (shouldScrollToQuestionRef.current && questionCardRef.current) {
+            const rect = questionCardRef.current.getBoundingClientRect();
+            const targetTop = window.scrollY + rect.top - 220;
+            window.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+            shouldScrollToQuestionRef.current = false;
+        }
+    }, [currentQuestionIndex, step]);
+
+    useEffect(() => {
+        if (step !== 'quiz' || !questionCardRef.current) return;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                setIsQuestionVisible(entry.isIntersecting);
+            },
+            { threshold: 0.45 }
+        );
+
+        observer.observe(questionCardRef.current);
+        return () => observer.disconnect();
+    }, [step, currentQuestionIndex]);
+
     // --- Handlers ---
     const handleVersionSelect = (version) => {
         setQuizVersion(version);
         setStep('quiz');
         setCurrentQuestionIndex(0);
         setAnswers({});
+        localStorage.removeItem('riasec_answers');
         window.scrollTo(0, 0);
     };
 
     const handleAnswer = (value) => {
+        if (isTransitioning) return; // Prevent rapid clicking
+
         const questionId = filteredQuestions[currentQuestionIndex].id;
+        preservedScrollYRef.current = window.scrollY;
         setAnswers(prev => ({ ...prev, [questionId]: value }));
+        setShowWarning(false);
 
         if (currentQuestionIndex < filteredQuestions.length - 1) {
-            // Автоматично напред след кратко забавяне за по-добър UX
+            setIsTransitioning(true);
+            // 500ms delay as requested to prevent rapid skip
             setTimeout(() => {
+                shouldScrollToQuestionRef.current = true;
                 setCurrentQuestionIndex(prev => prev + 1);
-                window.scrollTo(0, 0);
-            }, 300);
+                setIsTransitioning(false);
+            }, 500);
+        }
+    };
+
+    const handleNext = () => {
+        const questionId = filteredQuestions[currentQuestionIndex].id;
+        if (!answers[questionId]) {
+            setShowWarning(true);
+            return;
+        }
+        if (currentQuestionIndex < filteredQuestions.length - 1) {
+            preservedScrollYRef.current = window.scrollY;
+            shouldScrollToQuestionRef.current = true;
+            setCurrentQuestionIndex(prev => prev + 1);
         }
     };
 
@@ -92,6 +156,8 @@ const CareerAdvisor = () => {
             setCurrentQuestionIndex(prev => prev - 1);
         } else {
             setStep('version');
+            localStorage.removeItem('riasec_quiz_version');
+            localStorage.removeItem('riasec_answers');
         }
     };
 
@@ -200,64 +266,82 @@ const CareerAdvisor = () => {
         if (!filteredQuestions.length) return null;
         const currentQ = filteredQuestions[currentQuestionIndex];
         const progress = ((currentQuestionIndex + 1) / filteredQuestions.length) * 100;
+        const currentAnswer = answers[currentQ.id];
 
         return (
             <div className="space-y-12 animate-in fade-in duration-500">
-                {/* Progress */}
-                <div className="space-y-4">
-                    <div className="flex items-center justify-between px-2">
+                {/* Progress Bar (Clearly visible) */}
+                <div className="bg-base-100 p-1 rounded-2xl border border-base-content/5 shadow-sm sticky top-24 z-10 backdrop-blur-md">
+                    <div className="flex items-center justify-between mb-1">
                         <span className="text-xs font-black uppercase tracking-widest opacity-40">
                             Въпрос {currentQuestionIndex + 1} от {filteredQuestions.length}
                         </span>
                         <span className="text-xs font-black text-primary">
-                            {Math.round(progress)}% завършени
+                            {Math.round(progress)}% завършени {isQuestionVisible ? '• Активен' : '• Извън фокус'}
                         </span>
                     </div>
-                    <div className="h-3 w-full bg-base-200 rounded-full overflow-hidden p-1">
+                    <div className="h-4 w-full bg-base-200 rounded-full overflow-hidden p-1 border border-base-content/5">
                         <div 
-                            className="h-full bg-primary rounded-full transition-all duration-500 shadow-sm" 
+                            className="h-full bg-primary rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(var(--p),0.5)]" 
                             style={{ width: `${progress}%` }}
                         ></div>
                     </div>
                 </div>
 
                 {/* Question Card */}
-                <div className="space-y-8 py-10">
-                    <div className="space-y-3 text-center">
-                        <div className="badge badge-outline border-base-content/10 font-black text-[10px] uppercase tracking-widest px-4 py-3">
+                <div
+                    ref={questionCardRef}
+                    className="space-y-6 pt-14 pb-4 min-h-[180px] flex flex-col justify-center"
+                    aria-current={isQuestionVisible ? 'true' : 'false'}
+                    style={isQuestionVisible ? { outline: '1px solid rgba(59, 130, 246, 0.25)', outlineOffset: '10px', borderRadius: '16px' } : undefined}
+                >
+                    <div className="space-y-2 text-center">
+                        {/* <div className="badge badge-outline border-base-content/10 font-black text-[10px] uppercase tracking-widest px-3 py-2">
                            {currentQ.category || "Интереси"}
-                        </div>
-                        <h2 className="text-2xl md:text-4xl font-black leading-tight max-w-2xl mx-auto">
+                        </div> */}
+                        <h2 className={`font-black leading-tight max-w-2xl mx-auto break-words ${
+                            currentQ.text.length > 60 ? 'text-lg md:text-2xl' : 'text-xl md:text-3xl'
+                        }`}>
                             {currentQ.text}
                         </h2>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-3 max-w-xl mx-auto">
+                    <div className="grid grid-cols-1 gap-2.5 max-w-xl mx-auto">
                         {[1, 2, 3, 4, 5].map((val) => (
                             <button
                                 key={val}
+                                disabled={isTransitioning}
                                 onClick={() => handleAnswer(val)}
                                 className={`
-                                    flex items-center justify-between p-5 rounded-2xl border-2 transition-all font-bold text-lg
-                                    ${answers[currentQ.id] === val 
+                                    flex items-center justify-between p-4 rounded-xl border-2 transition-all font-bold text-base
+                                    ${currentAnswer === val 
                                         ? 'border-primary bg-primary/10 text-primary' 
                                         : 'border-base-200 bg-base-100 hover:border-primary/30'}
+                                    ${isTransitioning ? 'opacity-50 cursor-not-allowed' : ''}
                                 `}
                             >
-                                <span className="flex items-center gap-4">
-                                    <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm ${answers[currentQ.id] === val ? 'bg-primary text-primary-content' : 'bg-base-200'}`}>
+                                <span className="flex items-center gap-3">
+                                    <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs ${currentAnswer === val ? 'bg-primary text-primary-content' : 'bg-base-200'}`}>
                                         {val}
                                     </span>
                                     {scaleLabels[val]}
                                 </span>
-                                {answers[currentQ.id] === val && <CheckCircle2 size={24} />}
+                                {currentAnswer === val && <CheckCircle2 size={20} />}
                             </button>
                         ))}
                     </div>
                 </div>
 
+                {/* Warning Message */}
+                {showWarning && (
+                    <div className="flex items-center gap-2 text-error font-bold justify-center animate-bounce">
+                        <AlertCircle size={20} />
+                        <span>Моля, отговорете на въпроса, преди да продължите!</span>
+                    </div>
+                )}
+
                 {/* Footer Nav */}
-                <div className="flex items-center justify-between pt-10 border-t border-base-content/5">
+                <div className="flex items-center justify-between pt-6 border-t border-base-content/5 sticky bottom-0 bg-base-100 pb-2 z-10">
                     <button 
                         onClick={handleBack}
                         className="btn btn-ghost gap-2 rounded-xl font-black uppercase tracking-widest text-xs"
@@ -265,18 +349,18 @@ const CareerAdvisor = () => {
                         <ChevronLeft size={18} /> Назад
                     </button>
                     
-                    {currentQuestionIndex === filteredQuestions.length - 1 && answers[currentQ.id] ? (
+                    {currentQuestionIndex === filteredQuestions.length - 1 ? (
                         <button 
+                            disabled={!currentAnswer || loading}
                             onClick={calculateFinalResults}
-                            className="btn btn-primary px-10 rounded-2xl font-black shadow-xl shadow-primary/30 gap-2"
+                            className={`btn btn-primary px-10 rounded-2xl font-black shadow-xl shadow-primary/30 gap-2 ${!currentAnswer ? 'btn-disabled opacity-50' : ''}`}
                         >
                             Виж резултатите <ChevronRight size={18} />
                         </button>
                     ) : (
                         <button 
-                            disabled={!answers[currentQ.id]}
-                            onClick={() => setCurrentQuestionIndex(prev => prev + 1)}
-                            className="btn btn-ghost gap-2 rounded-xl font-black uppercase tracking-widest text-xs"
+                            onClick={handleNext}
+                            className={`btn btn-ghost gap-2 rounded-xl font-black uppercase tracking-widest text-xs ${!currentAnswer ? 'opacity-50' : ''}`}
                         >
                             Напред <ChevronRight size={18} />
                         </button>
@@ -313,17 +397,18 @@ const CareerAdvisor = () => {
                     setResults(null);
                     setAnswers({});
                     setCurrentQuestionIndex(0);
+                    localStorage.removeItem('riasec_answers');
                 }} 
             />
         );
     };
 
     return (
-        <div className="min-h-screen bg-base-200 selection:bg-primary/20 pt-28 pb-20">
-            <div className="container mx-auto px-4 max-w-5xl">
+        <div className={`min-h-screen bg-base-200 selection:bg-primary/20 pb-20 transition-all duration-500 ${step === 'quiz' ? 'pt-20 md:pt-20' : 'pt-24'}`}>
+            <div className="container mx-auto px-4 max-w-5xl flex flex-col items-center">
                 {/* Header Section */}
-                {step !== 'results' && (
-                    <div className="text-center space-y-6 mb-16">
+                {step === 'version' && (
+                    <div className="text-center space-y-4 mb-10 w-full">
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-[0.2em]">
                             <Zap size={12} /> RIASEC Career Advisor
                         </div>
@@ -338,8 +423,9 @@ const CareerAdvisor = () => {
 
                 {/* Main Content Card */}
                 <div className={`
-                    bg-base-100 rounded-[3rem] shadow-2xl p-6 md:p-16 relative overflow-hidden transition-all duration-500
-                    ${step === 'results' ? 'p-0 bg-transparent shadow-none' : ''}
+                    bg-base-100 rounded-[3rem] shadow-2xl relative overflow-hidden transition-all duration-500
+                    ${step === 'results' ? 'p-0 bg-transparent shadow-none' : 'p-6 md:p-12'}
+                    ${step === 'quiz' ? 'md:p-8' : ''}
                 `}>
                     {/* Background decorations */}
                     {step !== 'results' && (
@@ -383,4 +469,3 @@ const CareerAdvisor = () => {
 };
 
 export default CareerAdvisor;
-

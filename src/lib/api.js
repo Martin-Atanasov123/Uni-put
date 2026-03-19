@@ -62,8 +62,7 @@ export async function getRiasecMatches(userScores) {
                 };
             })
             .filter(item => item.compatibility >= 50) // Намаляваме прага до 50% за повече резултати
-            .sort((a, b) => b.compatibility - a.compatibility)
-            .slice(0, 20);
+            .sort((a, b) => b.compatibility - a.compatibility);
 
         console.log(`RIASEC Matching: Filtered to ${specialties.length} matching specialties (>=50%).`);
 
@@ -80,8 +79,7 @@ export async function getRiasecMatches(userScores) {
                 compatibility: calculateHybridCompatibility(userScores, item)
             }))
             .filter(item => item.compatibility >= 50)
-            .sort((a, b) => b.compatibility - a.compatibility)
-            .slice(0, 20);
+            .sort((a, b) => b.compatibility - a.compatibility);
 
         console.log(`RIASEC Matching: Found ${careers.length} matching careers.`);
 

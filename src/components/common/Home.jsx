@@ -40,7 +40,6 @@ const ReviewsSlider = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isTransitioning, setIsTransitioning] = useState(true);
     const timeoutRef = useRef(null);
-    const sliderRef = useRef(null);
     
     // We duplicate the reviews for the infinite effect
     const extendedReviews = [...REVIEWS, ...REVIEWS, ...REVIEWS];
@@ -48,7 +47,7 @@ const ReviewsSlider = () => {
 
     useEffect(() => {
         setCurrentIndex(startIndex);
-    }, []);
+    }, [startIndex]);
 
     const resetTimeout = () => {
         if (timeoutRef.current) clearTimeout(timeoutRef.current);

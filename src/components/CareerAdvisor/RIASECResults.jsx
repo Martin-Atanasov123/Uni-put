@@ -15,7 +15,14 @@ import {
 
 const RIASECResults = ({ results, onRestart }) => {
     const [viewMode, setViewMode] = useState('all'); // all, specialties, careers
+    const [showAllSpecialties, setShowAllSpecialties] = useState(false);
+    const [showAllCareers, setShowAllCareers] = useState(false);
+    
     const { scores, riasecCode, specialties, careers } = results;
+
+    // Filtered data based on showAll state
+    const visibleSpecialties = showAllSpecialties ? specialties : specialties.slice(0, 5);
+    const visibleCareers = showAllCareers ? careers : careers.slice(0, 5);
 
     const riasecLabels = {
         R: { name: 'Реалистичен', desc: 'Предпочиташ практическа работа с инструменти и машини.' },
@@ -94,7 +101,7 @@ const RIASECResults = ({ results, onRestart }) => {
                         🎓 Топ специалности за теб
                     </h3>
                     <div className="grid grid-cols-1 gap-4">
-                        {specialties.length > 0 ? specialties.map((spec, index) => (
+                        {visibleSpecialties.length > 0 ? visibleSpecialties.map((spec, index) => (
                             <div key={spec.id} className="bg-base-100 p-6 rounded-[2rem] border border-base-200 shadow-sm flex flex-col md:flex-row gap-6 items-center hover:shadow-md transition-all group">
                                 <div className="w-12 h-12 rounded-2xl bg-base-200 flex items-center justify-center font-black text-xl text-primary shrink-0">
                                     #{index + 1}
@@ -120,6 +127,18 @@ const RIASECResults = ({ results, onRestart }) => {
                             </div>
                         )}
                     </div>
+                    {specialties.length > 5 && (
+                        <div className="flex justify-center mt-4">
+                            <button
+                                onClick={() => setShowAllSpecialties(prev => !prev)}
+                                className="btn btn-ghost rounded-xl font-black gap-2"
+                            >
+                                {showAllSpecialties 
+                                    ? 'Скрий останалите' 
+                                    : `Покажи останалите ${specialties.length - 5}`}
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -132,7 +151,7 @@ const RIASECResults = ({ results, onRestart }) => {
                         💼 Топ професии за теб
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {careers.length > 0 ? careers.map((career, index) => (
+                        {visibleCareers.length > 0 ? visibleCareers.map((career, index) => (
                             <div key={career.id} className="bg-base-100 p-8 rounded-[2.5rem] border border-base-200 shadow-sm flex flex-col justify-between hover:shadow-xl transition-all group relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform"></div>
                                 
@@ -177,6 +196,18 @@ const RIASECResults = ({ results, onRestart }) => {
                             </div>
                         )}
                     </div>
+                    {careers.length > 5 && (
+                        <div className="flex justify-center mt-4">
+                            <button
+                                onClick={() => setShowAllCareers(prev => !prev)}
+                                className="btn btn-ghost rounded-xl font-black gap-2"
+                            >
+                                {showAllCareers 
+                                    ? 'Скрий останалите' 
+                                    : `Покажи останалите ${careers.length - 5}`}
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
 
