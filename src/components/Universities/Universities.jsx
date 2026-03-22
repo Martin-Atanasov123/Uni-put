@@ -77,7 +77,7 @@ const UniversitiesPage = () => {
                 {/* --- HEADER SECTION --- */}
                 <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-8">
                     <div className="space-y-2">
-                        <div className="badge badge-primary font-black italic p-4 mb-2">DATABASE 2025</div>
+                        
                         <h1 className="text-5xl font-black tracking-tighter uppercase italic">
                             Открий своето <br />
                             <span className="text-primary ">бъдеще</span>

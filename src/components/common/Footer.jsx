@@ -63,7 +63,7 @@ const Footer = () => {
                             <Info size={14} /> За нас
                         </a>
                         <span className="link link-hover flex items-center justify-center md:justify-start gap-2 opacity-70 hover:opacity-100 font-bold text-sm">
-                            <ShieldCheck size={34} /> Лиценз на проекта ГНУ (GNU General Public License version 3)
+                            <ShieldCheck size={14} /> Лиценз GNU
                         </span>
                         <span className="badge badge-primary font-black text-[10px] mt-2 italic mx-auto md:mx-0 text-primary-content border-none">НОИТ 2026</span>
                     </nav>
