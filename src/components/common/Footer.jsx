@@ -8,7 +8,7 @@ import {
     FileText,
     Heart
 } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 
 const Footer = () => {
     const currentYear = new Date().getFullYear();
@@ -71,8 +71,8 @@ const Footer = () => {
                     {/* Секция Правна информация */}
                     <nav className="flex flex-col gap-3">
                         <h2 className="footer-title opacity-100 font-black text-secondary tracking-widest text-[10px] mb-2 uppercase">Правна част</h2>
-                        <a className="link link-hover opacity-70 hover:opacity-100 font-bold text-sm">Условия за ползване</a>
-                        <a className="link link-hover opacity-70 hover:opacity-100 font-bold text-sm">Поверителност</a>
+                        <Link to="/terms" className="link link-hover opacity-70 hover:opacity-100 font-bold text-sm">Условия за ползване</Link>
+                        <Link to="/privacy" className="link link-hover opacity-70 hover:opacity-100 font-bold text-sm">Поверителност</Link>
                         <div className="mt-4 p-4 bg-base-300/50 rounded-2xl border border-base-content/5">
                             <p className="text-[10px] font-bold opacity-50 leading-tight">Данните за баловете са базирани на справочниците за 2025г.</p>
                         </div>
