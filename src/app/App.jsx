@@ -29,6 +29,8 @@ const FavoritesPage = lazy(() => import("../components/Favorites/Favorites"));
 const CalculatorPage = lazy(() => import("../components/Calculator/Calculator"));
 const Profile = lazy(() => import("../components/Auth/Profile"));
 const AdminDashboard = lazy(() => import("../components/admin/AdminDashboard"));
+const TermsOfService = lazy(() => import("../components/common/TermsOfService"));
+const PrivacyPolicy = lazy(() => import("../components/common/PrivacyPolicy"));
 
 // Основен входен компонент – включва AuthProvider, ScrollToTop, Header, Footer и рутера.
 function App() {
@@ -47,6 +49,8 @@ function App() {
                         <Route path="/forgot-password" element={<Suspense fallback={null}><ForgotPassword /></Suspense>} />
                         <Route path="/update-password" element={<Suspense fallback={null}><UpdatePassword /></Suspense>} />
                         <Route path="/about" element={<Suspense fallback={null}><About /></Suspense>} />
+                        <Route path="/terms" element={<Suspense fallback={null}><TermsOfService /></Suspense>} />
+                        <Route path="/privacy" element={<Suspense fallback={null}><PrivacyPolicy /></Suspense>} />
                         <Route
                             path="/universities"
                             element={<Suspense fallback={null}><UniversitiesPage /></Suspense>}
