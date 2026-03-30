@@ -26,7 +26,7 @@ const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
 
-    const isAdmin = user?.user_metadata?.role === "admin";
+    const isAdmin = user?.app_metadata?.role === "admin";
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);

@@ -1,6 +1,6 @@
 // Модул: Админ маршрут
 // Описание: Осигурява достъп до административни секции само за потребители
-//   с роля "admin", дефинирана в user_metadata. Блокира неоторизирани достъпи.
+//   с роля "admin", дефинирана в app_metadata (не може да се променя от клиента).
 // Вход: { children } - JSX за рендериране при налична админ роля
 // Изход: children ако потребителят е администратор; пренасочване към "/" иначе
 import { Navigate } from "react-router-dom";
@@ -14,9 +14,9 @@ const AdminRoute = ({ children }) => {
             <span className="loading loading-infinity loading-lg text-primary"></span>
         </div>
     );
-    
-    // Проверка за админ роля
-    const isAdmin = user?.user_metadata?.role === "admin";
+
+    // Проверка за админ роля чрез app_metadata (защитена от клиентска промяна)
+    const isAdmin = user?.app_metadata?.role === "admin";
 
     if (!user || !isAdmin) {
         return <Navigate to="/" replace />;
