@@ -100,7 +100,6 @@ const Profile = () => {
                     setCalculatorHistory(history.slice(0, 3));
                 }
             } catch (error) {
-                console.error("Error loading profile data:", error.message);
                 navigate("/login");
             } finally {
                 setLoading(false);
@@ -444,10 +443,7 @@ const Profile = () => {
             </div>
 
             {/* Global Smooth Styles */}
-            <style dangerouslySetInnerHTML={{ __html: `
-                .no-scrollbar::-webkit-scrollbar { display: none; }
-                .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-            `}} />
+            <style>{`.no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }`}</style>
         </div>
     );
 };

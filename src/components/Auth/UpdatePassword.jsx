@@ -23,9 +23,7 @@ const UpdatePassword = () => {
         const checkSession = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
-                // If no session, it might mean the link is invalid or expired
-                // However, Supabase sometimes takes a moment to process the hash fragment
-                console.log("No session found yet, waiting for Supabase hash processing...");
+                // Supabase може да има нужда от време за обработка на hash фрагмента
             }
         };
         checkSession();
@@ -39,8 +37,12 @@ const UpdatePassword = () => {
             return;
         }
 
-        if (password.length < 6) {
-            setError("Паролата трябва да е поне 6 символа!");
+        if (password.length < 8) {
+            setError("Паролата трябва да е поне 8 символа!");
+            return;
+        }
+        if (!/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+            setError("Паролата трябва да съдържа поне една главна буква и една цифра!");
             return;
         }
 
@@ -53,13 +55,13 @@ const UpdatePassword = () => {
             });
 
             if (error) throw error;
-            
+
             setSuccess(true);
             setTimeout(() => {
                 navigate("/login");
             }, 3000);
-        } catch (err) {
-            setError(err.message);
+        } catch {
+            setError("Възникна грешка при смяна на паролата. Опитайте отново.");
         } finally {
             setLoading(false);
         }

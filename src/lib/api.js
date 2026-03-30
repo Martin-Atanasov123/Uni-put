@@ -10,19 +10,13 @@ import {
  */
 export async function getRiasecMatches(userScores) {
     if (!userScores) return { specialties: [], careers: [] };
-    console.log('RIASEC Matching: Start matching for scores:', userScores);
 
     try {
-        // 1. Извличане на специалности с RIASEC mapping
-        // Използваме два отделни обръщения, ако JOIN-ът се провали поради липсващ Foreign Key
-        console.log('RIASEC Matching: Fetching specialties from specialty_riasec_mapping...');
         let { data: specialtiesData, error: specError } = await supabase
             .from('specialty_riasec_mapping')
-            .select('*, universities_duplicate(id, university_name, city, min_ball_2024)');
+            .select('*, universities(id, university_name, city, max_ball)');
 
-        // Ако JOIN заявката се провали (напр. PGRST200), опитваме без JOIN
         if (specError && specError.code === 'PGRST200') {
-            console.warn('RIASEC Matching: Join failed, falling back to separate queries.');
             const { data: standaloneSpecs, error: standaloneError } = await supabase
                 .from('specialty_riasec_mapping')
                 .select('*');
@@ -33,19 +27,13 @@ export async function getRiasecMatches(userScores) {
             throw specError;
         }
 
-        console.log(`RIASEC Matching: Found ${specialtiesData?.length || 0} specialties in DB.`);
-
-        // 2. Извличане на професии с RIASEC mapping
-        console.log('RIASEC Matching: Fetching careers from careers_riasec_mapping...');
         const { data: careersData, error: careerError } = await supabase
             .from('careers_riasec_mapping')
             .select('*');
 
         if (careerError) {
-            console.error('RIASEC Matching Error (careers):', careerError);
             throw careerError;
         }
-        console.log(`RIASEC Matching: Found ${careersData?.length || 0} careers in DB.`);
 
         // 3. Изчисляване на съвместимост (Hybrid Logic)
         const specialties = (specialtiesData || [])
@@ -57,14 +45,12 @@ export async function getRiasecMatches(userScores) {
                     riasec_code: item.riasec_code,
                     category: item.category,
                     compatibility: compatibility,
-                    universities_count: item.universities_duplicate?.length || 0,
-                    universities: item.universities_duplicate || []
+                    universities_count: item.universities?.length || 0,
+                    universities: item.universities || []
                 };
             })
             .filter(item => item.compatibility >= 50) // Намаляваме прага до 50% за повече резултати
             .sort((a, b) => b.compatibility - a.compatibility);
-
-        console.log(`RIASEC Matching: Filtered to ${specialties.length} matching specialties (>=50%).`);
 
         const careers = (careersData || [])
             .map(item => ({
@@ -81,13 +67,10 @@ export async function getRiasecMatches(userScores) {
             .filter(item => item.compatibility >= 50)
             .sort((a, b) => b.compatibility - a.compatibility);
 
-        console.log(`RIASEC Matching: Found ${careers.length} matching careers.`);
-
         return { specialties, careers };
 
-    } catch (error) {
-        console.error('RIASEC matching final error:', error);
-        return { specialties: [], careers: [] };
+    } catch (err) {
+        return { specialties: [], careers: [], error: err?.message || 'Грешка при зареждане на данните.' };
     }
 }
 
@@ -105,7 +88,6 @@ export async function getCareersByRiasec(riasecCode) {
         .ilike('riasec_code', `${firstLetter}%`);
 
     if (error) {
-        console.error('Грешка при извличане на професии:', error);
         return [];
     }
     return data;
@@ -121,11 +103,10 @@ export async function getSpecialtiesByRiasec(riasecCode) {
 
     const { data, error } = await supabase
         .from('specialty_riasec_mapping')
-        .select('*, universities_duplicate(id)')
+        .select('*, universities(id)')
         .ilike('riasec_code', `${firstLetter}%`);
 
     if (error) {
-        console.error('Грешка при извличане на специалности:', error);
         return [];
     }
     return data;
@@ -197,7 +178,6 @@ export async function getAllDormitories() {
         .select('*');
 
     if (error) {
-        console.error('Грешка при извличане на общежития:', error);
         return [];
     }
     return data;

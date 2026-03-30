@@ -37,7 +37,7 @@ describe('UniversityService', () => {
         localStorage.clear();
     });
 
-    it('should fetch universities_duplicate from API if cache is empty', async () => {
+    it('should fetch universities from API if cache is empty', async () => {
         const mockData = [
             { id: 1, university_name: 'Uni 1', specialty: 'CS', city: 'Sofia' },
             { id: 2, university_name: 'Uni 2', specialty: 'Math', city: 'Plovdiv' }
@@ -49,7 +49,7 @@ describe('UniversityService', () => {
 
         const result = await universityService.searchUniversities({});
         
-        expect(supabase.from).toHaveBeenCalledWith('universities_duplicate');
+        expect(supabase.from).toHaveBeenCalledWith('universities');
         expect(result).toHaveLength(2);
         expect(result[0].university_name).toBe('Uni 1');
     });
@@ -60,7 +60,7 @@ describe('UniversityService', () => {
             timestamp: Date.now(),
             data: mockData
         };
-        localStorage.setItem('universities_cache', JSON.stringify(cacheEntry));
+        localStorage.setItem('universities_cache_v2', JSON.stringify(cacheEntry));
 
         // Ensure supabase is NOT called
         const result = await universityService.searchUniversities({});
@@ -109,7 +109,7 @@ describe('UniversityService', () => {
                 { id: 10, university_name: 'Cached Uni', specialty: 'Biology', city: 'Varna' }
             ]
         };
-        localStorage.setItem('universities_cache', JSON.stringify(cachedEntry));
+        localStorage.setItem('universities_cache_v2', JSON.stringify(cachedEntry));
 
         const freshData = [
             { id: 20, university_name: 'SU', specialty: 'Право', city: 'Sofia' }

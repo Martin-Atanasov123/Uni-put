@@ -66,11 +66,9 @@ export const AuthProvider = ({ children }) => {
             });
             if (error) {
                 setFavorites(prev);
-                console.error("[favorites] updateUser failed", error);
             }
-        } catch (e) {
+        } catch {
             setFavorites(prev);
-            console.error("[favorites] unexpected error", e);
         }
     };
 
