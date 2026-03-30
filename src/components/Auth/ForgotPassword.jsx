@@ -8,6 +8,8 @@ import { supabase } from "../../lib/supabase";
 import { Mail, ArrowLeft, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
+const SAFE_ORIGIN = import.meta.env.VITE_APP_URL || window.location.origin;
+
 const ForgotPassword = () => {
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
@@ -22,13 +24,13 @@ const ForgotPassword = () => {
 
         try {
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${window.location.origin}/update-password`,
+                redirectTo: `${SAFE_ORIGIN}/update-password`,
             });
 
             if (error) throw error;
             setSuccess(true);
-        } catch (err) {
-            setError(err.message);
+        } catch {
+            setError("Възникна грешка. Опитайте отново.");
         } finally {
             setLoading(false);
         }

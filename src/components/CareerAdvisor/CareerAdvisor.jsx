@@ -170,16 +170,17 @@ const CareerAdvisor = () => {
             const riasecCode = calculateRiasecCode(scores);
             
             // Търсене на съвпадения в базата данни
-            const { specialties, careers } = await getRiasecMatches(scores);
+            const { specialties, careers, error } = await getRiasecMatches(scores);
 
             setResults({
                 scores,
                 riasecCode,
                 specialties,
-                careers
+                careers,
+                error
             });
-        } catch (error) {
-            console.error("Грешка при изчисляване на резултатите:", error);
+        } catch {
+            // RIASEC calculation error
         } finally {
             setLoading(false);
         }
@@ -423,8 +424,8 @@ const CareerAdvisor = () => {
 
                 {/* Main Content Card */}
                 <div className={`
-                    bg-base-100 rounded-[3rem] shadow-2xl relative overflow-hidden transition-all duration-500
-                    ${step === 'results' ? 'p-0 bg-transparent shadow-none' : 'p-6 md:p-12'}
+                    relative transition-all duration-500 w-full
+                    ${step === 'results' ? 'p-0 bg-transparent shadow-none' : 'bg-base-100 rounded-[3rem] shadow-2xl overflow-hidden p-6 md:p-12'}
                     ${step === 'quiz' ? 'md:p-8' : ''}
                 `}>
                     {/* Background decorations */}

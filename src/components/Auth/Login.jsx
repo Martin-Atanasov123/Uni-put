@@ -14,7 +14,18 @@ import {
     Eye,
     EyeOff,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+
+const SAFE_ORIGIN = import.meta.env.VITE_APP_URL || window.location.origin;
+
+const safeAuthError = (msg) => {
+    const map = {
+        'Invalid login credentials': 'Невалиден имейл или парола.',
+        'Email not confirmed': 'Моля потвърдете имейла си.',
+        'Too many requests': 'Твърде много опити. Опитайте по-късно.',
+    };
+    return map[msg] || 'Възникна грешка. Опитайте отново.';
+};
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -24,15 +35,17 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
 
     const navigate = useNavigate();
+    const location = useLocation();
+    const from = location.state?.from?.pathname + (location.state?.from?.search || '') || '/calculator';
 
     const handleGoogleLogin = async () => {
         const { error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: `${window.location.origin}/calculator`
+                redirectTo: `${SAFE_ORIGIN}${from}`
             }
         });
-        if (error) setError(error.message);
+        if (error) setError(safeAuthError(error.message));
     };
 
     const handleLogin = async (e) => {
@@ -46,10 +59,10 @@ const Login = () => {
         });
 
         if (error) {
-            setError(error.message);
+            setError(safeAuthError(error.message));
             setLoading(false);
         } else {
-            navigate("/calculator");
+            navigate(from);
         }
         setLoading(false);
     };

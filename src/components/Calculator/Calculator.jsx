@@ -1,9 +1,9 @@
 // Модул: Калкулатор на състезателен бал
 // Описание: Дава UI и логика за избор на факултет/специалност, въвеждане на оценки
 //   и изчисляване на бал на база коефициенти от база данни (Supabase).
-// Вход: данни от Supabase (universities_duplicate), потребителски оценки
+// Вход: данни от Supabase (universities), потребителски оценки
 // Изход: изчислен бал и описания на липсващи термини/слотове; визуализация с филтри
-// Бизнес логика: групира ключове по коефициенти; при алтернативни ключове използва най-добрия.
+// Бизнес логика: групира ключове по SLOT_GROUP; при алтернативни ключове взима най-изгодния (max grade×coef).
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "../../lib/supabase";
 import { useLocation } from "react-router-dom";
@@ -41,7 +41,6 @@ const CalculatorPage = () => {
     const location = useLocation();
     const [selectedSpecialtyName, setSelectedSpecialtyName] = useState("");
     const [grades, setGrades] = useState({});
-    const [activeAltBySlot, setActiveAltBySlot] = useState({});
 
     // Derived unique values for filters
     const cities = [...new Set(allData.map(d => d.city).filter(Boolean))].sort();
@@ -68,21 +67,6 @@ const CalculatorPage = () => {
     const availableSpecialties = [...new Set(filteredData.map(d => d.specialty))].sort();
 
     useEffect(() => {
-        // Debug: track selection and specialties derived
-        // Avoid noisy logs by only logging when selection changes or allData updates
-        console.log("[Calculator] Selection", {
-            selectedFaculty,
-            selectedCity,
-            selectedUniversity
-        });
-        console.log("[Calculator] Data sizes", {
-            allData: allData.length,
-            filteredData: filteredData.length,
-            availableSpecialtiesCount: availableSpecialties.length
-        });
-    }, [selectedFaculty, selectedCity, selectedUniversity, allData.length, filteredData.length, availableSpecialties.length]);
-
-    useEffect(() => {
         const fetchFaculties = async () => {
             setLoading(true);
             /**
@@ -90,19 +74,14 @@ const CalculatorPage = () => {
              * Причина за имплементация: UI трябва да показва динамичен списък от база, не хардкодиран.
              * Странични ефекти: При грешка логира и оставя текущото състояние; няма кеш тук.
              */
-            const { data, error } = await supabase.from('universities_duplicate').select('faculty');
-            if (error) {
-                console.error("[Calculator] fetchFaculties error", error);
-            } else {
-                console.log("[Calculator] fetchFaculties result", data?.length || 0);
-            }
+            const { data, error } = await supabase.from('universities').select('faculty');
             if (!error && data) {
                 const list = [...new Set(data.map(item => item.faculty).filter(Boolean))];
                 setFaculties(list);
                 try {
                     localStorage.setItem("uniput_faculties_cache", JSON.stringify(list));
-                } catch (e) {
-                    console.warn("[Calculator] cache faculties write failed", e);
+                } catch {
+                    // cache write failed silently
                 }
             }
             setLoading(false);
@@ -116,8 +95,8 @@ const CalculatorPage = () => {
                     setFaculties(cached);
                 }
             }
-        } catch (e) {
-            console.warn("[Calculator] cache faculties read failed", e);
+        } catch {
+            // cache read failed silently
         }
         fetchFaculties();
     }, []);
@@ -126,21 +105,50 @@ const CalculatorPage = () => {
         if (!selectedFaculty) return;
         const fetchData = async () => {
             setLoading(true);
-            console.log("[Calculator] fetchData for faculty", selectedFaculty);
             const { data, error } = await supabase
-                .from('universities_duplicate')
+                .from('universities')
                 .select('*')
                 .eq('faculty', selectedFaculty);
-            if (error) {
-                console.error("[Calculator] fetchData error", error);
-            } else {
-                console.log("[Calculator] fetchData rows", data?.length || 0);
-            }
             if (!error && data) setAllData(data);
             setLoading(false);
         };
         fetchData();
     }, [selectedFaculty]);
+
+    // Auto-select from URL params (e.g. from Career Advisor link)
+    const [pendingSpecialty, setPendingSpecialty] = useState(null);
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const specialtyParam = params.get('specialty');
+        if (!specialtyParam) return;
+
+        const autoSelect = async () => {
+            const { data, error } = await supabase
+                .from('universities')
+                .select('faculty, specialty')
+                .ilike('specialty', `%${specialtyParam}%`)
+                .limit(1);
+
+            if (error || !data || data.length === 0) return;
+
+            const match = data[0];
+            setPendingSpecialty(match.specialty);
+            setSelectedFaculty(match.faculty);
+            setFacultySearch(match.faculty);
+        };
+        autoSelect();
+    }, [location.search]);
+
+    // Once allData loads after auto-select, set the pending specialty
+    useEffect(() => {
+        if (!pendingSpecialty || allData.length === 0) return;
+        const match = allData.find(d => d.specialty === pendingSpecialty);
+        if (match) {
+            setSelectedSpecialtyName(pendingSpecialty);
+            setPendingSpecialty(null);
+        }
+    }, [allData, pendingSpecialty]);
 
     useEffect(() => {
         setIsFacultyDropdownOpen(false);
@@ -158,9 +166,8 @@ const CalculatorPage = () => {
         return () => window.removeEventListener("keydown", onKey);
     }, []);
 
-    const handleGradesChange = (newGrades, newActiveAltBySlot) => {
+    const handleGradesChange = (newGrades) => {
         setGrades(newGrades);
-        setActiveAltBySlot(newActiveAltBySlot || {});
     };
 
     const rowsForSelectedSpecialty = useMemo(() => {
@@ -171,11 +178,11 @@ const CalculatorPage = () => {
     const coefficientsForInputs = useMemo(() => {
         const merged = {};
         rowsForSelectedSpecialty.forEach((row) => {
-            const coefficients = row?.coefficients || {};
-            Object.entries(coefficients).forEach(([key, coef]) => {
-                const n = Number(coef);
-                if (!n) return;
-                merged[key] = 1;
+            const slots = Array.isArray(row?.coefficients) ? row.coefficients : [];
+            slots.forEach(slot => {
+                (slot.alternatives || []).forEach(alt => {
+                    if (alt?.key) merged[alt.key] = Number(alt.coef) || 1;
+                });
             });
         });
         return merged;
@@ -218,57 +225,42 @@ const CalculatorPage = () => {
 
     /**
      * Смята крайния бал по дадени коефициенти и оценки.
-     * - Групира ключовете по коефициент (напр. 3*, 1*).
-     * - За всяка група взима най-добрата валидна оценка от активната алтернатива.
+     * - Групира ключовете по SLOT_GROUP (предмет), не по стойност на коефициента.
+     * - За всяка група взима алтернативата с най-висок grade×coef (авто-избор на най-изгодна).
      * - Връща сбор и списък липсващи слотове.
      * @param {Record<string, number|string>} coefficients
      * @param {Record<string, string|number>} gradeSource
      * @param {Record<string, string>} activeAltMap
      * @returns {{ score: number, missingSlots: string[][] }}
      */
-    const calculateScore = (coefficients, gradeSource, activeAltMap) => {
-        if (!coefficients) return { score: 0, missingSlots: [] };
-        const termsByCoef = {};
-
-        Object.entries(coefficients).forEach(([key, coef]) => {
-            const coefNum = Number(coef);
-            if (!coefNum) return;
-            const termId = String(coefNum);
-            if (!termsByCoef[termId]) {
-                termsByCoef[termId] = {
-                    coef: coefNum,
-                    keys: []
-                };
-            }
-            termsByCoef[termId].keys.push(key);
-        });
+    const calculateScore = (coefficients, gradeSource) => {
+        if (!Array.isArray(coefficients) || coefficients.length === 0) return { score: 0, missingSlots: [] };
 
         let total = 0;
         const missingSlots = [];
 
-        Object.values(termsByCoef).forEach((term) => {
-            const { coef, keys } = term;
-            let bestValue = 0;
-            let hasValue = false;
+        coefficients.forEach((slot) => {
+            const alternatives = slot.alternatives || [];
+            let bestProduct = null;
+            const keys = [];
 
-            keys.forEach((key) => {
-                const groupId = getGroupIdForKey(key);
-                const activeKey = (activeAltMap && activeAltMap[groupId]) || key;
-                const val = parseFloat(gradeSource[activeKey]);
+            alternatives.forEach(alt => {
+                if (!alt?.key) return;
+                keys.push(alt.key);
+                const val = parseFloat(gradeSource[alt.key]);
                 if (!Number.isNaN(val) && val >= 2 && val <= 6) {
-                    if (!hasValue || val > bestValue) {
-                        bestValue = val;
-                        hasValue = true;
+                    const product = val * Number(alt.coef);
+                    if (bestProduct === null || product > bestProduct) {
+                        bestProduct = product;
                     }
                 }
             });
 
-            if (!hasValue) {
+            if (bestProduct === null) {
                 missingSlots.push(keys);
-                return;
+            } else {
+                total += bestProduct;
             }
-
-            total += bestValue * coef;
         });
 
         return { score: total, missingSlots };
@@ -437,20 +429,27 @@ const CalculatorPage = () => {
 
                 {/* --- РЕЗУЛТАТИ --- */}
                 {(() => {
-                    console.time("calc:rows");
+                    // Средно аритметично на max_ball за специалностите с попълнена стойност
+                    const maxBallValues = rowsForSelectedSpecialty
+                        .map(r => Number(r.max_ball))
+                        .filter(v => !Number.isNaN(v) && v > 0);
+                    const averageMaxBall = maxBallValues.length > 0
+                        ? maxBallValues.reduce((a, b) => a + b, 0) / maxBallValues.length
+                        : null;
+
                     const displayedResults = rowsForSelectedSpecialty.map(item => {
-                        const { score, missingSlots } = calculateScore(item.coefficients, grades, activeAltBySlot);
+                        const { score, missingSlots } = calculateScore(item.coefficients, grades);
                         const formattedScore = Number.isFinite(score) ? score.toFixed(2) : "0.00";
-                        const diff = (item.min_ball_2024 - score).toFixed(2);
-                        const isPassing = score >= item.min_ball_2024;
+                        const hasMaxBall = averageMaxBall !== null;
+                        const isAboveAverage = hasMaxBall && score >= averageMaxBall;
+                        const diff = hasMaxBall ? Math.abs(averageMaxBall - score).toFixed(2) : null;
                         const hasStarted = score > 0 || hasAnyValidGrade;
                         const hasMissing = missingSlots.length > 0;
-                        return { item, score, formattedScore, diff, isPassing, hasStarted, hasMissing, missingSlots };
+                        return { item, score, formattedScore, diff, isAboveAverage, hasMaxBall, hasStarted, hasMissing, missingSlots };
                     });
-                    console.timeEnd("calc:rows");
                     return (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            {displayedResults.map(({ item, formattedScore, isPassing, hasMissing, hasStarted, diff, missingSlots }) => (
+                            {displayedResults.map(({ item, formattedScore, isAboveAverage, hasMaxBall, hasMissing, hasStarted, diff, missingSlots }) => (
                                 <div key={item.id} className="bg-base-100 p-10 rounded-[3rem] shadow-xl border border-base-200 group transition-all hover:shadow-2xl">
                                     <div className="space-y-6">
                                         <div className="flex justify-between items-start">
@@ -459,13 +458,13 @@ const CalculatorPage = () => {
                                                 <h3 className="text-2xl font-black leading-tight group-hover:text-primary transition-colors">{item.specialty}</h3>
                                             </div>
                                             <div className="text-right">
-                                                <div className={`text-5xl font-black tracking-tighter ${isPassing ? 'text-success' : 'text-primary'}`}>
+                                                <div className={`text-5xl font-black tracking-tighter ${hasMaxBall && isAboveAverage ? 'text-success' : 'text-primary'}`}>
                                                     {hasMissing ? "—" : formattedScore}
                                                 </div>
                                                 <div className="text-[10px] font-black opacity-30 uppercase">БАЛ</div>
                                             </div>
                                         </div>
-                                        
+
                                         <div className="p-5 bg-base-200 rounded-[2rem] text-[clamp(12px,1.1vw,13px)] font-semibold opacity-80 flex gap-4 border-l-4 border-primary">
                                             <Info size={20} className="shrink-0 text-primary mt-0.5" />
                                             <span className="min-w-0 break-words whitespace-pre-wrap"><strong>Метод:</strong> {item.formula_description}</span>
@@ -474,21 +473,23 @@ const CalculatorPage = () => {
 
                                     <div className="mt-8 pt-6 border-t border-base-200 flex justify-between items-center">
                                         <div className="flex flex-col">
-                                            <span className="text-xs font-black opacity-40 italic font-mono uppercase">Мин. бал 2024: {item.min_ball_2024}</span>
+                                            {hasMaxBall && (
+                                                <span className="text-xs font-black opacity-40 italic font-mono uppercase">Макс. бал: {averageMaxBall.toFixed(2)}</span>
+                                            )}
                                             {hasMissing && hasStarted && (
                                                 <div className="mt-1 text-[11px] text-error font-black uppercase">
                                                     Липсват оценки за: {missingSlots.map(describeMissingTerm).join(", ")}
                                                 </div>
                                             )}
-                                            {!hasMissing && !isPassing && hasStarted && (
+                                            {hasMaxBall && !hasMissing && !isAboveAverage && hasStarted && (
                                                 <div className="flex items-center gap-1.5 text-error mt-1 animate-pulse">
                                                     <TrendingDown size={14} strokeWidth={3} />
-                                                    <span className="text-[11px] font-black uppercase">Нужни са още {diff} т.</span>
+                                                    <span className="text-[11px] font-black uppercase">Под средното с {diff} т.</span>
                                                 </div>
                                             )}
                                         </div>
-                                        {!hasMissing && isPassing && <div className="badge badge-success py-3 px-5 font-black italic text-white rounded-xl shadow-lg animate-bounce"><CheckCircle2 size={12} className="mr-1"/>ВЛИЗАШ</div>}
-                                        {!hasMissing && !isPassing && hasStarted && <div className="badge badge-error badge-outline py-3 px-5 font-black italic rounded-xl border-2">НЕ ДОСТИГА</div>}
+                                        {!hasMissing && hasMaxBall && isAboveAverage && <div className="badge badge-success py-3 px-5 font-black italic text-white rounded-xl shadow-lg animate-bounce"><CheckCircle2 size={12} className="mr-1"/>НАД СРЕДНОТО</div>}
+                                        {!hasMissing && hasMaxBall && !isAboveAverage && hasStarted && <div className="badge badge-error badge-outline py-3 px-5 font-black italic rounded-xl border-2">ПОД СРЕДНОТО</div>}
                                     </div>
                                 </div>
                             ))}

@@ -6,7 +6,7 @@
 // Бележки: Използва TTL кеш (1 час) и fallback свеж fetch при празен резултат.
 import { supabase } from '../lib/supabase';
 
-const CACHE_KEY = 'universities_cache';
+const CACHE_KEY = 'universities_cache_v2';
 const CACHE_DURATION = 1000 * 60 * 60; // 1 hour
 const SEARCH_LIMIT_REFRESH_MS = 1000 * 60 * 10; // 10 minutes
 
@@ -44,7 +44,7 @@ export const universityService = {
             // 2. Fetch if not cached or expired
             if (!data) {
                 const { data: fetchedData, error } = await supabase
-                    .from('universities_duplicate')
+                    .from('universities')
                     .select('*');
                 
                 if (error) throw error;
@@ -74,7 +74,7 @@ export const universityService = {
             // 4. Ако имаме текстово търсене, но резултатите са празни, опитай свеж fetch (fallback)
             if (normalizedQuery && filtered.length === 0) {
                 const { data: fetchedData, error } = await supabase
-                    .from('universities_duplicate')
+                    .from('universities')
                     .select('*');
                 if (!error && fetchedData) {
                     const fresh = fetchedData.map(uni => ({ ...uni }));
@@ -95,7 +95,6 @@ export const universityService = {
             return filtered;
 
         } catch (error) {
-            console.error('Error fetching universities_duplicate:', error);
             return [];
         }
     },
