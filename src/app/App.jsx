@@ -12,6 +12,7 @@ import NotFound from "../components/common/NotFound";
 import Header from "../components/common/Header";
 import Home from "../components/common/Home";
 import Footer from "../components/common/Footer";
+import GlobalErrorBoundary from "../components/common/GlobalErrorBoundary";
 
 import AdminRoute from "../routes/AdminRoute";
 import ScrollToTop from "../components/common/ScrollToTop";
@@ -35,7 +36,7 @@ const PrivacyPolicy = lazy(() => import("../components/common/PrivacyPolicy"));
 // Основен входен компонент – включва AuthProvider, ScrollToTop, Header, Footer и рутера.
 function App() {
     return (
-        <>
+        <GlobalErrorBoundary>
             <AuthProvider>
                 <ScrollToTop />
                 <Header />
@@ -57,11 +58,19 @@ function App() {
                         />
                         <Route
                             path="/career-advisor"
-                            element={<Suspense fallback={null}><CareerAdvisor /></Suspense>}
+                            element={
+                                <GlobalErrorBoundary>
+                                    <Suspense fallback={null}><CareerAdvisor /></Suspense>
+                                </GlobalErrorBoundary>
+                            }
                         />
                         <Route
                             path="/test-career"
-                            element={<Suspense fallback={null}><TestCareer /></Suspense>}
+                            element={
+                                <GlobalErrorBoundary>
+                                    <Suspense fallback={null}><TestCareer /></Suspense>
+                                </GlobalErrorBoundary>
+                            }
                         />
                         <Route
                             path="/dormitories"
@@ -81,7 +90,9 @@ function App() {
                             path="/calculator"
                             element={
                                 <ProtectedRoute>
-                                    <Suspense fallback={null}><CalculatorPage /></Suspense>
+                                    <GlobalErrorBoundary>
+                                        <Suspense fallback={null}><CalculatorPage /></Suspense>
+                                    </GlobalErrorBoundary>
                                 </ProtectedRoute>
                             }
                         />
@@ -99,7 +110,9 @@ function App() {
                             path="/admin"
                             element={
                                 <AdminRoute>
-                                    <Suspense fallback={null}><AdminDashboard /></Suspense>
+                                    <GlobalErrorBoundary>
+                                        <Suspense fallback={null}><AdminDashboard /></Suspense>
+                                    </GlobalErrorBoundary>
                                 </AdminRoute>
                             }
                         />
@@ -107,7 +120,7 @@ function App() {
                 </main>
                 <Footer />
             </AuthProvider>
-        </>
+        </GlobalErrorBoundary>
     );
 }
 

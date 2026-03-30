@@ -16,32 +16,41 @@ const SPECIALTY_SYNONYMS = {
 
 const normalize = (s) => (s || "").toLowerCase().trim();
 
+/**
+ * @typedef {Object} UniversitySearchParam
+ * @property {string} [query] - Текст за търсене (университет или специалност)
+ * @property {string} [city] - Град за филтриране (по подразбиране "Всички")
+ */
+
+/**
+ * Сервизен слой за управление на данни за университети.
+ * Осигурява абстракция над Supabase с вградено клиентско кеширане (TTL).
+ */
 export const universityService = {
     
     /**
-     * Търсене на университети със филтри
-     * @param {{ query?: string, city?: string }} params - Параметри за търсене
-     * @returns {Promise<Array<object>>} - Списък от съвпадащи записи
+     * Търсене на университети и специалности с филтри и синоними.
      * 
-     * Логика:
-     * 1) Проверява кеш (localStorage) и използва данните, ако са валидни.
-     * 2) Ако няма валидни данни в кеша, чете от Supabase таблицата `university_admissions`.
-     * 3) Прилага клиентски филтър: по текст (университет/специалност) и по град.
+     * Алгоритъм:
+     * 1. Опит за четене от локален кеш (localStorage).
+     * 2. При липса на кеш - извличане на пълния набор от Supabase.
+     * 3. Прилагане на текстови филтри (case-insensitive) и поддръжка на синоними.
+     * 4. Fallback: Ако филтрираните резултати са празни, опитва нов fetch за опресняване.
      * 
-     * Edge случаи:
-     * - При грешка от Supabase връща празен списък и логва грешката.
-     * - Филтрирането е case-insensitive; ако city е „Всички“, град не се ограничава.
+     * @async
+     * @param {UniversitySearchParam} params - Параметри за търсене
+     * @returns {Promise<Array<Object>>} - Масив от съвпадащи обекти на университети
      */
     async searchUniversities({ query = '', city = 'Всички' }) {
         try {
             const normalizedQuery = normalize(query);
             const synonyms = SPECIALTY_SYNONYMS[normalizedQuery] || [normalizedQuery].filter(Boolean);
 
-            // 1. Check Cache
+            // 1. Проверка на кеша
             const cached = this.getFromCache();
             let data = cached;
 
-            // 2. Fetch if not cached or expired
+            // 2. Fetch ако няма кеш или е изтекъл
             if (!data) {
                 const { data: fetchedData, error } = await supabase
                     .from('universities_duplicate')
@@ -49,18 +58,15 @@ export const universityService = {
                 
                 if (error) throw error;
                 
-                // Enhance data (removed rating and coords)
-                data = fetchedData.map(uni => ({
-                    ...uni
-                }));
-
+                data = fetchedData;
                 this.saveToCache(data);
             }
 
-            // 3. Прилагане на клиентски филтри
+            // 3. Клиентско филтриране
             let filtered = data.filter(uni => {
                 const uName = normalize(uni.university_name);
                 const spec = normalize(uni.specialty);
+                
                 const matchesQuery = !normalizedQuery || 
                     uName.includes(normalizedQuery) || 
                     spec.includes(normalizedQuery) ||
@@ -71,21 +77,18 @@ export const universityService = {
                 return matchesQuery && matchesCity;
             });
 
-            // 4. Ако имаме текстово търсене, но резултатите са празни, опитай свеж fetch (fallback)
+            // 4. Fallback при празен резултат (възможно остарял кеш)
             if (normalizedQuery && filtered.length === 0) {
                 const { data: fetchedData, error } = await supabase
                     .from('universities_duplicate')
                     .select('*');
+                
                 if (!error && fetchedData) {
-                    const fresh = fetchedData.map(uni => ({ ...uni }));
-                    this.saveToCache(fresh); // обнови кеша
-                    filtered = fresh.filter(uni => {
+                    this.saveToCache(fetchedData);
+                    filtered = fetchedData.filter(uni => {
                         const uName = normalize(uni.university_name);
                         const spec = normalize(uni.specialty);
-                        const matchesQuery = !normalizedQuery || 
-                            uName.includes(normalizedQuery) || 
-                            spec.includes(normalizedQuery) ||
-                            (synonyms.length > 0 && synonyms.some(s => spec.includes(s)));
+                        const matchesQuery = !normalizedQuery || uName.includes(normalizedQuery) || spec.includes(normalizedQuery);
                         const matchesCity = city === 'Всички' || uni.city === city;
                         return matchesQuery && matchesCity;
                     });
@@ -95,14 +98,15 @@ export const universityService = {
             return filtered;
 
         } catch (error) {
-            console.error('Error fetching universities_duplicate:', error);
+            console.error('universityService critical error:', error);
             return [];
         }
     },
 
     /**
-     * Връща списък с уникални градове от набора данни
-     * @returns {Promise<string[]>}
+     * Извлича всички уникални градове от наличните университети.
+     * @async
+     * @returns {Promise<string[]>} - Сортиран масив от градове, започващ с "Всички"
      */
     async getCities() {
         const unis = await this.searchUniversities({});
@@ -110,9 +114,10 @@ export const universityService = {
         return ['Всички', ...cities.sort()];
     },
 
-    // --- Caching Mechanisms ---
-
-    // Записване на данни в кеш (localStorage), заедно с времеви маркер.
+    /**
+     * Записва данни в localStorage кеш с времеви маркер.
+     * @param {Array} data - Данните за кеширане
+     */
     saveToCache(data) {
         const cacheEntry = {
             timestamp: Date.now(),
@@ -121,7 +126,10 @@ export const universityService = {
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheEntry));
     },
 
-    // Четене от кеш и проверка за изтичане (TTL = 1 час).
+    /**
+     * Чете данни от кеша и проверява за изтичане на TTL (1 час).
+     * @returns {Array|null} - Данните или null, ако кешът е празен/невалиден
+     */
     getFromCache() {
         const json = localStorage.getItem(CACHE_KEY);
         if (!json) return null;

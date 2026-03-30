@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { universityService } from "../../services/universityService";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 
 const UniversitiesPage = () => {
     const { user, isFavorite, toggleFavorite } = useAuth();

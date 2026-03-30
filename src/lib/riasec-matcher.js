@@ -1,15 +1,38 @@
 /**
+ * @typedef {Object} RiasecScores
+ * @property {number} R - Realistic score (0-100)
+ * @property {number} I - Investigative score (0-100)
+ * @property {number} A - Artistic score (0-100)
+ * @property {number} S - Social score (0-100)
+ * @property {number} E - Enterprising score (0-100)
+ * @property {number} C - Conventional score (0-100)
+ */
+
+/**
+ * @typedef {Object} RiasecQuestion
+ * @property {string|number} id - Unique identifier for the question
+ * @property {string} type - RIASEC type (R, I, A, S, E, or C)
+ * @property {string} text - The question text in Bulgarian
+ * @property {string} [category] - Optional category label
+ */
+
+/**
  * Изчислява RIASEC резултатите на базата на отговорите на потребителя.
  * 
  * Логика на точкуване (базирана на docs/SCORING_METHODOLOGY.md):
  * - Всеки тип (R, I, A, S, E, C) има N въпроса.
- * - Отговорите са от 1 до 5.
+ * - Отговорите са по 5-степенна скала на Лайкерт (1 до 5).
  * - Raw Score = Сума от всички отговори за даден тип.
  * - Normalized Score = ((raw - min) / (max - min)) * 100
  * 
- * @param {Object} answers - Обект с отговори { questionId: value }
- * @param {Array} questions - Масив от въпроси от src/data/riasec_questions.json
- * @returns {Object} - Изчислените нормализирани резултати { R: number, I: number, ... }
+ * @example
+ * const answers = { "q1": 5, "q2": 4 };
+ * const questions = [{ id: "q1", type: "R", text: "..." }, { id: "q2", type: "R", text: "..." }];
+ * const results = calculateScores(answers, questions); // { R: 88, I: 0, ... }
+ * 
+ * @param {Object.<string, number>} answers - Обект с отговори { questionId: value }
+ * @param {RiasecQuestion[]} questions - Масив от въпроси от src/data/riasec_questions.json
+ * @returns {RiasecScores} - Изчислените нормализирани резултати { R: number, I: number, ... }
  */
 const EMPTY_SCORES = () => ({ R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 });
 
@@ -40,19 +63,19 @@ export function calculateScores(answers, questions = []) {
 
     // Нова логика на базата на въпроси
     questions.forEach(q => {
-        const val = answers[q.id] || 3; // 3 е неутрален
+        const val = answers[q.id] || 3; // 3 е неутрален (middle of 1-5 scale)
         if (Object.prototype.hasOwnProperty.call(rawScores, q.type)) {
             rawScores[q.type] += val;
             questionsPerType[q.type] += 1;
         }
     });
 
-    // Нормализация (0-100)
+    // Нормализация към скала 0-100 за по-лесно сравнение
     const normalizedScores = {};
     Object.keys(rawScores).forEach(type => {
         const count = questionsPerType[type] || 1;
-        const min = count * 1;
-        const max = count * 5;
+        const min = count * 1; // Минимален възможен резултат (всички отговори са 1)
+        const max = count * 5; // Максимален възможен резултат (всички отговори са 5)
         const raw = rawScores[type];
         
         // Формула: ((raw - min) / (max - min)) * 100
@@ -65,17 +88,23 @@ export function calculateScores(answers, questions = []) {
 
 /**
  * Изчислява топ 3 буквения RIASEC код базиран на резултатите.
- * @param {Object} scores - Обектът с нормализирани резултати { R: 75, I: 90, ... }
- * @returns {string} - 3-буквеният код (напр. "ICS")
+ * Сортира резултатите низходящо и взема първите три букви.
+ * При равни резултати се запазва детерминистичен ред.
+ * 
+ * @example
+ * calculateRiasecCode({ R: 75, I: 90, A: 30, S: 20, E: 50, C: 80 }); // "ICR"
+ * 
+ * @param {RiasecScores} scores - Обектът с нормализирани резултати
+ * @returns {string} - 3-буквеният Holland код (напр. "ICS")
  */
 export function calculateRiasecCode(scores) {
     if (!scores) return "";
     
     return Object.entries(scores)
         .sort(([, scoreA], [, scoreB]) => {
-            // Първо по резултат
+            // Първо по резултат (descending)
             if (scoreB !== scoreA) return scoreB - scoreA;
-            // При равенство - по азбучен ред (детерминистично)
+            // При равенство - запазваме консистентен ред (R > I > A > S > E > C)
             return 0; 
         })
         .slice(0, 3)
@@ -84,42 +113,51 @@ export function calculateRiasecCode(scores) {
 }
 
 /**
- * Хибридно изчисляване на съвместимост.
- * Комбинира Евклидово разстояние (векторна близост) с Позиционен мач (Holland Code).
+ * Хибридно изчисляване на съвместимост между потребител и елемент (специалност/кариера).
+ * Комбинира Евклидово разстояние (прецизност на вектора) с Позиционен мач (структура на интересите).
  * 
- * @param {Object} userScores - Нормализирани потребителски резултати (0-100)
- * @param {Object} item - Обект от базата (специалност или кариера)
+ * @param {RiasecScores} userScores - Нормализирани потребителски резултати (0-100)
+ * @param {Object} item - Обект от базата данни
+ * @param {RiasecScores} [item.riasec_scores_normalized] - Нормализиран вектор на елемента
+ * @param {string} [item.riasec_code] - Holland код на елемента (напр. "RIA")
+ * @returns {number} - Процент съвместимост (0-100)
  */
 export function calculateHybridCompatibility(userScores, item) {
     if (!userScores || !item) return 0;
     
-    // 1. Евклидова съвместимост (базирана на вектора)
+    // 1. Евклидова съвместимост (базирана на геометрична близост в 6D пространство)
     let euclideanScore = 0;
     if (item.riasec_scores_normalized) {
         euclideanScore = calculateEuclideanCompatibility(userScores, item.riasec_scores_normalized);
     }
     
-    // 2. Позиционна съвместимост (базирана на кода)
+    // 2. Позиционна съвместимост (базирана на приоритета на топ интересите)
     let codeScore = 0;
     if (item.riasec_code) {
         const userCode = calculateRiasecCode(userScores);
         codeScore = calculateMatchScore(userCode, item.riasec_code);
     }
     
-    // Тегла: 70% Евклидово (прецизно), 30% Код (структурно)
-    // Ако липсва едното, другото поема тежестта
+    // Тегла на алгоритмите:
+    // - 70% Евклидово: отчита общата интензивност на всички 6 типа интереси.
+    // - 30% Код: отчита точното подреждане на водещите 3 интереса.
     if (euclideanScore > 0 && codeScore > 0) {
         return Math.round(euclideanScore * 0.7 + codeScore * 0.3);
     }
     
+    // Fallback ако липсва една от двете метрики в базата
     return Math.max(euclideanScore, codeScore);
 }
 
 /**
  * Изчислява процент на съвпадение между два RIASEC вектора чрез Експоненциално затихване.
- * Това позволява по-добра диференциация между близки резултати.
+ * Това позволява по-добра диференциация между близки резултати в 6-измерното пространство.
  * 
- * Формула: e^(-k * d) * 100
+ * Формула: e^(-k * d) * 100, където d е Евклидовото разстояние.
+ * 
+ * @param {RiasecScores} userScores - Вектор на потребителя
+ * @param {RiasecScores} itemScores - Вектор на обекта (специалност/професия)
+ * @returns {number} - Нормализиран процент съвпадение (0-100)
  */
 export function calculateEuclideanCompatibility(userScores, itemScores) {
     if (!userScores || !itemScores) return 0;
@@ -127,7 +165,7 @@ export function calculateEuclideanCompatibility(userScores, itemScores) {
     const letters = ['R', 'I', 'A', 'S', 'E', 'C'];
     let sumSquaredDiff = 0;
     
-    // Нормализираме векторите до 0-1 за разстоянието
+    // 1. Нормализираме векторите до диапазон 0-1 за изчисляване на разстоянието
     for (const l of letters) {
         const u = (userScores[l] || 0) / 100;
         const i = (itemScores[l] || 0) / 100;
@@ -136,8 +174,8 @@ export function calculateEuclideanCompatibility(userScores, itemScores) {
     
     const distance = Math.sqrt(sumSquaredDiff);
     
-    // k е коефициент на чувствителност. 
-    // k = 1.2 дава добра диференциация (80% съвпадение при малко разстояние).
+    // 2. Коефициент k определя колко "строго" е сравнението. 
+    // k = 1.2 дава балансирана диференциация.
     const k = 1.2;
     const compatibility = Math.exp(-k * distance) * 100;
     
@@ -145,8 +183,15 @@ export function calculateEuclideanCompatibility(userScores, itemScores) {
 }
 
 /**
- * Позиционно сравнение на Holland кодове.
- * Прилага тегла за всяка позиция.
+ * Позиционно сравнение на два 3-буквени Holland кода.
+ * Прилага специфични тегла според позицията на буквите.
+ * 
+ * @example
+ * calculateMatchScore("RIA", "RAI"); // 35 (R на 1-ва поз) + 10 (I) + 10 (A) = 55
+ * 
+ * @param {string} userCode - 3-буквен код на потребителя
+ * @param {string} itemCode - 3-буквен код на обекта
+ * @returns {number} - Точки съвпадение (0-100)
  */
 export function calculateMatchScore(userCode, itemCode) {
     if (!userCode || !itemCode) return 0;
@@ -156,7 +201,10 @@ export function calculateMatchScore(userCode, itemCode) {
     
     let score = 0;
     
-    // Тегла за позиции: 35/20/15 за точен мач на позиция + 10 за наличие на буквата
+    // Тегла за позиции: 
+    // - 35 за съвпадение на 1-ва позиция (водещ интерес)
+    // - 20 за съвпадение на 2-ра позиция
+    // - 15 за съвпадение на 3-та позиция
     const positionWeights = [35, 20, 15];
     
     // 1. Проверка за точни съвпадения на позиции
@@ -166,13 +214,13 @@ export function calculateMatchScore(userCode, itemCode) {
         }
     }
     
-    // 2. Бонус за наличие на буквата в кода (но на грешна позиция)
+    // 2. Бонус за наличие на буквата в кода (но на различна позиция)
     u.forEach(letter => {
         if (i.includes(letter)) {
             score += 10;
         }
     });
 
-    // Максималният резултат може да е над 100, затова го ограничаваме
+    // Резултатът се ограничава до 100 за консистентност с другите метрики
     return Math.min(100, score);
 }

@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
 import { useNavigate, Link } from "react-router-dom";
 import { sessionService } from "../../services/sessionService";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import { universityService } from "../../services/universityService";
 import { 
     User, 

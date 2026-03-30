@@ -5,8 +5,34 @@ import {
 } from './riasec-matcher';
 
 /**
+ * @typedef {Object} SpecialtyMatch
+ * @property {string} id - UUID от базата
+ * @property {string} name - Име на специалността
+ * @property {string} riasec_code - 3-буквен RIASEC код
+ * @property {string} category - Категория (напр. "ИТ", "Право")
+ * @property {number} compatibility - Процент съвместимост (0-100)
+ * @property {number} universities_count - Брой предлагащи университети
+ * @property {Array} universities - Списък с детайли за университетите
+ */
+
+/**
+ * @typedef {Object} CareerMatch
+ * @property {string} id - UUID от базата
+ * @property {string} name - Име на професията на български
+ * @property {string} career_name_en - Име на професията на английски
+ * @property {string} riasec_code - 3-буквен RIASEC код
+ * @property {string} salary - Очакван диапазон на заплата
+ * @property {string} required_education - Минимално образование
+ * @property {number} compatibility - Процент съвместимост (0-100)
+ */
+
+/**
  * Matching за специалности и професии на базата на RIASEC резултати.
- * Използва новите таблици specialty_riasec_mapping и careers_riasec_mapping.
+ * Използва хибриден алгоритъм за сравнение с данните от Supabase.
+ * 
+ * @async
+ * @param {RiasecScores} userScores - Нормализирани резултати на потребителя
+ * @returns {Promise<{specialties: SpecialtyMatch[], careers: CareerMatch[]}>}
  */
 export async function getRiasecMatches(userScores) {
     if (!userScores) return { specialties: [], careers: [] };
@@ -20,9 +46,9 @@ export async function getRiasecMatches(userScores) {
             .from('specialty_riasec_mapping')
             .select('*, universities_duplicate(id, university_name, city, min_ball_2024)');
 
-        // Ако JOIN заявката се провали (напр. PGRST200), опитваме без JOIN
+        // Fallback механизъм при грешка в релациите (напр. PGRST200)
         if (specError && specError.code === 'PGRST200') {
-            console.warn('RIASEC Matching: Join failed, falling back to separate queries.');
+            console.warn('RIASEC Matching: Join failed, falling back to standalone query.');
             const { data: standaloneSpecs, error: standaloneError } = await supabase
                 .from('specialty_riasec_mapping')
                 .select('*');
@@ -33,19 +59,12 @@ export async function getRiasecMatches(userScores) {
             throw specError;
         }
 
-        console.log(`RIASEC Matching: Found ${specialtiesData?.length || 0} specialties in DB.`);
-
         // 2. Извличане на професии с RIASEC mapping
-        console.log('RIASEC Matching: Fetching careers from careers_riasec_mapping...');
         const { data: careersData, error: careerError } = await supabase
             .from('careers_riasec_mapping')
             .select('*');
 
-        if (careerError) {
-            console.error('RIASEC Matching Error (careers):', careerError);
-            throw careerError;
-        }
-        console.log(`RIASEC Matching: Found ${careersData?.length || 0} careers in DB.`);
+        if (careerError) throw careerError;
 
         // 3. Изчисляване на съвместимост (Hybrid Logic)
         const specialties = (specialtiesData || [])
@@ -61,10 +80,8 @@ export async function getRiasecMatches(userScores) {
                     universities: item.universities_duplicate || []
                 };
             })
-            .filter(item => item.compatibility >= 50) // Намаляваме прага до 50% за повече резултати
+            .filter(item => item.compatibility >= 50) // Показваме само релевантни съвпадения
             .sort((a, b) => b.compatibility - a.compatibility);
-
-        console.log(`RIASEC Matching: Filtered to ${specialties.length} matching specialties (>=50%).`);
 
         const careers = (careersData || [])
             .map(item => ({
@@ -81,12 +98,10 @@ export async function getRiasecMatches(userScores) {
             .filter(item => item.compatibility >= 50)
             .sort((a, b) => b.compatibility - a.compatibility);
 
-        console.log(`RIASEC Matching: Found ${careers.length} matching careers.`);
-
         return { specialties, careers };
 
     } catch (error) {
-        console.error('RIASEC matching final error:', error);
+        console.error('RIASEC matching critical error:', error);
         return { specialties: [], careers: [] };
     }
 }
