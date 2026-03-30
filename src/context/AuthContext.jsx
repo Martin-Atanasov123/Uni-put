@@ -7,17 +7,19 @@
 //   - При монтиране: извлича текущата сесия и метаданни (favorite_universities).
 //   - Слуша събитията за промяна на сесията (login/logout) и актуализира state.
 //   - Пази UI стабилен: рендерира деца само когато loading е false.
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
-import { AuthContext } from "./AuthContext";
+
+const AuthContext = createContext({});
 
 /**
- * Провайдър за автентикация и управление на потребителски предпочитания.
- * Капсулира логиката за сесии на Supabase и синхронизация на метаданни.
- * 
- * @param {Object} props
- * @param {React.ReactNode} props.children - Дъщерни компоненти
+ * Провайдър за автентикация
+ * @param {{ children: React.ReactNode }} props - Дъщерни компоненти, които ще получат контекста
  * @returns {JSX.Element}
+ *
+ * Edge случаи:
+ * - Ако няма активна сесия, user остава null.
+ * - При промяна на сесията (login/logout), състоянието се обновява и loading става false.
  */
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -25,11 +27,10 @@ export const AuthProvider = ({ children }) => {
     const [favorites, setFavorites] = useState([]);
 
     useEffect(() => {
-        // 1. Първоначална проверка на сесията
+        // 1. Провери текущата сесия при зареждане
         supabase.auth.getSession().then(({ data: { session } }) => {
             const currentUser = session?.user ?? null;
             setUser(currentUser);
-            // Извличаме любимите от потребителските метаданни
             setFavorites(
                 (currentUser?.user_metadata?.favorite_universities || []).filter(
                     (id) => typeof id === "string" && id.length > 0
@@ -38,7 +39,7 @@ export const AuthProvider = ({ children }) => {
             setLoading(false);
         });
 
-        // 2. Абониране за събития (LOGIN, SIGN_OUT, TOKEN_REFRESHED и др.)
+        // 2. Слушай за промени (Login/Logout)
         const {
             data: { subscription },
         } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -55,42 +56,24 @@ export const AuthProvider = ({ children }) => {
         return () => subscription.unsubscribe();
     }, []);
 
-    /**
-     * Вътрешна функция за синхронизация на любими със Supabase Auth метаданни.
-     * @async
-     * @param {string[]} nextFavorites - Новият списък с любими
-     */
     const updateFavorites = async (nextFavorites) => {
         if (!user) return;
         const prev = favorites;
-        setFavorites(nextFavorites); // Optimistic UI update
+        setFavorites(nextFavorites);
         try {
             const { error } = await supabase.auth.updateUser({
                 data: { favorite_universities: nextFavorites },
             });
             if (error) {
-                setFavorites(prev); // Rollback при грешка
-                console.error("[favorites] updateUser failed", error);
+                setFavorites(prev);
             }
-        } catch (e) {
+        } catch {
             setFavorites(prev);
-            console.error("[favorites] unexpected error", e);
         }
     };
 
-    /**
-     * Проверява дали даден запис е маркиран като любим.
-     * @param {string} id - ID на записа
-     * @returns {boolean}
-     */
     const isFavorite = (id) => favorites.includes(id);
 
-    /**
-     * Превключва състоянието на "любим" за дадено ID.
-     * Изисква автентикиран потребител.
-     * @async
-     * @param {string} id - ID на записа
-     */
     const toggleFavorite = async (id) => {
         if (!user) return;
         const exists = favorites.includes(id);
@@ -108,3 +91,9 @@ export const AuthProvider = ({ children }) => {
         </AuthContext.Provider>
     );
 };
+
+/**
+ * Хук за достъп до контекста на автентикация и любими
+ * @returns {{ user: object|null, loading: boolean, favorites: string[], isFavorite: (id: string) => boolean, toggleFavorite: (id: string) => Promise<void> }}
+ */
+export const useAuth = () => useContext(AuthContext);

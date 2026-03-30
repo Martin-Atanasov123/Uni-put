@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import {
     Search,
     MapPin,
-    ChevronRight,
+    Calculator,
     School,
     Filter,
     Heart,
@@ -172,10 +172,10 @@ const UniversitiesPage = () => {
 
                                         <div className="flex items-center justify-between pt-4 border-t border-base-200 mt-auto gap-3">
                                             <Link
-                                                to="/calculator"
-                                                className="btn btn-circle btn-primary shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform"
+                                                to={`/calculator?specialty=${encodeURIComponent(uni.specialty)}`}
+                                                className="btn btn-primary btn-sm rounded-xl font-bold gap-2 shadow-lg shadow-primary/20"
                                             >
-                                                <ChevronRight />
+                                                <Calculator size={14} /> Изчисли бал
                                             </Link>
                                             {user && (
                                                 <button

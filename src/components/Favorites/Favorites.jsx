@@ -6,7 +6,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { universityService } from "../../services/universityService";
-import { Search, MapPin, School, Heart } from "lucide-react";
+import { Search, MapPin, School, Heart, Calculator } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const FavoritesPage = () => {
@@ -30,8 +30,7 @@ const FavoritesPage = () => {
                     favorites.includes(String(item.id))
                 );
                 setAllFavoritesData(mapped);
-            } catch (e) {
-                console.error("[favorites] load failed", e);
+            } catch {
                 setAllFavoritesData([]);
             } finally {
                 setLoading(false);
@@ -202,6 +201,14 @@ const FavoritesPage = () => {
                                                 <School size={14} />{" "}
                                                 {uni.university_name}
                                             </p>
+                                        </div>
+                                        <div className="pt-4 border-t border-base-200 mt-auto">
+                                            <Link
+                                                to={`/calculator?specialty=${encodeURIComponent(uni.specialty)}`}
+                                                className="btn btn-primary btn-sm rounded-xl font-bold gap-2 shadow-lg shadow-primary/20"
+                                            >
+                                                <Calculator size={14} /> Изчисли бал
+                                            </Link>
                                         </div>
                                     </div>
                                 </div>

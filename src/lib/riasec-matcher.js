@@ -40,24 +40,8 @@ export function calculateScores(answers, questions = []) {
     const rawScores = EMPTY_SCORES();
     const questionsPerType = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 };
 
-    // Ако нямаме въпроси (fallback към старата логика за съвместимост)
+    // Ако нямаме въпроси, връщаме нулеви резултати
     if (!questions || questions.length === 0) {
-        // Стара логика от CareerAdvisor.jsx стъпките
-        if (answers && answers.interests && Array.isArray(answers.interests)) {
-            answers.interests.forEach(interest => {
-                switch (interest) {
-                    case 'Technology': rawScores.I += 3; rawScores.C += 2; break;
-                    case 'Art': rawScores.A += 3; rawScores.I += 2; break;
-                    case 'Science': rawScores.I += 3; rawScores.R += 2; break;
-                    case 'Social': rawScores.S += 3; rawScores.A += 2; break;
-                    case 'Business': rawScores.E += 3; rawScores.C += 2; break;
-                    case 'Nature': rawScores.R += 3; rawScores.I += 2; break;
-                }
-            });
-            // За старата логика приемаме фиксиран брой "въпроси" за нормализация, 
-            // ако искаме да връщаме 0-100. Но тук връщаме rawScores за съвместимост.
-            return rawScores;
-        }
         return rawScores;
     }
 

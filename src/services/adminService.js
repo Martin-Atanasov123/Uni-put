@@ -23,9 +23,17 @@
 // - Кешът се държи в localStorage; при обновяване/изтриване се инвалидира за съответната таблица.
 // - Филтърът е прост, пълнотекстов (join на всички стойности), който е достатъчен за малък обем данни.
 import { supabase } from "../lib/supabase";
+import { ADMIN_TABLES } from "../admin/adminConfig";
 
 const CACHE_KEY = "admin_cache_v1";
 const PAGE_SIZE = 10;
+const ALLOWED_TABLES = ADMIN_TABLES.map(t => t.table);
+
+const assertAllowedTable = (table) => {
+  if (!ALLOWED_TABLES.includes(table)) {
+    throw new Error("Невалидна таблица.");
+  }
+};
 
 // Прочитане на кеш обекта от localStorage.
 // Връща: {} ако няма валиден кеш.
@@ -105,6 +113,7 @@ export const adminService = {
    * @returns {{ page: number, pageSize: number, total: number, pages: number, items: any[] }}
    */
   async list(table, options = {}) {
+    assertAllowedTable(table);
     const { useCache = true, page = 0, filters } = options;
     let rows = [];
 
@@ -135,6 +144,7 @@ export const adminService = {
    * @returns {object|null} - Създаденият запис (ако Supabase го върне), иначе null
    */
   async create(table, payload) {
+    assertAllowedTable(table);
     const { data, error } = await supabase.from(table).insert([payload]).select();
     if (error) throw error;
     invalidateTableCache(table);
@@ -150,6 +160,7 @@ export const adminService = {
    * @returns {object|null} - Обновеният запис (ако Supabase го върне), иначе null
    */
   async update(table, idField, id, payload) {
+    assertAllowedTable(table);
     const { data, error } = await supabase
       .from(table)
       .update(payload)
@@ -167,6 +178,7 @@ export const adminService = {
    * @param {Array<string|number>} ids - Списък от идентификатори
    */
   async removeMany(table, idField, ids) {
+    assertAllowedTable(table);
     const { error } = await supabase.from(table).delete().in(idField, ids);
     if (error) throw error;
     invalidateTableCache(table);
@@ -178,6 +190,7 @@ export const adminService = {
    * @returns {Array<object>} - Списък от всички записи
    */
   async exportAll(table) {
+    assertAllowedTable(table);
     const { data, error } = await supabase.from(table).select("*");
     if (error) throw error;
     return data || [];

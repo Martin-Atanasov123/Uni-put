@@ -1,7 +1,7 @@
 // Административен панел (CRUD) за управление на данни по конфигурация.
 // Включва: динамични формуляри, таблица със селекция/филтър/пагинация,
 // bulk действия, експорт в CSV и резервно копие в JSON, както и локален одит лог.
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { 
     Database, CheckCircle, AlertCircle, LayoutDashboard, Filter, Trash2, 
     Edit2, PlusCircle, Download, RefreshCw, Search, ChevronLeft, 
@@ -24,6 +24,7 @@ const AdminDashboard = () => {
     const [loading, setLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
+    const currentPageRef = useRef(0);
     const [showOnboarding, setShowOnboarding] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -40,33 +41,47 @@ const AdminDashboard = () => {
         pages: 0
     });
 
-    // --- Audit Log Persistence ---
-    const loadAuditLog = () => {
+    // --- Audit Log Persistence (Database) ---
+    const loadAuditLog = async () => {
         try {
-            const raw = window.localStorage.getItem("admin_audit_log_v1");
-            setAuditLog(raw ? JSON.parse(raw) : []);
+            const { data, error } = await supabase
+                .from("admin_audit_log")
+                .select("*")
+                .order("created_at", { ascending: false })
+                .limit(50);
+            if (error) throw error;
+            setAuditLog((data || []).map(entry => ({
+                id: entry.id,
+                time: entry.created_at,
+                action: entry.action,
+                table: entry.table_name,
+                payload: entry.payload
+            })));
         } catch {
             setAuditLog([]);
         }
     };
 
-    const persistAuditLog = (entries) => {
+    const appendAuditEntry = async (action, table, payload) => {
         try {
-            window.localStorage.setItem("admin_audit_log_v1", JSON.stringify(entries));
-        } catch { /* Ignore */ }
-    };
-
-    const appendAuditEntry = (action, table, payload) => {
-        const entry = {
-            id: Date.now(),
-            time: new Date().toISOString(),
-            action,
-            table,
-            payload
-        };
-        const next = [entry, ...auditLog].slice(0, 50);
-        setAuditLog(next);
-        persistAuditLog(next);
+            const { data: { user } } = await supabase.auth.getUser();
+            const { data, error } = await supabase
+                .from("admin_audit_log")
+                .insert([{ admin_id: user.id, action, table_name: table, payload }])
+                .select()
+                .single();
+            if (error) throw error;
+            const entry = {
+                id: data.id,
+                time: data.created_at,
+                action: data.action,
+                table: data.table_name,
+                payload: data.payload
+            };
+            setAuditLog(prev => [entry, ...prev].slice(0, 50));
+        } catch {
+            // audit write failed silently
+        }
     };
 
     // --- Data Fetching ---
@@ -74,7 +89,7 @@ const AdminDashboard = () => {
         if (!activeTable) return;
         setLoading(true);
         try {
-            const targetPage = opts.page ?? currentPage;
+            const targetPage = opts.page ?? currentPageRef.current;
             const result = await adminService.list(activeTable.table, {
                 page: targetPage,
                 filters: { query },
@@ -83,6 +98,7 @@ const AdminDashboard = () => {
             setDataPage(result);
             setSelection([]);
             if (opts.page !== undefined) {
+                currentPageRef.current = opts.page;
                 setCurrentPage(opts.page);
             }
         } catch (err) {
@@ -90,7 +106,7 @@ const AdminDashboard = () => {
         } finally {
             setLoading(false);
         }
-    }, [activeTable, currentPage, query]);
+    }, [activeTable, query]);
 
     useEffect(() => {
         loadAuditLog();
@@ -98,6 +114,7 @@ const AdminDashboard = () => {
 
     useEffect(() => {
         // Reset to page 0 when table or query changes
+        currentPageRef.current = 0;
         setCurrentPage(0);
         loadData({ page: 0 });
     }, [activeTableId, query, loadData]);
@@ -226,11 +243,11 @@ const AdminDashboard = () => {
                     editingRow[activeTable.primaryKey],
                     payload
                 );
-                appendAuditEntry("update", activeTable.table, { id: editingRow[activeTable.primaryKey], payload });
+                appendAuditEntry("UPDATE", activeTable.table, { id: editingRow[activeTable.primaryKey], payload });
                 setStatus({ type: "success", msg: "Записът е обновен успешно." });
             } else {
                 const created = await adminService.create(activeTable.table, payload);
-                appendAuditEntry("create", activeTable.table, created);
+                appendAuditEntry("CREATE", activeTable.table, created);
                 setStatus({ type: "success", msg: "Нов запис е създаден успешно." });
             }
             setEditingRow(null);
@@ -264,7 +281,7 @@ const AdminDashboard = () => {
         setStatus({ type: "loading", msg: "Изтриване..." });
         try {
             await adminService.removeMany(activeTable.table, activeTable.primaryKey, selection);
-            appendAuditEntry("delete_many", activeTable.table, { ids: selection });
+            appendAuditEntry("DELETE", activeTable.table, { ids: selection });
             setSelection([]);
             setStatus({ type: "success", msg: "Избраните записи са изтрити." });
             await loadData({ useCache: false });
@@ -410,8 +427,8 @@ const AdminDashboard = () => {
                                 <div key={entry.id} className="p-2.5 rounded-lg bg-base-100 border border-base-content/5 text-[11px] leading-tight">
                                     <div className="flex items-center gap-1.5 mb-1">
                                         <span className={`w-1.5 h-1.5 rounded-full ${
-                                            entry.action.includes('create') ? 'bg-success' : 
-                                            entry.action.includes('update') ? 'bg-info' : 'bg-error'
+                                            entry.action === 'CREATE' ? 'bg-success' :
+                                            entry.action === 'UPDATE' ? 'bg-info' : 'bg-error'
                                         }`} />
                                         <span className="font-bold uppercase opacity-80">{entry.action}</span>
                                     </div>
@@ -782,24 +799,13 @@ const AdminDashboard = () => {
             </main>
 
             {/* --- Global Styles --- */}
-            <style dangerouslySetInnerHTML={{ __html: `
-                .custom-scrollbar::-webkit-scrollbar {
-                    width: 4px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-track {
-                    background: transparent;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background: rgba(var(--bc), 0.1);
-                    border-radius: 10px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                    background: rgba(var(--bc), 0.2);
-                }
-                @media (max-width: 1024px) {
-                    main { margin-left: 0 !important; }
-                }
-            `}} />
+            <style>{`
+                .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(var(--bc), 0.1); border-radius: 10px; }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(var(--bc), 0.2); }
+                @media (max-width: 1024px) { main { margin-left: 0 !important; } }
+            `}</style>
         </div>
     );
 };
