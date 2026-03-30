@@ -3,11 +3,12 @@
 //   (напр. калкулатор, профил). Предотвратява грешни пренасочвания и мигане.
 // Вход: { children } - JSX за рендериране при налична сесия
 // Изход: children ако има активен потребител; пренасочване към /login ако няма
-import { Navigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const ProtectedRoute = ({ children }) => {
     const { user, loading } = useAuth();
+    const location = useLocation();
 
     // Докато не знаем дали има сесия, избягваме мигане на екрана и грешни пренасочвания.
     if (loading)
@@ -18,8 +19,7 @@ const ProtectedRoute = ({ children }) => {
         );
 
     if (!user) {
-        console.log("Access Denied - Redirecting to Login");
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
     return children;

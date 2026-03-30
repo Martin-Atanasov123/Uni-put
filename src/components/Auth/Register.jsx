@@ -21,27 +21,36 @@ const SignUp = () => {
         setLoading(true);
         setError(null);
 
-        // Регистрация със Supabase Auth + Метаданни за username
-        const { data, error: signUpError } = await supabase.auth.signUp({
+        // Валидация на паролата
+        if (password.length < 8) {
+            setError("Паролата трябва да е поне 8 символа!");
+            setLoading(false);
+            return;
+        }
+        if (!/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+            setError("Паролата трябва да съдържа поне една главна буква и една цифра!");
+            setLoading(false);
+            return;
+        }
+
+        const { error: signUpError } = await supabase.auth.signUp({
             email,
             password,
             options: {
                 data: {
-                    username: username, // Записваме потребителското име тук
+                    username: username,
                 }
             }
         });
 
         if (signUpError) {
-            // Проверка дали имейлът вече съществува
             if (signUpError.message.includes("already registered")) {
                 setError("Този имейл вече е зает. Пробвай да влезеш.");
             } else {
-                setError(signUpError.message);
+                setError("Възникна грешка при регистрацията. Опитайте отново.");
             }
             setLoading(false);
         } else {
-            console.log("Успех!", data);
             navigate("/");
         }
     };

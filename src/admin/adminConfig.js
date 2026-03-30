@@ -1,7 +1,7 @@
 export const ADMIN_TABLES = [
   {
-    id: "universities_duplicate",
-    table: "universities_duplicate",
+    id: "universities",
+    table: "universities",
     label: "Университети и специалности",
     primaryKey: "id",
     fields: [
@@ -10,10 +10,10 @@ export const ADMIN_TABLES = [
       { id: "specialty", label: "Специалност", type: "text", required: true },
       { id: "city", label: "Град", type: "text", required: true },
       { id: "education_level", label: "Степен на образование", type: "select", options: ["бакалавър", "магистър"], required: true },
-      { id: "riasec_code", label: "RIASEC код (напр. IRA)", type: "text", required: true },
-      { id: "min_ball_2024", label: "Мин. бал 2024", type: "number", step: "0.01" },
-      { id: "formula_description", label: "Формула", type: "text" },
-      { id: "coefficients", label: "Коефициенти (JSON)", type: "json" }
+      { id: "max_ball", label: "Макс. бал", type: "number", step: "0.01" },
+      { id: "formula_description", label: "Формула (описание)", type: "text" },
+      { id: "coefficients", label: "Коефициенти (JSON)", type: "json" },
+      { id: "specialty_id", label: "Specialty ID (UUID)", type: "text" }
     ],
     defaultSort: { field: "university_name", direction: "asc" }
   },

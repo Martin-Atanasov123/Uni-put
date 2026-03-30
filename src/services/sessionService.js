@@ -19,8 +19,8 @@ const clearClientState = () => {
 };
 
 const logout = async () => {
-    clearClientState();
     await supabase.auth.signOut();
+    clearClientState();
 };
 
 export const sessionService = {

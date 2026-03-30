@@ -5,14 +5,18 @@ import { MemoryRouter } from "react-router-dom";
 import CalculatorPage from "./Calculator";
 
 // Mock Supabase
+const mockCoefs = [
+  { alternatives: [{ key: "dzi_bel", coef: 3 }] },
+  { alternatives: [{ key: "diploma", coef: 1 }] }
+];
 const mockDataByFaculty = {
   "Факултет A": [
-    { id: 1, university_name: "Университет 1", city: "София", specialty: "Спец A1", faculty: "Факултет A", min_ball_2024: 10, coefficients: { dzi_bel: 3, geo: 1 } },
-    { id: 2, university_name: "Университет 1", city: "София", specialty: "Спец A2", faculty: "Факултет A", min_ball_2024: 12, coefficients: { dzi_bel: 3, geo: 1 } }
+    { id: 1, university_name: "Университет 1", city: "София", specialty: "Спец A1", faculty: "Факултет A", max_ball: 10, formula_description: "ДЗИ(БЕЛ)×3 + Диплома×1", coefficients: mockCoefs },
+    { id: 2, university_name: "Университет 1", city: "София", specialty: "Спец A2", faculty: "Факултет A", max_ball: 12, formula_description: "ДЗИ(БЕЛ)×3 + Диплома×1", coefficients: mockCoefs }
   ],
   "Факултет B": [
-    { id: 3, university_name: "Университет 2", city: "Пловдив", specialty: "Спец B1", faculty: "Факултет B", min_ball_2024: 13, coefficients: { dzi_bel: 3, geo: 1 } },
-    { id: 4, university_name: "Университет 2", city: "Пловдив", specialty: "Спец B2", faculty: "Факултет B", min_ball_2024: 11, coefficients: { dzi_bel: 3, geo: 1 } }
+    { id: 3, university_name: "Университет 2", city: "Пловдив", specialty: "Спец B1", faculty: "Факултет B", max_ball: 13, formula_description: "ДЗИ(БЕЛ)×3 + Диплома×1", coefficients: mockCoefs },
+    { id: 4, university_name: "Университет 2", city: "Пловдив", specialty: "Спец B2", faculty: "Факултет B", max_ball: 11, formula_description: "ДЗИ(БЕЛ)×3 + Диплома×1", coefficients: mockCoefs }
   ]
 };
 

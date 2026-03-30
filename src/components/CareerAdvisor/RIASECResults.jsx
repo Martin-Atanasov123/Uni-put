@@ -1,24 +1,27 @@
 import React, { useState } from 'react';
-import { 
-    Target, 
-    GraduationCap, 
-    Briefcase, 
-    ChevronRight, 
-    RefreshCw, 
+import { useNavigate } from 'react-router-dom';
+import {
+    Target,
+    GraduationCap,
+    Briefcase,
+    ChevronRight,
+    RefreshCw,
     Award,
     TrendingUp,
     MapPin,
     Building2,
     DollarSign,
-    BookOpen
+    BookOpen,
+    Calculator
 } from 'lucide-react';
 
 const RIASECResults = ({ results, onRestart }) => {
+    const navigate = useNavigate();
     const [viewMode, setViewMode] = useState('all'); // all, specialties, careers
     const [showAllSpecialties, setShowAllSpecialties] = useState(false);
     const [showAllCareers, setShowAllCareers] = useState(false);
     
-    const { scores, riasecCode, specialties, careers } = results;
+    const { scores, riasecCode, specialties, careers, error } = results;
 
     // Filtered data based on showAll state
     const visibleSpecialties = showAllSpecialties ? specialties : specialties.slice(0, 5);
@@ -42,9 +45,9 @@ const RIASECResults = ({ results, onRestart }) => {
                 </div>
                 <h2 className="text-4xl font-black italic">Твоят RIASEC Профил: <span className="text-primary">{riasecCode}</span></h2>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
                     {riasecCode.split('').map((char, index) => (
-                        <div key={index} className="bg-base-200/50 p-6 rounded-[2rem] border border-base-300 hover:shadow-lg transition-all">
+                        <div key={index} className="bg-base-200/50 p-4 md:p-6 rounded-2xl md:rounded-[2rem] border border-base-300 hover:shadow-lg transition-all">
                             <div className="text-2xl font-black text-primary mb-2">{char}</div>
                             <h4 className="font-bold text-lg mb-1">{riasecLabels[char].name}</h4>
                             <p className="text-xs opacity-60 leading-relaxed">{riasecLabels[char].desc}</p>
@@ -68,6 +71,12 @@ const RIASECResults = ({ results, onRestart }) => {
                     ))}
                 </div>
             </div>
+
+            {error && (
+                <div className="bg-error/10 text-error p-4 rounded-2xl text-center font-bold text-sm">
+                    Възникна грешка при зареждане на препоръките. Опитайте отново.
+                </div>
+            )}
 
             {/* 2. View Toggle */}
             <div className="flex justify-center">
@@ -102,28 +111,54 @@ const RIASECResults = ({ results, onRestart }) => {
                     </h3>
                     <div className="grid grid-cols-1 gap-4">
                         {visibleSpecialties.length > 0 ? visibleSpecialties.map((spec, index) => (
-                            <div key={spec.id} className="bg-base-100 p-6 rounded-[2rem] border border-base-200 shadow-sm flex flex-col md:flex-row gap-6 items-center hover:shadow-md transition-all group">
-                                <div className="w-12 h-12 rounded-2xl bg-base-200 flex items-center justify-center font-black text-xl text-primary shrink-0">
-                                    #{index + 1}
-                                </div>
-                                <div className="flex-1 text-center md:text-left">
-                                    <h4 className="text-xl font-black mb-2">{spec.university_name} — {spec.specialty}</h4>
-                                    <div className="flex flex-wrap justify-center md:justify-start gap-3">
-                                        <span className="badge badge-primary badge-sm font-bold uppercase py-3">{spec.category || 'Университет'}</span>
-                                        <span className="badge badge-ghost badge-sm font-bold py-3">{spec.riasec_code}</span>
-                                        <span className="text-xs font-bold opacity-50 flex items-center gap-1">
-                                            <MapPin size={14} /> {spec.city}
-                                        </span>
+                            <div key={spec.id} className="bg-base-100 p-4 md:p-6 rounded-2xl md:rounded-[2rem] border border-base-200 shadow-sm flex flex-col gap-4 hover:shadow-md transition-all group">
+                                <div className="flex flex-col md:flex-row gap-6 items-center">
+                                    <div className="w-12 h-12 rounded-2xl bg-base-200 flex items-center justify-center font-black text-xl text-primary shrink-0">
+                                        #{index + 1}
+                                    </div>
+                                    <div className="flex-1 text-center md:text-left">
+                                        <h4 className="text-xl font-black mb-2">{spec.name}</h4>
+                                        <div className="flex flex-wrap justify-center md:justify-start gap-3">
+                                            <span className="badge badge-primary badge-sm font-bold uppercase py-3">{spec.category || 'Специалност'}</span>
+                                            <span className="badge badge-ghost badge-sm font-bold py-3">{spec.riasec_code}</span>
+                                        </div>
+                                    </div>
+                                    <div className="text-center shrink-0">
+                                        <div className="text-3xl font-black text-primary">{spec.compatibility}%</div>
+                                        <div className="text-[10px] font-black uppercase tracking-widest opacity-40">съвпадение</div>
                                     </div>
                                 </div>
-                                <div className="text-center shrink-0">
-                                    <div className="text-3xl font-black text-primary">{spec.compatibility}%</div>
-                                    <div className="text-[10px] font-black uppercase tracking-widest opacity-40">съвпадение</div>
+                                {spec.universities && spec.universities.length > 0 && (
+                                    <div className="border-t border-base-200 pt-3 pl-0 md:pl-18">
+                                        <p className="text-xs font-black uppercase tracking-widest opacity-40 mb-2">Университети ({spec.universities_count})</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {spec.universities.slice(0, 3).map((uni) => (
+                                                <span key={uni.id} className="text-xs font-bold opacity-70 flex items-center gap-1 bg-base-200/50 px-3 py-1.5 rounded-xl">
+                                                    <Building2 size={12} /> {uni.university_name}
+                                                    {uni.city && <><MapPin size={10} className="ml-1" /> {uni.city}</>}
+                                                </span>
+                                            ))}
+                                            {spec.universities.length > 3 && (
+                                                <span className="text-xs font-bold opacity-50 px-3 py-1.5">+{spec.universities.length - 3} още</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                                <div className="flex justify-end pt-1">
+                                    <button
+                                        onClick={() => {
+                                            const params = new URLSearchParams({ specialty: spec.name });
+                                            navigate(`/calculator?${params.toString()}`);
+                                        }}
+                                        className="btn btn-primary btn-sm rounded-xl font-bold gap-2"
+                                    >
+                                        <Calculator size={14} /> Изчисли бал
+                                    </button>
                                 </div>
                             </div>
                         )) : (
                             <div className="p-12 text-center bg-base-200/30 rounded-[2.5rem] border border-dashed border-base-300 opacity-50">
-                                <p className="font-bold">Няма намерени специалности с над 60% съвпадение.</p>
+                                <p className="font-bold">Няма намерени специалности с над 50% съвпадение.</p>
                             </div>
                         )}
                     </div>
@@ -152,7 +187,7 @@ const RIASECResults = ({ results, onRestart }) => {
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {visibleCareers.length > 0 ? visibleCareers.map((career, index) => (
-                            <div key={career.id} className="bg-base-100 p-8 rounded-[2.5rem] border border-base-200 shadow-sm flex flex-col justify-between hover:shadow-xl transition-all group relative overflow-hidden">
+                            <div key={career.id} className="bg-base-100 p-5 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border border-base-200 shadow-sm flex flex-col justify-between hover:shadow-xl transition-all group relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform"></div>
                                 
                                 <div className="space-y-4 relative z-10">

@@ -25,7 +25,7 @@ const COEFFICIENT_KEYS = [
   "dzi_portugалски", "dzi_portugalski", "dzi_predpriemachestvo", "dzi_profesiq", "dzi_ris",
   "dzi_rumunski", "dzi_turski", "dzi_yaponski", "ese_obsht_tema", "etika_pravo", "exam_bel",
   "exam_bio", "exam_chu", "exam_fiz", "exam_geo", "exam_him", "exam_informatika", "exam_ist",
-  "exam_mat", "exam_muz", "exam_ris", "fil", "fiz", "geo", "himija", "him", "informatika",
+  "exam_mat", "exam_muz", "exam_ris", "fil", "fiz", "fiz_vazpitanie", "geo", "himija", "him", "informatika",
   "ist", "it", "izpit_drugo_vu", "konkursen_izpit_1", "konkursen_izpit_2", "logika_psihologiya",
   "mat", "muz", "muzika", "obsht_uspeh", "obshtoobrazovatelen_test", "obshtestvoznanie",
   "olympiad_laureate_it", "olympiad_laureate_mat_inf", "olympiad_winner_it",
@@ -154,6 +154,7 @@ const FIELD_LABELS = {
   exam_ris: "Изпит по рисуване",
   fil: "Диплома: Философия",
   fiz: "Диплома: Физика",
+  fiz_vazpitanie: "Диплома: Физическо възпитание",
   geo: "Диплома: География",
   himija: "Диплома: Химия",
   him: "Диплома: Химия",
@@ -300,7 +301,7 @@ const SLOT_GROUPS = {
   
   // Diploma and general
   diploma_group: ["diploma", "obsht_uspeh", "diploma_semestrial", "diploma_state_exams", "bel_diploma",
-    "mat_diploma", "matematika", "zrelosten_bel"],
+    "mat_diploma", "matematika", "zrelosten_bel", "fiz_vazpitanie"],
   
   // Business
   business_group: ["dzi1_predpriemachestvo", "dzi_predpriemachestvo", "predpriemachestvo"],
