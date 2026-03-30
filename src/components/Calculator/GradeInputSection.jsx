@@ -10,7 +10,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpDown, CheckCircle2 } from "lucide-react";
 import { FIELD_LABELS, SLOT_GROUPS } from "../../lib/coefficients_config";
 import { supabase } from "../../lib/supabase";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 
 const STORAGE_PREFIX = "uniput_grades";
 
