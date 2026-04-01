@@ -283,6 +283,9 @@ const CalculatorPage = () => {
                         <Calculator size={40} />
                     </div>
                     <h1 className="text-4xl font-black tracking-tight uppercase italic underline decoration-primary">Калкулатор </h1>
+                    <h2 className="text-xl font-semibold text- bg-base-200 p-4 rounded-xl border-l-4 border-primary max-w-2xl ">
+                        Внимание , все още се работи по добавянето на всички  университети и специалности. Ако не намирате своята, моля изчакайте!
+                    </h2>
                 </div>
 
                 {/* --- ИЗБИРАТЕЛИ --- */}
