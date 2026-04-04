@@ -201,7 +201,7 @@ export default function Home() {
                 <div className="max-w-6xl mx-auto text-center space-y-8 relative z-10">
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary border border-primary/60 text-xs font-bold text-primary-content uppercase tracking-wider shadow-sm hover:scale-105 transition-transform cursor-default">
                         <Sparkles size={14} />
-                        Изцяло обновена платформа 2025
+                        Изцяло обновена платформа 2026
                     </div>
                     
                     <h1 className="text-5xl md:text-8xl font-black text-base-content leading-tight tracking-tight">
