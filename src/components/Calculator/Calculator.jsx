@@ -22,6 +22,7 @@ import {
     ChevronDown
 } from "lucide-react";
 import GradeInputSection from "./GradeInputSection";
+import ReportButton from "./ReportButton";
 import { FIELD_LABELS, SLOT_GROUPS } from "../../lib/coefficients_config";
 
 const CalculatorPage = () => {
@@ -491,8 +492,11 @@ const CalculatorPage = () => {
                                                 </div>
                                             )}
                                         </div>
-                                        {!hasMissing && hasMaxBall && isAboveAverage && <div className="badge badge-success py-3 px-5 font-black italic text-white rounded-xl shadow-lg animate-bounce"><CheckCircle2 size={12} className="mr-1"/>НАД СРЕДНОТО</div>}
-                                        {!hasMissing && hasMaxBall && !isAboveAverage && hasStarted && <div className="badge badge-error badge-outline py-3 px-5 font-black italic rounded-xl border-2">ПОД СРЕДНОТО</div>}
+                                        <div className="flex items-center gap-2">
+                                            <ReportButton universityName={item.university_name} specialty={item.specialty} />
+                                            {!hasMissing && hasMaxBall && isAboveAverage && <div className="badge badge-success py-3 px-5 font-black italic text-white rounded-xl shadow-lg animate-bounce"><CheckCircle2 size={12} className="mr-1"/>НАД СРЕДНОТО</div>}
+                                            {!hasMissing && hasMaxBall && !isAboveAverage && hasStarted && <div className="badge badge-error badge-outline py-3 px-5 font-black italic rounded-xl border-2">ПОД СРЕДНОТО</div>}
+                                        </div>
                                     </div>
                                 </div>
                             ))}

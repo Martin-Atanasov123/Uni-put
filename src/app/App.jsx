@@ -30,6 +30,7 @@ const FavoritesPage = lazy(() => import("../components/Favorites/Favorites"));
 const CalculatorPage = lazy(() => import("../components/Calculator/Calculator"));
 const Profile = lazy(() => import("../components/Auth/Profile"));
 const AdminDashboard = lazy(() => import("../components/admin/AdminDashboard"));
+const AdminReports = lazy(() => import("../components/admin/AdminReports"));
 const TermsOfService = lazy(() => import("../components/common/TermsOfService"));
 const PrivacyPolicy = lazy(() => import("../components/common/PrivacyPolicy"));
 
@@ -112,6 +113,16 @@ function App() {
                                 <AdminRoute>
                                     <GlobalErrorBoundary>
                                         <Suspense fallback={null}><AdminDashboard /></Suspense>
+                                    </GlobalErrorBoundary>
+                                </AdminRoute>
+                            }
+                        />
+                        <Route
+                            path="/admin/reports"
+                            element={
+                                <AdminRoute>
+                                    <GlobalErrorBoundary>
+                                        <Suspense fallback={null}><AdminReports /></Suspense>
                                     </GlobalErrorBoundary>
                                 </AdminRoute>
                             }

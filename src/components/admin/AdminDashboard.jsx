@@ -2,17 +2,20 @@
 // Включва: динамични формуляри, таблица със селекция/филтър/пагинация,
 // bulk действия, експорт в CSV и резервно копие в JSON, както и локален одит лог.
 import { useEffect, useMemo, useState, useCallback, useRef } from "react";
-import { 
-    Database, CheckCircle, AlertCircle, LayoutDashboard, Filter, Trash2, 
-    Edit2, PlusCircle, Download, RefreshCw, Search, ChevronLeft, 
-    ChevronRight, Info, HelpCircle, X, Check, Save, History, 
-    FileJson, FileSpreadsheet, Settings, ExternalLink
+import { useNavigate } from "react-router-dom";
+import {
+    Database, CheckCircle, AlertCircle, LayoutDashboard, Filter, Trash2,
+    Edit2, PlusCircle, Download, RefreshCw, Search, ChevronLeft,
+    ChevronRight, Info, HelpCircle, X, Check, Save, History,
+    FileJson, FileSpreadsheet, Settings, ExternalLink, Flag
 } from "lucide-react";
 import { ADMIN_TABLES } from "../../admin/adminConfig";
 import { adminService } from "../../services/adminService";
 import { supabase } from "../../lib/supabase";
 
 const AdminDashboard = () => {
+    const navigate = useNavigate();
+
     // --- State Management ---
     const [activeTableId, setActiveTableId] = useState(ADMIN_TABLES[0].id);
     const [query, setQuery] = useState("");
@@ -414,6 +417,18 @@ const AdminDashboard = () => {
                                 {activeTableId === table.id && <ChevronRight size={14} className="ml-auto opacity-50" />}
                             </button>
                         ))}
+
+                        <p className="text-[10px] font-bold opacity-40 uppercase tracking-widest px-3 mb-2 mt-4">Обратна връзка</p>
+                        <button
+                            onClick={() => {
+                                setIsSidebarOpen(false);
+                                navigate("/admin/reports");
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 hover:bg-base-300 text-base-content/70 hover:text-base-content"
+                        >
+                            <Flag size={18} className="opacity-50" />
+                            Докладвания
+                        </button>
                     </nav>
 
                     {/* Sidebar Footer - Audit Log Mini */}
