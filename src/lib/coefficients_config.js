@@ -44,7 +44,12 @@ const COEFFICIENT_KEYS = [
   "zdipp_programno_osiguryavane", "zdippk_bibliotekoznanie", "zdippk_delovodstvo_arhiv",
   "zdippk_fotografiya", "zdippk_ikonomichesko_informacionno_osigurqvane",
   "zdippk_poligrafiya", "zdippk_posrednik_trudova_borsa", "zdippk_satrudnik_socialni_deinosti",
-  "zdippk_tekstoobrabotka", "zdippk_turizam", "zdippk_veterinaren_tehnik", "zrelosten_bel"
+  "zdippk_tekstoobrabotka", "zdippk_turizam", "zdippk_veterinaren_tehnik", "zrelosten_bel",
+  "exam_nemski", "exam_frenski", "exam_ispanski", "exam_italianski", "exam_ruski",
+  "dzi1_nemski", "dzi1_frenski", "dzi1_ispanski", "dzi1_italianski", "dzi1_ruski",
+  "dzi2_nemski", "dzi2_frenski", "dzi2_ispanski", "dzi2_italianski", "dzi2_ruski",
+  "dzi_nemski", "dzi_frenski", "dzi_ispanski", "dzi_italianski", "dzi_ruski",
+  "dzi_iztochno_hrist", "zdippk_muzika", "zdippk_iztochno_hrist"
 ];
 
 const FIELD_LABELS = {
@@ -233,7 +238,30 @@ const FIELD_LABELS = {
   zdippk_tekstoobrabotka: "ЗДИППК Текстообработка",
   zdippk_turizam: "ЗДИППК Туризъм",
   zdippk_veterinaren_tehnik: "ЗДИППК Ветеринарен техник",
-  zrelosten_bel: "Зрелостен изпит по БЕЛ"
+  zrelosten_bel: "Зрелостен изпит по БЕЛ",
+  exam_nemski: "Изпит по немски език",
+  exam_frenski: "Изпит по френски език",
+  exam_ispanski: "Изпит по испански език",
+  exam_italianski: "Изпит по италиански език",
+  exam_ruski: "Изпит по руски език",
+  dzi1_nemski: "ДЗИ¹ Немски език",
+  dzi1_frenski: "ДЗИ¹ Френски език",
+  dzi1_ispanski: "ДЗИ¹ Испански език",
+  dzi1_italianski: "ДЗИ¹ Италиански език",
+  dzi1_ruski: "ДЗИ¹ Руски език",
+  dzi2_nemski: "ДЗИ² Немски език",
+  dzi2_frenski: "ДЗИ² Френски език",
+  dzi2_ispanski: "ДЗИ² Испански език",
+  dzi2_italianski: "ДЗИ² Италиански език",
+  dzi2_ruski: "ДЗИ² Руски език",
+  dzi_nemski: "ДЗИ Немски език",
+  dzi_frenski: "ДЗИ Френски език",
+  dzi_ispanski: "ДЗИ Испански език",
+  dzi_italianski: "ДЗИ Италиански език",
+  dzi_ruski: "ДЗИ Руски език",
+  dzi_iztochno_hrist: "ДЗИ Източноправославно християнство",
+  zdippk_muzika: "ЗДИППК Музика",
+  zdippk_iztochno_hrist: "ЗДИППК Източноправославно християнство"
 };
 
 // Логически групи от коефициенти – помагат при избор на подходящи полета за формули/интерфейс.
@@ -266,16 +294,32 @@ const SLOT_GROUPS = {
     "dzi_chu_ezik_cert_nemski_b2_plus", "dzi_chu_ezik_dele_b1_combo"],
   
   // English
-  english_group: ["dzi1_angliiski", "dzi2_angliiski", "dzi_angliiski", 
+  english_group: ["dzi1_angliiski", "dzi2_angliiski", "dzi_angliiski",
     "dzi_angliyski_b1", "dzi_angliyski_b2", "angliiski_ezik",
     "exam_angliiski", "exam_angliyski"],
+
+  // German
+  german_group: ["exam_nemski", "dzi1_nemski", "dzi2_nemski", "dzi_nemski"],
+
+  // French
+  french_group: ["exam_frenski", "dzi1_frenski", "dzi2_frenski", "dzi_frenski"],
+
+  // Spanish
+  spanish_group: ["exam_ispanski", "dzi1_ispanski", "dzi2_ispanski", "dzi_ispanski"],
+
+  // Italian
+  italian_group: ["exam_italianski", "dzi1_italianski", "dzi2_italianski", "dzi_italianski"],
+
+  // Russian
+  russian_group: ["exam_ruski", "dzi1_ruski", "dzi2_ruski", "dzi_ruski"],
   
   // Asian languages
   asian_languages_group: ["dzi_yaponski", "dzi_kitayski", "dzi_kitayski_b2", "dzi_koreiski"],
   
   // Other languages
-  other_languages_group: ["dzi_arabski", "dzi_latin", "dzi_rumunski", 
-    "dzi_portugalski", "dzi_portugалски", "dzi_turski"],
+  other_languages_group: ["dzi_arabski", "dzi_latin", "dzi_rumunski",
+    "dzi_portugalski", "dzi_portugалски", "dzi_turski",
+    "dzi_iztochno_hrist"],
   
   // IT and Informatics
   it_informatics_group: ["exam_informatika", "dzi1_informatika", "dzi2_informatika", 
@@ -313,7 +357,8 @@ const SLOT_GROUPS = {
     "zdipp_programno_osiguryavane", "zdippk_bibliotekoznanie", "zdippk_delovodstvo_arhiv",
     "zdippk_fotografiya", "zdippk_ikonomichesko_informacionno_osigurqvane",
     "zdippk_poligrafiya", "zdippk_posrednik_trudova_borsa", "zdippk_satrudnik_socialni_deinosti",
-    "zdippk_tekstoobrabotka", "zdippk_turizam", "zdippk_veterinaren_tehnik"],
+    "zdippk_tekstoobrabotka", "zdippk_turizam", "zdippk_veterinaren_tehnik",
+    "zdippk_muzika", "zdippk_iztochno_hrist"],
   
   // Social sciences
   social_subjects_group: ["etika_pravo", "logika_psihologiya", "obshtestvoznanie",
