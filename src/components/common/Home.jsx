@@ -123,18 +123,21 @@ const ReviewsSlider = () => {
                 </div>
 
                 <div className="relative w-full overflow-hidden">
-                    <div 
+                    <div
                         data-testid="reviews-slider"
-                        className={`flex gap-6 ${isTransitioning ? "transition-transform duration-700 ease-in-out" : ""}`}
-                        style={{ 
-                            transform: `translateX(-${currentIndex * (itemWidth + 0.5)}%)`,
+                        className={`flex ${isTransitioning ? "transition-transform duration-700 ease-in-out" : ""}`}
+                        style={{
+                            transform: `translateX(-${currentIndex * itemWidth}%)`,
                         }}
                         onTransitionEnd={handleTransitionEnd}
                     >
                         {extendedReviews.map((review, i) => (
-                            <div 
-                                key={i} 
-                                className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] shrink-0 bg-base-100 p-8 rounded-[2rem] border border-base-300 shadow-sm flex flex-col justify-between hover:shadow-xl transition-all duration-300 group"
+                            <div
+                                key={i}
+                                style={{ width: `${itemWidth}%` }}
+                                className="shrink-0 px-3"
+                            >
+                            <div className="h-full bg-base-100 p-8 rounded-[2rem] border border-base-300 shadow-sm flex flex-col justify-between hover:shadow-xl transition-all duration-300 group"
                             >
                                 <div className="space-y-4">
                                     <div className="flex gap-1 text-warning group-hover:scale-105 transition-transform origin-left">
@@ -160,6 +163,7 @@ const ReviewsSlider = () => {
                                         <p className="text-[10px] opacity-50 font-black uppercase tracking-widest">Потребител на УниПът</p>
                                     </div>
                                 </div>
+                            </div>
                             </div>
                         ))}
                     </div>
