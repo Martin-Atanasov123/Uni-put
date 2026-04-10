@@ -104,8 +104,8 @@ const Header = () => {
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <label className="swap swap-rotate btn btn-ghost btn-circle btn-sm opacity-70 hover:opacity-100">
-                            <input type="checkbox" className="theme-controller" value="light" aria-label="Смени тема" />
+                        <label className="swap swap-rotate btn btn-ghost btn-circle btn-sm opacity-70 hover:opacity-100" title="Смени тема">
+                            <input type="checkbox" className="theme-controller" value="nord" aria-label="Смени тема" />
                             <Sun className="swap-on w-5 h-5" />
                             <Moon className="swap-off w-5 h-5" />
                         </label>

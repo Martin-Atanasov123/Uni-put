@@ -13,6 +13,6 @@ export default {
         daisyui, // Ползваме импортираната променлива тук
     ],
     daisyui: {
-        themes: ["light", "dark", "cupcake", "emerald", "retro"],
+        themes: ["dark", "nord"],
     },
 }
