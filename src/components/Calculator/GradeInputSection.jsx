@@ -212,6 +212,21 @@ const GradeInputSection = ({ coefficients = {}, faculty, specialty, onGradesChan
                     const value = valuesByKey[activeAlt.key] ?? "";
                     const invalid = !isValidGrade(value);
 
+                    // Намери най-добрата алтернатива по grade × coef сред всички въведени
+                    let bestAlt = null;
+                    let bestProduct = -Infinity;
+                    slot.alternatives.forEach((alt) => {
+                        const v = parseFloat(valuesByKey[alt.key]);
+                        if (!Number.isNaN(v) && v >= 2 && v <= 6) {
+                            const coef = Number(coefficients[alt.key]) || 1;
+                            const product = v * coef;
+                            if (product > bestProduct) {
+                                bestProduct = product;
+                                bestAlt = { ...alt, grade: v };
+                            }
+                        }
+                    });
+
                     return (
                         <div
                             key={slot.id}
@@ -221,9 +236,6 @@ const GradeInputSection = ({ coefficients = {}, faculty, specialty, onGradesChan
                                 <div>
                                     <div className="text-xs font-bold uppercase opacity-60">
                                         {activeAlt?.label || slot.label}
-                                    </div>
-                                    <div className="text-[11px] opacity-60">
-                                        Активна алтернатива: {activeAlt?.label}
                                     </div>
                                 </div>
                                 <div className="dropdown dropdown-end">
@@ -277,12 +289,9 @@ const GradeInputSection = ({ coefficients = {}, faculty, specialty, onGradesChan
                                 )}
                                 <div className="text-[11px] opacity-60 flex justify-between">
                                     <span>
-                                        Най-добра оценка:{" "}
-                                        {!Number.isNaN(parseFloat(value)) &&
-                                        parseFloat(value) >= 2 &&
-                                        parseFloat(value) <= 6
-                                            ? Number(value).toFixed(2)
-                                            : "липсва вход"}
+                                        {bestAlt
+                                            ? <>Най-добра: <strong>{bestAlt.grade.toFixed(2)}</strong> <span className="opacity-70">({bestAlt.label})</span></>
+                                            : "Въведи оценка"}
                                     </span>
                                 </div>
                             </div>

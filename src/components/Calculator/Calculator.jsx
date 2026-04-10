@@ -445,15 +445,16 @@ const CalculatorPage = () => {
                         const { score, missingSlots } = calculateScore(item.coefficients, grades);
                         const formattedScore = Number.isFinite(score) ? score.toFixed(2) : "0.00";
                         const hasMaxBall = averageMaxBall !== null;
-                        const isAboveAverage = hasMaxBall && score >= averageMaxBall;
-                        const diff = hasMaxBall ? Math.abs(averageMaxBall - score).toFixed(2) : null;
+                        const midPoint = hasMaxBall ? averageMaxBall / 2 : null;
+                        const isAboveAverage = hasMaxBall && score >= midPoint;
+                        const diff = hasMaxBall ? Math.abs(midPoint - score).toFixed(2) : null;
                         const hasStarted = score > 0 || hasAnyValidGrade;
                         const hasMissing = missingSlots.length > 0;
-                        return { item, score, formattedScore, diff, isAboveAverage, hasMaxBall, hasStarted, hasMissing, missingSlots };
+                        return { item, score, formattedScore, diff, isAboveAverage, hasMaxBall, hasStarted, hasMissing, missingSlots, midPoint, averageMaxBall };
                     });
                     return (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            {displayedResults.map(({ item, formattedScore, isAboveAverage, hasMaxBall, hasMissing, hasStarted, diff, missingSlots }) => (
+                            {displayedResults.map(({ item, formattedScore, isAboveAverage, hasMaxBall, hasMissing, hasStarted, diff, missingSlots, midPoint, averageMaxBall, score }) => (
                                 <div key={item.id} className="bg-base-100 p-10 rounded-[3rem] shadow-xl border border-base-200 group transition-all hover:shadow-2xl">
                                     <div className="space-y-6">
                                         <div className="flex justify-between items-start">
@@ -475,27 +476,49 @@ const CalculatorPage = () => {
                                         </div>
                                     </div>
 
-                                    <div className="mt-8 pt-6 border-t border-base-200 flex justify-between items-center">
-                                        <div className="flex flex-col">
-                                            {hasMaxBall && (
-                                                <span className="text-xs font-black opacity-40 italic font-mono uppercase">Макс. бал: {averageMaxBall.toFixed(2)}</span>
-                                            )}
-                                            {hasMissing && hasStarted && (
-                                                <div className="mt-1 text-[11px] text-error font-black uppercase">
-                                                    Липсват оценки за: {missingSlots.map(describeMissingTerm).join(", ")}
-                                                </div>
-                                            )}
-                                            {hasMaxBall && !hasMissing && !isAboveAverage && hasStarted && (
-                                                <div className="flex items-center gap-1.5 text-error mt-1 animate-pulse">
-                                                    <TrendingDown size={14} strokeWidth={3} />
-                                                    <span className="text-[11px] font-black uppercase">Под средното с {diff} т.</span>
-                                                </div>
-                                            )}
+                                    <div className="mt-8 pt-6 border-t border-base-200 space-y-3">
+                                        {/* Среден бал + статус */}
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex flex-col gap-1">
+                                                {hasMaxBall && (
+                                                    <span className="text-xs font-black opacity-40 italic font-mono uppercase">
+                                                        Среден бал: {midPoint.toFixed(2)}
+                                                    </span>
+                                                )}
+                                                {hasMissing && hasStarted && (
+                                                    <div className="text-[11px] text-error font-black uppercase">
+                                                        Липсват оценки за: {missingSlots.map(describeMissingTerm).join(", ")}
+                                                    </div>
+                                                )}
+                                                {hasMaxBall && !hasMissing && !isAboveAverage && hasStarted && (
+                                                    <div className="flex items-center gap-1.5 text-error animate-pulse">
+                                                        <TrendingDown size={14} strokeWidth={3} />
+                                                        <span className="text-[11px] font-black uppercase">Под средното с {diff} т.</span>
+                                                    </div>
+                                                )}
+                                                {hasMaxBall && !hasMissing && isAboveAverage && hasStarted && (
+                                                    <div className="flex items-center gap-1.5 text-success">
+                                                        <TrendingUp size={14} strokeWidth={3} />
+                                                        <span className="text-[11px] font-black uppercase">Над средното с {diff} т.</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div>
+                                                {!hasMissing && hasMaxBall && isAboveAverage && hasStarted && (
+                                                    <div className="badge badge-success py-3 px-4 font-black italic text-white rounded-xl shadow-md text-[11px]">
+                                                        <CheckCircle2 size={11} className="mr-1" />НАД СРЕДНОТО
+                                                    </div>
+                                                )}
+                                                {!hasMissing && hasMaxBall && !isAboveAverage && hasStarted && (
+                                                    <div className="badge badge-error badge-outline py-3 px-4 font-black italic rounded-xl border-2 text-[11px]">
+                                                        ПОД СРЕДНОТО
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-2">
+                                        {/* Докладвай — дискретно, вдясно */}
+                                        <div className="flex justify-end">
                                             <ReportButton universityName={item.university_name} specialty={item.specialty} />
-                                            {!hasMissing && hasMaxBall && isAboveAverage && <div className="badge badge-success py-3 px-5 font-black italic text-white rounded-xl shadow-lg animate-bounce"><CheckCircle2 size={12} className="mr-1"/>НАД СРЕДНОТО</div>}
-                                            {!hasMissing && hasMaxBall && !isAboveAverage && hasStarted && <div className="badge badge-error badge-outline py-3 px-5 font-black italic rounded-xl border-2">ПОД СРЕДНОТО</div>}
                                         </div>
                                     </div>
                                 </div>

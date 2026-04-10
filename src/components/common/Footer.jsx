@@ -74,7 +74,7 @@ const Footer = () => {
                         <Link to="/terms" className="link link-hover opacity-70 hover:opacity-100 font-bold text-sm">Условия за ползване</Link>
                         <Link to="/privacy" className="link link-hover opacity-70 hover:opacity-100 font-bold text-sm">Поверителност</Link>
                         <div className="mt-4 p-4 bg-base-300/50 rounded-2xl border border-base-content/5">
-                            <p className="text-[10px] font-bold opacity-50 leading-tight">Данните за баловете са базирани на справочниците за 2025г.</p>
+                            <p className="text-[10px] font-bold opacity-50 leading-tight">Данните за баловете са базирани на справочниците за 2026г.</p>
                         </div>
                     </nav>
                 </div>
