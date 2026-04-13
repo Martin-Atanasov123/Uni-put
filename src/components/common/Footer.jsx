@@ -33,14 +33,14 @@ const Footer = () => {
                         <p className="text-sm font-medium opacity-60 leading-relaxed">
                             Иновативна платформа за кандидатстудентски прием. Твоят дигитален пътеводител към висшето образование в България.
                         </p>
-                        <div className="flex items-center justify-center md:justify-start gap-4 pt-2">
+                        {/* <div className="flex items-center justify-center md:justify-start gap-4 pt-2">
                             <a href="https://github.com/Martin-Atanasov123/Uni-put" target="_blank" rel="noreferrer" className="btn btn-ghost btn-circle btn-sm hover:text-primary transition-colors" aria-label="GitHub репозитория на УниПът">
                                 <Github size={20} />
                             </a>
                             <a href="https://www.mon.bg/visshe-obrazovanie/" target="_blank" rel="noreferrer" className="btn btn-ghost btn-circle btn-sm hover:text-primary transition-colors" aria-label="Министерство на образованието и науката – Висше образование">
                                 <Globe size={20} />
                             </a>
-                        </div>
+                        </div> */}
                     </aside>
 
                     {/* Секция Ресурси (Външни линкове) */}
@@ -62,9 +62,9 @@ const Footer = () => {
                         <a href="/about" className="link link-hover flex items-center justify-center md:justify-start gap-2 opacity-70 hover:opacity-100 font-bold text-sm italic">
                             <Info size={14} /> За нас
                         </a>
-                        <span className="link link-hover flex items-center justify-center md:justify-start gap-2 opacity-70 hover:opacity-100 font-bold text-sm">
+                        <a href="https://www.gnu.org/licenses/gpl-3.0.html" className="link link-hover flex items-center justify-center md:justify-start gap-2 opacity-70 hover:opacity-100 font-bold text-sm">
                             <ShieldCheck size={14} /> Лиценз GNU
-                        </span>
+                        </a>
                         <span className="badge badge-primary font-black text-[10px] mt-2 italic mx-auto md:mx-0 text-primary-content border-none">НОИТ 2026</span>
                     </nav>
 

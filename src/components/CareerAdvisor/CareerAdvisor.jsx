@@ -411,7 +411,7 @@ const CareerAdvisor = () => {
                 {step === 'version' && (
                     <div className="text-center space-y-4 mb-10 w-full">
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-[0.2em]">
-                            <Zap size={12} /> RIASEC Career Advisor
+                            <Zap size={12} /> 
                         </div>
                         <h1 className="text-5xl md:text-6xl font-black tracking-tight leading-none">
                             Открий своето <span className="text-primary italic">призвание</span>
