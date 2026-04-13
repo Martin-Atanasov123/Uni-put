@@ -133,14 +133,24 @@ const DormCard = ({ dorm }) => {
                     </div>
                     <div className="flex flex-col items-end shrink-0 ml-2">
                         <div className="flex gap-0.5 text-warning">
-                            {[...Array(5)].map((_, i) => (
-                                <Star
-                                    key={i}
-                                    size={13}
-                                    fill={i < Math.round(dorm.condition_rating) ? "currentColor" : "none"}
-                                    className={i < Math.round(dorm.condition_rating) ? "" : "opacity-30"}
-                                />
-                            ))}
+                            {[...Array(5)].map((_, i) => {
+                                const full = Math.floor(dorm.condition_rating);
+                                const half = (dorm.condition_rating - full) > 0;
+                                if (i < full) {
+                                    return <Star key={i} size={13} fill="currentColor" />;
+                                }
+                                if (i === full && half) {
+                                    return (
+                                        <span key={i} className="relative inline-block" style={{ width: 13, height: 13 }}>
+                                            <Star size={13} fill="none" className="opacity-30" />
+                                            <span className="absolute inset-0 overflow-hidden" style={{ width: '50%' }}>
+                                                <Star size={13} fill="currentColor" />
+                                            </span>
+                                        </span>
+                                    );
+                                }
+                                return <Star key={i} size={13} fill="none" className="opacity-30" />;
+                            })}
                         </div>
                         <span className="text-xs font-bold opacity-40 mt-0.5">{dorm.condition_rating}/5</span>
                     </div>
