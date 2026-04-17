@@ -7,7 +7,7 @@
 
 const COEFFICIENT_KEYS = [
   "angliiski_ezik", "bel", "bel_plus_cert_angliyski_b2", "bio", "bio_udostoverenie",
-  "bonifikaciq", "chu_ezik", "chujdezik", "contest_elementarna_mat_boyanov", "diploma",
+  "bonifikaciq", "chu_ezik", "contest_elementarna_mat_boyanov", "diploma",
   "diploma_semestrial", "diploma_state_exams", "diploma_bel", "diploma_mat", "diploma_fiz", "diploma_geo",
   "dzi1_angliiski", "dzi1_bel", "dzi1_bio",
   "dzi1_chu_ezik", "dzi1_fil", "dzi1_fiz", "dzi1_geo", "dzi1_him", "dzi1_informatika",
@@ -18,8 +18,8 @@ const COEFFICIENT_KEYS = [
   "dzi_bel_cert_italianski_b2", "dzi_bel_dele_b1", "dzi_bel_dele_b2plus", "dzi_bio",
   "dzi_bio_obshto", "dzi_bio_profil", "dzi_chu_ezik", "dzi_chu_ezik_b1", "dzi_chu_ezik_b2",
   "dzi_chu_ezik_cert_b1", "dzi_chu_ezik_cert_frenski_b2", "dzi_chu_ezik_cert_nemski_b1",
-  "dzi_chu_ezik_cert_nemski_b2_plus", "dzi_chu_ezik_dele_b1_combo", "dzi_chuzhd_ezik",
-  "dzi_fil", "dzi_filosofiya", "dzi_fiz", "dzi_fizika", "dzi_geo", "dzi_geografiya",
+  "dzi_chu_ezik_cert_nemski_b2_plus", "dzi_chu_ezik_dele_b1_combo",
+  "dzi_fil", "dzi_fiz", "dzi_fizika", "dzi_geo",
   "dzi_him", "dzi_hим_obshto",
   "dzi_him_profil", "dzi_himiq", "dzi_informatika", "dzi_inf", "dzi_ist", "dzi_istoriq",
   "dzi_it", "dzi_kitayski", "dzi_kitayski_b2", "dzi_koreiski", "dzi_latin", "dzi_mat",
@@ -27,7 +27,7 @@ const COEFFICIENT_KEYS = [
   "dzi_portugалски", "dzi_portugalski", "dzi_predpriemachestvo", "dzi_profesiq", "dzi_ris",
   "dzi_rumunski", "dzi_turski", "dzi_yaponski", "ese_obsht_tema", "etika_pravo", "exam_bel",
   "exam_bio", "exam_chu", "exam_fiz", "exam_geo", "exam_him", "exam_informatika", "exam_ist",
-  "exam_mat", "exam_muz", "exam_ris", "exam_risuvane",
+  "exam_mat", "exam_muz", "exam_ris",
   "fil", "fiz", "fiz_vazpitanie", "geo", "himija", "him", "informatika",
   "ist", "it", "izpit_drugo_vu", "konkursen_izpit_1", "konkursen_izpit_2", "logika_psihologiya",
   "mat", "muz", "muzika", "obsht_uspeh", "obshtoobrazovatelen_test", "obshtestvoznanie",
@@ -68,7 +68,6 @@ const FIELD_LABELS = {
   bio_udostoverenie: "Биология удостоверение",
   bonifikaciq: "Бонификация",
   chu_ezik: "Диплома: Чужд език",
-  chujdezik: "Чужд език",
   contest_elementarna_mat_boyanov: "Състезание елементарна мат (Боянов)",
   diploma: "Диплома",
   diploma_semestrial: "Семестриален успех",
@@ -119,13 +118,10 @@ const FIELD_LABELS = {
   dzi_chu_ezik_cert_nemski_b1: "ДЗИ Чужд език + Сертификат немски B1",
   dzi_chu_ezik_cert_nemski_b2_plus: "ДЗИ Чужд език + Сертификат немски B2+",
   dzi_chu_ezik_dele_b1_combo: "ДЗИ Чужд език + DELE B1 (комбо)",
-  dzi_chuzhd_ezik: "ДЗИ Чужд език",
   dzi_fil: "ДЗИ Философия",
-  dzi_filosofiya: "ДЗИ Философия",
   dzi_fiz: "ДЗИ Физика",
   dzi_fizika: "ДЗИ Физика",
   dzi_geo: "ДЗИ География",
-  dzi_geografiya: "ДЗИ География",
   dzi_him: "ДЗИ Химия",
   dzi_him_obshto: "ДЗИ Химия (общо)",
   dzi_him_profil: "ДЗИ Химия (профил)",
@@ -165,7 +161,6 @@ const FIELD_LABELS = {
   exam_mat: "Изпит по математика",
   exam_muz: "Изпит по музика",
   exam_ris: "Изпит по рисуване",
-  exam_risuvane: "Изпит по рисуване",
   fil: "Диплома: Философия",
   fiz: "Диплома: Физика",
   fiz_vazpitanie: "Диплома: Физическо възпитание",
@@ -315,7 +310,7 @@ const SLOT_GROUPS = {
   
   // Foreign languages group
   foreign_languages_group: ["exam_chu", "dzi1_chu_ezik", "dzi2_chu_ezik", "dzi_chu_ezik",
-    "dzi_chu_ezik_b1", "dzi_chu_ezik_b2", "chu_ezik", "chujdezik", "dzi_chuzhd_ezik",
+    "dzi_chu_ezik_b1", "dzi_chu_ezik_b2", "chu_ezik",
     "dzi_chu_ezik_cert_b1", "dzi_chu_ezik_cert_frenski_b2", "dzi_chu_ezik_cert_nemski_b1",
     "dzi_chu_ezik_cert_nemski_b2_plus", "dzi_chu_ezik_dele_b1_combo", "dzi_profil_chu"],
   
@@ -358,15 +353,15 @@ const SLOT_GROUPS = {
     "istoriq_diploma", "dzi_profil_ist"],
 
   // Geography
-  geography_group: ["exam_geo", "dzi1_geo", "dzi2_geo", "dzi_geo", "dzi_geografiya", "geo",
+  geography_group: ["exam_geo", "dzi1_geo", "dzi2_geo", "dzi_geo", "geo",
     "dzi_profil_geografiya"],
 
   // Philosophy
-  philosophy_group: ["dzi1_fil", "dzi2_fil", "dzi_fil", "dzi_filosofiya", "fil",
+  philosophy_group: ["dzi1_fil", "dzi2_fil", "dzi_fil", "fil",
     "dzi_profil_filosofiya"],
-  
+
   // Arts
-  arts_group: ["exam_muz", "dzi_muz", "muz", "muzika", "exam_ris", "exam_risuvane", "dzi_ris",
+  arts_group: ["exam_muz", "dzi_muz", "muz", "muzika", "exam_ris", "dzi_ris",
     "portfolio", "exam_ris_1", "exam_ris_2", "exam_skulptirane", "ris",
     "risuvane_cvetna_kompoziciq", "risuvane_obemno_prostranstvena_kompoziciq",
     "risuvane_perspektiva", "prakticheski_izpit_horeografiq"],
