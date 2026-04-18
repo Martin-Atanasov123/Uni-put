@@ -8,7 +8,7 @@ import {
     Filter, RefreshCw, ChevronDown, ChevronUp, AlertTriangle,
     XCircle, Search, Inbox
 } from "lucide-react";
-import { supabase } from "../../lib/supabase";
+import { supabase } from "@/lib/supabase";
 
 const STATUS_CONFIG = {
     open: { label: "Отворен", color: "badge-warning", icon: Clock },

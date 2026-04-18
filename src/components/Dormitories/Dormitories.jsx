@@ -3,7 +3,7 @@
 // Вход: данни от API (getAllDormitories); потребителски избор на университет.
 // Изход: карти с данни, конвертирани цени (EUR), обобщение на първи месец.
 import React, { useState, useEffect } from 'react';
-import { getAllDormitories } from '../../lib/api';
+import { getAllDormitories } from '@/lib/api';
 import {
     Building2,
     MapPin,

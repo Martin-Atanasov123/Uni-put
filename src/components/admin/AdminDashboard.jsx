@@ -9,9 +9,9 @@ import {
     ChevronRight, Info, HelpCircle, X, Check, Save, History,
     FileJson, FileSpreadsheet, Settings, ExternalLink, Flag
 } from "lucide-react";
-import { ADMIN_TABLES } from "../../admin/adminConfig";
-import { adminService } from "../../services/adminService";
-import { supabase } from "../../lib/supabase";
+import { ADMIN_TABLES } from "./adminConfig";
+import { adminService } from "@/services/adminService";
+import { supabase } from "@/lib/supabase";
 
 const AdminDashboard = () => {
     const navigate = useNavigate();

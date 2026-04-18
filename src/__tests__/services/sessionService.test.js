@@ -1,9 +1,9 @@
 // @vitest-environment happy-dom
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { sessionService } from "./sessionService";
-import { supabase } from "../lib/supabase";
+import { sessionService } from "@/services/sessionService";
+import { supabase } from "@/lib/supabase";
 
-vi.mock("../lib/supabase", () => ({
+vi.mock("@/lib/supabase", () => ({
     supabase: {
         auth: {
             signOut: vi.fn().mockResolvedValue({ error: null })

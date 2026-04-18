@@ -5,7 +5,7 @@
 import { useState, useRef } from "react";
 import { Flag, Camera, Send, X, AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
 import html2canvas from "html2canvas";
-import { supabase } from "../../lib/supabase";
+import { supabase } from "@/lib/supabase";
 
 const REPORT_TYPES = [
     { value: "formula_error", label: "Грешна формула / коефициенти" },

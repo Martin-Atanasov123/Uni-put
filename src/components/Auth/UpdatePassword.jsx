@@ -4,7 +4,7 @@
 // Вход: няма пропсове; използва локално състояние и проверка за активна сесия.
 // Изход: статус съобщения; пренасочване към /login при успех.
 import { useState, useEffect } from "react";
-import { supabase } from "../../lib/supabase";
+import { supabase } from "@/lib/supabase";
 import { Lock, Eye, EyeOff, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 

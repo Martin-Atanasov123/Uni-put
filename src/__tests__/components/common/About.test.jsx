@@ -2,7 +2,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import About from "./About";
+import About from "@/components/common/About";
 
 const renderWithRouter = () => {
     return render(

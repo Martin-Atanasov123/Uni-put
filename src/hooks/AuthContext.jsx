@@ -8,7 +8,7 @@
 //   - Слуша събитията за промяна на сесията (login/logout) и актуализира state.
 //   - Пази UI стабилен: рендерира деца само когато loading е false.
 import { createContext, useContext, useEffect, useState } from "react";
-import { supabase } from "../lib/supabase";
+import { supabase } from "@/lib/supabase";
 
 export const AuthContext = createContext({});
 

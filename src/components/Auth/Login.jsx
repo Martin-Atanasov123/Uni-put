@@ -3,7 +3,7 @@
 // Вход: няма директни пропсове; използва локално състояние за email/password.
 // Изход: навигация към защитени страници при успех; визуализира грешки при провал.
 import { useState } from "react";
-import { supabase } from "../../lib/supabase";
+import { supabase } from "@/lib/supabase";
 
 import {
     Mail,

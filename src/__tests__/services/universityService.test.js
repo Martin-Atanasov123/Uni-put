@@ -1,10 +1,9 @@
 // @vitest-environment happy-dom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { universityService } from './universityService';
-import { supabase } from '../lib/supabase';
+import { universityService } from '@/services/universityService';
+import { supabase } from '@/lib/supabase';
 
-// Mock Supabase client
-vi.mock('../lib/supabase', () => ({
+vi.mock('@/lib/supabase', () => ({
     supabase: {
         from: vi.fn().mockReturnThis(),
         select: vi.fn()

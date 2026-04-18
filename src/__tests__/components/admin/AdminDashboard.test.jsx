@@ -2,10 +2,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import AdminDashboard from "./AdminDashboard";
-import { adminService } from "../../services/adminService";
+import AdminDashboard from "@/components/admin/AdminDashboard";
+import { adminService } from "@/services/adminService";
 
-vi.mock("../../services/adminService", () => ({
+vi.mock("@/services/adminService", () => ({
   adminService: {
     list: vi.fn()
   }

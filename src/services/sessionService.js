@@ -1,4 +1,4 @@
-import { supabase } from "../lib/supabase";
+import { supabase } from "@/lib/supabase";
 
 const clearClientState = () => {
     if (typeof window === "undefined") return;

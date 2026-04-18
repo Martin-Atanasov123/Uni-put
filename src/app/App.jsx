@@ -5,34 +5,34 @@
 import { Route, Routes } from "react-router";
 import { Suspense, lazy } from "react";
 
-import { AuthProvider } from "../context/AuthContext";
-import ProtectedRoute from "../routes/ProtectedRoute";
+import { AuthProvider } from "@/hooks/AuthContext";
+import ProtectedRoute from "@/routes/ProtectedRoute";
 
-import NotFound from "../components/common/NotFound";
-import Header from "../components/common/Header";
-import Home from "../components/common/Home";
-import Footer from "../components/common/Footer";
-import GlobalErrorBoundary from "../components/common/GlobalErrorBoundary";
+import NotFound from "@/components/common/NotFound";
+import Header from "@/components/common/Header";
+import Home from "@/components/common/Home";
+import Footer from "@/components/common/Footer";
+import GlobalErrorBoundary from "@/components/common/GlobalErrorBoundary";
 
-import AdminRoute from "../routes/AdminRoute";
-import ScrollToTop from "../components/common/ScrollToTop";
+import AdminRoute from "@/routes/AdminRoute";
+import ScrollToTop from "@/components/common/ScrollToTop";
 
-const Login = lazy(() => import("../components/Auth/Login"));
-const Register = lazy(() => import("../components/Auth/Register"));
-const ForgotPassword = lazy(() => import("../components/Auth/ForgotPassword"));
-const UpdatePassword = lazy(() => import("../components/Auth/UpdatePassword"));
-const About = lazy(() => import("../components/common/About"));
-const UniversitiesPage = lazy(() => import("../components/Universities/Universities"));
-const CareerAdvisor = lazy(() => import("../components/CareerAdvisor/CareerAdvisor"));
-const TestCareer = lazy(() => import("../components/CareerAdvisor/TestCareer"));
-const Dormitories = lazy(() => import("../components/Dormitories/Dormitories"));
-const FavoritesPage = lazy(() => import("../components/Favorites/Favorites"));
-const CalculatorPage = lazy(() => import("../components/Calculator/Calculator"));
-const Profile = lazy(() => import("../components/Auth/Profile"));
-const AdminDashboard = lazy(() => import("../components/admin/AdminDashboard"));
-const AdminReports = lazy(() => import("../components/admin/AdminReports"));
-const TermsOfService = lazy(() => import("../components/common/TermsOfService"));
-const PrivacyPolicy = lazy(() => import("../components/common/PrivacyPolicy"));
+const Login = lazy(() => import("@/components/Auth/Login"));
+const Register = lazy(() => import("@/components/Auth/Register"));
+const ForgotPassword = lazy(() => import("@/components/Auth/ForgotPassword"));
+const UpdatePassword = lazy(() => import("@/components/Auth/UpdatePassword"));
+const About = lazy(() => import("@/components/common/About"));
+const UniversitiesPage = lazy(() => import("@/components/Universities/Universities"));
+const CareerAdvisor = lazy(() => import("@/components/CareerAdvisor/CareerAdvisor"));
+const TestCareer = lazy(() => import("@/components/CareerAdvisor/TestCareer"));
+const Dormitories = lazy(() => import("@/components/Dormitories/Dormitories"));
+const FavoritesPage = lazy(() => import("@/components/Favorites/Favorites"));
+const CalculatorPage = lazy(() => import("@/components/Calculator/Calculator"));
+const Profile = lazy(() => import("@/components/Auth/Profile"));
+const AdminDashboard = lazy(() => import("@/components/admin/AdminDashboard"));
+const AdminReports = lazy(() => import("@/components/admin/AdminReports"));
+const TermsOfService = lazy(() => import("@/components/common/TermsOfService"));
+const PrivacyPolicy = lazy(() => import("@/components/common/PrivacyPolicy"));
 
 // Основен входен компонент – включва AuthProvider, ScrollToTop, Header, Footer и рутера.
 function App() {

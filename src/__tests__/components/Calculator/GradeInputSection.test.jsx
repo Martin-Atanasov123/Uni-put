@@ -1,13 +1,13 @@
 // @vitest-environment happy-dom
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
-import GradeInputSection from "./GradeInputSection";
+import GradeInputSection from "@/components/Calculator/GradeInputSection";
 
-vi.mock("../../hooks/useAuth", () => ({
+vi.mock("@/hooks/useAuth", () => ({
     useAuth: () => ({ user: null })
 }));
 
-vi.mock("../../lib/supabase", () => ({
+vi.mock("@/lib/supabase", () => ({
     supabase: {
         auth: {
             updateUser: vi.fn().mockResolvedValue({ data: null, error: null })

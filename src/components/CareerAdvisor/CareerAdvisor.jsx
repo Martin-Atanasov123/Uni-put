@@ -1,9 +1,9 @@
 // Кариерен съветник – RIASEC въпросник за определяне на професионални интереси.
 // Поддържа три версии: Кратка (30), Стандартна (60) и Разширена (90) въпроса.
 import { useState, useEffect, useMemo, useLayoutEffect, useRef } from 'react';
-import { calculateScores, calculateRiasecCode } from '../../lib/riasec-matcher';
-import { getRiasecMatches } from '../../lib/api';
-import riasecData from '../../data/riasec_questions.json';
+import { calculateScores, calculateRiasecCode } from '@/lib/riasec-matcher';
+import { getRiasecMatches } from '@/lib/api';
+import riasecData from '@/data/riasec_questions.json';
 import { 
     CheckCircle2, 
     ChevronRight, 

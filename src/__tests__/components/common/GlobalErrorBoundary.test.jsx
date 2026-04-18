@@ -3,7 +3,7 @@
  */
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import GlobalErrorBoundary from './GlobalErrorBoundary';
+import GlobalErrorBoundary from '@/components/common/GlobalErrorBoundary';
 import React from 'react';
 
 // Почистване на DOM след всеки тест

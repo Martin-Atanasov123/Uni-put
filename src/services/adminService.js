@@ -22,8 +22,8 @@
 // - Ако Supabase върне грешка, тя се хвърля (throw), за да може UI да визуализира статуса.
 // - Кешът се държи в localStorage; при обновяване/изтриване се инвалидира за съответната таблица.
 // - Филтърът е прост, пълнотекстов (join на всички стойности), който е достатъчен за малък обем данни.
-import { supabase } from "../lib/supabase";
-import { ADMIN_TABLES } from "../admin/adminConfig";
+import { supabase } from "@/lib/supabase";
+import { ADMIN_TABLES } from "@/components/admin/adminConfig";
 
 const CACHE_KEY = "admin_cache_v1";
 const PAGE_SIZE = 10;

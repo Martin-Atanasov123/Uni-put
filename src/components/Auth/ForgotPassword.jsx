@@ -4,7 +4,7 @@
 // Вход: няма пропсове; локално състояние за имейл и индикатори за статус.
 // Изход: статус съобщения; Supabase изпраща имейл с линк към /update-password.
 import { useState } from "react";
-import { supabase } from "../../lib/supabase";
+import { supabase } from "@/lib/supabase";
 import { Mail, ArrowLeft, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
