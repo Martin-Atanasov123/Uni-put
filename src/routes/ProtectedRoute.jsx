@@ -4,7 +4,7 @@
 // Вход: { children } - JSX за рендериране при налична сесия
 // Изход: children ако има активен потребител; пренасочване към /login ако няма
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 
 const ProtectedRoute = ({ children }) => {
     const { user, loading } = useAuth();

@@ -4,7 +4,7 @@
 // Вход: { children } - JSX за рендериране при налична админ роля
 // Изход: children ако потребителят е администратор; пренасочване към "/" иначе
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 
 const AdminRoute = ({ children }) => {
     const { user, loading } = useAuth();

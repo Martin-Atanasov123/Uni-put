@@ -4,7 +4,7 @@ import {
     addFavoriteId,
     removeFavoriteId,
     toggleFavoriteId,
-} from "./favoritesService";
+} from "@/services/favoritesService";
 
 describe("favoritesService", () => {
     it("adds id when not present", () => {

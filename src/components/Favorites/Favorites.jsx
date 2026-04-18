@@ -4,8 +4,8 @@
 // Вход: няма пропсове; използва контекст (favorites) и услуги (universityService).
 // Изход: филтриран списък; възможност за премахване/добавяне към любими.
 import { useEffect, useMemo, useState } from "react";
-import { useAuth } from "../../hooks/useAuth";
-import { universityService } from "../../services/universityService";
+import { useAuth } from "@/hooks/useAuth";
+import { universityService } from "@/services/universityService";
 import { Search, MapPin, School, Heart, Calculator } from "lucide-react";
 import { Link } from "react-router-dom";
 

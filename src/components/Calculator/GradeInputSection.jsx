@@ -8,9 +8,9 @@
 // Изход: визуални полета, синхронизация към родителя, локален кеш и запис в user_metadata
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpDown, CheckCircle2 } from "lucide-react";
-import { FIELD_LABELS, SLOT_GROUPS } from "../../lib/coefficients_config";
-import { supabase } from "../../lib/supabase";
-import { useAuth } from "../../hooks/useAuth";
+import { FIELD_LABELS, SLOT_GROUPS } from "@/lib/coefficients_config";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/hooks/useAuth";
 
 const STORAGE_PREFIX = "uniput_grades";
 
@@ -165,7 +165,7 @@ const GradeInputSection = ({ coefficients = {}, faculty, specialty, onGradesChan
     const handleChangeGrade = (key, value) => {
         setValuesByKey((prev) => ({
             ...prev,
-            [key]: value
+            [key]: value.replace(",", ".")
         }));
     };
 
@@ -269,8 +269,7 @@ const GradeInputSection = ({ coefficients = {}, faculty, specialty, onGradesChan
 
                             <div className="space-y-2">
                                 <input
-                                    type="number"
-                                    step="0.01"
+                                    type="text"
                                     inputMode="decimal"
                                     className={`input input-bordered w-full rounded-2xl text-lg font-bold ${
                                         invalid ? "input-error" : ""

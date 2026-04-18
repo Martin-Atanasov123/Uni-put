@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getCareersByRiasec, getUniversitiesByRiasec, getAllRiasecCodes } from '../../lib/api';
+import { getCareersByRiasec, getUniversitiesByRiasec, getAllRiasecCodes } from '@/lib/api';
 
 /**
  * Тестова конзола за проверка на RIASEC API интеграцията.

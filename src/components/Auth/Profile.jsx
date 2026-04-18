@@ -2,11 +2,11 @@
 // Описание: Зарежда профил от Supabase, визуализира основни данни, любими университети 
 //   и история на баловете. Позволява промени в потребителска информация и сигурност.
 import { useState, useEffect } from "react";
-import { supabase } from "../../lib/supabase";
+import { supabase } from "@/lib/supabase";
 import { useNavigate, Link } from "react-router-dom";
-import { sessionService } from "../../services/sessionService";
-import { useAuth } from "../../hooks/useAuth";
-import { universityService } from "../../services/universityService";
+import { sessionService } from "@/services/sessionService";
+import { useAuth } from "@/hooks/useAuth";
+import { universityService } from "@/services/universityService";
 import { 
     User, 
     Mail, 

@@ -2,7 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import CalculatorPage from "./Calculator";
+import CalculatorPage from "@/components/Calculator/Calculator";
 
 // Mock Supabase
 const mockCoefs = [
@@ -20,7 +20,7 @@ const mockDataByFaculty = {
   ]
 };
 
-vi.mock("../../lib/supabase", () => {
+vi.mock("@/lib/supabase", () => {
   const select = vi.fn((columns) => {
     if (columns === "faculty") {
       // return list of faculties

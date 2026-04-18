@@ -5,7 +5,7 @@
 // Изход: изчислен бал и описания на липсващи термини/слотове; визуализация с филтри
 // Бизнес логика: групира ключове по SLOT_GROUP; при алтернативни ключове взима най-изгодния (max grade×coef).
 import { useState, useEffect, useMemo } from "react";
-import { supabase } from "../../lib/supabase";
+import { supabase } from "@/lib/supabase";
 import { useLocation } from "react-router-dom";
 import {
     Calculator,

@@ -2,7 +2,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
-import About from "../components/common/About";
+import About from "@/components/common/About";
 
 describe("Routing to About page", () => {
     it("renders About page on /about route", () => {

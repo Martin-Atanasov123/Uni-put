@@ -4,7 +4,7 @@
 // Вход: параметри за търсене { query?: string, city?: string }
 // Изход: масив от записи (университет/факултет/специалност/град/коефициенти и др.)
 // Бележки: Използва TTL кеш (1 час) и fallback свеж fetch при празен резултат.
-import { supabase } from '../lib/supabase';
+import { supabase } from '@/lib/supabase';
 
 const CACHE_KEY = 'universities_cache_v2';
 const CACHE_DURATION = 1000 * 60 * 60; // 1 hour
