@@ -1,49 +1,90 @@
-// Кариерен съветник – RIASEC въпросник за определяне на професионални интереси.
-// Поддържа три версии: Кратка (30), Стандартна (60) и Разширена (90) въпроса.
-import { useState, useEffect, useMemo, useLayoutEffect, useRef } from 'react';
-import { calculateScores, calculateRiasecCode } from '@/lib/riasec-matcher';
-import { getRiasecMatches } from '@/lib/api';
-import riasecData from '@/data/riasec_questions.json';
-import { 
-    CheckCircle2, 
-    ChevronRight, 
-    ChevronLeft, 
+import { useState, useEffect, useMemo, useLayoutEffect, useRef } from "react";
+import { calculateScores, calculateRiasecCode } from "@/lib/riasec-matcher";
+import { getRiasecMatches } from "@/lib/api";
+import riasecData from "@/data/riasec_questions.json";
+import {
+    CheckCircle2,
+    ChevronRight,
+    ChevronLeft,
     Target,
     Zap,
     Layout,
     Layers,
     ClipboardList,
-    AlertCircle
-} from 'lucide-react';
+    AlertCircle,
+    Sparkles,
+} from "lucide-react";
 
-import RIASECResults from './RIASECResults';
+import RIASECResults from "./RIASECResults";
+
+const S = {
+    surface: {
+        background: "var(--brand-surface)",
+        backdropFilter: "blur(8px)",
+        border: "1px solid var(--brand-card-border)",
+        borderRadius: "1.25rem",
+    },
+};
+
+const VERSIONS = [
+    {
+        id: "short",
+        name: "Кратка",
+        questions: 30,
+        time: "3–5 мин",
+        icon: Zap,
+        accent: "#fbbf24",
+        accentBg: "rgba(251,191,36,0.12)",
+        accentBorder: "rgba(251,191,36,0.3)",
+        desc: "Бърз преглед на твоите основни интереси.",
+    },
+    {
+        id: "standard",
+        name: "Стандартна",
+        questions: 60,
+        time: "8–12 мин",
+        icon: Layout,
+        accent: "var(--brand-cyan)",
+        accentBg: "rgba(6,182,212,0.12)",
+        accentBorder: "rgba(6,182,212,0.35)",
+        desc: "Балансирана версия за прецизни резултати.",
+        recommended: true,
+    },
+    {
+        id: "extended",
+        name: "Разширена",
+        questions: 90,
+        time: "15–20 мин",
+        icon: Layers,
+        accent: "var(--brand-violet)",
+        accentBg: "rgba(139,92,246,0.12)",
+        accentBorder: "rgba(139,92,246,0.35)",
+        desc: "Дълбок анализ на професионалния ти потенциал.",
+    },
+];
 
 const CareerAdvisor = () => {
-    // --- State ---
-    const [step, setStep] = useState('version'); // 'version', 'quiz', 'results'
+    const [step, setStep] = useState("version");
     const [loading, setLoading] = useState(false);
     const [questions, setQuestions] = useState([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [answers, setAnswers] = useState(() => {
-        const saved = localStorage.getItem('riasec_answers');
+        const saved = localStorage.getItem("riasec_answers");
         return saved ? JSON.parse(saved) : {};
     });
     const [results, setResults] = useState(null);
-    const [quizVersion, setQuizVersion] = useState(null); // 'short', 'standard', 'extended'
+    const [quizVersion, setQuizVersion] = useState(null);
     const [scaleLabels, setScaleLabels] = useState({});
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [showWarning, setShowWarning] = useState(false);
     const questionCardRef = useRef(null);
     const preservedScrollYRef = useRef(null);
     const shouldScrollToQuestionRef = useRef(false);
-    const [isQuestionVisible, setIsQuestionVisible] = useState(true);
 
-    // --- Persistence ---
     useEffect(() => {
-        localStorage.setItem('riasec_answers', JSON.stringify(answers));
+        localStorage.setItem("riasec_answers", JSON.stringify(answers));
     }, [answers]);
 
-    // --- Load Questions ---
     useEffect(() => {
         if (riasecData) {
             setQuestions(riasecData.questions);
@@ -51,85 +92,49 @@ const CareerAdvisor = () => {
         }
     }, []);
 
-    // --- Filtered Questions based on Version ---
     const filteredQuestions = useMemo(() => {
         if (!questions.length || !quizVersion) return [];
-        
-        if (quizVersion === 'short') {
-            // Кратка версия: 30 въпроса (първите 5 от всеки тип)
-            const types = ['R', 'I', 'A', 'S', 'E', 'C'];
-            const shortSet = [];
-            types.forEach(type => {
-                const typeQuestions = questions.filter(q => q.type === type).slice(0, 5);
-                shortSet.push(...typeQuestions);
-            });
-            return shortSet;
+        if (quizVersion === "short") {
+            const types = ["R", "I", "A", "S", "E", "C"];
+            const set = [];
+            types.forEach(t => set.push(...questions.filter(q => q.type === t).slice(0, 5)));
+            return set;
         }
-        
-        if (quizVersion === 'standard') {
-            // Стандартна версия: 60 въпроса (всички налични в момента)
-            return questions.slice(0, 60);
-        }
-
-        if (quizVersion === 'extended') {
-            // Разширена версия: 90 въпроса (засега използваме 60, докато се добавят още)
-            return questions;
-        }
-
+        if (quizVersion === "standard") return questions.slice(0, 60);
         return questions;
     }, [questions, quizVersion]);
 
     useLayoutEffect(() => {
-        if (step !== 'quiz') return;
-
+        if (step !== "quiz") return;
         if (preservedScrollYRef.current !== null) {
-            window.scrollTo({ top: preservedScrollYRef.current, behavior: 'auto' });
+            window.scrollTo({ top: preservedScrollYRef.current, behavior: "auto" });
             preservedScrollYRef.current = null;
         }
-
         if (shouldScrollToQuestionRef.current && questionCardRef.current) {
             const rect = questionCardRef.current.getBoundingClientRect();
             const targetTop = window.scrollY + rect.top - 220;
-            window.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+            window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
             shouldScrollToQuestionRef.current = false;
         }
     }, [currentQuestionIndex, step]);
 
-    useEffect(() => {
-        if (step !== 'quiz' || !questionCardRef.current) return;
-
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                setIsQuestionVisible(entry.isIntersecting);
-            },
-            { threshold: 0.45 }
-        );
-
-        observer.observe(questionCardRef.current);
-        return () => observer.disconnect();
-    }, [step, currentQuestionIndex]);
-
-    // --- Handlers ---
-    const handleVersionSelect = (version) => {
+    const handleVersionSelect = version => {
         setQuizVersion(version);
-        setStep('quiz');
+        setStep("quiz");
         setCurrentQuestionIndex(0);
         setAnswers({});
-        localStorage.removeItem('riasec_answers');
+        localStorage.removeItem("riasec_answers");
         window.scrollTo(0, 0);
     };
 
-    const handleAnswer = (value) => {
-        if (isTransitioning) return; // Prevent rapid clicking
-
+    const handleAnswer = value => {
+        if (isTransitioning) return;
         const questionId = filteredQuestions[currentQuestionIndex].id;
         preservedScrollYRef.current = window.scrollY;
         setAnswers(prev => ({ ...prev, [questionId]: value }));
         setShowWarning(false);
-
         if (currentQuestionIndex < filteredQuestions.length - 1) {
             setIsTransitioning(true);
-            // 500ms delay as requested to prevent rapid skip
             setTimeout(() => {
                 shouldScrollToQuestionRef.current = true;
                 setCurrentQuestionIndex(prev => prev + 1);
@@ -140,10 +145,7 @@ const CareerAdvisor = () => {
 
     const handleNext = () => {
         const questionId = filteredQuestions[currentQuestionIndex].id;
-        if (!answers[questionId]) {
-            setShowWarning(true);
-            return;
-        }
+        if (!answers[questionId]) { setShowWarning(true); return; }
         if (currentQuestionIndex < filteredQuestions.length - 1) {
             preservedScrollYRef.current = window.scrollY;
             shouldScrollToQuestionRef.current = true;
@@ -152,117 +154,92 @@ const CareerAdvisor = () => {
     };
 
     const handleBack = () => {
-        if (currentQuestionIndex > 0) {
-            setCurrentQuestionIndex(prev => prev - 1);
-        } else {
-            setStep('version');
-            localStorage.removeItem('riasec_quiz_version');
-            localStorage.removeItem('riasec_answers');
+        if (currentQuestionIndex > 0) setCurrentQuestionIndex(prev => prev - 1);
+        else {
+            setStep("version");
+            localStorage.removeItem("riasec_quiz_version");
+            localStorage.removeItem("riasec_answers");
         }
     };
 
     const calculateFinalResults = async () => {
         setLoading(true);
-        setStep('results');
+        setStep("results");
         try {
-            // Използваме само въпросите от текущата версия за изчислението
             const scores = calculateScores(answers, filteredQuestions);
             const riasecCode = calculateRiasecCode(scores);
-            
-            // Търсене на съвпадения в базата данни
             const { specialties, careers, error } = await getRiasecMatches(scores);
-
-            setResults({
-                scores,
-                riasecCode,
-                specialties,
-                careers,
-                error
-            });
-        } catch {
-            // RIASEC calculation error
-        } finally {
-            setLoading(false);
-        }
+            setResults({ scores, riasecCode, specialties, careers, error });
+        } catch { /* empty */ } finally { setLoading(false); }
     };
 
-    // --- Renderers ---
-
-    // 1. Избор на версия
     const renderVersionSelection = () => (
-        <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="text-center space-y-4">
-                <h2 className="text-3xl font-black tracking-tight">Избери версия на теста</h2>
-                <p className="opacity-60 max-w-lg mx-auto">
+        <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
+            <div style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                <h2 style={{ margin: 0, fontSize: "1.875rem", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--brand-text)", textWrap: "balance" }}>
+                    Избери версия на теста
+                </h2>
+                <p style={{ margin: 0, color: "var(--brand-muted)", maxWidth: "480px", marginLeft: "auto", marginRight: "auto", fontSize: "15px" }}>
                     Колкото повече въпроси отговориш, толкова по-точен ще бъде твоят кариерен профил.
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[
-                    { 
-                        id: 'short', 
-                        name: 'Кратка', 
-                        questions: 30, 
-                        time: '3-5 мин', 
-                        icon: Zap, 
-                        color: 'text-warning',
-                        desc: 'Бърз преглед на твоите основни интереси.'
-                    },
-                    { 
-                        id: 'standard', 
-                        name: 'Стандартна', 
-                        questions: 60, 
-                        time: '8-12 мин', 
-                        icon: Layout, 
-                        color: 'text-primary',
-                        desc: 'Балансирана версия за прецизни резултати.',
-                        recommended: true
-                    },
-                    { 
-                        id: 'extended', 
-                        name: 'Разширена', 
-                        questions: 90, 
-                        time: '15-20 мин', 
-                        icon: Layers, 
-                        color: 'text-accent',
-                        desc: 'Дълбок анализ на твоя професионален потенциал.'
-                    }
-                ].map((v) => (
-                    <button
-                        key={v.id}
-                        onClick={() => handleVersionSelect(v.id)}
-                        className={`relative group p-8 rounded-[2rem] border-2 transition-all hover:scale-[1.02] active:scale-[0.98] text-left flex flex-col gap-6 ${v.recommended ? 'border-primary bg-primary/5' : 'border-base-200 bg-base-100'}`}
-                    >
-                        {v.recommended && (
-                            <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-content text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg">
-                                Препоръчано
-                            </span>
-                        )}
-                        <div className={`w-14 h-14 rounded-2xl bg-base-200 flex items-center justify-center ${v.color}`}>
-                            <v.icon size={32} />
-                        </div>
-                        <div className="space-y-1">
-                            <h3 className="text-xl font-black">{v.name} версия</h3>
-                            <p className="text-sm opacity-50 leading-relaxed">{v.desc}</p>
-                        </div>
-                        <div className="mt-auto pt-4 border-t border-base-content/5 flex items-center justify-between">
-                            <div className="flex flex-col">
-                                <span className="text-xs font-black opacity-40 uppercase">Въпроси</span>
-                                <span className="font-bold">{v.questions}</span>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "1.25rem" }}>
+                {VERSIONS.map(v => {
+                    const Icon = v.icon;
+                    return (
+                        <button
+                            key={v.id}
+                            type="button"
+                            onClick={() => handleVersionSelect(v.id)}
+                            style={{
+                                position: "relative",
+                                padding: "1.75rem",
+                                background: v.recommended ? "rgba(6,182,212,0.06)" : "var(--brand-surface)",
+                                backdropFilter: "blur(8px)",
+                                border: `1px solid ${v.recommended ? "rgba(6,182,212,0.35)" : "var(--brand-card-border)"}`,
+                                borderRadius: "1.25rem",
+                                cursor: "pointer",
+                                textAlign: "left",
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "1.25rem",
+                                fontFamily: "inherit",
+                                color: "var(--brand-text)",
+                                transition: "transform 0.2s, border-color 0.2s, box-shadow 0.2s",
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 16px 40px rgba(6,182,212,0.12)"; e.currentTarget.style.borderColor = v.accentBorder; }}
+                            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = v.recommended ? "rgba(6,182,212,0.35)" : "var(--brand-card-border)"; }}
+                        >
+                            {v.recommended && (
+                                <span style={{ position: "absolute", top: "-12px", left: "50%", transform: "translateX(-50%)", background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))", color: "#fff", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.15em", padding: "0.3rem 0.875rem", borderRadius: "999px", boxShadow: "0 8px 20px rgba(6,182,212,0.3)" }}>
+                                    Препоръчано
+                                </span>
+                            )}
+                            <div style={{ width: "3rem", height: "3rem", borderRadius: "0.875rem", background: v.accentBg, border: `1px solid ${v.accentBorder}`, display: "flex", alignItems: "center", justifyContent: "center", color: v.accent }}>
+                                <Icon size={26} />
                             </div>
-                            <div className="flex flex-col text-right">
-                                <span className="text-xs font-black opacity-40 uppercase">Време</span>
-                                <span className="font-bold">{v.time}</span>
+                            <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
+                                <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 800, letterSpacing: "-0.01em" }}>{v.name} версия</h3>
+                                <p style={{ margin: 0, fontSize: "13px", color: "var(--brand-muted)", lineHeight: 1.5 }}>{v.desc}</p>
                             </div>
-                        </div>
-                    </button>
-                ))}
+                            <div style={{ marginTop: "auto", paddingTop: "1rem", borderTop: "1px solid var(--brand-border)", display: "flex", justifyContent: "space-between" }}>
+                                <div>
+                                    <span style={{ display: "block", fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.1em", opacity: 0.6 }}>Въпроси</span>
+                                    <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--brand-text)", fontFamily: "monospace" }}>{v.questions}</span>
+                                </div>
+                                <div style={{ textAlign: "right" }}>
+                                    <span style={{ display: "block", fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.1em", opacity: 0.6 }}>Време</span>
+                                    <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--brand-text)", fontFamily: "monospace" }}>{v.time}</span>
+                                </div>
+                            </div>
+                        </button>
+                    );
+                })}
             </div>
         </div>
     );
 
-    // 2. Въпросник
     const renderQuiz = () => {
         if (!filteredQuestions.length) return null;
         const currentQ = filteredQuestions[currentQuestionIndex];
@@ -270,100 +247,135 @@ const CareerAdvisor = () => {
         const currentAnswer = answers[currentQ.id];
 
         return (
-            <div className="space-y-12 animate-in fade-in duration-500">
-                {/* Progress Bar (Clearly visible) */}
-                <div className="bg-base-100 p-1 rounded-2xl border border-base-content/5 shadow-sm sticky top-24 z-10 backdrop-blur-md">
-                    <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-black uppercase tracking-widest opacity-40">
+            <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
+                {/* Progress bar */}
+                <div
+                    style={{
+                        position: "sticky",
+                        top: "6rem",
+                        zIndex: 10,
+                        padding: "0.875rem 1rem",
+                        background: "var(--brand-progress-bg)",
+                        backdropFilter: "blur(12px)",
+                        border: "1px solid var(--brand-border)",
+                        borderRadius: "1rem",
+                    }}
+                >
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
+                        <span style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--brand-muted)" }}>
                             Въпрос {currentQuestionIndex + 1} от {filteredQuestions.length}
                         </span>
-                        <span className="text-xs font-black text-primary">
-                            {Math.round(progress)}% завършени {isQuestionVisible ? '• Активен' : '• Извън фокус'}
+                        <span style={{ fontSize: "10px", fontWeight: 800, color: "var(--brand-cyan)", textTransform: "uppercase",fontFamily: "monospace" }}>
+                            {Math.round(progress)}% завършени
                         </span>
                     </div>
-                    <div className="h-4 w-full bg-base-200 rounded-full overflow-hidden p-1 border border-base-content/5">
-                        <div 
-                            className="h-full bg-primary rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(var(--p),0.5)]" 
-                            style={{ width: `${progress}%` }}
-                        ></div>
+                    <div style={{ height: "6px", width: "100%", background: "var(--brand-border)", borderRadius: "999px", overflow: "hidden" }}>
+                        <div
+                            style={{
+                                height: "100%",
+                                width: `${progress}%`,
+                                background: "linear-gradient(90deg, var(--brand-cyan), var(--brand-violet))",
+                                borderRadius: "999px",
+                                transition: "width 0.5s ease",
+                                boxShadow: "0 0 12px rgba(6,182,212,0.5)",
+                            }}
+                        />
                     </div>
                 </div>
 
-                {/* Question Card */}
-                <div
-                    ref={questionCardRef}
-                    className="space-y-6 pt-14 pb-4 min-h-[180px] flex flex-col justify-center"
-                    aria-current={isQuestionVisible ? 'true' : 'false'}
-                    style={isQuestionVisible ? { outline: '1px solid rgba(59, 130, 246, 0.25)', outlineOffset: '10px', borderRadius: '16px' } : undefined}
-                >
-                    <div className="space-y-2 text-center">
-                        {/* <div className="badge badge-outline border-base-content/10 font-black text-[10px] uppercase tracking-widest px-3 py-2">
-                           {currentQ.category || "Интереси"}
-                        </div> */}
-                        <h2 className={`font-black leading-tight max-w-2xl mx-auto break-words ${
-                            currentQ.text.length > 60 ? 'text-lg md:text-2xl' : 'text-xl md:text-3xl'
-                        }`}>
-                            {currentQ.text}
-                        </h2>
-                    </div>
+                {/* Question */}
+                <div ref={questionCardRef} style={{ display: "flex", flexDirection: "column", gap: "1.75rem", paddingTop: "2rem" }}>
+                    <h2 style={{ fontSize: currentQ.text.length > 60 ? "1.5rem" : "1.875rem", fontWeight: 800, lineHeight: 1.25, textAlign: "center", maxWidth: "640px", margin: "0 auto", color: "var(--brand-text)", letterSpacing: "-0.01em", textWrap: "balance" }}>
+                        {currentQ.text}
+                    </h2>
 
-                    <div className="grid grid-cols-1 gap-2.5 max-w-xl mx-auto">
-                        {[1, 2, 3, 4, 5].map((val) => (
-                            <button
-                                key={val}
-                                disabled={isTransitioning}
-                                onClick={() => handleAnswer(val)}
-                                className={`
-                                    flex items-center justify-between p-4 rounded-xl border-2 transition-all font-bold text-base
-                                    ${currentAnswer === val 
-                                        ? 'border-primary bg-primary/10 text-primary' 
-                                        : 'border-base-200 bg-base-100 hover:border-primary/30'}
-                                    ${isTransitioning ? 'opacity-50 cursor-not-allowed' : ''}
-                                `}
-                            >
-                                <span className="flex items-center gap-3">
-                                    <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs ${currentAnswer === val ? 'bg-primary text-primary-content' : 'bg-base-200'}`}>
-                                        {val}
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem", maxWidth: "520px", margin: "0 auto", width: "100%" }}>
+                        {[1, 2, 3, 4, 5].map(val => {
+                            const active = currentAnswer === val;
+                            return (
+                                <button
+                                    key={val}
+                                    type="button"
+                                    disabled={isTransitioning}
+                                    onClick={() => handleAnswer(val)}
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "space-between",
+                                        padding: "0.875rem 1rem",
+                                        background: active ? "rgba(6,182,212,0.12)" : "var(--brand-surface)",
+                                        border: `1px solid ${active ? "rgba(6,182,212,0.5)" : "var(--brand-card-border)"}`,
+                                        borderRadius: "0.875rem",
+                                        color: active ? "var(--brand-cyan)" : "var(--brand-text)",
+                                        fontSize: "14px",
+                                        fontWeight: 600,
+                                        cursor: isTransitioning ? "not-allowed" : "pointer",
+                                        opacity: isTransitioning ? 0.5 : 1,
+                                        fontFamily: "inherit",
+                                        transition: "background 0.2s, border-color 0.2s",
+                                    }}
+                                    onMouseEnter={e => { if (!active && !isTransitioning) e.currentTarget.style.borderColor = "rgba(6,182,212,0.3)"; }}
+                                    onMouseLeave={e => { if (!active) e.currentTarget.style.borderColor = "var(--brand-card-border)"; }}
+                                >
+                                    <span style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                                        <span style={{ width: "1.75rem", height: "1.75rem", borderRadius: "0.5rem", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: 700, background: active ? "var(--brand-cyan)" : "var(--brand-border)", color: active ? "#0F172A" : "var(--brand-muted)", fontFamily: "monospace" }}>
+                                            {val}
+                                        </span>
+                                        {scaleLabels[val]}
                                     </span>
-                                    {scaleLabels[val]}
-                                </span>
-                                {currentAnswer === val && <CheckCircle2 size={20} />}
-                            </button>
-                        ))}
+                                    {active && <CheckCircle2 size={18} />}
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
 
-                {/* Warning Message */}
                 {showWarning && (
-                    <div className="flex items-center gap-2 text-error font-bold justify-center animate-bounce">
-                        <AlertCircle size={20} />
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", color: "#f87171", fontWeight: 600, fontSize: "13px" }}>
+                        <AlertCircle size={18} />
                         <span>Моля, отговорете на въпроса, преди да продължите!</span>
                     </div>
                 )}
 
-                {/* Footer Nav */}
-                <div className="flex items-center justify-between pt-6 border-t border-base-content/5 sticky bottom-0 bg-base-100 pb-2 z-10">
-                    <button 
+                {/* Nav */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "1.5rem", borderTop: "1px solid var(--brand-border)" }}>
+                    <button
+                        type="button"
                         onClick={handleBack}
-                        className="btn btn-ghost gap-2 rounded-xl font-black uppercase tracking-widest text-xs"
+                        style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", padding: "0.625rem 1rem", background: "transparent", border: "1px solid var(--brand-border)", borderRadius: "0.625rem", color: "var(--brand-muted)", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", cursor: "pointer", fontFamily: "inherit" }}
                     >
-                        <ChevronLeft size={18} /> Назад
+                        <ChevronLeft size={14} /> Назад
                     </button>
-                    
+
                     {currentQuestionIndex === filteredQuestions.length - 1 ? (
-                        <button 
+                        <button
+                            type="button"
                             disabled={!currentAnswer || loading}
                             onClick={calculateFinalResults}
-                            className={`btn btn-primary px-10 rounded-2xl font-black shadow-xl shadow-primary/30 gap-2 ${!currentAnswer ? 'btn-disabled opacity-50' : ''}`}
+                            style={{
+                                display: "inline-flex", alignItems: "center", gap: "0.5rem",
+                                padding: "0.75rem 1.75rem",
+                                background: !currentAnswer ? "rgba(148,163,184,0.1)" : "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                border: "none",
+                                borderRadius: "0.75rem",
+                                color: "#fff",
+                                fontSize: "14px",
+                                fontWeight: 800,
+                                cursor: !currentAnswer ? "not-allowed" : "pointer",
+                                opacity: !currentAnswer ? 0.5 : 1,
+                                boxShadow: !currentAnswer ? "none" : "0 10px 30px rgba(6,182,212,0.3)",
+                                fontFamily: "inherit",
+                            }}
                         >
-                            Виж резултатите <ChevronRight size={18} />
+                            Виж резултатите <ChevronRight size={16} />
                         </button>
                     ) : (
-                        <button 
+                        <button
+                            type="button"
                             onClick={handleNext}
-                            className={`btn btn-ghost gap-2 rounded-xl font-black uppercase tracking-widest text-xs ${!currentAnswer ? 'opacity-50' : ''}`}
+                            style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", padding: "0.625rem 1rem", background: "transparent", border: "1px solid var(--brand-border)", borderRadius: "0.625rem", color: currentAnswer ? "var(--brand-text)" : "var(--brand-muted)", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", cursor: "pointer", fontFamily: "inherit", opacity: !currentAnswer ? 0.5 : 1 }}
                         >
-                            Напред <ChevronRight size={18} />
+                            Напред <ChevronRight size={14} />
                         </button>
                     )}
                 </div>
@@ -371,95 +383,105 @@ const CareerAdvisor = () => {
         );
     };
 
-    // 3. Резултати
     const renderResults = () => {
         if (loading) {
             return (
-                <div className="flex flex-col items-center justify-center py-24 space-y-8 animate-in fade-in duration-700">
-                    <div className="relative">
-                        <div className="w-24 h-24 rounded-full border-4 border-primary/10 border-t-primary animate-spin"></div>
-                        <Target className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-primary" size={32} />
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "6rem 0", gap: "1.5rem" }}>
+                    <div style={{ position: "relative", width: "5rem", height: "5rem" }}>
+                        <div
+                            style={{
+                                width: "100%",
+                                height: "100%",
+                                borderRadius: "50%",
+                                border: "3px solid rgba(6,182,212,0.15)",
+                                borderTopColor: "var(--brand-cyan)",
+                                animation: "spin 1s linear infinite",
+                            }}
+                        />
+                        <Target size={28} style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", color: "var(--brand-cyan)" }} />
                     </div>
-                    <div className="text-center space-y-3">
-                        <h3 className="text-3xl font-black tracking-tight">Генерираме твоя профил...</h3>
-                        <p className="opacity-50 font-medium">Анализираме отговорите и търсим най-добрите съвпадения.</p>
+                    <div style={{ textAlign: "center" }}>
+                        <h3 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, color: "var(--brand-text)", letterSpacing: "-0.01em", textWrap: "balance" }}>Генерираме твоя профил...</h3>
+                        <p style={{ margin: "0.5rem 0 0", color: "var(--brand-muted)", fontSize: "14px" }}>Анализираме отговорите и търсим най-добрите съвпадения.</p>
                     </div>
                 </div>
             );
         }
-
         if (!results) return null;
-
         return (
-            <RIASECResults 
-                results={results} 
+            <RIASECResults
+                results={results}
                 onRestart={() => {
-                    setStep('version');
+                    setStep("version");
                     setResults(null);
                     setAnswers({});
                     setCurrentQuestionIndex(0);
-                    localStorage.removeItem('riasec_answers');
-                }} 
+                    localStorage.removeItem("riasec_answers");
+                }}
             />
         );
     };
 
     return (
-        <div className={`min-h-screen bg-base-200 selection:bg-primary/20 pb-20 transition-all duration-500 ${step === 'quiz' ? 'pt-20 md:pt-20' : 'pt-24'}`}>
-            <div className="container mx-auto px-4 max-w-5xl flex flex-col items-center">
-                {/* Header Section */}
-                {step === 'version' && (
-                    <div className="text-center space-y-4 mb-10 w-full">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-[0.2em]">
-                            <Zap size={12} /> 
+        <div style={{ minHeight: "100vh", background: "var(--brand-bg)", color: "var(--brand-text)", paddingTop: step === "quiz" ? "5rem" : "6rem", paddingBottom: "5rem", position: "relative", overflow: "hidden" }}>
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+
+            {/* ambient glow */}
+            <div aria-hidden style={{ position: "absolute", top: "-200px", right: "-200px", width: "600px", height: "600px", background: "radial-gradient(circle, rgba(6,182,212,0.08), transparent 70%)", pointerEvents: "none" }} />
+            <div aria-hidden style={{ position: "absolute", bottom: "-200px", left: "-200px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(139,92,246,0.08), transparent 70%)", pointerEvents: "none" }} />
+
+            <div style={{ maxWidth: "960px", margin: "0 auto", padding: "0 1.5rem", position: "relative" }}>
+                {step === "version" && (
+                    <div style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: "1rem", marginBottom: "3rem" }}>
+                        <div style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.4rem 0.875rem", background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.3)", borderRadius: "999px", color: "var(--brand-cyan)", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 auto" }}>
+                            <Sparkles size={12} /> RIASEC
                         </div>
-                        <h1 className="text-5xl md:text-6xl font-black tracking-tight leading-none">
-                            Открий своето <span className="text-primary italic">призвание</span>
+                        <h1 style={{ margin: 0, fontSize: "clamp(2.25rem, 5vw, 3.5rem)", fontWeight: 800, lineHeight: 1.05, letterSpacing: "-0.03em", textWrap: "balance" }}>
+                            Открий своето{" "}
+                            <span
+                                style={{
+                                    background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                    WebkitBackgroundClip: "text",
+                                    WebkitTextFillColor: "transparent",
+                                }}
+                            >
+                                призвание
+                            </span>
                         </h1>
-                        <p className="text-lg opacity-60 max-w-2xl mx-auto font-medium">
+                        <p style={{ margin: 0, fontSize: "1.0625rem", color: "var(--brand-muted)", maxWidth: "620px", marginLeft: "auto", marginRight: "auto" }}>
                             Научно обоснован метод за определяне на твоите професионални интереси и намиране на перфектната кариера.
                         </p>
                     </div>
                 )}
 
-                {/* Main Content Card */}
-                <div className={`
-                    relative transition-all duration-500 w-full
-                    ${step === 'results' ? 'p-0 bg-transparent shadow-none' : 'bg-base-100 rounded-[3rem] shadow-2xl overflow-hidden p-6 md:p-12'}
-                    ${step === 'quiz' ? 'md:p-8' : ''}
-                `}>
-                    {/* Background decorations */}
-                    {step !== 'results' && (
-                        <>
-                            <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none blur-3xl"></div>
-                            <div className="absolute bottom-0 left-0 w-64 h-64 bg-secondary/5 rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none blur-2xl"></div>
-                        </>
-                    )}
-
-                    {step === 'version' && renderVersionSelection()}
-                    {step === 'quiz' && renderQuiz()}
-                    {step === 'results' && renderResults()}
+                <div style={step === "results" ? {} : { ...S.surface, padding: "2rem 1.5rem" }}>
+                    {step === "version" && renderVersionSelection()}
+                    {step === "quiz" && renderQuiz()}
+                    {step === "results" && renderResults()}
                 </div>
 
-                {/* Additional Info (Only on start page) */}
-                {step === 'version' && (
-                    <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 opacity-80">
-                        <div className="flex gap-6 p-8 rounded-3xl bg-base-100/50 border border-base-content/5">
-                            <div className="w-12 h-12 rounded-2xl bg-success/10 text-success flex items-center justify-center shrink-0">
-                                <ClipboardList size={24} />
+                {step === "version" && (
+                    <div style={{ marginTop: "3rem", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1rem" }}>
+                        <div style={{ ...S.surface, padding: "1.5rem", display: "flex", gap: "1rem" }}>
+                            <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "0.75rem", background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.3)", color: "#86efac", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <ClipboardList size={20} />
                             </div>
-                            <div className="space-y-2">
-                                <h4 className="font-black uppercase tracking-widest text-xs opacity-50">Как работи?</h4>
-                                <p className="text-sm leading-relaxed">Алгоритъмът измерва 6 измерения на личността: Реалистичен, Изследователски, Артистичен, Социален, Предприемчив и Конвенционален.</p>
+                            <div>
+                                <h4 style={{ margin: 0, fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--brand-muted)" }}>Как работи?</h4>
+                                <p style={{ margin: "0.4rem 0 0", fontSize: "13px", lineHeight: 1.55, color: "var(--brand-text)" }}>
+                                    Алгоритъмът измерва 6 измерения на личността: Реалистичен, Изследователски, Артистичен, Социален, Предприемчив и Конвенционален.
+                                </p>
                             </div>
                         </div>
-                        <div className="flex gap-6 p-8 rounded-3xl bg-base-100/50 border border-base-content/5">
-                            <div className="w-12 h-12 rounded-2xl bg-info/10 text-info flex items-center justify-center shrink-0">
-                                <AlertCircle size={24} />
+                        <div style={{ ...S.surface, padding: "1.5rem", display: "flex", gap: "1rem" }}>
+                            <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "0.75rem", background: "rgba(6,182,212,0.12)", border: "1px solid rgba(6,182,212,0.3)", color: "var(--brand-cyan)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <AlertCircle size={20} />
                             </div>
-                            <div className="space-y-2">
-                                <h4 className="font-black uppercase tracking-widest text-xs opacity-50">Съвет</h4>
-                                <p className="text-sm leading-relaxed">Отговаряй честно според това как се чувстваш, а не според това как смяташ, че "трябва" да се отговори.</p>
+                            <div>
+                                <h4 style={{ margin: 0, fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--brand-muted)" }}>Съвет</h4>
+                                <p style={{ margin: "0.4rem 0 0", fontSize: "13px", lineHeight: 1.55, color: "var(--brand-text)" }}>
+                                    Отговаряй честно според това как се чувстваш, а не според това как смяташ, че "трябва" да се отговори.
+                                </p>
                             </div>
                         </div>
                     </div>

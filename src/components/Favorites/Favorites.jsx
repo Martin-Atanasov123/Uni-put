@@ -1,12 +1,7 @@
-// Компонент: Любими специалности
-// Описание: Показва списък от запазени специалности/университети за текущия потребител,
-//   с филтри по град и текстово търсене. Данните се извличат от сервизните методи.
-// Вход: няма пропсове; използва контекст (favorites) и услуги (universityService).
-// Изход: филтриран списък; възможност за премахване/добавяне към любими.
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { universityService } from "@/services/universityService";
-import { Search, MapPin, School, Heart, Calculator } from "lucide-react";
+import { Search, MapPin, School, Heart, Calculator, Filter, X } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const FavoritesPage = () => {
@@ -26,9 +21,7 @@ const FavoritesPage = () => {
             setLoading(true);
             try {
                 const data = await universityService.searchUniversities({});
-                const mapped = data.filter((item) =>
-                    favorites.includes(String(item.id))
-                );
+                const mapped = data.filter(item => favorites.includes(String(item.id)));
                 setAllFavoritesData(mapped);
             } catch {
                 setAllFavoritesData([]);
@@ -41,16 +34,13 @@ const FavoritesPage = () => {
 
     const cities = useMemo(() => {
         const set = new Set(["Всички"]);
-        allFavoritesData.forEach((u) => {
-            if (u.city) set.add(u.city);
-        });
+        allFavoritesData.forEach(u => u.city && set.add(u.city));
         return Array.from(set);
     }, [allFavoritesData]);
 
     const filtered = useMemo(() => {
-        return allFavoritesData.filter((u) => {
-            const matchesCity =
-                cityFilter === "Всички" || u.city === cityFilter;
+        return allFavoritesData.filter(u => {
+            const matchesCity = cityFilter === "Всички" || u.city === cityFilter;
             const term = search.trim().toLowerCase();
             if (!term) return matchesCity;
             const haystack = `${u.specialty || ""} ${u.university_name || ""}`.toLowerCase();
@@ -60,18 +50,62 @@ const FavoritesPage = () => {
 
     if (!user) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-base-200 px-4">
-                <div className="max-w-md text-center space-y-4">
-                    <h1 className="text-3xl font-black">
-                        Любими са достъпни само за логнати потребители
+            <div
+                style={{
+                    minHeight: "100vh",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: "var(--brand-bg)",
+                    color: "var(--brand-text)",
+                    padding: "7rem 1.5rem 3rem",
+                }}
+            >
+                <div
+                    style={{
+                        maxWidth: "440px",
+                        textAlign: "center",
+                        background: "var(--brand-surface)",
+                        backdropFilter: "blur(12px)",
+                        border: "1px solid var(--brand-border)",
+                        borderRadius: "1.5rem",
+                        padding: "2.5rem 2rem",
+                    }}
+                >
+                    <div
+                        style={{
+                            width: "3.5rem",
+                            height: "3.5rem",
+                            margin: "0 auto 1rem",
+                            borderRadius: "1rem",
+                            background: "rgba(248,113,113,0.1)",
+                            border: "1px solid rgba(248,113,113,0.25)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <Heart size={24} style={{ color: "#fca5a5" }} />
+                    </div>
+                    <h1 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, letterSpacing: "-0.02em", textWrap: "balance" }}>
+                        Любимите са само за логнати потребители
                     </h1>
-                    <p className="opacity-60">
-                        Влез в профила си, за да запазваш и виждаш любимите
-                        специалности.
+                    <p style={{ margin: "0.75rem 0 1.5rem", color: "var(--brand-muted)", fontSize: "14px" }}>
+                        Влез в профила си, за да запазваш и виждаш любимите специалности.
                     </p>
                     <Link
                         to="/login"
-                        className="btn btn-primary rounded-2xl font-black mt-4"
+                        style={{
+                            display: "inline-flex",
+                            padding: "0.75rem 1.5rem",
+                            background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                            borderRadius: "0.75rem",
+                            color: "#fff",
+                            fontSize: "14px",
+                            fontWeight: 800,
+                            textDecoration: "none",
+                            boxShadow: "0 12px 30px rgba(6,182,212,0.3)",
+                        }}
                     >
                         Към вход
                     </Link>
@@ -81,135 +115,232 @@ const FavoritesPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-base-100 pt-28 pb-12 px-6">
-            <div className="max-w-7xl mx-auto space-y-8">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-4xl font-black tracking-tight">
-                            Моите любими специалности
-                        </h1>
-                        <p className="opacity-60 text-sm mt-2">
-                            Запазени университети и специалности, достъпни от
-                            всеки твой вход.
-                        </p>
+        <div style={{ minHeight: "100vh", background: "var(--brand-bg)", color: "var(--brand-text)", padding: "7rem 1.5rem 3rem" }}>
+            <div style={{ maxWidth: "1200px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "2rem" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        <Heart size={14} style={{ color: "#f87171", fill: "#f87171" }} />
+                        <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.14em" }}>
+                            Запазени
+                        </span>
                     </div>
+                    <h1 style={{ margin: 0, fontSize: "clamp(2rem, 4vw, 2.75rem)", fontWeight: 800, letterSpacing: "-0.02em", textWrap: "balance" }}>
+                        Моите любими специалности
+                    </h1>
+                    <p style={{ margin: 0, color: "var(--brand-muted)", fontSize: "1rem", maxWidth: "640px" }}>
+                        Запазени университети и специалности, достъпни от всеки твой вход.
+                    </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-4 bg-base-200 p-4 rounded-[2.5rem] shadow-inner sticky top-24 z-20 backdrop-blur-md bg-base-200/80">
-                    <div className="relative col-span-1 md:col-span-8">
-                        <Search
-                            className="absolute left-4 top-1/2 -translate-y-1/2 opacity-30"
-                            size={20}
-                        />
+                <div
+                    style={{
+                        background: "var(--brand-surface)",
+                        backdropFilter: "blur(8px)",
+                        border: "1px solid var(--brand-border)",
+                        borderRadius: "1rem",
+                        padding: "1rem 1.25rem",
+                        display: "grid",
+                        gridTemplateColumns: "1fr auto",
+                        gap: "0.75rem",
+                        position: "sticky",
+                        top: "6rem",
+                        zIndex: 20,
+                    }}
+                >
+                    <div style={{ position: "relative" }}>
+                        <Search size={16} style={{ position: "absolute", left: "0.875rem", top: "50%", transform: "translateY(-50%)", color: "var(--brand-muted)", pointerEvents: "none" }} />
                         <input
                             type="text"
                             placeholder="Търси в любимите..."
-                            className="input w-full pl-12 h-14 bg-base-100 border-none rounded-2xl font-bold shadow-sm focus:ring-2 ring-primary/20"
                             value={search}
-                            onChange={(e) => setSearch(e.target.value)}
+                            onChange={e => setSearch(e.target.value)}
+                            style={{
+                                width: "100%",
+                                height: "2.75rem",
+                                padding: "0 0.875rem 0 2.5rem",
+                                background: "var(--brand-input-bg)",
+                                border: "1px solid var(--brand-input-border)",
+                                borderRadius: "0.625rem",
+                                color: "var(--brand-text)",
+                                fontSize: "13px",
+                                fontWeight: 500,
+                                fontFamily: "inherit",
+                                outline: "none",
+                                boxSizing: "border-box",
+                            }}
                         />
                     </div>
-
-                    <div className="relative col-span-1 md:col-span-4">
-                        <select
-                            className="select w-full h-14 bg-base-100 border-none rounded-2xl font-bold shadow-sm cursor-pointer"
-                            value={cityFilter}
-                            onChange={(e) => setCityFilter(e.target.value)}
-                        >
-                            {cities.map((city) => (
-                                <option key={city} value={city}>
-                                    {city}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                    <select
+                        value={cityFilter}
+                        onChange={e => setCityFilter(e.target.value)}
+                        style={{
+                            height: "2.75rem",
+                            minWidth: "160px",
+                            padding: "0 0.875rem",
+                            background: "var(--brand-input-bg)",
+                            border: "1px solid var(--brand-input-border)",
+                            borderRadius: "0.625rem",
+                            color: "var(--brand-text)",
+                            fontSize: "13px",
+                            fontFamily: "inherit",
+                            cursor: "pointer",
+                            outline: "none",
+                        }}
+                    >
+                        {cities.map(city => (
+                            <option key={city} value={city} style={{ background: "var(--brand-dropdown-bg)" }}>{city}</option>
+                        ))}
+                    </select>
                 </div>
 
                 {loading ? (
-                    <div className="flex justify-center py-20">
-                        <span className="loading loading-infinity loading-lg text-primary scale-150"></span>
+                    <div style={{ display: "flex", justifyContent: "center", padding: "5rem 0" }}>
+                        <div style={{ width: "3rem", height: "3rem", borderRadius: "50%", border: "3px solid rgba(6,182,212,0.2)", borderTopColor: "var(--brand-cyan)", animation: "spin 1s linear infinite" }} />
+                        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
                     </div>
                 ) : filtered.length === 0 ? (
-                    <div className="text-center py-20 space-y-4">
-                        <div className="bg-base-200 w-20 h-20 rounded-full flex items-center justify-center mx-auto opacity-20">
-                            <Heart size={40} />
+                    <div
+                        style={{
+                            textAlign: "center",
+                            padding: "4rem 2rem",
+                            background: "var(--brand-surface)",
+                            backdropFilter: "blur(8px)",
+                            border: "1px solid var(--brand-border)",
+                            borderRadius: "1.25rem",
+                        }}
+                    >
+                        <div
+                            style={{
+                                width: "4rem",
+                                height: "4rem",
+                                margin: "0 auto 1rem",
+                                borderRadius: "1rem",
+                                background: "rgba(248,113,113,0.1)",
+                                border: "1px solid rgba(248,113,113,0.25)",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                            }}
+                        >
+                            <Heart size={28} style={{ color: "#fca5a5" }} />
                         </div>
-                        <h3 className="text-2xl font-black opacity-40 italic uppercase tracking-tighter text-center">
-                            Все още нямаш любими.
-                        </h3>
-                        <p className="opacity-60 text-sm max-w-md mx-auto">
-                            Посети страницата „Университети“ и натисни
-                            сърчицето към специалностите, които те
-                            интересуват.
+                        <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700, textWrap: "balance" }}>Все още нямаш запазени специалности.</h3>
+                        <p style={{ margin: "0.5rem auto 1.25rem", color: "var(--brand-muted)", fontSize: "14px", maxWidth: "400px", lineHeight: 1.6 }}>
+                            Намери специалност, която те интересува, и я добави тук с натискане на сърцето.
                         </p>
                         <Link
                             to="/universities"
-                            className="btn btn-primary rounded-2xl mt-4 font-black"
+                            style={{
+                                display: "inline-flex",
+                                padding: "0.6rem 1.25rem",
+                                background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                borderRadius: "0.625rem",
+                                color: "#fff",
+                                fontSize: "13px",
+                                fontWeight: 700,
+                                textDecoration: "none",
+                            }}
                         >
                             Към университетите
                         </Link>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filtered.map((uni) => {
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "1.25rem" }}>
+                        {filtered.map(uni => {
                             const favorite = isFavorite(String(uni.id));
                             return (
                                 <div
                                     key={uni.id}
-                                    className="group bg-base-100 rounded-[2.5rem] border border-base-200 p-8 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 relative overflow-hidden"
+                                    style={{
+                                        position: "relative",
+                                        padding: "1.5rem",
+                                        background: "var(--brand-surface)",
+                                        backdropFilter: "blur(8px)",
+                                        border: "1px solid var(--brand-border)",
+                                        borderRadius: "1rem",
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        gap: "1rem",
+                                        overflow: "hidden",
+                                        transition: "transform 0.2s, border-color 0.2s, box-shadow 0.2s",
+                                    }}
+                                    onMouseEnter={e => {
+                                        e.currentTarget.style.borderColor = "rgba(6,182,212,0.35)";
+                                        e.currentTarget.style.transform = "translateY(-2px)";
+                                        e.currentTarget.style.boxShadow = "0 16px 40px rgba(6,182,212,0.1)";
+                                    }}
+                                    onMouseLeave={e => {
+                                        e.currentTarget.style.borderColor = "var(--brand-border)";
+                                        e.currentTarget.style.transform = "translateY(0)";
+                                        e.currentTarget.style.boxShadow = "none";
+                                    }}
                                 >
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors"></div>
+                                    <div
+                                        aria-hidden
+                                        style={{
+                                            position: "absolute",
+                                            top: "-80px",
+                                            right: "-80px",
+                                            width: "160px",
+                                            height: "160px",
+                                            borderRadius: "50%",
+                                            background: "radial-gradient(circle, rgba(6,182,212,0.08), transparent 70%)",
+                                            pointerEvents: "none",
+                                        }}
+                                    />
 
-                                    <div className="flex flex-col h-full space-y-6">
-                                        <div className="space-y-1">
-                                            <div className="flex justify-between items-start">
-                                                <div className="flex items-center gap-2 text-[10px] font-black opacity-40 uppercase tracking-widest">
-                                                    <MapPin
-                                                        size={12}
-                                                        className="text-primary"
-                                                    />{" "}
-                                                    {uni.city}
-                                                </div>
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        toggleFavorite(
-                                                            String(uni.id)
-                                                        )
-                                                    }
-                                                    className={`btn btn-ghost btn-xs rounded-full border transition-colors ${
-                                                        favorite
-                                                            ? "border-red-500/40 bg-red-500/10 text-red-500"
-                                                            : "border-base-300 text-base-content/60 hover:bg-base-200"
-                                                    }`}
-                                                >
-                                                    <Heart
-                                                        size={16}
-                                                        className={
-                                                            favorite
-                                                                ? "fill-red-500"
-                                                                : ""
-                                                        }
-                                                    />
-                                                </button>
-                                            </div>
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "0.5rem", position: "relative" }}>
+                                        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                                            <MapPin size={10} style={{ color: "var(--brand-cyan)" }} /> {uni.city}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => toggleFavorite(String(uni.id))}
+                                            style={{
+                                                padding: "0.3rem",
+                                                background: favorite ? "rgba(248,113,113,0.1)" : "var(--brand-border)",
+                                                border: `1px solid ${favorite ? "rgba(248,113,113,0.3)" : "rgba(148,163,184,0.15)"}`,
+                                                borderRadius: "999px",
+                                                color: favorite ? "#f87171" : "var(--brand-muted)",
+                                                cursor: "pointer",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                            }}
+                                            aria-label="Премахни от любими"
+                                        >
+                                            <Heart size={14} fill={favorite ? "#f87171" : "none"} />
+                                        </button>
+                                    </div>
 
-                                            <h2 className="text-xl font-black leading-tight group-hover:text-primary transition-colors">
-                                                {uni.specialty}
-                                            </h2>
-                                            <p className="text-xs font-bold opacity-60 flex items-center gap-1">
-                                                <School size={14} />{" "}
-                                                {uni.university_name}
-                                            </p>
-                                        </div>
-                                        <div className="pt-4 border-t border-base-200 mt-auto">
-                                            <Link
-                                                to={`/calculator?specialty=${encodeURIComponent(uni.specialty)}`}
-                                                className="btn btn-primary btn-sm rounded-xl font-bold gap-2 shadow-lg shadow-primary/20"
-                                            >
-                                                <Calculator size={14} /> Изчисли бал
-                                            </Link>
-                                        </div>
+                                    <div style={{ position: "relative" }}>
+                                        <h2 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 800, lineHeight: 1.25, letterSpacing: "-0.01em", color: "var(--brand-text)" }}>
+                                            {uni.specialty}
+                                        </h2>
+                                        <p style={{ margin: "0.4rem 0 0", display: "inline-flex", alignItems: "center", gap: "0.3rem", fontSize: "12px", color: "var(--brand-muted)", fontWeight: 600 }}>
+                                            <School size={12} /> {uni.university_name}
+                                        </p>
+                                    </div>
+
+                                    <div style={{ marginTop: "auto", paddingTop: "0.875rem", borderTop: "1px solid var(--brand-border)", position: "relative" }}>
+                                        <Link
+                                            to={`/calculator?specialty=${encodeURIComponent(uni.specialty)}`}
+                                            style={{
+                                                display: "inline-flex",
+                                                alignItems: "center",
+                                                gap: "0.4rem",
+                                                padding: "0.5rem 0.875rem",
+                                                background: "rgba(6,182,212,0.1)",
+                                                border: "1px solid rgba(6,182,212,0.3)",
+                                                borderRadius: "0.5rem",
+                                                color: "var(--brand-cyan)",
+                                                fontSize: "12px",
+                                                fontWeight: 700,
+                                                textDecoration: "none",
+                                            }}
+                                        >
+                                            <Calculator size={13} /> Изчисли бал
+                                        </Link>
                                     </div>
                                 </div>
                             );

@@ -17,6 +17,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Създаване на Supabase клиентска инстанция
-const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '')
+const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '', {
+    realtime: { enabled: false },
+    auth: { persistSession: true, autoRefreshToken: true },
+})
 
 export { supabase }

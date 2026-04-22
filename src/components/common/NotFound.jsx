@@ -1,37 +1,103 @@
 import { Link } from "react-router-dom";
+import { Home, ArrowRight, AlertCircle } from "lucide-react";
 
 export default function NotFound() {
     return (
-        <>
-            <main className="grid min-h-full place-items-center bg-gray-900 px-6 py-24 sm:py-32 lg:px-8">
-                <div className="text-center">
-                    <p className="text-base font-semibold text-indigo-400">
-                        404
-                    </p>
-                    <h1 className="mt-4 text-5xl font-semibold tracking-tight text-balance text-white sm:text-7xl">
-                        Page not found
-                    </h1>
-                    <p className="mt-6 text-lg font-medium text-pretty text-gray-400 sm:text-xl/8">
-                        Sorry, we couldn't find the page you're looking for.
-                    </p>
-                    <div className="mt-10 flex items-center justify-center gap-x-6">
-                        <Link
-                            to="/"
-                            className="rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                        >
-                            Go back home
-                        </Link>
-                        <Link
-                            to="/"
-                            className="text-sm font-semibold text-white"
-                        >
-                            Contact support{" "}
-                            <span aria-hidden="true">&rarr;</span>
-                        </Link>
-                    </div>
+        <main
+            style={{
+                minHeight: "100vh",
+                display: "grid",
+                placeItems: "center",
+                padding: "6rem 1.5rem",
+                background: "var(--brand-bg)",
+                color: "var(--brand-text)",
+                position: "relative",
+                overflow: "hidden",
+            }}
+        >
+            <div aria-hidden style={{ position: "absolute", top: "-200px", left: "50%", transform: "translateX(-50%)", width: "640px", height: "640px", background: "radial-gradient(circle, rgba(139,92,246,0.12), transparent 70%)", pointerEvents: "none" }} />
+            <div aria-hidden style={{ position: "absolute", bottom: "-200px", left: "10%", width: "400px", height: "400px", background: "radial-gradient(circle, rgba(6,182,212,0.1), transparent 70%)", pointerEvents: "none" }} />
+
+            <div style={{ textAlign: "center", maxWidth: "640px", position: "relative", zIndex: 1 }}>
+                <div
+                    style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.4rem",
+                        padding: "0.4rem 0.875rem",
+                        background: "rgba(248,113,113,0.1)",
+                        border: "1px solid rgba(248,113,113,0.25)",
+                        borderRadius: "999px",
+                        color: "#fca5a5",
+                        fontSize: "11px",
+                        fontWeight: 800,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.18em",
+                        marginBottom: "1.5rem",
+                    }}
+                >
+                    <AlertCircle size={12} /> 404
                 </div>
-            </main>
-        </>
+
+                <h1
+                    style={{
+                        margin: 0,
+                        fontSize: "clamp(3rem, 10vw, 6rem)",
+                        fontWeight: 800,
+                        lineHeight: 1,
+                        letterSpacing: "-0.04em",
+                        background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                    }}
+                >
+                    Страницата не е намерена
+                </h1>
+
+                <p style={{ margin: "1.25rem auto 0", fontSize: "1.0625rem", color: "var(--brand-muted)", maxWidth: "440px", lineHeight: 1.6 }}>
+                    Търсената страница не съществува или е била преместена. Върни се към началото, за да продължиш.
+                </p>
+
+                <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center", flexWrap: "wrap", marginTop: "2rem" }}>
+                    <Link
+                        to="/"
+                        style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "0.5rem",
+                            padding: "0.75rem 1.5rem",
+                            background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                            border: "none",
+                            borderRadius: "0.75rem",
+                            color: "#fff",
+                            fontSize: "14px",
+                            fontWeight: 700,
+                            textDecoration: "none",
+                            boxShadow: "0 12px 30px rgba(6,182,212,0.3)",
+                        }}
+                    >
+                        <Home size={16} /> Към началната
+                    </Link>
+                    <Link
+                        to="/universities"
+                        style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "0.5rem",
+                            padding: "0.75rem 1.5rem",
+                            background: "transparent",
+                            border: "1px solid rgba(148,163,184,0.2)",
+                            borderRadius: "0.75rem",
+                            color: "var(--brand-text)",
+                            fontSize: "14px",
+                            fontWeight: 600,
+                            textDecoration: "none",
+                        }}
+                    >
+                        Разгледай университети <ArrowRight size={14} />
+                    </Link>
+                </div>
+            </div>
+        </main>
     );
 }
-

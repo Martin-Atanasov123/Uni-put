@@ -1,52 +1,46 @@
-// Компонент: Профил и настройки (Модерен Дизайн)
-// Описание: Зарежда профил от Supabase, визуализира основни данни, любими университети 
-//   и история на баловете. Позволява промени в потребителска информация и сигурност.
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useNavigate, Link } from "react-router-dom";
 import { sessionService } from "@/services/sessionService";
 import { useAuth } from "@/hooks/useAuth";
 import { universityService } from "@/services/universityService";
-import { 
-    User, 
-    Mail, 
-    LogOut, 
-    Save, 
-    Loader2, 
-    CheckCircle2, 
+import {
+    User,
+    Mail,
+    LogOut,
+    Loader2,
+    CheckCircle2,
     AlertCircle,
-    ChevronLeft,
     Shield,
-    Bell,
     Lock,
-    Eye,
-    EyeOff,
     Globe,
     Activity,
-    Smartphone,
     Heart,
     Calculator,
-    Calendar,
     ArrowRight,
     MapPin,
     GraduationCap,
-    Star,
     Trash2,
     Settings,
-    Edit3
+    Edit3,
 } from "lucide-react";
+
+const SURFACE = {
+    background: "var(--brand-surface)",
+    backdropFilter: "blur(10px)",
+    border: "1px solid var(--brand-border)",
+    borderRadius: "1.25rem",
+};
 
 const Profile = () => {
     const navigate = useNavigate();
     const { favorites, toggleFavorite } = useAuth();
-    
-    // UI State
+
     const [activeTab, setActiveTab] = useState("overview");
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
     const [message, setMessage] = useState({ type: "", text: "" });
 
-    // Data State
     const [user, setUser] = useState(null);
     const [favoriteDetails, setFavoriteDetails] = useState([]);
     const [calculatorHistory, setCalculatorHistory] = useState([]);
@@ -54,13 +48,9 @@ const Profile = () => {
         username: "",
         bio: "",
         email: "",
-        newEmail: "",
-        currentPassword: "",
         privacy: { isPublic: false, showActivity: true },
-        notifications: { emailUpdates: true, securityAlerts: true, marketing: false }
     });
 
-    // --- 1. Fetch Profile & Related Data ---
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -71,7 +61,6 @@ const Profile = () => {
                 if (user) {
                     setUser(user);
                     const metadata = user.user_metadata || {};
-                    
                     setFormData(prev => ({
                         ...prev,
                         username: metadata.username || "",
@@ -79,37 +68,28 @@ const Profile = () => {
                         email: user.email || "",
                         privacy: {
                             isPublic: metadata.privacy?.isPublic ?? false,
-                            showActivity: metadata.privacy?.showActivity ?? true
+                            showActivity: metadata.privacy?.showActivity ?? true,
                         },
-                        notifications: {
-                            emailUpdates: metadata.notifications?.emailUpdates ?? true,
-                            securityAlerts: metadata.notifications?.securityAlerts ?? true,
-                            marketing: metadata.notifications?.marketing ?? false
-                        }
                     }));
 
-                    // Fetch Favorite Details
                     if (favorites.length > 0) {
                         const allUnis = await universityService.searchUniversities({});
                         const details = allUnis.filter(u => favorites.includes(u.id.toString()));
-                        setFavoriteDetails(details.slice(0, 3)); // Show top 3 in overview
+                        setFavoriteDetails(details.slice(0, 3));
                     }
 
-                    // Fetch Calculator History from LocalStorage (Mock or actual if implemented)
                     const history = JSON.parse(localStorage.getItem("calculator_history") || "[]");
                     setCalculatorHistory(history.slice(0, 3));
                 }
-            } catch (error) {
+            } catch {
                 navigate("/login");
             } finally {
                 setLoading(false);
             }
         };
-
         fetchData();
     }, [navigate, favorites]);
 
-    // --- Helpers ---
     const showMessage = (type, text) => {
         setMessage({ type, text });
         setTimeout(() => setMessage({ type: "", text: "" }), 5000);
@@ -120,13 +100,12 @@ const Profile = () => {
         navigate("/login");
     };
 
-    // --- Handlers ---
-    const updateGeneralInfo = async (e) => {
+    const updateGeneralInfo = async e => {
         e.preventDefault();
         setUpdating(true);
         try {
             const { error } = await supabase.auth.updateUser({
-                data: { username: formData.username, bio: formData.bio }
+                data: { username: formData.username, bio: formData.bio },
             });
             if (error) throw error;
             showMessage("success", "Профилът е обновен успешно!");
@@ -139,10 +118,13 @@ const Profile = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-base-100">
-                <div className="flex flex-col items-center gap-4">
-                    <Loader2 className="w-12 h-12 animate-spin text-primary" />
-                    <p className="font-black animate-pulse opacity-50 uppercase tracking-widest text-xs">Зареждане на профил...</p>
+            <div style={{ minHeight: "100vh", background: "var(--brand-bg)", color: "var(--brand-text)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}>
+                    <div style={{ width: "3rem", height: "3rem", borderRadius: "50%", border: "3px solid rgba(6,182,212,0.2)", borderTopColor: "var(--brand-cyan)", animation: "spin 1s linear infinite" }} />
+                    <p style={{ margin: 0, fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--brand-muted)" }}>
+                        Зареждане на профил...
+                    </p>
                 </div>
             </div>
         );
@@ -156,296 +138,627 @@ const Profile = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-base-200/50 selection:bg-primary/30">
-            {/* Top Decorative Banner */}
-            <div className="h-48 md:h-64 bg-gradient-to-br from-primary via-secondary to-accent relative overflow-hidden">
-                <div className="absolute inset-0 opacity-20 mix-blend-overlay">
-                    <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.2),transparent_70%)] animate-pulse"></div>
-                </div>
+        <div style={{ minHeight: "100vh", background: "var(--brand-bg)", color: "var(--brand-text)" }}>
+            <style>{`
+                .no-scrollbar::-webkit-scrollbar { display: none; }
+                .no-scrollbar { scrollbar-width: none; }
+            `}</style>
+
+            {/* Banner */}
+            <div
+                style={{
+                    height: "240px",
+                    position: "relative",
+                    overflow: "hidden",
+                    background: "linear-gradient(135deg, rgba(6,182,212,0.18), rgba(139,92,246,0.18))",
+                }}
+            >
+                <div
+                    aria-hidden
+                    style={{
+                        position: "absolute",
+                        inset: 0,
+                        background: "radial-gradient(circle at 30% 30%, rgba(6,182,212,0.25), transparent 50%), radial-gradient(circle at 70% 70%, rgba(139,92,246,0.25), transparent 50%)",
+                    }}
+                />
+                <div
+                    aria-hidden
+                    style={{
+                        position: "absolute",
+                        inset: 0,
+                        backgroundImage: "linear-gradient(rgba(148,163,184,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.05) 1px, transparent 1px)",
+                        backgroundSize: "40px 40px",
+                        maskImage: "radial-gradient(ellipse at center, black 30%, transparent 75%)",
+                    }}
+                />
             </div>
 
-            <div className="max-w-6xl mx-auto px-4 -mt-24 md:-mt-32 relative z-10 pb-20">
-                {/* Main Profile Card */}
-                <div className="bg-base-100 rounded-[2.5rem] shadow-2xl shadow-primary/5 border border-base-content/5 overflow-hidden">
-                    <div className="p-6 md:p-10">
-                        {/* Header Section */}
-                        <div className="flex flex-col md:flex-row items-center md:items-end gap-6 mb-12">
-                            <div className="relative group">
-                                <div className="w-32 h-32 md:w-40 md:h-40 rounded-[2rem] bg-base-200 p-1 ring-4 ring-base-100 shadow-xl overflow-hidden">
-                                    <div className="w-full h-full rounded-[1.8rem] bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center text-primary">
-                                        <User size={64} strokeWidth={1.5} />
-                                    </div>
-                                </div>
-                                <button className="absolute -bottom-2 -right-2 btn btn-circle btn-primary btn-sm shadow-lg border-2 border-base-100 hover:scale-110 transition-transform">
-                                    <Edit3 size={14} />
-                                </button>
+            <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 1.5rem 4rem", marginTop: "-120px", position: "relative", zIndex: 1 }}>
+                <div style={{ ...SURFACE, padding: "1.75rem 1.5rem", overflow: "hidden" }}>
+                    {/* Header */}
+                    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", gap: "1.5rem", marginBottom: "2.5rem" }}>
+                        <div style={{ position: "relative" }}>
+                            <div
+                                style={{
+                                    width: "9rem",
+                                    height: "9rem",
+                                    borderRadius: "1.5rem",
+                                    background: "linear-gradient(135deg, rgba(6,182,212,0.15), rgba(139,92,246,0.15))",
+                                    border: "3px solid var(--brand-surface)",
+                                    boxShadow: "0 16px 40px var(--brand-shadow)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    color: "var(--brand-cyan)",
+                                }}
+                            >
+                                <User size={56} strokeWidth={1.5} />
                             </div>
-
-                            <div className="flex-1 text-center md:text-left space-y-2">
-                                <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-                                    <h1 className="text-3xl md:text-4xl font-black tracking-tight">{formData.username || "Потребител"}</h1>
-                                    <span className="badge badge-primary font-black text-[10px] uppercase tracking-widest px-3 py-3 shadow-sm shadow-primary/20">
-                                        Кандидат-студент
-                                    </span>
-                                </div>
-                                <p className="text-base-content/60 font-medium flex items-center justify-center md:justify-start gap-2">
-                                    <Mail size={16} className="opacity-40" /> {user?.email}
-                                </p>
-                                <p className="text-sm opacity-50 italic max-w-md mx-auto md:mx-0">
-                                    {formData.bio || "Все още няма добавена биография..."}
-                                </p>
-                            </div>
-
-                            <div className="flex gap-2">
-                                <button onClick={handleLogout} className="btn btn-ghost btn-sm rounded-xl font-black text-error hover:bg-error/10">
-                                    <LogOut size={16} /> Изход
-                                </button>
-                            </div>
+                            <button
+                                style={{
+                                    position: "absolute",
+                                    bottom: "-0.375rem",
+                                    right: "-0.375rem",
+                                    width: "2.25rem",
+                                    height: "2.25rem",
+                                    borderRadius: "50%",
+                                    background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                    border: "2px solid var(--brand-bg)",
+                                    color: "#fff",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    cursor: "pointer",
+                                    boxShadow: "0 8px 20px rgba(6,182,212,0.3)",
+                                }}
+                            >
+                                <Edit3 size={13} />
+                            </button>
                         </div>
 
-                        {/* Navigation Tabs */}
-                        <div className="flex overflow-x-auto gap-2 p-1 bg-base-200/50 rounded-2xl mb-10 no-scrollbar">
-                            {tabs.map((tab) => (
+                        <div style={{ flex: 1, minWidth: "240px", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.75rem" }}>
+                                <h1 style={{ margin: 0, fontSize: "clamp(1.5rem, 3vw, 2.25rem)", fontWeight: 800, letterSpacing: "-0.02em" }}>
+                                    {formData.username || "Потребител"}
+                                </h1>
+                                <span
+                                    style={{
+                                        padding: "0.3rem 0.75rem",
+                                        background: "rgba(6,182,212,0.12)",
+                                        border: "1px solid rgba(6,182,212,0.3)",
+                                        borderRadius: "999px",
+                                        color: "var(--brand-cyan)",
+                                        fontSize: "10px",
+                                        fontWeight: 800,
+                                        textTransform: "uppercase",
+                                        letterSpacing: "0.14em",
+                                    }}
+                                >
+                                    Кандидат-студент
+                                </span>
+                            </div>
+                            <p style={{ margin: 0, display: "inline-flex", alignItems: "center", gap: "0.4rem", color: "var(--brand-muted)", fontSize: "13px", fontWeight: 500 }}>
+                                <Mail size={14} style={{ opacity: 0.6 }} /> {user?.email}
+                            </p>
+                            <p style={{ margin: 0, fontSize: "13px", color: "var(--brand-muted)", opacity: 0.7, fontStyle: "italic", maxWidth: "480px" }}>
+                                {formData.bio || "Все още няма добавена биография..."}
+                            </p>
+                        </div>
+
+                        <button
+                            onClick={handleLogout}
+                            style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "0.4rem",
+                                padding: "0.55rem 1rem",
+                                background: "rgba(248,113,113,0.08)",
+                                border: "1px solid rgba(248,113,113,0.25)",
+                                borderRadius: "0.625rem",
+                                color: "#fca5a5",
+                                fontSize: "12px",
+                                fontWeight: 700,
+                                cursor: "pointer",
+                                fontFamily: "inherit",
+                            }}
+                        >
+                            <LogOut size={14} /> Изход
+                        </button>
+                    </div>
+
+                    {/* Tabs */}
+                    <div
+                        className="no-scrollbar"
+                        style={{
+                            display: "flex",
+                            gap: "0.25rem",
+                            padding: "0.25rem",
+                            background: "var(--brand-input-bg)",
+                            border: "1px solid var(--brand-border)",
+                            borderRadius: "0.75rem",
+                            marginBottom: "2rem",
+                            overflow: "auto",
+                        }}
+                    >
+                        {tabs.map(tab => {
+                            const active = activeTab === tab.id;
+                            return (
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-black transition-all whitespace-nowrap
-                                        ${activeTab === tab.id 
-                                            ? "bg-base-100 text-primary shadow-sm ring-1 ring-base-content/5" 
-                                            : "opacity-50 hover:opacity-100 hover:bg-base-100/50"}`}
+                                    style={{
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        gap: "0.4rem",
+                                        padding: "0.6rem 1rem",
+                                        background: active ? "rgba(6,182,212,0.12)" : "transparent",
+                                        border: `1px solid ${active ? "rgba(6,182,212,0.35)" : "transparent"}`,
+                                        borderRadius: "0.5rem",
+                                        color: active ? "var(--brand-cyan)" : "var(--brand-muted)",
+                                        fontSize: "12px",
+                                        fontWeight: 700,
+                                        whiteSpace: "nowrap",
+                                        cursor: "pointer",
+                                        fontFamily: "inherit",
+                                        transition: "all 0.2s",
+                                    }}
                                 >
-                                    <tab.icon size={16} />
+                                    <tab.icon size={14} />
                                     {tab.label}
                                 </button>
-                            ))}
+                            );
+                        })}
+                    </div>
+
+                    {message.text && (
+                        <div
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "0.5rem",
+                                padding: "0.75rem 0.875rem",
+                                background: message.type === "success" ? "rgba(34,197,94,0.08)" : "rgba(248,113,113,0.08)",
+                                border: `1px solid ${message.type === "success" ? "rgba(34,197,94,0.3)" : "rgba(248,113,113,0.3)"}`,
+                                borderRadius: "0.625rem",
+                                color: message.type === "success" ? "#86efac" : "#fca5a5",
+                                fontSize: "13px",
+                                fontWeight: 600,
+                                marginBottom: "1.25rem",
+                            }}
+                        >
+                            {message.type === "success" ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                            <span>{message.text}</span>
                         </div>
+                    )}
 
-                        {/* Messages */}
-                        {message.text && (
-                            <div className={`alert ${message.type === "success" ? "alert-success bg-success/10 text-success border-success/20" : "alert-error bg-error/10 text-error border-error/20"} mb-8 rounded-2xl animate-in fade-in slide-in-from-top-4 duration-500`}>
-                                {message.type === "success" ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
-                                <span className="font-bold">{message.text}</span>
+                    {/* OVERVIEW */}
+                    {activeTab === "overview" && (
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.5rem" }}>
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.875rem" }}>
+                                <StatCard icon={Heart} label="Любими" value={favorites.length} color="cyan" />
+                                <StatCard icon={Calculator} label="Изчислени бала" value={calculatorHistory.length} color="violet" />
                             </div>
-                        )}
 
-                        {/* Content Area */}
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-                            
-                            {/* --- TAB: OVERVIEW --- */}
-                            {activeTab === "overview" && (
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                    {/* Stats Grid */}
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="bg-primary/5 p-6 rounded-3xl border border-primary/10 group hover:bg-primary/10 transition-colors">
-                                            <Heart className="text-primary mb-4 group-hover:scale-110 transition-transform" size={32} />
-                                            <p className="text-3xl font-black">{favorites.length}</p>
-                                            <p className="text-xs font-black uppercase tracking-widest opacity-40">Любими</p>
-                                        </div>
-                                        <div className="bg-secondary/5 p-6 rounded-3xl border border-secondary/10 group hover:bg-secondary/10 transition-colors">
-                                            <Calculator className="text-secondary mb-4 group-hover:scale-110 transition-transform" size={32} />
-                                            <p className="text-3xl font-black">{calculatorHistory.length}</p>
-                                            <p className="text-xs font-black uppercase tracking-widest opacity-40">Изчислени бала</p>
-                                        </div>
-                                    </div>
-
-                                    {/* Favorite Universities Preview */}
-                                    <div className="space-y-4">
-                                        <div className="flex items-center justify-between px-2">
-                                            <h3 className="text-lg font-black italic">Последно добавени любими</h3>
-                                            <Link to="/favorites" className="text-xs font-black text-primary hover:underline flex items-center gap-1">
-                                                Виж всички <ArrowRight size={12} />
-                                            </Link>
-                                        </div>
-                                        <div className="space-y-3">
-                                            {favoriteDetails.length > 0 ? favoriteDetails.map((uni) => (
-                                                <div key={uni.id} className="flex items-center gap-4 p-4 bg-base-200/30 rounded-2xl border border-base-content/5 hover:border-primary/20 transition-all group">
-                                                    <div className="w-12 h-12 rounded-xl bg-base-100 flex items-center justify-center text-primary shadow-sm">
-                                                        <GraduationCap size={24} />
-                                                    </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="font-bold truncate text-sm">{uni.university_name}</p>
-                                                        <p className="text-[10px] opacity-50 flex items-center gap-1 uppercase tracking-tighter">
-                                                            <MapPin size={10} /> {uni.city}
-                                                        </p>
-                                                    </div>
-                                                    <button 
-                                                        onClick={() => toggleFavorite(uni.id.toString())}
-                                                        className="btn btn-ghost btn-circle btn-sm text-error opacity-0 group-hover:opacity-100 transition-opacity"
-                                                    >
-                                                        <Trash2 size={14} />
-                                                    </button>
-                                                </div>
-                                            )) : (
-                                                <div className="p-10 bg-base-200/20 rounded-[2rem] border border-dashed border-base-content/10 flex flex-col items-center gap-4 text-center">
-                                                    <Heart size={32} className="opacity-10" />
-                                                    <p className="text-sm opacity-40 font-medium italic">Нямате добавени любими университети</p>
-                                                    <Link to="/universities" className="btn btn-primary btn-xs rounded-lg">Търсене</Link>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
+                            <div style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                    <h3 style={{ margin: 0, fontSize: "1rem", fontWeight: 800, letterSpacing: "-0.01em" }}>Последно добавени любими</h3>
+                                    <Link to="/favorites" style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", fontSize: "11px", fontWeight: 700, color: "var(--brand-cyan)", textDecoration: "none", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                                        Виж всички <ArrowRight size={11} />
+                                    </Link>
                                 </div>
-                            )}
-
-                            {/* --- TAB: SETTINGS --- */}
-                            {activeTab === "settings" && (
-                                <form onSubmit={updateGeneralInfo} className="max-w-2xl space-y-8">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="form-control">
-                                            <label className="label"><span className="label-text font-black uppercase tracking-widest text-[10px] opacity-50">Потребителско име</span></label>
-                                            <div className="relative">
-                                                <User className="absolute left-4 top-1/2 -translate-y-1/2 opacity-30" size={18} />
-                                                <input 
-                                                    type="text" 
-                                                    className="input input-bordered w-full pl-12 rounded-2xl bg-base-200/50 focus:bg-base-100 transition-all font-bold" 
-                                                    value={formData.username}
-                                                    onChange={(e) => setFormData({...formData, username: e.target.value})}
-                                                />
+                                <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}>
+                                    {favoriteDetails.length > 0 ? favoriteDetails.map(uni => (
+                                        <div
+                                            key={uni.id}
+                                            style={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                gap: "0.875rem",
+                                                padding: "0.75rem",
+                                                background: "var(--brand-input-bg)",
+                                                border: "1px solid var(--brand-border)",
+                                                borderRadius: "0.75rem",
+                                            }}
+                                        >
+                                            <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "0.625rem", background: "rgba(6,182,212,0.1)", color: "var(--brand-cyan)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                                <GraduationCap size={18} />
                                             </div>
-                                        </div>
-                                        <div className="form-control">
-                                            <label className="label"><span className="label-text font-black uppercase tracking-widest text-[10px] opacity-50">Имейл (Само за четене)</span></label>
-                                            <div className="relative">
-                                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 opacity-30" size={18} />
-                                                <input 
-                                                    type="text" 
-                                                    className="input input-bordered w-full pl-12 rounded-2xl bg-base-200/20 opacity-50 font-bold cursor-not-allowed" 
-                                                    value={user?.email} 
-                                                    disabled 
-                                                />
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                                <p style={{ margin: 0, fontSize: "13px", fontWeight: 700, color: "var(--brand-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                                    {uni.university_name}
+                                                </p>
+                                                <p style={{ margin: "0.15rem 0 0", display: "inline-flex", alignItems: "center", gap: "0.25rem", fontSize: "10px", color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                                                    <MapPin size={9} /> {uni.city}
+                                                </p>
                                             </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="form-control">
-                                        <label className="label"><span className="label-text font-black uppercase tracking-widest text-[10px] opacity-50">Биография</span></label>
-                                        <textarea 
-                                            className="textarea textarea-bordered h-32 rounded-3xl bg-base-200/50 focus:bg-base-100 transition-all font-medium p-6" 
-                                            placeholder="Разкажете ни малко за вашите цели..."
-                                            value={formData.bio}
-                                            onChange={(e) => setFormData({...formData, bio: e.target.value})}
-                                        ></textarea>
-                                    </div>
-
-                                    <div className="flex justify-end gap-3 pt-6 border-t border-base-content/5">
-                                        <button type="submit" disabled={updating} className="btn btn-primary px-10 rounded-2xl font-black shadow-xl shadow-primary/20">
-                                            {updating && <Loader2 className="animate-spin" size={18} />}
-                                            Запази промените
-                                        </button>
-                                    </div>
-                                </form>
-                            )}
-
-                            {/* --- TAB: SECURITY --- */}
-                            {activeTab === "security" && (
-                                <div className="max-w-2xl space-y-10">
-                                    <div className="p-8 bg-base-200/30 rounded-[2rem] border border-base-content/5 space-y-6">
-                                        <div className="flex items-center gap-4 mb-2">
-                                            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
-                                                <Shield size={24} />
-                                            </div>
-                                            <div>
-                                                <h3 className="text-xl font-black">Сигурност на акаунта</h3>
-                                                <p className="text-xs opacity-50">Управлявайте вашата парола и методи за вход</p>
-                                            </div>
-                                        </div>
-                                        
-                                        <div className="divider opacity-5"></div>
-
-                                        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                                            <div className="space-y-1">
-                                                <p className="font-black text-lg">Парола</p>
-                                                <p className="text-sm opacity-50">Последна промяна: преди 2 месеца</p>
-                                            </div>
-                                            <button 
-                                                onClick={() => navigate("/forgot-password")}
-                                                className="btn btn-outline btn-primary px-8 rounded-xl font-black text-xs uppercase tracking-widest"
+                                            <button
+                                                onClick={() => toggleFavorite(uni.id.toString())}
+                                                style={{ width: "1.75rem", height: "1.75rem", borderRadius: "0.5rem", background: "transparent", border: "1px solid rgba(248,113,113,0.2)", color: "#fca5a5", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
                                             >
-                                                Промени парола
+                                                <Trash2 size={12} />
                                             </button>
                                         </div>
-                                    </div>
-
-                                    <div className="p-8 bg-error/5 rounded-[2rem] border border-error/10 space-y-6">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-2xl bg-error/10 text-error flex items-center justify-center">
-                                                <AlertCircle size={24} />
-                                            </div>
-                                            <div>
-                                                <h3 className="text-xl font-black text-error">Опасна зона</h3>
-                                                <p className="text-xs opacity-50">Действия, които не могат да бъдат отменени</p>
-                                            </div>
+                                    )) : (
+                                        <div
+                                            style={{
+                                                padding: "2rem",
+                                                textAlign: "center",
+                                                background: "var(--brand-input-bg)",
+                                                border: "1px dashed var(--brand-input-border)",
+                                                borderRadius: "1rem",
+                                            }}
+                                        >
+                                            <Heart size={28} style={{ color: "var(--brand-muted)", opacity: 0.3, margin: "0 auto 0.625rem" }} />
+                                            <p style={{ margin: "0 0 0.75rem", fontSize: "12px", color: "var(--brand-muted)", fontStyle: "italic" }}>
+                                                Нямате добавени любими университети
+                                            </p>
+                                            <Link
+                                                to="/universities"
+                                                style={{
+                                                    display: "inline-flex",
+                                                    padding: "0.4rem 0.875rem",
+                                                    background: "rgba(6,182,212,0.1)",
+                                                    border: "1px solid rgba(6,182,212,0.3)",
+                                                    borderRadius: "0.5rem",
+                                                    color: "var(--brand-cyan)",
+                                                    fontSize: "11px",
+                                                    fontWeight: 700,
+                                                    textDecoration: "none",
+                                                }}
+                                            >
+                                                Търсене
+                                            </Link>
                                         </div>
-                                        <div className="flex items-center justify-between bg-base-100 p-6 rounded-2xl border border-error/20">
-                                            <div>
-                                                <p className="font-bold">Изтриване на акаунт</p>
-                                                <p className="text-xs opacity-50">Всички ваши данни ще бъдат премахнати завинаги.</p>
-                                            </div>
-                                            <button className="btn btn-error btn-sm rounded-lg text-white font-black">Изтрий</button>
-                                        </div>
-                                    </div>
+                                    )}
                                 </div>
-                            )}
-
-                            {/* --- TAB: PRIVACY --- */}
-                            {activeTab === "privacy" && (
-                                <div className="max-w-2xl space-y-6">
-                                    <div className="bg-base-200/30 rounded-[2.5rem] p-4 border border-base-content/5">
-                                        <label className="flex items-center justify-between p-6 hover:bg-base-100/50 rounded-[2rem] cursor-pointer transition-all group">
-                                            <div className="flex items-center gap-5">
-                                                <div className="w-14 h-14 bg-primary/10 text-primary rounded-[1.5rem] flex items-center justify-center group-hover:scale-110 transition-transform">
-                                                    <Globe size={28} strokeWidth={1.5} />
-                                                </div>
-                                                <div>
-                                                    <span className="text-lg font-black block">Публичен профил</span>
-                                                    <span className="text-xs opacity-50 font-medium">Позволете на другите да виждат вашите любими университети.</span>
-                                                </div>
-                                            </div>
-                                            <input 
-                                                type="checkbox" 
-                                                className="toggle toggle-primary toggle-lg"
-                                                checked={formData.privacy.isPublic}
-                                                onChange={(e) => setFormData({...formData, privacy: {...formData.privacy, isPublic: e.target.checked}})}
-                                            />
-                                        </label>
-
-                                        <div className="divider my-0 opacity-5 mx-8"></div>
-
-                                        <label className="flex items-center justify-between p-6 hover:bg-base-100/50 rounded-[2rem] cursor-pointer transition-all group">
-                                            <div className="flex items-center gap-5">
-                                                <div className="w-14 h-14 bg-secondary/10 text-secondary rounded-[1.5rem] flex items-center justify-center group-hover:scale-110 transition-transform">
-                                                    <Activity size={28} strokeWidth={1.5} />
-                                                </div>
-                                                <div>
-                                                    <span className="text-lg font-black block">Статус на активност</span>
-                                                    <span className="text-xs opacity-50 font-medium">Показвай кога последно сте влизали в платформата.</span>
-                                                </div>
-                                            </div>
-                                            <input 
-                                                type="checkbox" 
-                                                className="toggle toggle-secondary toggle-lg"
-                                                checked={formData.privacy.showActivity}
-                                                onChange={(e) => setFormData({...formData, privacy: {...formData.privacy, showActivity: e.target.checked}})}
-                                            />
-                                        </label>
-                                    </div>
-                                    <div className="flex justify-end pt-4">
-                                        <button className="btn btn-primary px-10 rounded-2xl font-black shadow-lg shadow-primary/20">
-                                            Запази настройките
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-
+                            </div>
                         </div>
-                    </div>
+                    )}
+
+                    {/* SETTINGS */}
+                    {activeTab === "settings" && (
+                        <form onSubmit={updateGeneralInfo} style={{ maxWidth: "640px", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem" }}>
+                                <InputGroup
+                                    label="Потребителско име"
+                                    icon={User}
+                                    value={formData.username}
+                                    onChange={e => setFormData({ ...formData, username: e.target.value })}
+                                />
+                                <InputGroup label="Имейл (само за четене)" icon={Mail} value={user?.email || ""} disabled />
+                            </div>
+
+                            <div>
+                                <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: "0.4rem" }}>
+                                    Биография
+                                </label>
+                                <textarea
+                                    placeholder="Разкажете ни малко за вашите цели..."
+                                    value={formData.bio}
+                                    onChange={e => setFormData({ ...formData, bio: e.target.value })}
+                                    style={{
+                                        width: "100%",
+                                        minHeight: "120px",
+                                        padding: "0.875rem",
+                                        background: "var(--brand-input-bg)",
+                                        border: "1px solid var(--brand-input-border)",
+                                        borderRadius: "0.75rem",
+                                        color: "var(--brand-text)",
+                                        fontSize: "13px",
+                                        fontFamily: "inherit",
+                                        outline: "none",
+                                        resize: "vertical",
+                                        boxSizing: "border-box",
+                                    }}
+                                />
+                            </div>
+
+                            <div style={{ display: "flex", justifyContent: "flex-end", paddingTop: "1rem", borderTop: "1px solid var(--brand-border)" }}>
+                                <button
+                                    type="submit"
+                                    disabled={updating}
+                                    style={{
+                                        padding: "0.75rem 2rem",
+                                        background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                        border: "none",
+                                        borderRadius: "0.75rem",
+                                        color: "#fff",
+                                        fontSize: "13px",
+                                        fontWeight: 800,
+                                        cursor: updating ? "not-allowed" : "pointer",
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        gap: "0.5rem",
+                                        fontFamily: "inherit",
+                                        boxShadow: "0 12px 30px rgba(6,182,212,0.3)",
+                                    }}
+                                >
+                                    {updating && <Loader2 size={14} style={{ animation: "spin 1s linear infinite" }} />}
+                                    Запази промените
+                                </button>
+                            </div>
+                        </form>
+                    )}
+
+                    {/* SECURITY */}
+                    {activeTab === "security" && (
+                        <div style={{ maxWidth: "640px", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                            <Section icon={Shield} iconColor="cyan" title="Сигурност на акаунта" subtitle="Управлявайте вашата парола и методи за вход">
+                                <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>
+                                    <div>
+                                        <p style={{ margin: 0, fontSize: "14px", fontWeight: 700, color: "var(--brand-text)" }}>Парола</p>
+                                        <p style={{ margin: "0.2rem 0 0", fontSize: "12px", color: "var(--brand-muted)" }}>Последна промяна: преди 2 месеца</p>
+                                    </div>
+                                    <button
+                                        onClick={() => navigate("/forgot-password")}
+                                        style={{
+                                            padding: "0.55rem 1rem",
+                                            background: "rgba(6,182,212,0.1)",
+                                            border: "1px solid rgba(6,182,212,0.3)",
+                                            borderRadius: "0.625rem",
+                                            color: "var(--brand-cyan)",
+                                            fontSize: "11px",
+                                            fontWeight: 700,
+                                            textTransform: "uppercase",
+                                            letterSpacing: "0.1em",
+                                            cursor: "pointer",
+                                            fontFamily: "inherit",
+                                        }}
+                                    >
+                                        Промени парола
+                                    </button>
+                                </div>
+                            </Section>
+
+                            <Section icon={AlertCircle} iconColor="red" title="Опасна зона" subtitle="Действия, които не могат да бъдат отменени" danger>
+                                <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>
+                                    <div>
+                                        <p style={{ margin: 0, fontSize: "14px", fontWeight: 700, color: "var(--brand-text)" }}>Изтриване на акаунт</p>
+                                        <p style={{ margin: "0.2rem 0 0", fontSize: "12px", color: "var(--brand-muted)" }}>Всички ваши данни ще бъдат премахнати завинаги.</p>
+                                    </div>
+                                    <button
+                                        style={{
+                                            padding: "0.55rem 1rem",
+                                            background: "rgba(248,113,113,0.15)",
+                                            border: "1px solid rgba(248,113,113,0.35)",
+                                            borderRadius: "0.625rem",
+                                            color: "#fca5a5",
+                                            fontSize: "11px",
+                                            fontWeight: 700,
+                                            textTransform: "uppercase",
+                                            letterSpacing: "0.1em",
+                                            cursor: "pointer",
+                                            fontFamily: "inherit",
+                                        }}
+                                    >
+                                        Изтрий
+                                    </button>
+                                </div>
+                            </Section>
+                        </div>
+                    )}
+
+                    {/* PRIVACY */}
+                    {activeTab === "privacy" && (
+                        <div style={{ maxWidth: "640px", display: "flex", flexDirection: "column", gap: "1rem" }}>
+                            <ToggleRow
+                                icon={Globe}
+                                title="Публичен профил"
+                                subtitle="Позволете на другите да виждат вашите любими университети."
+                                checked={formData.privacy.isPublic}
+                                onChange={e => setFormData({ ...formData, privacy: { ...formData.privacy, isPublic: e.target.checked } })}
+                            />
+                            <ToggleRow
+                                icon={Activity}
+                                title="Статус на активност"
+                                subtitle="Показвай кога последно сте влизали в платформата."
+                                checked={formData.privacy.showActivity}
+                                onChange={e => setFormData({ ...formData, privacy: { ...formData.privacy, showActivity: e.target.checked } })}
+                                color="violet"
+                            />
+                            <div style={{ display: "flex", justifyContent: "flex-end", paddingTop: "0.5rem" }}>
+                                <button
+                                    style={{
+                                        padding: "0.75rem 2rem",
+                                        background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                        border: "none",
+                                        borderRadius: "0.75rem",
+                                        color: "#fff",
+                                        fontSize: "13px",
+                                        fontWeight: 800,
+                                        cursor: "pointer",
+                                        fontFamily: "inherit",
+                                        boxShadow: "0 12px 30px rgba(6,182,212,0.3)",
+                                    }}
+                                >
+                                    Запази настройките
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
-
-            {/* Global Smooth Styles */}
-            <style>{`.no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }`}</style>
         </div>
     );
 };
+
+function StatCard({ icon: Icon, label, value, color }) {
+    const palette = color === "cyan"
+        ? { bg: "rgba(6,182,212,0.08)", border: "rgba(6,182,212,0.25)", color: "var(--brand-cyan)" }
+        : { bg: "rgba(139,92,246,0.08)", border: "rgba(139,92,246,0.25)", color: "var(--brand-violet)" };
+    return (
+        <div
+            style={{
+                padding: "1.25rem",
+                background: palette.bg,
+                border: `1px solid ${palette.border}`,
+                borderRadius: "1rem",
+            }}
+        >
+            <Icon size={24} style={{ color: palette.color, marginBottom: "0.75rem" }} />
+            <p style={{ margin: 0, fontSize: "1.875rem", fontWeight: 800, color: "var(--brand-text)", fontFamily: "monospace", lineHeight: 1 }}>{value}</p>
+            <p style={{ margin: "0.4rem 0 0", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--brand-muted)" }}>{label}</p>
+        </div>
+    );
+}
+
+function InputGroup({ label, icon: Icon, disabled, ...props }) {
+    return (
+        <div>
+            <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: "0.4rem" }}>
+                {label}
+            </label>
+            <div
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.625rem",
+                    padding: "0 0.875rem",
+                    height: "2.75rem",
+                    background: disabled ? "var(--brand-surface)" : "var(--brand-input-bg)",
+                    border: "1px solid var(--brand-input-border)",
+                    borderRadius: "0.625rem",
+                    opacity: disabled ? 0.6 : 1,
+                }}
+            >
+                {Icon && <Icon size={15} style={{ color: "var(--brand-muted)", flexShrink: 0 }} />}
+                <input
+                    {...props}
+                    disabled={disabled}
+                    type="text"
+                    style={{
+                        flex: 1,
+                        background: "transparent",
+                        border: "none",
+                        outline: "none",
+                        color: "var(--brand-text)",
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        fontFamily: "inherit",
+                        cursor: disabled ? "not-allowed" : "text",
+                    }}
+                />
+            </div>
+        </div>
+    );
+}
+
+function Section({ icon: Icon, iconColor, title, subtitle, danger, children }) {
+    const palette = iconColor === "cyan"
+        ? { bg: "rgba(6,182,212,0.12)", border: "rgba(6,182,212,0.3)", color: "var(--brand-cyan)" }
+        : { bg: "rgba(248,113,113,0.12)", border: "rgba(248,113,113,0.3)", color: "#fca5a5" };
+    return (
+        <div
+            style={{
+                padding: "1.5rem",
+                background: danger ? "rgba(248,113,113,0.04)" : "var(--brand-input-bg)",
+                border: `1px solid ${danger ? "rgba(248,113,113,0.2)" : "var(--brand-border)"}`,
+                borderRadius: "1rem",
+                display: "flex",
+                flexDirection: "column",
+                gap: "1.25rem",
+            }}
+        >
+            <div style={{ display: "flex", alignItems: "center", gap: "0.875rem" }}>
+                <div
+                    style={{
+                        width: "2.5rem",
+                        height: "2.5rem",
+                        borderRadius: "0.75rem",
+                        background: palette.bg,
+                        border: `1px solid ${palette.border}`,
+                        color: palette.color,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                    }}
+                >
+                    <Icon size={20} />
+                </div>
+                <div>
+                    <h3 style={{ margin: 0, fontSize: "1rem", fontWeight: 800, color: danger ? "#fca5a5" : "var(--brand-text)", letterSpacing: "-0.01em" }}>{title}</h3>
+                    <p style={{ margin: "0.2rem 0 0", fontSize: "11px", color: "var(--brand-muted)" }}>{subtitle}</p>
+                </div>
+            </div>
+            {children}
+        </div>
+    );
+}
+
+function ToggleRow({ icon: Icon, title, subtitle, checked, onChange, color = "cyan" }) {
+    const palette = color === "cyan"
+        ? { bg: "rgba(6,182,212,0.1)", border: "rgba(6,182,212,0.3)", color: "var(--brand-cyan)" }
+        : { bg: "rgba(139,92,246,0.1)", border: "rgba(139,92,246,0.3)", color: "var(--brand-violet)" };
+    return (
+        <label
+            style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "1rem",
+                padding: "1rem 1.25rem",
+                background: "var(--brand-input-bg)",
+                border: "1px solid var(--brand-border)",
+                borderRadius: "1rem",
+                cursor: "pointer",
+            }}
+        >
+            <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                <div
+                    style={{
+                        width: "2.75rem",
+                        height: "2.75rem",
+                        borderRadius: "0.75rem",
+                        background: palette.bg,
+                        border: `1px solid ${palette.border}`,
+                        color: palette.color,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                    }}
+                >
+                    <Icon size={22} strokeWidth={1.5} />
+                </div>
+                <div>
+                    <span style={{ display: "block", fontSize: "14px", fontWeight: 700, color: "var(--brand-text)" }}>{title}</span>
+                    <span style={{ display: "block", fontSize: "12px", color: "var(--brand-muted)", marginTop: "0.2rem" }}>{subtitle}</span>
+                </div>
+            </div>
+            <span
+                style={{
+                    position: "relative",
+                    width: "2.5rem",
+                    height: "1.375rem",
+                    flexShrink: 0,
+                    background: checked ? "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))" : "rgba(148,163,184,0.2)",
+                    borderRadius: "999px",
+                    transition: "background 0.2s",
+                }}
+            >
+                <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={onChange}
+                    style={{ position: "absolute", opacity: 0, width: 0, height: 0 }}
+                />
+                <span
+                    style={{
+                        position: "absolute",
+                        top: "2px",
+                        left: checked ? "calc(100% - 1.25rem)" : "2px",
+                        width: "1.125rem",
+                        height: "1.125rem",
+                        borderRadius: "50%",
+                        background: "#fff",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                        transition: "left 0.2s",
+                    }}
+                />
+            </span>
+        </label>
+    );
+}
 
 export default Profile;
