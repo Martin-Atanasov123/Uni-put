@@ -1,425 +1,842 @@
+import { useRef, useState, useEffect, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
-import { 
-    Calculator, 
-    Search, 
-    BrainCircuit, 
-    Building2, 
-    ArrowRight, 
-    CheckCircle2, 
-    Users, 
-    Trophy,
-    Calendar,
-    Clock,
-    TrendingUp,
-    Sparkles,
-    GraduationCap,
-    MapPin,
-    BookOpen,
-    Star,
-    ChevronLeft,
-    ChevronRight,
-    Quote
-} from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { m, useInView } from "framer-motion";
 
-// --- КОМПОНЕНТ: РЕВЮТА (СЛАЙДЕР) ---
-const REVIEWS = [
-    { name: "Мария Георгиева", text: "Изключително полезен сайт! Помогна ми да се ориентирам в бала си за СУ.", rating: 5 },
-    { name: "Иван Петров", text: "Калкулаторът е много точен. Вече съм студент благодарение на УниПът!", rating: 5 },
-    { name: "Елена Димова", text: "Дизайнът е супер, много лесно се работи с търсачката.", rating: 4 },
-    { name: "Стефан Колев", text: "Най-накрая платформа, която обединява всичко за кандидат-студентите.", rating: 5 },
-    { name: "Анелия Иванова", text: "Тестът за кариерно ориентиране ми даде страхотни идеи за бъдещето.", rating: 5 },
-    { name: "Георги Стоянов", text: "Секцията за общежития е много подробна. Спести ми часове ровене.", rating: 5 },
-    { name: "Виктория Николова", text: "Много полезно приложение. Препоръчвам на всички дванадесетокласници.", rating: 4 },
-    { name: "Мартин Димитров", text: "Бързо, лесно и надеждно. Информационната база е огромна.", rating: 5 },
-    { name: "Симона Кръстева", text: "Благодарение на УниПът намерих специалност, за която дори не бях мислила.", rating: 5 },
-    { name: "Петър Ангелов", text: "Страхотна инициатива! Платформата е на световно ниво.", rating: 5 },
+// Heavy 3D components — lazy loaded so they never block first paint
+const SplineHero  = lazy(() => import("@/components/landing/SplineHero"));
+const GlobeScene  = lazy(() => import("@/components/landing/GlobeScene"));
+import {
+    Brain,
+    Target,
+    GraduationCap,
+    BarChart3,
+    Shield,
+    ArrowRight,
+    Database,
+    BookOpen,
+    ChevronDown,
+    Calculator,
+    BookMarked,
+    Smartphone,
+    Zap,
+    CheckCircle,
+} from "lucide-react";
+
+// ── Animation primitives ────────────────────────────────────────────────────
+
+const EASE = [0.16, 1, 0.3, 1];
+
+const fadeUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+};
+
+const stagger = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.04, delayChildren: 0.05 } },
+};
+
+function Reveal({ children, delay = 0, className }) {
+    const ref = useRef(null);
+    const inView = useInView(ref, { once: true, margin: "-60px" });
+    return (
+        <m.div
+            ref={ref}
+            initial="hidden"
+            animate={inView ? "visible" : "hidden"}
+            variants={fadeUp}
+            transition={{ duration: 0.55, ease: EASE, delay }}
+            className={className}
+        >
+            {children}
+        </m.div>
+    );
+}
+
+// ── Count-up hook ────────────────────────────────────────────────────────────
+function useCountUp(end, duration = 1400, trigger) {
+    const [value, setValue] = useState(0);
+    useEffect(() => {
+        if (!trigger) return;
+        let startTime = null;
+        const raf = (ts) => {
+            if (!startTime) startTime = ts;
+            const p = Math.min((ts - startTime) / duration, 1);
+            const eased = 1 - Math.pow(1 - p, 3); // ease-out-cubic
+            setValue(Math.floor(eased * end));
+            if (p < 1) requestAnimationFrame(raf);
+            else setValue(end);
+        };
+        requestAnimationFrame(raf);
+    }, [trigger, end, duration]);
+    return value;
+}
+
+// ── HERO ────────────────────────────────────────────────────────────────────
+
+function HeroSection() {
+    return (
+        <section
+            data-testid="hero-section"
+            className="relative min-h-screen overflow-hidden"
+            style={{ background: "var(--brand-bg)" }}
+        >
+            {/* ── Layer 0: Spline 3D scene — full hero background ── */}
+            <Suspense fallback={null}>
+                <SplineHero />
+            </Suspense>
+
+            {/* ── Layer 1: dot grid — adds texture over Spline ── */}
+            <div
+                aria-hidden
+                style={{
+                    position: "absolute", inset: 0,
+                    backgroundImage: "radial-gradient(rgba(148,163,184,0.055) 1px, transparent 1px)",
+                    backgroundSize: "32px 32px",
+                    pointerEvents: "none",
+                    zIndex: 1,
+                }}
+            />
+
+            {/* ── Layer 1: noise grain overlay ── */}
+            <div
+                aria-hidden
+                style={{
+                    position: "absolute", inset: 0,
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+                    opacity: 0.028,
+                    pointerEvents: "none",
+                    zIndex: 1,
+                }}
+            />
+
+            {/* ── Layer 2: hero text — single column, left-aligned ── */}
+            <div
+                className="relative max-w-7xl mx-auto px-6 flex flex-col lg:flex-row items-center min-h-screen"
+                style={{ zIndex: 2 }}
+            >
+                {/* ── Left: text content ── */}
+                <m.div
+                    className="flex-1 flex flex-col justify-center py-32 lg:py-0 text-left"
+                    initial={{ opacity: 0, x: -36 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.9, ease: EASE }}
+                    style={{ maxWidth: "560px" }}
+                >
+                    {/* Badge — filled with real data */}
+                    <div
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 w-fit"
+                        style={{
+                            background: "rgba(6,182,212,0.08)",
+                            border: "1px solid rgba(6,182,212,0.28)",
+                            color: "var(--brand-cyan)",
+                            fontSize: "11px",
+                            fontWeight: 700,
+                            letterSpacing: "0.04em",
+                            textTransform: "uppercase",
+                        }}
+                    >
+                        <Zap size={11} />
+                        127 специалности · 18 университета · Безплатно
+                    </div>
+
+                    {/* Headline */}
+                    <h1
+                        className="font-bold leading-tight mb-6"
+                        style={{
+                            fontSize: "clamp(2.5rem, 6vw, 4.5rem)",
+                            color: "var(--brand-text)",
+                            letterSpacing: "-0.03em",
+                            lineHeight: 1.07,
+                            textWrap: "balance",
+                        }}
+                    >
+                        Открий своя
+                        <br />
+                        <span
+                            style={{
+                                background: "linear-gradient(130deg, #06B6D4 0%, #8B5CF6 100%)",
+                                WebkitBackgroundClip: "text",
+                                WebkitTextFillColor: "transparent",
+                            }}
+                        >
+                            път към Университета
+                        </span>
+                    </h1>
+
+                    {/* Subheadline */}
+                    <p
+                        className="mb-10 leading-relaxed"
+                        style={{
+                            fontSize: "clamp(1rem, 2vw, 1.125rem)",
+                            color: "var(--brand-muted)",
+                            maxWidth: "460px",
+                            lineHeight: 1.7,
+                        }}
+                    >
+                        Забрави за сложните таблици и неясните критерии. Ние
+                        използваме реални данни, за да ти покажем къде имаш шанс.
+                    </p>
+
+                    {/* CTA buttons */}
+                    <div className="flex flex-col sm:flex-row gap-4 items-start">
+                        {/* Primary — calculator (highest-intent action) */}
+                        <m.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
+                            <Link
+                                to="/calculator"
+                                className="inline-flex items-center gap-3 font-semibold"
+                                style={{
+                                    background: "linear-gradient(135deg, #06B6D4, #8B5CF6)",
+                                    color: "#fff",
+                                    padding: "0.9rem 1.75rem",
+                                    borderRadius: "0.875rem",
+                                    fontSize: "0.9375rem",
+                                    textDecoration: "none",
+                                    boxShadow:
+                                        "0 0 32px rgba(6,182,212,0.35), 0 4px 16px rgba(0,0,0,0.2)",
+                                    transition: "box-shadow 0.2s",
+                                }}
+                            >
+                                <Calculator size={18} />
+                                Изчисли моя бал
+                                <ArrowRight size={16} />
+                            </Link>
+                        </m.div>
+
+                        {/* Secondary — with hover state */}
+                        <m.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                            <Link
+                                to="/career-advisor"
+                                className="inline-flex items-center gap-2 font-medium"
+                                style={{
+                                    border: "1px solid var(--brand-border)",
+                                    color: "var(--brand-text)",
+                                    background: "rgba(255,255,255,0.04)",
+                                    padding: "0.9rem 1.75rem",
+                                    borderRadius: "0.875rem",
+                                    fontSize: "0.9375rem",
+                                    textDecoration: "none",
+                                    transition: "border-color 0.2s, color 0.2s, background 0.2s",
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.borderColor = "rgba(6,182,212,0.4)";
+                                    e.currentTarget.style.color = "var(--brand-cyan)";
+                                    e.currentTarget.style.background = "rgba(6,182,212,0.04)";
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.borderColor = "var(--brand-border)";
+                                    e.currentTarget.style.color = "var(--brand-text)";
+                                    e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+                                }}
+                            >
+                                <Brain size={18} />
+                                Направи RIASEC тест
+                                <ArrowRight size={16} />
+                            </Link>
+                        </m.div>
+                    </div>
+                </m.div>
+
+                
+            </div>
+
+            {/* Bottom fade into next section */}
+            <div
+                aria-hidden
+                className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
+                style={{
+                    background: "linear-gradient(to bottom, transparent, var(--brand-bg))",
+                    zIndex: 3,
+                }}
+            />
+
+            {/* Scroll indicator — chevron instead of line */}
+            <m.div
+                className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1"
+                style={{ zIndex: 4, color: "rgba(148,163,184,0.4)" }}
+                animate={{ y: [0, 6, 0] }}
+                transition={{ repeat: Infinity, duration: 2.4, ease: "easeInOut" }}
+            >
+                <div style={{
+                    width: "1px", height: "20px",
+                    background: "linear-gradient(to bottom, transparent, rgba(148,163,184,0.3))",
+                }} />
+                <ChevronDown size={15} />
+            </m.div>
+        </section>
+    );
+}
+
+// ── STAT STRIP ───────────────────────────────────────────────────────────────
+
+const STATS = [
+    { value: 127, suffix: "+", label: "специалности", sub: "в базата данни" },
+    { value: 18,  suffix: "",  label: "университета",  sub: "от цяла България" },
+    { value: 6,   suffix: "",  label: "RIASEC типа",   sub: "кариерен профил" },
+    { value: 100, suffix: "%", label: "безплатно",     sub: "без скрити такси" },
 ];
 
-const ReviewsSlider = () => {
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [isTransitioning, setIsTransitioning] = useState(true);
-    const timeoutRef = useRef(null);
-    
-    // We duplicate the reviews for the infinite effect
-    const extendedReviews = [...REVIEWS, ...REVIEWS, ...REVIEWS];
-    const startIndex = REVIEWS.length; // Start at the middle set
-
-    useEffect(() => {
-        setCurrentIndex(startIndex);
-    }, [startIndex]);
-
-    const resetTimeout = () => {
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-
-    useEffect(() => {
-        resetTimeout();
-        timeoutRef.current = setTimeout(() => {
-            nextSlide();
-        }, 4000);
-        return () => resetTimeout();
-    }, [currentIndex]);
-
-    const nextSlide = () => {
-        setIsTransitioning(true);
-        setCurrentIndex((prev) => prev + 1);
-    };
-
-    const prevSlide = () => {
-        setIsTransitioning(true);
-        setCurrentIndex((prev) => prev - 1);
-    };
-
-    const handleTransitionEnd = () => {
-        // If we reach the end of the middle set or the beginning of it, 
-        // jump back to the middle without animation
-        if (currentIndex >= REVIEWS.length * 2) {
-            setIsTransitioning(false);
-            setCurrentIndex(REVIEWS.length);
-        } else if (currentIndex <= REVIEWS.length - 1) {
-            setIsTransitioning(false);
-            setCurrentIndex(REVIEWS.length * 2 - 1);
-        }
-    };
-
-    // Calculate how many items to show based on screen width
-    const getVisibleItems = () => {
-        if (typeof window === "undefined") return 3;
-        if (window.innerWidth < 768) return 1;
-        if (window.innerWidth < 1024) return 2;
-        return 3;
-    };
-
-    const [visibleItems, setVisibleItems] = useState(getVisibleItems());
-
-    useEffect(() => {
-        const handleResize = () => setVisibleItems(getVisibleItems());
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
-
-    const itemWidth = 100 / visibleItems;
-
+function StatItem({ value, suffix, label, sub, delay, trigger }) {
+    const count = useCountUp(value, 1400, trigger);
     return (
-        <section className="py-24 bg-base-200/30 overflow-hidden relative" id="reviews-section">
-            <div className="max-w-7xl mx-auto px-6">
-                <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
-                    <div className="space-y-2">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest">
-                            <Quote size={12} />
-                            Отзиви
-                        </div>
-                        <h2 className="text-4xl font-black italic">Доволни клиенти и ревюта</h2>
-                    </div>
-                    <div className="flex gap-2">
-                        <button onClick={prevSlide} className="btn btn-circle btn-outline btn-sm hover:bg-primary hover:border-primary border-base-content/20 transition-all shadow-sm">
-                            <ChevronLeft size={20} />
-                        </button>
-                        <button onClick={nextSlide} className="btn btn-circle btn-outline btn-sm hover:bg-primary hover:border-primary border-base-content/20 transition-all shadow-sm">
-                            <ChevronRight size={20} />
-                        </button>
-                    </div>
-                </div>
+        <m.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={trigger ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+            transition={{ duration: 0.5, delay, ease: EASE }}
+            style={{ textAlign: "center", padding: "2rem 1rem" }}
+        >
+            <div style={{
+                fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)",
+                fontWeight: 900,
+                letterSpacing: "-0.04em",
+                lineHeight: 1,
+                fontFamily: "monospace",
+                background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+            }}>
+                {count}{suffix}
+            </div>
+            <div style={{ fontSize: "0.9375rem", fontWeight: 700, color: "var(--brand-text)", marginTop: "0.4rem" }}>
+                {label}
+            </div>
+            <div style={{ fontSize: "0.6875rem", fontWeight: 600, color: "var(--brand-muted)", marginTop: "0.125rem", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                {sub}
+            </div>
+        </m.div>
+    );
+}
 
-                <div className="relative w-full overflow-hidden">
-                    <div
-                        data-testid="reviews-slider"
-                        className={`flex ${isTransitioning ? "transition-transform duration-700 ease-in-out" : ""}`}
-                        style={{
-                            transform: `translateX(-${currentIndex * itemWidth}%)`,
-                        }}
-                        onTransitionEnd={handleTransitionEnd}
-                    >
-                        {extendedReviews.map((review, i) => (
-                            <div
-                                key={i}
-                                style={{ width: `${itemWidth}%` }}
-                                className="shrink-0 px-3"
-                            >
-                            <div className="h-full bg-base-100 p-8 rounded-[2rem] border border-base-300 shadow-sm flex flex-col justify-between hover:shadow-xl transition-all duration-300 group"
-                            >
-                                <div className="space-y-4">
-                                    <div className="flex gap-1 text-warning group-hover:scale-105 transition-transform origin-left">
-                                        {[...Array(5)].map((_, starI) => (
-                                            <Star 
-                                                key={starI} 
-                                                size={16} 
-                                                fill={starI < review.rating ? "currentColor" : "none"} 
-                                                className={starI < review.rating ? "" : "text-base-300"}
-                                            />
-                                        ))}
-                                    </div>
-                                    <p className="text-lg font-medium leading-relaxed italic opacity-80 group-hover:opacity-100 transition-opacity">
-                                        "{review.text}"
-                                    </p>
-                                </div>
-                                <div className="mt-8 flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center text-white font-black shadow-lg shadow-primary/20 rotate-3 group-hover:rotate-0 transition-transform">
-                                        {review.name.charAt(0)}
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-base-content">{review.name}</p>
-                                        <p className="text-[10px] opacity-50 font-black uppercase tracking-widest">Потребител на УниПът</p>
-                                    </div>
-                                </div>
-                            </div>
-                            </div>
-                        ))}
+function StatStripSection() {
+    const ref = useRef(null);
+    const inView = useInView(ref, { once: true, margin: "-80px" });
+    return (
+        <section
+            ref={ref}
+            style={{
+                background: "var(--brand-bg)",
+                borderTop: "1px solid var(--brand-border)",
+                borderBottom: "1px solid var(--brand-border)",
+            }}
+        >
+            <div className="stat-strip-grid" style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 1.5rem" }}>
+                {STATS.map((stat, i) => (
+                    <div key={stat.label} className={`stat-col stat-col-${i}`}>
+                        <StatItem {...stat} delay={i * 0.07} trigger={inView} />
                     </div>
+                ))}
+            </div>
+            <style>{`
+                .stat-strip-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+                .stat-col { border-right: 1px solid var(--brand-border); }
+                .stat-col:last-child { border-right: none; }
+                @media (max-width: 640px) {
+                    .stat-strip-grid { grid-template-columns: repeat(2, 1fr); }
+                    .stat-col-1 { border-right: none; }
+                    .stat-col-2 { border-top: 1px solid var(--brand-border); }
+                    .stat-col-3 { border-top: 1px solid var(--brand-border); border-right: none; }
+                }
+                @keyframes uniput-pulse {
+                    0%, 100% { opacity: 0.4; }
+                    50% { opacity: 0.8; }
+                }
+            `}</style>
+        </section>
+    );
+}
+
+// ── HOW IT WORKS ────────────────────────────────────────────────────────────
+
+const STEPS = [
+    {
+        num: "01",
+        icon: Brain,
+        title: "Психометричен Анализ",
+        desc: "Попълни научно-валидирания RIASEC тест (базиран на O*NET данни) и открий своя уникален кариерен профил в 6 измерения.",
+    },
+    {
+        num: "02",
+        icon: Target,
+        title: "Алгоритмичен Подбор",
+        desc: "Нашият алгоритъм сравнява профила ти с над 127 специалности в 18 университета и генерира персонализиран списък.",
+    },
+    {
+        num: "03",
+        icon: GraduationCap,
+        title: "Изчисли Приемния Бал",
+        desc: "Виж точните изисквания, изчисли конкурсния си бал с калкулатора и разбери дали имаш шанс — преди да е станало.",
+    },
+];
+
+function HowItWorksSection() {
+    return (
+        <section
+            className="py-28 px-6"
+            style={{ background: "var(--brand-bg)" }}
+        >
+            <div className="max-w-6xl mx-auto">
+                <Reveal className="text-center mb-16">
+                    <p className="text-xs font-bold tracking-widest uppercase mb-4"
+                        style={{ color: "var(--brand-cyan)" }}>
+                        Как работи
+                    </p>
+                    <h2
+                        className="text-3xl md:text-5xl font-bold"
+                        style={{
+                            color: "var(--brand-text)",
+                            letterSpacing: "-0.02em",
+                            textWrap: "balance",
+                        }}
+                    >
+                        Три стъпки до правилния избор
+                    </h2>
+                </Reveal>
+
+                <m.div
+                    className="grid md:grid-cols-3 gap-7"
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-60px" }}
+                    variants={stagger}
+                >
+                    {STEPS.map((step) => {
+                        const Icon = step.icon;
+                        return (
+                            <m.div
+                                key={step.num}
+                                variants={fadeUp}
+                                transition={{ duration: 0.5, ease: EASE }}
+                                whileHover={{ y: -5 }}
+                                className="p-8 rounded-2xl"
+                                style={{
+                                    background: "var(--brand-surface)",
+                                    border: "1px solid var(--brand-card-border)",
+                                    transition: "border-color 0.2s, box-shadow 0.2s",
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.borderColor = "rgba(6,182,212,0.4)";
+                                    e.currentTarget.style.boxShadow = "0 0 28px rgba(6,182,212,0.09)";
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.borderColor = "var(--brand-card-border)";
+                                    e.currentTarget.style.boxShadow = "none";
+                                }}
+                            >
+                                <div className="flex items-start justify-between mb-6">
+                                    <div
+                                        className="p-3 rounded-xl"
+                                        style={{
+                                            background: "linear-gradient(135deg, rgba(6,182,212,0.14), rgba(139,92,246,0.14))",
+                                        }}
+                                    >
+                                        <Icon size={20} style={{ color: "var(--brand-cyan)" }} />
+                                    </div>
+                                    <span
+                                        className="text-5xl font-black select-none"
+                                        style={{ color: "rgba(148,163,184,0.12)", fontFamily: "monospace" }}
+                                    >
+                                        {step.num}
+                                    </span>
+                                </div>
+                                <h3
+                                    className="text-lg font-semibold mb-3"
+                                    style={{ color: "var(--brand-text)", textWrap: "balance" }}
+                                >
+                                    {step.title}
+                                </h3>
+                                <p className="text-sm leading-relaxed" style={{ color: "var(--brand-muted)" }}>
+                                    {step.desc}
+                                </p>
+                            </m.div>
+                        );
+                    })}
+                </m.div>
+            </div>
+        </section>
+    );
+}
+
+// ── FEATURES ────────────────────────────────────────────────────────────────
+
+const FEATURES = [
+    {
+        icon: BarChart3,
+        title: "Реалистични Шансове",
+        desc: "Показваме реални приемни балове от официалните данни на МОН — без приукрасяване.",
+    },
+    {
+        icon: Brain,
+        title: "RIASEC Психометрия",
+        desc: "Научно-валидирана методология (Holland Codes), използвана от O*NET — открий кариерния си тип.",
+    },
+    {
+        icon: Shield,
+        title: "Официална Интеграция",
+        desc: "Всички данни са от публичните регистри на Министерство на Образованието, актуализирани за 2025 г.",
+    },
+    {
+        icon: Calculator,
+        title: "Прецизен Калкулатор",
+        desc: "Въведи оценките си и виж точния конкурсен бал по официалната формула за всяка специалност.",
+    },
+    {
+        icon: Smartphone,
+        title: "Работи Навсякъде",
+        desc: "Оптимизиран за телефон, таблет и компютър. Тъмна и светла тема за комфортна работа по всяко време.",
+    },
+    {
+        icon: BookMarked,
+        title: "Запази и Сравни",
+        desc: "Добавяй специалности в любими и сравнявай шансовете си в различни университети и градове.",
+    },
+];
+
+function FeaturesSection() {
+    return (
+        <section className="py-28 px-6" style={{ background: "var(--brand-bg-alt)" }}>
+            <div className="max-w-6xl mx-auto">
+                <Reveal className="text-center mb-16">
+                    <p className="text-xs font-bold tracking-widest uppercase mb-4"
+                        style={{ color: "var(--brand-violet)" }}>
+                        Характеристики
+                    </p>
+                    <h2
+                        className="text-3xl md:text-5xl font-bold"
+                        style={{
+                            color: "var(--brand-text)",
+                            letterSpacing: "-0.02em",
+                            textWrap: "balance",
+                        }}
+                    >
+                        Създаден за сериозни избори
+                    </h2>
+                    <p className="mt-4 text-lg max-w-xl mx-auto" style={{ color: "var(--brand-muted)" }}>
+                        Не просто калкулатор. Цялостна платформа за информирано кандидатстване.
+                    </p>
+                </Reveal>
+
+                <m.div
+                    className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5"
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-60px" }}
+                    variants={stagger}
+                >
+                    {FEATURES.map((f) => {
+                        const Icon = f.icon;
+                        return (
+                            <m.div
+                                key={f.title}
+                                variants={fadeUp}
+                                transition={{ duration: 0.5, ease: EASE }}
+                                whileHover={{ y: -4 }}
+                                className="p-6 rounded-2xl"
+                                style={{
+                                    background: "var(--brand-surface)",
+                                    border: "1px solid var(--brand-card-border)",
+                                    transition: "border-color 0.2s, box-shadow 0.2s",
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.borderColor = "rgba(139,92,246,0.35)";
+                                    e.currentTarget.style.boxShadow = "0 0 24px rgba(139,92,246,0.07)";
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.borderColor = "var(--brand-card-border)";
+                                    e.currentTarget.style.boxShadow = "none";
+                                }}
+                            >
+                                <div
+                                    className="inline-flex p-3 rounded-xl mb-4"
+                                    style={{
+                                        background: "linear-gradient(135deg, rgba(139,92,246,0.12), rgba(6,182,212,0.12))",
+                                    }}
+                                >
+                                    <Icon size={20} style={{ color: "var(--brand-violet)" }} />
+                                </div>
+                                <h3
+                                    className="font-semibold mb-2"
+                                    style={{ color: "var(--brand-text)", fontSize: "16px", textWrap: "balance" }}
+                                >
+                                    {f.title}
+                                </h3>
+                                <p style={{ color: "var(--brand-muted)", fontSize: "14px", lineHeight: "1.65" }}>
+                                    {f.desc}
+                                </p>
+                            </m.div>
+                        );
+                    })}
+                </m.div>
+            </div>
+        </section>
+    );
+}
+
+// ── TRUST ───────────────────────────────────────────────────────────────────
+
+const TRUST = [
+    {
+        icon: Database,
+        label: "O*NET Professional",
+        sub: "Научна основа за RIASEC",
+    },
+    {
+        icon: BookOpen,
+        label: "Holland Codes",
+        sub: "Валидирана психометрия",
+    },
+    {
+        icon: Shield,
+        label: "Данни от МОН",
+        sub: "Официална интеграция",
+    },
+    {
+        icon: CheckCircle,
+        label: "Актуално за 2025 г.",
+        sub: "Редовно обновявани данни",
+    },
+];
+
+function TrustSection() {
+    return (
+        <section
+            className="py-28 px-6"
+            style={{
+                background: "var(--brand-bg)",
+                borderTop: "1px solid var(--brand-border)",
+            }}
+        >
+            <div className="max-w-4xl mx-auto">
+                <Reveal className="text-center mb-12">
+                    <p className="text-xs font-bold tracking-widest uppercase mb-4"
+                        style={{ color: "var(--brand-muted)" }}>
+                        Защо ни се доверяват
+                    </p>
+                    <h2
+                        className="text-2xl md:text-4xl font-bold"
+                        style={{
+                            color: "var(--brand-text)",
+                            letterSpacing: "-0.02em",
+                            textWrap: "balance",
+                        }}
+                    >
+                        Изграден върху наука, не на интуиция
+                    </h2>
+                </Reveal>
+
+                <m.div
+                    className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5"
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    variants={stagger}
+                >
+                    {TRUST.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                            <m.div
+                                key={item.label}
+                                variants={fadeUp}
+                                transition={{ duration: 0.5, ease: EASE }}
+                                className="text-center p-6 rounded-2xl"
+                                style={{
+                                    background: "var(--brand-surface)",
+                                    border: "1px solid var(--brand-card-border)",
+                                }}
+                            >
+                                <div
+                                    className="inline-flex p-3 rounded-xl mb-3"
+                                    style={{ background: "rgba(6,182,212,0.09)" }}
+                                >
+                                    <Icon size={20} style={{ color: "var(--brand-cyan)" }} />
+                                </div>
+                                <p className="font-semibold text-sm" style={{ color: "var(--brand-text)" }}>
+                                    {item.label}
+                                </p>
+                                <p className="text-xs mt-1" style={{ color: "var(--brand-muted)" }}>
+                                    {item.sub}
+                                </p>
+                            </m.div>
+                        );
+                    })}
+                </m.div>
+            </div>
+        </section>
+    );
+}
+
+// ── FINAL CTA ────────────────────────────────────────────────────────────────
+
+function CTASection() {
+    return (
+        <section
+            className="relative overflow-hidden"
+            style={{ background: "var(--brand-bg-alt)", minHeight: "560px" }}
+        >
+            {/* ── Three.js globe — absolute right side, behind all text ── */}
+            <div
+                aria-hidden
+                style={{
+                    position: "absolute",
+                    top: "50%",
+                    right: "-8%",
+                    transform: "translateY(-50%)",
+                    width: "min(620px, 65vw)",
+                    height: "min(620px, 65vw)",
+                    zIndex: 0,
+                    pointerEvents: "none",
+                }}
+            >
+                <Suspense fallback={null}>
+                    <GlobeScene style={{ width: "100%", height: "100%" }} />
+                </Suspense>
+            </div>
+
+            {/* Edge fade — seamlessly blends globe into bg on the right */}
+            <div
+                aria-hidden
+                style={{
+                    position: "absolute", inset: 0,
+                    background: "linear-gradient(to right, var(--brand-bg-alt) 35%, transparent 65%, var(--brand-bg-alt) 100%)",
+                    zIndex: 1,
+                    pointerEvents: "none",
+                }}
+            />
+            {/* Top + bottom fades */}
+            <div
+                aria-hidden
+                style={{
+                    position: "absolute", inset: 0,
+                    background: "linear-gradient(to bottom, var(--brand-bg-alt) 0%, transparent 15%, transparent 85%, var(--brand-bg-alt) 100%)",
+                    zIndex: 1,
+                    pointerEvents: "none",
+                }}
+            />
+
+            {/* Dot grid */}
+            <div
+                aria-hidden
+                style={{
+                    position: "absolute", inset: 0,
+                    backgroundImage: "radial-gradient(rgba(148,163,184,0.05) 1px, transparent 1px)",
+                    backgroundSize: "32px 32px",
+                    pointerEvents: "none",
+                    zIndex: 1,
+                }}
+            />
+
+            {/* ── Text content — left-aligned on desktop, centred on mobile ── */}
+            <div
+                className="relative max-w-6xl mx-auto px-6 py-28"
+                style={{ zIndex: 2 }}
+            >
+                <div style={{ maxWidth: "640px" }}>
+                    <Reveal>
+                        <p
+                            className="text-xs font-bold tracking-widest uppercase mb-5"
+                            style={{ color: "var(--brand-cyan)" }}
+                        >
+                            Започни сега
+                        </p>
+                        <h2
+                            className="text-4xl md:text-6xl font-bold mb-6"
+                            style={{
+                                color: "var(--brand-text)",
+                                letterSpacing: "-0.03em",
+                                textWrap: "balance",
+                                lineHeight: 1.05,
+                            }}
+                        >
+                            Готов ли си да
+                            <br />
+                            <span
+                                style={{
+                                    background: "linear-gradient(130deg, #06B6D4, #8B5CF6)",
+                                    WebkitBackgroundClip: "text",
+                                    WebkitTextFillColor: "transparent",
+                                }}
+                            >
+                                откриеш своя път?
+                            </span>
+                        </h2>
+
+                        <p
+                            className="text-lg mb-10"
+                            style={{ color: "var(--brand-muted)", maxWidth: "480px", lineHeight: 1.7 }}
+                        >
+                            Присъедини се към учениците, които вземат информирани
+                            решения за своето бъдеще — напълно безплатно.
+                        </p>
+
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <m.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.97 }}>
+                                <Link
+                                    to="/register"
+                                    className="inline-flex items-center gap-3 font-semibold"
+                                    style={{
+                                        background: "linear-gradient(135deg, #06B6D4, #8B5CF6)",
+                                        color: "#fff",
+                                        padding: "0.9rem 1.75rem",
+                                        borderRadius: "0.875rem",
+                                        fontSize: "0.9375rem",
+                                        textDecoration: "none",
+                                        boxShadow: "0 0 40px rgba(6,182,212,0.28)",
+                                    }}
+                                >
+                                    Започни безплатно
+                                    <ArrowRight size={16} />
+                                </Link>
+                            </m.div>
+
+                            <m.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+                                <Link
+                                    to="/universities"
+                                    className="inline-flex items-center gap-2 font-medium"
+                                    style={{
+                                        border: "1px solid var(--brand-border)",
+                                        color: "var(--brand-text)",
+                                        background: "rgba(255,255,255,0.03)",
+                                        padding: "0.9rem 1.75rem",
+                                        borderRadius: "0.875rem",
+                                        fontSize: "0.9375rem",
+                                        textDecoration: "none",
+                                        transition: "border-color 0.2s, color 0.2s, background 0.2s",
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.borderColor = "rgba(139,92,246,0.4)";
+                                        e.currentTarget.style.color = "var(--brand-violet)";
+                                        e.currentTarget.style.background = "rgba(139,92,246,0.04)";
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.borderColor = "var(--brand-border)";
+                                        e.currentTarget.style.color = "var(--brand-text)";
+                                        e.currentTarget.style.background = "rgba(255,255,255,0.03)";
+                                    }}
+                                >
+                                    Разгледай университетите
+                                </Link>
+                            </m.div>
+                        </div>
+                    </Reveal>
                 </div>
             </div>
         </section>
     );
-};
+}
 
-// --- КОМПОНЕНТ: БРОЯЧ НА СТАТИСТИКИ ---
-const StatCounter = ({ end, duration = 2000 }) => {
-    const [count, setCount] = useState(0);
-
-    useEffect(() => {
-        let startTime = null;
-        const animate = (currentTime) => {
-            if (!startTime) startTime = currentTime;
-            const progress = Math.min((currentTime - startTime) / duration, 1);
-            setCount(Math.floor(progress * end));
-            if (progress < 1) {
-                requestAnimationFrame(animate);
-            }
-        };
-        requestAnimationFrame(animate);
-    }, [end, duration]);
-
-    return <span>{count}</span>;
-};
+// ── ROOT ─────────────────────────────────────────────────────────────────────
 
 export default function Home() {
     return (
-        <div className="min-h-screen bg-base-100 font-sans selection:bg-primary selection:text-white">
-            
-            {/* --- ГЛАВНА СЕКЦИЯ (HERO) --- */}
-            <section className="relative pt-32 pb-20 px-6 overflow-hidden">
-                {/* Фонови елементи */}
-                <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[120px] -z-10 animate-pulse"></div>
-                
-                <div className="max-w-6xl mx-auto text-center space-y-8 relative z-10">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary border border-primary/60 text-xs font-bold text-primary-content uppercase tracking-wider shadow-sm hover:scale-105 transition-transform cursor-default">
-                        <Sparkles size={14} />
-                        Изцяло обновена платформа 2026
-                    </div>
-                    
-                    <h1 className="text-5xl md:text-8xl font-black text-base-content leading-tight tracking-tight">
-                        Твоят път към <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent animate-gradient-x bg-300%">
-                            Университета
-                        </span>
-                    </h1>
-                    
-                    <p className="text-xl md:text-2xl text-base-content/60 max-w-3xl mx-auto font-medium leading-relaxed">
-                        Забрави за сложните таблици и неясните критерии. 
-                        <br className="hidden md:block" />
-                        Ние използваме <span className="text-base-content font-bold decoration-wavy  decoration-primary/30">реални данни</span>, за да ти покажем къде имаш шанс.
-                    </p>
-
-                    <div className="flex flex-wrap justify-center gap-4 pt-6">
-                        <Link to="/calculator" className="btn btn-primary btn-lg h-16 px-8 rounded-2xl shadow-xl shadow-primary/20 hover:scale-105 hover:shadow-2xl transition-all text-lg font-black">
-                            <Calculator className="mr-2" />
-                            Сметни си бала
-                        </Link>
-                        <Link to="/universities" className="btn btn-outline btn-lg h-16 px-8 rounded-2xl border-2 hover:bg-base-content hover:text-base-100 hover:border-base-content transition-all text-lg font-bold">
-                            <Search className="mr-2" />
-                            Търси Специалност
-                        </Link>
-                    </div>
-
-                    {/* Quick Stats Grid */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mt-12 pt-8 border-t border-base-200/50">
-                        {[
-                            { label: "Университета", value: 51, icon: Building2 },
-                            { label: "Специалности", value: 400, suffix: "+", icon: BookOpen },
-                            { label: "Потребители", value: 120,suffix: "+", icon: Users },
-                            { label: "Точност", value: 99, suffix: "%", icon: Trophy },
-                        ].map((stat, i) => (
-                            <div key={i} className="flex flex-col items-center gap-1 group cursor-default">
-                                <div className="text-3xl font-black text-base-content group-hover:text-primary transition-colors flex items-center justify-center gap-1 tabular-nums">
-                                    <span className="inline-block min-w-[5ch] text-center">
-                                        <StatCounter end={stat.value} />
-                                    </span>
-                                    {stat.suffix}
-                                </div>
-                                <div className="text-xs uppercase font-bold text-base-content/70 flex items-center gap-1">
-                                    <stat.icon size={12} />
-                                    {stat.label}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* --- ИНТЕРАКТИВЕН ПЪТ (TIMELINE) --- */}
-            <section className="py-20 bg-base-200/50 relative overflow-hidden">
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="text-center mb-16 space-y-4">
-                        <h2 className="text-4xl font-black">Как работи?</h2>
-                        <p className="text-lg opacity-60">Твоят път от училище до студентската скамейка в 4 стъпки</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
-                        {/* Connecting Line (Desktop) */}
-                        <div className="hidden md:block absolute top-12 left-0 w-full h-1 bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 -z-10 rounded-full"></div>
-
-                        {[
-                            { 
-                                step: "1", 
-                                title: "Въведи Оценки", 
-                                desc: "Използвай нашия калкулатор за да въведеш оценките от дипломата и изпитите.", 
-                                icon: Calculator,
-                                color: "text-primary",
-                                bg: "bg-primary/10"
-                            },
-                            { 
-                                step: "2", 
-                                title: "Виж Класиране", 
-                                desc: "Алгоритъмът ни веднага ще ти покаже къде балът ти е достатъчен.", 
-                                icon: TrendingUp,
-                                color: "text-secondary",
-                                bg: "bg-secondary/10"
-                            },
-                            { 
-                                step: "3", 
-                                title: "Избери Специалност", 
-                                desc: "Разгледай детайли за учебните програми и реализацията.", 
-                                icon: Search,
-                                color: "text-accent",
-                                bg: "bg-accent/10"
-                            },
-                            { 
-                                step: "4", 
-                                title: "Кандидатствай", 
-                                desc: "Вече знаеш къде имаш реален шанс. Действай смело!", 
-                                icon: CheckCircle2,
-                                color: "text-success",
-                                bg: "bg-success/10"
-                            }
-                        ].map((item, i) => (
-                            <div key={i} className="relative group">
-                                <div className={`w-24 h-24 mx-auto ${item.bg} rounded-3xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                                    <item.icon size={40} className={item.color} />
-                                </div>
-                                <div className="text-center space-y-2 px-4">
-                                    <div className="text-xs font-black opacity-60">СТЪПКА {item.step}</div>
-                                    <h3 className="text-xl font-bold">{item.title}</h3>
-                                    <p className="text-sm opacity-60 leading-relaxed">{item.desc}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* --- РЕШЕТКА С ИНСТРУМЕНТИ --- */}
-            <section className="max-w-7xl mx-auto px-6 py-24">
-                <div className="flex items-center justify-between mb-12">
-                    <h2 className="text-3xl font-black">Инструменти</h2>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 auto-rows-[minmax(250px,auto)]">
-                    
-                    {/* Калкулатор */}
-                    <Link to="/calculator" className="group relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-base-100 to-base-200 border border-base-300 p-8 transition-all hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1">
-                        <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-                            <Calculator size={180} />
-                        </div>
-                        <div className="relative z-10 h-full flex flex-col justify-between">
-                            <div className="space-y-4">
-                                <div className="w-14 h-14 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/30">
-                                    <Calculator size={28} />
-                                </div>
-                                <div>
-                                    <h3 className="text-2xl font-bold mb-1">Бал Калкулатор</h3>
-                                    <p className="text-sm opacity-60 line-clamp-2">
-                                        Сравни бала си с миналогодишните приеми.
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2 text-primary font-bold text-sm mt-6">
-                                Сметни  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                            </div>
-                        </div>
-                    </Link>
-
-                    {/* Кариерен Съветник */}
-                    <Link to="/career-advisor" className="group relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-indigo-600 to-purple-700 text-white p-8 transition-all hover:shadow-2xl hover:shadow-indigo-500/20 hover:-translate-y-1">
-                        <BrainCircuit className="absolute -bottom-4 -right-4 w-32 h-32 opacity-20 rotate-12 group-hover:rotate-0 transition-transform duration-500" />
-                        <div className="relative z-10 h-full flex flex-col justify-between">
-                            <div className="space-y-4">
-                                <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/10">
-                                    <BrainCircuit size={28} />
-                                </div>
-                                <div>
-                                    {/* <div className="badge badge-warning text-xs font-bold mb-2">Изпробвай сега</div> */}
-                                    <h3 className="text-2xl font-bold mb-1">Кариерен Съветник</h3>
-                                    <p className="text-sm opacity-80 line-clamp-2">
-                                        Не знаеш какво да учиш? Направи теста и разбери силните си страни.
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2 font-bold text-sm mt-6">
-                                Направи Тест <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                            </div>
-                        </div>
-                    </Link>
-
-                    {/* Търсачка за университети (NEW) */}
-                    <Link to="/universities" className="group relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-blue-500 to-cyan-400 text-white p-8 transition-all hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-1">
-                        <Search className="absolute -bottom-4 -right-4 w-32 h-32 opacity-20 rotate-12 group-hover:rotate-0 transition-transform duration-500" />
-                        <div className="relative z-10 h-full flex flex-col justify-between">
-                            <div className="space-y-4">
-                                <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/10">
-                                    <Search size={28} />
-                                </div>
-                                <div>
-                                    <h3 className="text-2xl font-bold mb-1">Търсачка</h3>
-                                    <p className="text-sm opacity-80 line-clamp-2">
-                                        Намери перфектния университет по специалност и град.
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2 font-bold text-sm mt-6">
-                                Потърси сега<ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                            </div>
-                        </div>
-                    </Link>
-
-                    {/* Общежития */}
-                    <Link to="/dormitories" className="group relative overflow-hidden rounded-[2.5rem] bg-emerald-500 text-white p-8 transition-all hover:shadow-2xl hover:shadow-emerald-500/20 hover:-translate-y-1">
-                        <Building2 className="absolute top-1/2 -translate-y-1/2 right-4 w-24 h-24 opacity-20 group-hover:scale-110 transition-transform" />
-                        <div className="relative z-10 h-full flex flex-col justify-between">
-                            <div className="space-y-4">
-                                <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/10">
-                                    <Building2 size={28} />
-                                </div>
-                                <div>
-                                    <div className="badge badge-success text-white border-none bg-emerald-600 text-xs font-bold mb-2">НОВО</div>
-                                    <h3 className="text-2xl font-bold mb-1">Общежития</h3>
-                                    <p className="text-sm text-white/95">
-                                        Информация за цени ,условия и още.
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2 font-bold text-sm mt-6">
-                                Разгледай <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                            </div>
-                        </div>
-                    </Link>
-                </div>
-            </section>
-
-            {/* --- ОТЗИВИ (СЛАЙДЕР) --- */}
-            <ReviewsSlider />
-
+        <div
+            className="landing-page"
+            style={{ background: "var(--brand-bg)", minHeight: "100vh" }}
+        >
+            <HeroSection />
+            <StatStripSection />
+            <HowItWorksSection />
+            <FeaturesSection />
+            <TrustSection />
+            <CTASection />
         </div>
     );
 }
-

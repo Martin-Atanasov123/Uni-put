@@ -3,6 +3,138 @@
   themes: dark --default, dark --prefersdark, nord;
 };
 
+:root,
+[data-theme="dark"] {
+  --brand-bg: #0F172A;
+  --brand-bg-alt: #0B1120;
+  --brand-surface: #1E293B;
+  --brand-surface-2: rgba(30,41,59,0.7);
+  --brand-cyan: #06B6D4;
+  --brand-violet: #8B5CF6;
+  --brand-text: #F1F5F9;
+  --brand-muted: #94A3B8;
+  --brand-border: rgba(148, 163, 184, 0.1);
+  --brand-input-bg: rgba(15,23,42,0.8);
+  --brand-input-border: rgba(148,163,184,0.12);
+  --brand-dropdown-bg: #1E293B;
+  --brand-nav-bg: rgba(15,23,42,0.55);
+  --brand-nav-scrolled: rgba(15,23,42,0.75);
+  --brand-shadow: rgba(0,0,0,0.5);
+  --brand-card-hover: rgba(139,92,246,0.08);
+  --brand-card-border: rgba(148,163,184,0.09);
+  --brand-progress-bg: rgba(15,23,42,0.85);
+
+  /* Map DaisyUI v5 tokens to brand palette (admin panel & any DaisyUI components) */
+  --color-base-100: #0F172A;
+  --color-base-200: #131d2e;
+  --color-base-300: #1E293B;
+  --color-base-content: #F1F5F9;
+  --color-primary: #06B6D4;
+  --color-primary-content: #0F172A;
+  --color-secondary: #8B5CF6;
+  --color-secondary-content: #F1F5F9;
+  --color-accent: #8B5CF6;
+  --color-accent-content: #F1F5F9;
+  --color-neutral: #1E293B;
+  --color-neutral-content: #94A3B8;
+  --color-info: #06B6D4;
+  --color-info-content: #0F172A;
+  --color-success: #10b981;
+  --color-success-content: #F1F5F9;
+  --color-warning: #FBBF24;
+  --color-warning-content: #0F172A;
+  --color-error: #f87171;
+  --color-error-content: #F1F5F9;
+}
+
+/* "nord" is the DaisyUI light theme name — triggered by useTheme when user picks "light" */
+[data-theme="nord"] {
+  --brand-bg: #F8FAFC;
+  --brand-bg-alt: #EFF4FA;
+  --brand-surface: #FFFFFF;
+  --brand-surface-2: rgba(255,255,255,0.92);
+  --brand-cyan: #0891B2;
+  --brand-violet: #7C3AED;
+  --brand-text: #0F172A;
+  --brand-muted: #64748B;
+  --brand-border: rgba(15, 23, 42, 0.08);
+  --brand-input-bg: #FFFFFF;
+  --brand-input-border: rgba(15,23,42,0.14);
+  --brand-dropdown-bg: #FFFFFF;
+  --brand-nav-bg: rgba(248,250,252,0.82);
+  --brand-nav-scrolled: rgba(248,250,252,0.96);
+  --brand-shadow: rgba(0,0,0,0.1);
+  --brand-card-hover: rgba(124,58,237,0.05);
+  --brand-card-border: rgba(15,23,42,0.08);
+  --brand-progress-bg: rgba(248,250,252,0.9);
+
+  /* Map DaisyUI v5 tokens to brand light palette */
+  --color-base-100: #F8FAFC;
+  --color-base-200: #EFF4FA;
+  --color-base-300: #E2EBF5;
+  --color-base-content: #0F172A;
+  --color-primary: #0891B2;
+  --color-primary-content: #F8FAFC;
+  --color-secondary: #7C3AED;
+  --color-secondary-content: #F8FAFC;
+  --color-accent: #7C3AED;
+  --color-accent-content: #F8FAFC;
+  --color-neutral: #E2EBF5;
+  --color-neutral-content: #0F172A;
+  --color-info: #0891B2;
+  --color-info-content: #F8FAFC;
+  --color-success: #059669;
+  --color-success-content: #F8FAFC;
+  --color-warning: #D97706;
+  --color-warning-content: #F8FAFC;
+  --color-error: #DC2626;
+  --color-error-content: #F8FAFC;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+  text-rendering: optimizeLegibility;
+}
+
+.landing-page * {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ── Global animation keyframes ─────────────────────────────────────────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Focus visible ring — accessibility + premium UX ────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--brand-cyan);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ── Reduced motion — always respect ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Scrollbar styling — subtle, theme-aware ─────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--brand-border);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-muted);
+}
+
 
 
 /* :root {

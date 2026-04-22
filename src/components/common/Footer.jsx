@@ -1,90 +1,222 @@
-import { 
-    Github, 
-    ExternalLink, 
-    ShieldCheck, 
-    Info, 
-    BookOpen, 
-    Globe,
+import {
+    ExternalLink,
+    ShieldCheck,
+    Info,
+    BookOpen,
     FileText,
-    Heart
+    GraduationCap,
+    Heart,
+    Database,
 } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
+
+const LINK_COLUMNS = [
+    {
+        title: "Официални Ресурси",
+        links: [
+            { label: "Данни от МОН", icon: Database, href: "https://www.mon.bg", external: true },
+            { label: "Информация за ДЗИ", icon: BookOpen, href: "https://www.mon.bg/obshto-obrazovanie/darzhavni-zrelostni-izpiti-dzi", external: true },
+            { label: "Новини от МОН", icon: ExternalLink, href: "https://www.mon.bg/novini/", external: true },
+            { label: "Държавни изпити", icon: FileText, href: "https://www.mon.bg/obshto-obrazovanie/darzhavni-zrelostni-izpiti-dzi/izpitni-materiali-za-dzi-po-godini/", external: true },
+        ],
+    },
+    {
+        title: "Проектът",
+        links: [
+            { label: "За нас", icon: Info, href: "/about" },
+            { label: "Лиценз GNU", icon: ShieldCheck, href: "https://www.gnu.org/licenses/gpl-3.0.html", external: true },
+        ],
+    },
+    {
+        title: "Правна част",
+        links: [
+            { label: "Условия за ползване", href: "/terms" },
+            { label: "Поверителност", href: "/privacy" },
+        ],
+    },
+];
+
+function FooterLink({ link }) {
+    const Icon = link.icon;
+    const content = (
+        <>
+            {Icon && <Icon size={13} style={{ opacity: 0.7 }} />}
+            <span>{link.label}</span>
+        </>
+    );
+    const style = {
+        display: "flex",
+        alignItems: "center",
+        gap: "0.5rem",
+        color: "var(--brand-muted)",
+        fontSize: "13px",
+        fontWeight: 500,
+        textDecoration: "none",
+        transition: "color 0.2s",
+    };
+    const onEnter = e => { e.currentTarget.style.color = "var(--brand-cyan)"; };
+    const onLeave = e => { e.currentTarget.style.color = "var(--brand-muted)"; };
+
+    if (link.external) {
+        return (
+            <a href={link.href} target="_blank" rel="noreferrer" style={style} onMouseEnter={onEnter} onMouseLeave={onLeave}>
+                {content}
+            </a>
+        );
+    }
+    return (
+        <Link to={link.href} style={style} onMouseEnter={onEnter} onMouseLeave={onLeave}>
+            {content}
+        </Link>
+    );
+}
 
 const Footer = () => {
     const currentYear = new Date().getFullYear();
     const location = useLocation();
-
     if (location.pathname.startsWith("/admin")) return null;
 
     return (
-        <footer className="bg-base-200 text-base-content mt-20 relative overflow-hidden">
-            {/* Декоративен елемент за фон */}
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
-            
-            <div className="max-w-7xl mx-auto p-10 lg:px-12">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 text-center md:text-left">
-                    
-                    {/* Лого секция */}
-                    <aside className="space-y-4">
-                        <div className="flex items-center justify-center md:justify-start gap-2 group">
-                            <span className="text-4xl group-hover:rotate-12 transition-transform duration-300">🎓</span>
-                            <span className="text-2xl font-black tracking-tighter text-primary italic uppercase">УниПът</span>
+        <footer
+            style={{
+                position: "relative",
+                background: "linear-gradient(180deg, transparent 0%, var(--brand-surface) 30%, var(--brand-bg) 100%)",
+                borderTop: "1px solid var(--brand-border)",
+                overflow: "hidden",
+            }}
+        >
+            <div
+                aria-hidden
+                style={{
+                    position: "absolute",
+                    top: 0, left: 0, right: 0,
+                    height: "1px",
+                    background: "linear-gradient(90deg, transparent, rgba(6,182,212,0.4), rgba(139,92,246,0.4), transparent)",
+                }}
+            />
+            <div
+                aria-hidden
+                style={{
+                    position: "absolute",
+                    top: "-120px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    width: "640px",
+                    height: "240px",
+                    background: "radial-gradient(ellipse at center, rgba(6,182,212,0.08), transparent 70%)",
+                    pointerEvents: "none",
+                }}
+            />
+
+            <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "3.5rem 1.5rem 2rem", position: "relative" }}>
+                <div
+                    style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                        gap: "3rem",
+                        marginBottom: "3rem",
+                    }}
+                >
+                    <div style={{ display: "flex", flexDirection: "column", gap: "1rem", maxWidth: "320px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}>
+                            <div
+                                style={{
+                                    width: "2.25rem",
+                                    height: "2.25rem",
+                                    borderRadius: "0.625rem",
+                                    background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    boxShadow: "0 8px 24px rgba(6,182,212,0.25)",
+                                }}
+                            >
+                                <GraduationCap size={20} color="#fff" />
+                            </div>
+                            <span
+                                style={{
+                                    fontSize: "1.25rem",
+                                    fontWeight: 800,
+                                    letterSpacing: "-0.02em",
+                                    background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                    WebkitBackgroundClip: "text",
+                                    WebkitTextFillColor: "transparent",
+                                }}
+                            >
+                                УниПът
+                            </span>
                         </div>
-                        <p className="text-sm font-medium opacity-60 leading-relaxed">
-                            Иновативна платформа за кандидатстудентски прием. Твоят дигитален пътеводител към висшето образование в България.
+                        <p style={{ fontSize: "13px", color: "var(--brand-muted)", lineHeight: 1.6, margin: 0 }}>
+                            Твоят дигитален пътеводител към висшето образование в България. Данните са от официалните наредби на МОН, актуализирани за 2025 г.
                         </p>
-                        {/* <div className="flex items-center justify-center md:justify-start gap-4 pt-2">
-                            <a href="https://github.com/Martin-Atanasov123/Uni-put" target="_blank" rel="noreferrer" className="btn btn-ghost btn-circle btn-sm hover:text-primary transition-colors" aria-label="GitHub репозитория на УниПът">
-                                <Github size={20} />
-                            </a>
-                            <a href="https://www.mon.bg/visshe-obrazovanie/" target="_blank" rel="noreferrer" className="btn btn-ghost btn-circle btn-sm hover:text-primary transition-colors" aria-label="Министерство на образованието и науката – Висше образование">
-                                <Globe size={20} />
-                            </a>
-                        </div> */}
-                    </aside>
+                        {/* <span
+                            style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                alignSelf: "flex-start",
+                                padding: "0.3rem 0.625rem",
+                                background: "rgba(139,92,246,0.1)",
+                                border: "1px solid rgba(139,92,246,0.3)",
+                                borderRadius: "999px",
+                                color: "#c4b5fd",
+                                fontSize: "10px",
+                                fontWeight: 700,
+                                letterSpacing: "0.12em",
+                                textTransform: "uppercase",
+                            }}
+                        >
+                            НОИТ 2026
+                        </span> */}
+                    </div>
 
-                    {/* Секция Ресурси (Външни линкове) */}
-                    <nav className="flex flex-col gap-3">
-                        <h2 className="footer-title opacity-100 font-black text-secondary tracking-widest text-[10px] mb-2 uppercase">Официални Ресурси</h2>
-                        <a href="https://www.mon.bg/obshto-obrazovanie/darzhavni-zrelostni-izpiti-dzi" target="_blank" rel="noreferrer" className="link link-hover flex items-center justify-center md:justify-start gap-2 opacity-70 hover:opacity-100 hover:text-primary font-bold text-sm">
-                            <BookOpen size={14} /> Инфорация за ДЗИ
-                        </a>
-                        <a href="https://www.mon.bg/novini/" target="_blank" rel="noreferrer" className="link link-hover flex items-center justify-center md:justify-start gap-2 opacity-70 hover:opacity-100 hover:text-primary font-bold text-sm">
-                            <ExternalLink size={14} /> Новини от МОН
-                        </a>
-                        <a href="https://www.mon.bg/obshto-obrazovanie/darzhavni-zrelostni-izpiti-dzi/izpitni-materiali-za-dzi-po-godini/" target="_blank" rel="noreferrer" className="link link-hover flex items-center justify-center md:justify-start gap-2 opacity-70 hover:opacity-100 hover:text-primary font-bold text-sm">
-                            <FileText size={14} /> Държавни изпити
-                        </a>
-                    </nav>
-
-                    <nav className="flex flex-col gap-3">
-                        <h2 className="footer-title opacity-100 font-black text-secondary tracking-widest text-[10px] mb-2 uppercase">Проектът</h2>
-                        <a href="/about" className="link link-hover flex items-center justify-center md:justify-start gap-2 opacity-70 hover:opacity-100 font-bold text-sm italic">
-                            <Info size={14} /> За нас
-                        </a>
-                        <a href="https://www.gnu.org/licenses/gpl-3.0.html" className="link link-hover flex items-center justify-center md:justify-start gap-2 opacity-70 hover:opacity-100 font-bold text-sm">
-                            <ShieldCheck size={14} /> Лиценз GNU
-                        </a>
-                        <span className="badge badge-primary font-black text-[10px] mt-2 italic mx-auto md:mx-0 text-primary-content border-none">НОИТ 2026</span>
-                    </nav>
-
-                    {/* Секция Правна информация */}
-                    <nav className="flex flex-col gap-3">
-                        <h2 className="footer-title opacity-100 font-black text-secondary tracking-widest text-[10px] mb-2 uppercase">Правна част</h2>
-                        <Link to="/terms" className="link link-hover opacity-70 hover:opacity-100 font-bold text-sm">Условия за ползване</Link>
-                        <Link to="/privacy" className="link link-hover opacity-70 hover:opacity-100 font-bold text-sm">Поверителност</Link>
-                        <div className="mt-4 p-4 bg-base-300/50 rounded-2xl border border-base-content/5">
-                            <p className="text-[10px] font-bold opacity-50 leading-tight">Данните за баловете са базирани на справочниците за 2026г.</p>
+                    {LINK_COLUMNS.map(col => (
+                        <div key={col.title} style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                            <h3
+                                style={{
+                                    margin: 0,
+                                    fontSize: "11px",
+                                    fontWeight: 700,
+                                    letterSpacing: "0.12em",
+                                    textTransform: "uppercase",
+                                    color: "var(--brand-cyan)",
+                                    opacity: 0.85,
+                                }}
+                            >
+                                {col.title}
+                            </h3>
+                            {col.links.map(link => <FooterLink key={link.label} link={link} />)}
                         </div>
-                    </nav>
+                    ))}
                 </div>
 
-                {/* Копирайт лента */}
-                <div className="mt-16 pt-8 border-t border-base-content/5 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-[10px] font-black opacity-70 uppercase tracking-[0.2em]">
-                        © {currentYear} УниПът Bulgaria. Всички права са запазени.   
+                <div
+                    style={{
+                        paddingTop: "1.5rem",
+                        borderTop: "1px solid var(--brand-border)",
+                        display: "flex",
+                        flexWrap: "wrap",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        gap: "1rem",
+                    }}
+                >
+                    <p
+                        style={{
+                            margin: 0,
+                            fontSize: "11px",
+                            fontWeight: 600,
+                            color: "var(--brand-muted)",
+                            letterSpacing: "0.1em",
+                            textTransform: "uppercase",
+                            opacity: 0.7,
+                            
+                        }}
+                    >
+                        © {currentYear} УниПът Bulgaria — Всички права запазени
                     </p>
-                    
+                    {/* <p style={{ margin: 0, display: "inline-flex", alignItems: "center", gap: "0.375rem", fontSize: "11px", color: "var(--brand-muted)", opacity: 0.7 }}>
+                        Направено с <Heart size={11} style={{ color: "#f87171", fill: "#f87171" }} /> в България
+                    </p> */}
                 </div>
             </div>
         </footer>
@@ -92,4 +224,3 @@ const Footer = () => {
 };
 
 export default Footer;
-

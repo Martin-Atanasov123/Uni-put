@@ -1,52 +1,36 @@
 // @vitest-environment happy-dom
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import Home from "@/components/common/Home";
 
-describe("Home ReviewsSlider", () => {
-    beforeEach(() => {
-        vi.useFakeTimers();
+vi.mock("../../../components/landing/ConstellationBackground", () => ({
+    default: () => null,
+}));
+
+describe("Home landing page", () => {
+    it("renders the hero section", () => {
+        render(<MemoryRouter><Home /></MemoryRouter>);
+        expect(screen.getByTestId("hero-section")).toBeTruthy();
     });
 
-    afterEach(() => {
-        vi.useRealTimers();
+    it("renders the main headline", () => {
+        render(<MemoryRouter><Home /></MemoryRouter>);
+        expect(screen.getByText(/Открий своя/i)).toBeTruthy();
     });
 
-    it("renders the reviews section title", () => {
-        render(
-            <MemoryRouter>
-                <Home />
-            </MemoryRouter>
-        );
-        expect(screen.getByText(/Доволни клиенти и ревюта/i)).toBeTruthy();
+    it("renders RIASEC CTA button", () => {
+        render(<MemoryRouter><Home /></MemoryRouter>);
+        expect(screen.getByText(/Направи своя RIASEC профил/i)).toBeTruthy();
     });
 
-    it("handles manual navigation clicks", async () => {
-        render(
-            <MemoryRouter>
-                <Home />
-            </MemoryRouter>
-        );
+    it("renders the how it works section", () => {
+        render(<MemoryRouter><Home /></MemoryRouter>);
+        expect(screen.getByText(/Три стъпки до правилния избор/i)).toBeTruthy();
+    });
 
-        await act(async () => {
-            vi.advanceTimersByTime(100);
-        });
-
-        const sliderContainers = screen.getAllByTestId('reviews-slider');
-        const sliderContainer = sliderContainers[0];
-        const initialStyle = sliderContainer.getAttribute('style');
-
-        // Find next button (it has ChevronRight)
-        const buttons = screen.getAllByRole('button');
-        const nextBtn = buttons.find(btn => 
-            btn.innerHTML.includes('lucide-chevron-right')
-        );
-
-        await act(async () => {
-            fireEvent.click(nextBtn);
-        });
-
-        expect(sliderContainer.getAttribute('style')).not.toBe(initialStyle);
+    it("renders the features section", () => {
+        render(<MemoryRouter><Home /></MemoryRouter>);
+        expect(screen.getByText(/Създаден за сериозни избори/i)).toBeTruthy();
     });
 });

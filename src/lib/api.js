@@ -35,13 +35,17 @@ export async function getRiasecMatches(userScores) {
             throw careerError;
         }
 
+        // Strip study-form suffixes like (Р), (Р, З), (Д) (ЦДО - София) from display names
+        const stripStudyForm = (name) =>
+            name.replace(/(\s*\(([РЗД][^)]*|ЦДО[^)]*|РЦДО[^)]*)\))+\s*$/, '').trim();
+
         // 3. Изчисляване на съвместимост (Hybrid Logic)
         const specialties = (specialtiesData || [])
             .map(item => {
                 const compatibility = calculateHybridCompatibility(userScores, item);
                 return {
                     id: item.id,
-                    name: item.specialty_base_name,
+                    name: stripStudyForm(item.specialty_base_name),
                     riasec_code: item.riasec_code,
                     category: item.category,
                     compatibility: compatibility,
@@ -49,8 +53,9 @@ export async function getRiasecMatches(userScores) {
                     universities: item.universities || []
                 };
             })
-            .filter(item => item.compatibility >= 50) // Намаляваме прага до 50% за повече резултати
-            .sort((a, b) => b.compatibility - a.compatibility);
+            .filter(item => item.compatibility >= 50)
+            .sort((a, b) => b.compatibility - a.compatibility)
+            .filter((item, idx, arr) => arr.findIndex(x => x.name === item.name) === idx);
 
         const careers = (careersData || [])
             .map(item => ({

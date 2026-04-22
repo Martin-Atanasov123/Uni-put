@@ -12,6 +12,7 @@ import {
 import { ADMIN_TABLES } from "./adminConfig";
 import { adminService } from "@/services/adminService";
 import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -128,7 +129,7 @@ const AdminDashboard = () => {
 
         // Инициализиране на Real-time канал за текущата таблица.
         // Това позволява автоматично обновяване на UI при INSERT, UPDATE или DELETE събития в Supabase.
-        const channel = supabase
+        const channel = supabaseAdmin
             .channel(`admin_realtime_${activeTable.table}`)
             .on(
                 "postgres_changes",
@@ -142,7 +143,7 @@ const AdminDashboard = () => {
 
         return () => {
             // Премахване на субскрипцията при смяна на таблица или демонтиране на компонента.
-            supabase.removeChannel(channel);
+            supabaseAdmin.removeChannel(channel);
         };
     }, [activeTable, loadData]);
 
