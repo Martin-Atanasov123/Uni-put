@@ -22,7 +22,7 @@ export default function SplineHero() {
             {/* The Spline canvas — fills the entire hero */}
             <Suspense fallback={null}>
                 <Spline
-                    scene="https://prod.spline.design/kg8OjUNE7hiPmPfZ/scene.splinecode"
+                    scene="https://prod.spline.design/SUVrHf-954oP3SsO/scene.splinecode"
                     style={{
                         width: "125%",
                         height: "100%",
