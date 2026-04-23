@@ -5,7 +5,7 @@ import { useTheme } from "@/hooks/useTheme";
 import {
     User, LogOut, LayoutDashboard, Menu, X, GraduationCap,
     Calculator, Search, Settings, Building2, Heart, ChevronDown,
-    Sun, Moon, Brain,
+    Sun, Moon, Brain
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
@@ -15,6 +15,8 @@ const NAV_LINKS = [
     { name: "Калкулатор",     path: "/calculator",     icon: Calculator },
     { name: "Кариерен тест",  path: "/career-advisor", icon: Brain },
     { name: "Общежития",      path: "/dormitories",    icon: Building2 },
+    { name: "За нас",      path: "/about",    icon: GraduationCap },
+
 ];
 
 export default function Header() {

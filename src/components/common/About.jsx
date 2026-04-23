@@ -1,4 +1,4 @@
-import { Mail, Github, Code2, Briefcase, Sparkles, Database, BookOpen, Calculator, Brain } from "lucide-react";
+import { Mail, Github, Code2, Briefcase, Users, Lightbulb, Database, BookOpen, Calculator, Brain } from "lucide-react";
 
 const TEAM = [
     {
@@ -172,7 +172,7 @@ const About = () => {
             <div style={{ maxWidth: "1100px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "5rem", position: "relative" }}>
                 <header style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: "1rem" }}>
                     <div style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.4rem 0.875rem", background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.3)", borderRadius: "999px", color: "var(--brand-cyan)", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 auto" }}>
-                        <Sparkles size={12} /> За проекта
+                        <Users size={12} /> За нас
                     </div>
                     <h1
                         id="about-title"
@@ -205,7 +205,7 @@ const About = () => {
                 <section aria-labelledby="why-title" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "3rem", alignItems: "start" }}>
                     <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
                         <div style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.35rem 0.75rem", background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.3)", borderRadius: "999px", color: "var(--brand-violet)", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.18em", width: "fit-content" }}>
-                            <Sparkles size={11} /> Защо го изградихме
+                            <Lightbulb size={11} /> Защо го изградихме
                         </div>
                         <h2
                             id="why-title"

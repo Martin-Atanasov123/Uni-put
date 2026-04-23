@@ -100,10 +100,27 @@ export default function CalculatorPage() {
     const [grades, setGrades] = useState({});
     const [pendingSpecialty, setPendingSpecialty] = useState(null);
     const [dziPoints, setDziPoints] = useState("");
+    const [dziError, setDziError] = useState("");
     const [copied, setCopied] = useState(false);
     const location = useLocation();
 
-    const dziResult = dziPoints !== "" && !isNaN(parseFloat(dziPoints))
+    const handleDziChange = (e) => {
+        const val = e.target.value;
+        setDziPoints(val);
+        if (val === "" || val === "-") { setDziError(""); return; }
+        const num = parseFloat(val);
+        if (isNaN(num)) {
+            setDziError("Въведи валидно число.");
+        } else if (num < 0) {
+            setDziError("Точките не могат да са отрицателни.");
+        } else if (num > 100) {
+            setDziError("Максималният брой точки е 100.");
+        } else {
+            setDziError("");
+        }
+    };
+
+    const dziResult = dziPoints !== "" && !dziError && !isNaN(parseFloat(dziPoints))
         ? dziToGrade(parseFloat(dziPoints))
         : null;
 
@@ -427,8 +444,8 @@ export default function CalculatorPage() {
                     </AnimatePresence>
                 </m.div>
 
-                {/* How it works — shown only when no faculty selected */}
-                {!selectedFaculty && (
+                {/* How it works — shown only when no faculty selected AND dropdown is closed */}
+                {!selectedFaculty && !isFacultyDropdownOpen && (
                     <m.div
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -460,8 +477,8 @@ export default function CalculatorPage() {
                     </m.div>
                 )}
 
-                {/* DZI → Grade Converter — shown only when no faculty selected */}
-                {!selectedFaculty && (
+                {/* DZI → Grade Converter — shown only when no faculty selected AND dropdown is closed */}
+                {!selectedFaculty && !isFacultyDropdownOpen && (
                     <m.div
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -491,11 +508,30 @@ export default function CalculatorPage() {
                                     step="0.25"
                                     placeholder="напр. 74.5"
                                     value={dziPoints}
-                                    onChange={e => setDziPoints(e.target.value)}
-                                    style={{ ...S.input, fontFamily: "monospace", fontSize: "1.1rem", fontWeight: 700 }}
-                                    onFocus={e => { e.target.style.borderColor = "rgba(6,182,212,0.5)"; }}
-                                    onBlur={e => { e.target.style.borderColor = "var(--brand-input-border)"; }}
+                                    onChange={handleDziChange}
+                                    style={{
+                                        ...S.input,
+                                        fontFamily: "monospace",
+                                        fontSize: "1.1rem",
+                                        fontWeight: 700,
+                                        borderColor: dziError ? "rgba(248,113,113,0.6)" : undefined,
+                                    }}
+                                    onFocus={e => { e.target.style.borderColor = dziError ? "rgba(248,113,113,0.6)" : "rgba(6,182,212,0.5)"; }}
+                                    onBlur={e => { e.target.style.borderColor = dziError ? "rgba(248,113,113,0.6)" : "var(--brand-input-border)"; }}
                                 />
+                                {dziError && (
+                                    <p style={{
+                                        marginTop: "0.35rem",
+                                        fontSize: "11px",
+                                        fontWeight: 600,
+                                        color: "#fca5a5",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "0.3rem",
+                                    }}>
+                                        <AlertCircle size={11} /> {dziError}
+                                    </p>
+                                )}
                             </div>
 
                             {/* Live result */}
@@ -594,8 +630,8 @@ export default function CalculatorPage() {
                     </m.div>
                 )}
 
-                {/* Tips — shown only when no faculty selected */}
-                {!selectedFaculty && (
+                {/* Tips — shown only when no faculty selected AND dropdown is closed */}
+                {!selectedFaculty && !isFacultyDropdownOpen && (
                     <m.div
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}

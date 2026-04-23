@@ -1,10 +1,11 @@
 import { useRef, useState, useEffect, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { m, useInView } from "framer-motion";
+import { useAuth } from "@/hooks/useAuth";
 
 // Heavy 3D components — lazy loaded so they never block first paint
-const SplineHero  = lazy(() => import("@/components/landing/SplineHero"));
-const GlobeScene  = lazy(() => import("@/components/landing/GlobeScene"));
+const HolographicEarth = lazy(() => import("@/components/landing/HolographicEarth"));
+const GlobeScene        = lazy(() => import("@/components/landing/GlobeScene"));
 import {
     Brain,
     Target,
@@ -35,6 +36,18 @@ const stagger = {
     hidden: {},
     visible: { transition: { staggerChildren: 0.04, delayChildren: 0.05 } },
 };
+
+function useMediaQuery(query) {
+    const [matches, setMatches] = useState(false);
+    useEffect(() => {
+        const mq = window.matchMedia(query);
+        setMatches(mq.matches);
+        const listener = (e) => setMatches(e.matches);
+        mq.addEventListener("change", listener);
+        return () => mq.removeEventListener("change", listener);
+    }, [query]);
+    return matches;
+}
 
 function Reveal({ children, delay = 0, className }) {
     const ref = useRef(null);
@@ -81,12 +94,7 @@ function HeroSection() {
             className="relative min-h-screen overflow-hidden"
             style={{ background: "var(--brand-bg)" }}
         >
-            {/* ── Layer 0: Spline 3D scene — full hero background ── */}
-            <Suspense fallback={null}>
-                <SplineHero />
-            </Suspense>
-
-            {/* ── Layer 1: dot grid — adds texture over Spline ── */}
+            {/* ── Layer 0: dot grid background ── */}
             <div
                 aria-hidden
                 style={{
@@ -121,7 +129,7 @@ function HeroSection() {
                     initial={{ opacity: 0, x: -36 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.9, ease: EASE }}
-                    style={{ maxWidth: "560px" }}
+                    style={{ maxWidth: "600px", zIndex: 2 }}
                 >
                     {/* Badge — filled with real data */}
                     <div
@@ -237,7 +245,49 @@ function HeroSection() {
                     </div>
                 </m.div>
 
-                
+                {/* ── Right: Holographic Earth — desktop only ── */}
+                <m.div
+                    className="hidden lg:flex flex-1 items-center justify-center"
+                    initial={{ opacity: 0, scale: 0.85 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 1.1, ease: EASE, delay: 0.2 }}
+                    aria-hidden
+                    style={{ minHeight: "540px", maxWidth: "580px" }}
+                >
+                    {/* Outer glow ring */}
+                    <div style={{
+                        position: "relative",
+                        width: "100%",
+                        maxWidth: "560px",
+                        aspectRatio: "1/1",
+                    }}>
+                        {/* Ambient glow behind the globe */}
+                        <div style={{
+                            position: "absolute",
+                            inset: "10%",
+                            borderRadius: "50%",
+                            background: "radial-gradient(circle, rgba(6,182,212,0.12) 0%, rgba(139,92,246,0.06) 50%, transparent 75%)",
+                            filter: "blur(24px)",
+                            pointerEvents: "none",
+                        }} />
+                        <Suspense fallback={
+                            <div style={{
+                                width: "100%", height: "100%",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                            }}>
+                                <div style={{
+                                    width: "200px", height: "200px", borderRadius: "50%",
+                                    border: "1px solid rgba(6,182,212,0.2)",
+                                    background: "radial-gradient(circle, rgba(6,182,212,0.05), transparent)",
+                                    animation: "spin 3s linear infinite",
+                                }} />
+                            </div>
+                        }>
+                            <HolographicEarth style={{ width: "100%", height: "100%" }} />
+                        </Suspense>
+                    </div>
+                </m.div>
+
             </div>
 
             {/* Bottom fade into next section */}
@@ -667,29 +717,35 @@ function TrustSection() {
 // ── FINAL CTA ────────────────────────────────────────────────────────────────
 
 function CTASection() {
+    // Only load Globe on desktop to reduce mobile render overhead
+    const isDesktop = useMediaQuery("(min-width: 1024px)");
+    const { user } = useAuth();
+
     return (
         <section
             className="relative overflow-hidden"
             style={{ background: "var(--brand-bg-alt)", minHeight: "560px" }}
         >
-            {/* ── Three.js globe — absolute right side, behind all text ── */}
-            <div
-                aria-hidden
-                style={{
-                    position: "absolute",
-                    top: "50%",
-                    right: "-8%",
-                    transform: "translateY(-50%)",
-                    width: "min(620px, 65vw)",
-                    height: "min(620px, 65vw)",
-                    zIndex: 0,
-                    pointerEvents: "none",
-                }}
-            >
-                <Suspense fallback={null}>
-                    <GlobeScene style={{ width: "100%", height: "100%" }} />
-                </Suspense>
-            </div>
+            {/* ── Three.js globe — absolute right side, behind all text — desktop only ── */}
+            {isDesktop && (
+                <div
+                    aria-hidden
+                    style={{
+                        position: "absolute",
+                        top: "50%",
+                        right: "-8%",
+                        transform: "translateY(-50%)",
+                        width: "min(620px, 65vw)",
+                        height: "min(620px, 65vw)",
+                        zIndex: 0,
+                        pointerEvents: "none",
+                    }}
+                >
+                    <Suspense fallback={null}>
+                        <GlobeScene style={{ width: "100%", height: "100%" }} />
+                    </Suspense>
+                </div>
+            )}
 
             {/* Edge fade — seamlessly blends globe into bg on the right */}
             <div
@@ -735,7 +791,7 @@ function CTASection() {
                             className="text-xs font-bold tracking-widest uppercase mb-5"
                             style={{ color: "var(--brand-cyan)" }}
                         >
-                            Започни сега
+                            {user ? "Продължи пътя си" : "Започни сега"}
                         </p>
                         <h2
                             className="text-4xl md:text-6xl font-bold mb-6"
@@ -763,14 +819,15 @@ function CTASection() {
                             className="text-lg mb-10"
                             style={{ color: "var(--brand-muted)", maxWidth: "480px", lineHeight: 1.7 }}
                         >
-                            Присъедини се към учениците, които вземат информирани
-                            решения за своето бъдеще — напълно безплатно.
+                            {user
+                                ? "Изчисли бал за твоите специалности, направи кариерния тест и сравни университетите."
+                                : "Присъедини се към учениците, които вземат информирани решения за своето бъдеще — напълно безплатно."}
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4">
                             <m.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.97 }}>
                                 <Link
-                                    to="/register"
+                                    to="/calculator"
                                     className="inline-flex items-center gap-3 font-semibold"
                                     style={{
                                         background: "linear-gradient(135deg, #06B6D4, #8B5CF6)",
@@ -782,14 +839,14 @@ function CTASection() {
                                         boxShadow: "0 0 40px rgba(6,182,212,0.28)",
                                     }}
                                 >
-                                    Започни безплатно
+                                    {user ? "Изчисли моя бал" : "Започни безплатно"}
                                     <ArrowRight size={16} />
                                 </Link>
                             </m.div>
 
                             <m.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
                                 <Link
-                                    to="/universities"
+                                    to={user ? "/career-advisor" : "/universities"}
                                     className="inline-flex items-center gap-2 font-medium"
                                     style={{
                                         border: "1px solid var(--brand-border)",
@@ -812,7 +869,7 @@ function CTASection() {
                                         e.currentTarget.style.background = "rgba(255,255,255,0.03)";
                                     }}
                                 >
-                                    Разгледай университетите
+                                    {user ? "Направи кариерен тест" : "Разгледай университетите"}
                                 </Link>
                             </m.div>
                         </div>
