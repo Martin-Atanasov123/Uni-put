@@ -23,10 +23,9 @@ export default defineConfig({
           'vendor-motion': ['framer-motion'],
           'vendor-ui':     ['lucide-react'],
           'vendor-supa':   ['@supabase/supabase-js'],
-          'vendor-spline': ['@splinetool/react-spline', '@splinetool/runtime'],
         },
       },
     },
-    chunkSizeWarningLimit: 2300, // Spline + Three.js are lazy-loaded; large size is expected
+    chunkSizeWarningLimit: 1600, // Three.js is lazy-loaded; large chunk is expected
   },
 })

@@ -18,38 +18,6 @@ const cardVariants = {
     },
 };
 
-function CompetitionBar({ maxBall }) {
-    if (!maxBall) return null;
-    const pct = Math.min((maxBall / 650) * 100, 100);
-    const label = pct > 70 ? "Висока" : pct > 40 ? "Средна" : "Ниска";
-    const gradient =
-        pct > 70
-            ? "linear-gradient(90deg,#f43f5e,#fb923c)"
-            : pct > 40
-            ? "linear-gradient(90deg,#f59e0b,#fde68a)"
-            : "linear-gradient(90deg,#10b981,#06b6d4)";
-
-    return (
-        <div style={{ marginTop: "0.25rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.375rem" }}>
-                <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                    Конкурентност
-                </span>
-                <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--brand-muted)" }}>
-                    {label} · {maxBall}
-                </span>
-            </div>
-            <div style={{ height: "4px", borderRadius: "999px", background: "var(--brand-border)", overflow: "hidden" }}>
-                <m.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${pct}%` }}
-                    transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                    style={{ height: "100%", borderRadius: "999px", background: gradient }}
-                />
-            </div>
-        </div>
-    );
-}
 
 const inputStyle = {
     width: "100%",
@@ -394,8 +362,6 @@ export default function UniversitiesPage() {
                                                 </p>
                                             )}
                                         </div>
-
-                                        <CompetitionBar maxBall={uni.max_ball} />
 
                                         {/* Actions */}
                                         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", paddingTop: "0.875rem", borderTop: "1px solid var(--brand-border)" }}>
