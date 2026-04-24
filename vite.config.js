@@ -23,6 +23,7 @@ export default defineConfig({
           'vendor-motion': ['framer-motion'],
           'vendor-ui':     ['lucide-react'],
           'vendor-supa':   ['@supabase/supabase-js'],
+          'vendor-spline': ['@splinetool/react-spline', '@splinetool/runtime'],
         },
       },
     },
