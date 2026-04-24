@@ -154,70 +154,68 @@ export default function AnoAI({ style, className }) {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const gl = canvas.getContext('webgl');
-    if (!gl) {
-      console.warn('WebGL not supported.');
-      return;
-    }
-
-    const program = createProgram(gl, VS_SOURCE, FS_SOURCE);
-    if (!program) return;
-
-    // Fullscreen quad
-    const positionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Float32Array([-1, -1,  1, -1,  -1, 1,  1, 1]),
-      gl.STATIC_DRAW
-    );
-
-    const vertexLoc     = gl.getAttribLocation(program,  'aVertexPosition');
-    const resolutionLoc = gl.getUniformLocation(program, 'iResolution');
-    const timeLoc       = gl.getUniformLocation(program, 'iTime');
-
-    // Resize: match canvas pixels to container CSS size
-    const resize = () => {
-      const { width, height } = canvas.getBoundingClientRect();
-      if (canvas.width !== width || canvas.height !== height) {
-        canvas.width  = width;
-        canvas.height = height;
-        gl.viewport(0, 0, width, height);
-      }
-    };
-
-    const ro = new ResizeObserver(resize);
-    ro.observe(canvas);
-    resize();
-
-    const startTime = Date.now();
     let rafId;
+    let ro;
+    let timerId;
 
-    const render = () => {
-      const t = (Date.now() - startTime) / 1000;
+    const init = () => {
+      const gl = canvas.getContext('webgl');
+      if (!gl) return;
 
-      gl.clearColor(0, 0, 0, 1);
-      gl.clear(gl.COLOR_BUFFER_BIT);
-      gl.useProgram(program);
+      const program = createProgram(gl, VS_SOURCE, FS_SOURCE);
+      if (!program) return;
 
-      gl.uniform2f(resolutionLoc, canvas.width, canvas.height);
-      gl.uniform1f(timeLoc, t);
-
+      const positionBuffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-      gl.vertexAttribPointer(vertexLoc, 2, gl.FLOAT, false, 0, 0);
-      gl.enableVertexAttribArray(vertexLoc);
+      gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
+        gl.STATIC_DRAW
+      );
 
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      const vertexLoc     = gl.getAttribLocation(program,  'aVertexPosition');
+      const resolutionLoc = gl.getUniformLocation(program, 'iResolution');
+      const timeLoc       = gl.getUniformLocation(program, 'iTime');
+
+      const resize = () => {
+        const { width, height } = canvas.getBoundingClientRect();
+        if (canvas.width !== width || canvas.height !== height) {
+          canvas.width  = width;
+          canvas.height = height;
+          gl.viewport(0, 0, width, height);
+        }
+      };
+
+      ro = new ResizeObserver(resize);
+      ro.observe(canvas);
+      resize();
+
+      const startTime = Date.now();
+
+      const render = () => {
+        const t = (Date.now() - startTime) / 1000;
+        gl.clearColor(0, 0, 0, 1);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.useProgram(program);
+        gl.uniform2f(resolutionLoc, canvas.width, canvas.height);
+        gl.uniform1f(timeLoc, t);
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        gl.vertexAttribPointer(vertexLoc, 2, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(vertexLoc);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        rafId = requestAnimationFrame(render);
+      };
+
       rafId = requestAnimationFrame(render);
     };
 
-    rafId = requestAnimationFrame(render);
+    // Delay init so the LCP element (H1) can paint before WebGL competes for the main thread
+    timerId = setTimeout(init, 350);
 
     return () => {
-      cancelAnimationFrame(rafId);
-      ro.disconnect();
-      gl.deleteBuffer(positionBuffer);
-      gl.deleteProgram(program);
+      clearTimeout(timerId);
+      if (rafId) cancelAnimationFrame(rafId);
+      if (ro) ro.disconnect();
     };
   }, []);
 
