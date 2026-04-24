@@ -1,139 +1,85 @@
-import { Suspense, lazy, useState, useEffect } from "react";
-
-// Lazy-load the heavy Spline runtime — only loads when this component mounts
-const Spline = lazy(() => import("@splinetool/react-spline"));
+import { useState, useEffect } from "react";
 
 /**
- * Spline 3D scene used as the full-bleed hero background.
- * Renders behind all hero content (z-index 0).
- * Gradient masks fade it into the page on every edge.
- *
- * Performance optimizations:
- * - Only loads on desktop (width ≥ 1024px)
- * - Lazy-loaded component wrapped in Suspense
- * - Loading fallback shows subtle gradient instead of blank
- * - Fade-in animation after scene loads
+ * SplineHero — uses the lightweight <spline-viewer> web component.
+ * The script is loaded once in index.html — no React package overhead.
+ * Desktop only (≥ 1024px). Fades in after the scene loads.
  */
-export default function SplineHero() {
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+export default function SplineHero({ style }) {
+    const [isMobile, setIsMobile] = useState(
+        typeof window !== "undefined" ? window.innerWidth < 1024 : false
+    );
     const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
-        const handleResize = () => setIsMobile(window.innerWidth < 1024);
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
+        const onResize = () => setIsMobile(window.innerWidth < 1024);
+        window.addEventListener("resize", onResize);
+        return () => window.removeEventListener("resize", onResize);
     }, []);
 
-    // Don't load Spline on mobile — saves ~200KB bundle + render time
+    useEffect(() => {
+        if (isMobile) return;
+        // spline-viewer fires a 'load' event on the custom element
+        const el = document.querySelector("spline-viewer");
+        if (!el) return;
+        const onLoad = () => setIsLoaded(true);
+        el.addEventListener("load", onLoad);
+        // Fallback — show after 4s even if event doesn't fire
+        const fallback = setTimeout(() => setIsLoaded(true), 4000);
+        return () => {
+            el.removeEventListener("load", onLoad);
+            clearTimeout(fallback);
+        };
+    }, [isMobile]);
+
     if (isMobile) return null;
 
     return (
         <div
             aria-hidden
             style={{
-                position: "absolute",
-                inset: 0,
-                zIndex: 0,
+                position: "relative",
+                width: "100%",
+                height: "100%",
                 overflow: "hidden",
+                ...style,
             }}
         >
-            {/* Loading fallback — subtle animated gradient while Spline initializes */}
+            {/* Ambient glow while loading */}
             {!isLoaded && (
-                <div
-                    style={{
-                        position: "absolute",
-                        inset: 0,
-                        background: "linear-gradient(135deg, rgba(6,182,212,0.05), rgba(139,92,246,0.03))",
-                        animation: "pulse-gradient 3s ease-in-out infinite",
-                    }}
-                />
+                <div style={{
+                    position: "absolute",
+                    inset: "20%",
+                    borderRadius: "50%",
+                    background: "radial-gradient(circle, rgba(6,182,212,0.10) 0%, rgba(139,92,246,0.05) 55%, transparent 75%)",
+                    filter: "blur(32px)",
+                    animation: "sh-pulse 2.5s ease-in-out infinite",
+                    pointerEvents: "none",
+                    zIndex: 0,
+                }} />
             )}
 
-            {/* The Spline canvas — fills the entire hero */}
-            <Suspense fallback={null}>
-                <div
-                    style={{
-                        opacity: isLoaded ? 1 : 0,
-                        transition: "opacity 0.6s ease",
-                    }}
-                >
-                    <Spline
-                        scene="https://prod.spline.design/SUVrHf-954oP3SsO/scene.splinecode"
-                        onLoad={() => setIsLoaded(true)}
-                        style={{
-                            width: "125%",
-                            height: "100%",
-                            pointerEvents: "none", // pure visual — don't block hero CTAs
-                        }}
-                    />
-                </div>
-            </Suspense>
+            {/* spline-viewer web component */}
+            <div style={{
+                width: "100%",
+                height: "100%",
+                opacity: isLoaded ? 1 : 0,
+                transition: "opacity 0.8s ease",
+                pointerEvents: "none",
+            }}>
+                {/* eslint-disable-next-line react/no-unknown-property */}
+                <spline-viewer
+                    url="https://prod.spline.design/3XKralooURbgSKlH/scene.splinecode"
+                    style={{ width: "100%", height: "100%", display: "block" }}
+                />
+            </div>
 
-            {/* Animation keyframes */}
             <style>{`
-                @keyframes pulse-gradient {
-                    0%, 100% { opacity: 0.5; }
-                    50% { opacity: 0.8; }
+                @keyframes sh-pulse {
+                    0%, 100% { opacity: 0.5; transform: scale(1); }
+                    50%       { opacity: 1;   transform: scale(1.06); }
                 }
             `}</style>
-
-            {/* ── Gradient masks — fade scene into the page ─────────────────────── */}
-
-            {/* Bottom — strong fade into next section */}
-            <div
-                style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: "55%",
-                    background:
-                        "linear-gradient(to bottom, transparent 0%, var(--brand-bg) 100%)",
-                    pointerEvents: "none",
-                }}
-            />
-
-            {/* Left — protect text readability */}
-            <div
-                style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    bottom: 0,
-                    width: "55%",
-                    background:
-                        "linear-gradient(to right, var(--brand-bg) 10%, rgba(15,23,42,0.7) 50%, transparent 100%)",
-                    pointerEvents: "none",
-                }}
-            />
-
-            {/* Top — subtle fade from nav */}
-            <div
-                style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: "20%",
-                    background:
-                        "linear-gradient(to bottom, var(--brand-bg) 0%, transparent 100%)",
-                    pointerEvents: "none",
-                }}
-            />
-
-            {/* Right edge */}
-            <div
-                style={{
-                    position: "absolute",
-                    top: 0,
-                    right: 0,
-                    bottom: 0,
-                    width: "18%",
-                    background:
-                        "linear-gradient(to left, var(--brand-bg) 0%, transparent 100%)",
-                    pointerEvents: "none",
-                }}
-            />
         </div>
     );
 }

@@ -3,9 +3,6 @@ import { Link } from "react-router-dom";
 import { m, useInView } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 
-// Heavy 3D components — lazy loaded so they never block first paint
-const HolographicEarth = lazy(() => import("@/components/landing/HolographicEarth"));
-const GlobeScene        = lazy(() => import("@/components/landing/GlobeScene"));
 import {
     Brain,
     Target,
@@ -22,6 +19,12 @@ import {
     Zap,
     CheckCircle,
 } from "lucide-react";
+
+// GlobeScene for CTASection — lazy loaded
+const GlobeScene = lazy(() => import("@/components/landing/GlobeScene"));
+
+// AnoAI aurora shader — lazy loaded (Three.js chunk, shared with GlobeScene)
+const AnoAI = lazy(() => import("@/components/landing/AnoAI"));
 
 // ── Animation primitives ────────────────────────────────────────────────────
 
@@ -94,42 +97,34 @@ function HeroSection() {
             className="relative min-h-screen overflow-hidden"
             style={{ background: "var(--brand-bg)" }}
         >
-            {/* ── Layer 0: dot grid background ── */}
-            <div
-                aria-hidden
-                style={{
-                    position: "absolute", inset: 0,
-                    backgroundImage: "radial-gradient(rgba(148,163,184,0.055) 1px, transparent 1px)",
-                    backgroundSize: "32px 32px",
-                    pointerEvents: "none",
-                    zIndex: 1,
-                }}
-            />
+            {/* ── Layer 0: AnoAI shader — само в долната половина ── */}
+            <Suspense fallback={null}>
+                <div
+                    aria-hidden
+                    style={{
+                        position: "absolute",
+                        top: "0%", bottom: 0, left: 0, right: 0,
+                        zIndex: 1,
+                        pointerEvents: "none",
+                        filter: "blur(2.5px)",
+                        transform: "scale(1.02)",
+                    }}
+                >
+                    <AnoAI style={{ position: "absolute", inset: 0 }} />
+                </div>
+            </Suspense>
 
-            {/* ── Layer 1: noise grain overlay ── */}
+            {/* ── Layer 2: centred hero text ── */}
             <div
-                aria-hidden
-                style={{
-                    position: "absolute", inset: 0,
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-                    opacity: 0.028,
-                    pointerEvents: "none",
-                    zIndex: 1,
-                }}
-            />
-
-            {/* ── Layer 2: hero text — single column, left-aligned ── */}
-            <div
-                className="relative max-w-7xl mx-auto px-6 flex flex-col lg:flex-row items-center min-h-screen"
-                style={{ zIndex: 2 }}
+                className="relative max-w-5xl mx-auto px-6 flex flex-col items-center justify-center min-h-screen text-center"
+                style={{ zIndex: 3 }}
             >
-                {/* ── Left: text content ── */}
                 <m.div
-                    className="flex-1 flex flex-col justify-center py-32 lg:py-0 text-left"
-                    initial={{ opacity: 0, x: -36 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    className="flex flex-col items-center"
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.9, ease: EASE }}
-                    style={{ maxWidth: "600px", zIndex: 2 }}
+                    style={{ width: "100%", zIndex: 3 }}
                 >
                     {/* Badge — filled with real data */}
                     <div
@@ -145,7 +140,7 @@ function HeroSection() {
                         }}
                     >
                         <Zap size={11} />
-                        127 специалности · 18 университета · Безплатно
+                        Изцяло обновени данни за 2026 г.
                     </div>
 
                     {/* Headline */}
@@ -160,7 +155,7 @@ function HeroSection() {
                         }}
                     >
                         Открий своя
-                        <br />
+                        <br /> път към Университета
                         <span
                             style={{
                                 background: "linear-gradient(130deg, #06B6D4 0%, #8B5CF6 100%)",
@@ -168,7 +163,7 @@ function HeroSection() {
                                 WebkitTextFillColor: "transparent",
                             }}
                         >
-                            път към Университета
+                            {/* път към Университета */}
                         </span>
                     </h1>
 
@@ -177,9 +172,10 @@ function HeroSection() {
                         className="mb-10 leading-relaxed"
                         style={{
                             fontSize: "clamp(1rem, 2vw, 1.125rem)",
-                            color: "var(--brand-muted)",
-                            maxWidth: "460px",
+                            color: "rgb(203, 213, 225)",
+                            maxWidth: "540px",
                             lineHeight: 1.7,
+                            margin: "0 auto 2.5rem",
                         }}
                     >
                         Забрави за сложните таблици и неясните критерии. Ние
@@ -187,7 +183,7 @@ function HeroSection() {
                     </p>
 
                     {/* CTA buttons */}
-                    <div className="flex flex-col sm:flex-row gap-4 items-start">
+                    <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
                         {/* Primary — calculator (highest-intent action) */}
                         <m.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
                             <Link
@@ -245,65 +241,22 @@ function HeroSection() {
                     </div>
                 </m.div>
 
-                {/* ── Right: Holographic Earth — desktop only ── */}
-                <m.div
-                    className="hidden lg:flex flex-1 items-center justify-center"
-                    initial={{ opacity: 0, scale: 0.85 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 1.1, ease: EASE, delay: 0.2 }}
-                    aria-hidden
-                    style={{ minHeight: "540px", maxWidth: "580px" }}
-                >
-                    {/* Outer glow ring */}
-                    <div style={{
-                        position: "relative",
-                        width: "100%",
-                        maxWidth: "560px",
-                        aspectRatio: "1/1",
-                    }}>
-                        {/* Ambient glow behind the globe */}
-                        <div style={{
-                            position: "absolute",
-                            inset: "10%",
-                            borderRadius: "50%",
-                            background: "radial-gradient(circle, rgba(6,182,212,0.12) 0%, rgba(139,92,246,0.06) 50%, transparent 75%)",
-                            filter: "blur(24px)",
-                            pointerEvents: "none",
-                        }} />
-                        <Suspense fallback={
-                            <div style={{
-                                width: "100%", height: "100%",
-                                display: "flex", alignItems: "center", justifyContent: "center",
-                            }}>
-                                <div style={{
-                                    width: "200px", height: "200px", borderRadius: "50%",
-                                    border: "1px solid rgba(6,182,212,0.2)",
-                                    background: "radial-gradient(circle, rgba(6,182,212,0.05), transparent)",
-                                    animation: "spin 3s linear infinite",
-                                }} />
-                            </div>
-                        }>
-                            <HolographicEarth style={{ width: "100%", height: "100%" }} />
-                        </Suspense>
-                    </div>
-                </m.div>
-
             </div>
 
             {/* Bottom fade into next section */}
             <div
                 aria-hidden
-                className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
+                className="absolute bottom-0 left-0 right-0 h-10 pointer-events-none"
                 style={{
                     background: "linear-gradient(to bottom, transparent, var(--brand-bg))",
-                    zIndex: 3,
+                    zIndex: 4,
                 }}
             />
 
             {/* Scroll indicator — chevron instead of line */}
             <m.div
                 className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1"
-                style={{ zIndex: 4, color: "rgba(148,163,184,0.4)" }}
+                style={{ zIndex: 5, color: "rgba(148,163,184,0.4)" }}
                 animate={{ y: [0, 6, 0] }}
                 transition={{ repeat: Infinity, duration: 2.4, ease: "easeInOut" }}
             >
