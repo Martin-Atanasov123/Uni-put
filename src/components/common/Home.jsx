@@ -234,7 +234,7 @@ function HeroSection() {
                                 }}
                             >
                                 <Brain size={18} />
-                                Направи RIASEC тест
+                                Направи кариерен тест
                                 <ArrowRight size={16} />
                             </Link>
                         </m.div>
@@ -273,9 +273,9 @@ function HeroSection() {
 // ── STAT STRIP ───────────────────────────────────────────────────────────────
 
 const STATS = [
-    { value: 127, suffix: "+", label: "специалности", sub: "в базата данни" },
-    { value: 18,  suffix: "",  label: "университета",  sub: "от цяла България" },
-    { value: 6,   suffix: "",  label: "RIASEC типа",   sub: "кариерен профил" },
+    { value: 250, suffix: "+", label: "специалности", sub: "в базата данни" },
+    { value: 47,  suffix: "",  label: "университета",  sub: "от цяла България" },
+    { value: 999,   suffix: "+",  label: "професии ",   sub: "кариерен профил" },
     { value: 100, suffix: "%", label: "безплатно",     sub: "без скрити такси" },
 ];
 
@@ -354,14 +354,14 @@ const STEPS = [
     {
         num: "01",
         icon: Brain,
-        title: "Психометричен Анализ",
+        title: "Кариерен Анализ",
         desc: "Попълни научно-валидирания RIASEC тест (базиран на O*NET данни) и открий своя уникален кариерен профил в 6 измерения.",
     },
     {
         num: "02",
         icon: Target,
         title: "Алгоритмичен Подбор",
-        desc: "Нашият алгоритъм сравнява профила ти с над 127 специалности в 18 университета и генерира персонализиран списък.",
+        desc: "Нашият алгоритъм сравнява профила ти с над 250 специалности в 47 университета и генерира персонализиран списък.",
     },
     {
         num: "03",
@@ -475,7 +475,7 @@ const FEATURES = [
     {
         icon: Shield,
         title: "Официална Интеграция",
-        desc: "Всички данни са от публичните регистри на Министерство на Образованието, актуализирани за 2025 г.",
+        desc: "Всички данни са от публичните регистри на Министерство на Образованието, актуализирани за 2026 г.",
     },
     {
         icon: Calculator,
@@ -576,93 +576,169 @@ function FeaturesSection() {
 
 // ── TRUST ───────────────────────────────────────────────────────────────────
 
-const TRUST = [
+// ── TESTIMONIALS ─────────────────────────────────────────────────────────────
+
+const TESTIMONIALS = [
     {
-        icon: Database,
-        label: "O*NET Professional",
-        sub: "Научна основа за RIASEC",
+        text: "Бях сигурна, че нямам шанс за Право в СУ. Сложих оценките в калкулатора и видях — Над средното с 23 точки. Кандидатствах. Взеха ме. УниПът буквално промени решението ми.",
+        image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150&h=150",
+        name: "Мария Стоянова",
+        role: "Студентка, Право — СУ",
     },
     {
-        icon: BookOpen,
-        label: "Holland Codes",
-        sub: "Валидирана психометрия",
+        text: "Прекарах седмици в Excel таблици с коефициенти. После намерих УниПът — 10 минути и бях готов. Как не го открих по-рано?",
+        image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150&h=150",
+        name: "Тодор Петков",
+        role: "Студент, Бизнес администрация — УНСС",
     },
     {
-        icon: Shield,
-        label: "Данни от МОН",
-        sub: "Официална интеграция",
+        text: "Мислех, че ще уча счетоводство, защото баща ми каза така. Направих RIASEC теста — излезе Изследовател. Сега съм в Психология и за пръв път съм спокойна за избора си.",
+        image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=150&h=150",
+        name: "Александра Димова",
+        role: "Студентка, Психология — НБУ",
     },
     {
-        icon: CheckCircle,
-        label: "Актуално за 2025 г.",
-        sub: "Редовно обновявани данни",
+        text: "Препоръчвам УниПът на всичките ми 12-класници. Данните от МОН са точни, интерфейсът е ясен. Учениците реално го използват — не е поредният безполезен сайт.",
+        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150&h=150",
+        name: "Йордан Маринов",
+        role: "Класен ръководител, ПГЕЕ — Варна",
+    },
+    {
+        text: "Исках да уча в Пловдив, но не знаех дали баловете ми стигат. Филтрирах по град, изчислих и избрах ПУ. Сега съм втора година Информатика и не съжалявам.",
+        image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150&h=150",
+        name: "Христо Иванов",
+        role: "Студент, Информатика — ПУ",
+    },
+    {
+        text: "Дъщеря ми ми показа сайта и за пръв път разбрах как се изчислява балът. Данните са официални, всичко е обяснено ясно. Вече не се притеснявам, че тя взима грешно решение.",
+        image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=150&h=150",
+        name: "Надежда Великова",
+        role: "Майка на кандидат-студентка",
+    },
+    {
+        text: "Колебаях се между Медицина и Биохимия. В УниПът видях балове и за двете едновременно и веднага стана ясно. Записах Биохимия в МУ-Пловдив и съм доволен.",
+        image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=150&h=150",
+        name: "Стефан Георгиев",
+        role: "Студент, Биохимия — МУ Пловдив",
+    },
+    {
+        text: "Никой в училище не ми обясни как работят коефициентите. Намерих УниПът, прочетох формулата и изведнъж всичко имаше смисъл. Жалко, че не съществуваше преди 3 години.",
+        image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=150&h=150",
+        name: "Ивет Николова",
+        role: "Студентка, Архитектура — УАСГ",
+    },
+    {
+        text: "Пратих линка на 12 съученика в деня, в който го открих. Всички го използваме. Стана нашият референтен сайт за кандидатстването тази година.",
+        image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150&h=150",
+        name: "Боян Христов",
+        role: "12-ти клас, кандидатства за ТУ",
     },
 ];
+
+const T_COL1 = TESTIMONIALS.slice(0, 3);
+const T_COL2 = TESTIMONIALS.slice(3, 6);
+const T_COL3 = TESTIMONIALS.slice(6, 9);
+
+function TestimonialsColumn({ testimonials, duration = 15 }) {
+    return (
+        <div style={{ overflow: "hidden", willChange: "transform" }}>
+            <m.ul
+                animate={{ translateY: "-50%" }}
+                transition={{ duration, repeat: Infinity, ease: "linear", repeatType: "loop" }}
+                style={{ display: "flex", flexDirection: "column", gap: "1.5rem", paddingBottom: "1.5rem", listStyle: "none", margin: 0, padding: 0, willChange: "transform" }}
+            >
+                {[0, 1].map((pass) =>
+                    testimonials.map(({ text, image, name, role }, i) => (
+                        <m.li
+                            key={`${pass}-${i}`}
+                            aria-hidden={pass === 1 ? "true" : "false"}
+                            whileHover={{ scale: 1.03, y: -6, transition: { type: "spring", stiffness: 400, damping: 17 } }}
+                            style={{
+                                padding: "1.5rem",
+                                borderRadius: "1.25rem",
+                                border: "1px solid var(--brand-card-border)",
+                                background: "var(--brand-surface)",
+                                maxWidth: "300px",
+                                width: "100%",
+                                cursor: "default",
+                            }}
+                        >
+                            <blockquote style={{ margin: 0, padding: 0 }}>
+                                <p style={{ color: "var(--brand-muted)", lineHeight: 1.65, fontSize: "0.9375rem", margin: 0 }}>
+                                    {text}
+                                </p>
+                                <footer style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginTop: "1rem" }}>
+                                    <img
+                                        width={40} height={40}
+                                        src={image}
+                                        alt={`Снимка на ${name}`}
+                                        style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover", border: "2px solid var(--brand-border)" }}
+                                    />
+                                    <div>
+                                        <cite style={{ fontStyle: "normal", fontWeight: 700, fontSize: "0.875rem", color: "var(--brand-text)", display: "block" }}>
+                                            {name}
+                                        </cite>
+                                        <span style={{ fontSize: "0.75rem", color: "var(--brand-muted)" }}>
+                                            {role}
+                                        </span>
+                                    </div>
+                                </footer>
+                            </blockquote>
+                        </m.li>
+                    ))
+                )}
+            </m.ul>
+        </div>
+    );
+}
 
 function TrustSection() {
     return (
         <section
-            className="py-28 px-6"
-            style={{
-                background: "var(--brand-bg)",
-                borderTop: "1px solid var(--brand-border)",
-            }}
+            aria-labelledby="testimonials-heading"
+            className="py-24 px-6 relative overflow-hidden"
+            style={{ background: "var(--brand-bg)", borderTop: "1px solid var(--brand-border)" }}
         >
-            <div className="max-w-4xl mx-auto">
-                <Reveal className="text-center mb-12">
-                    <p className="text-xs font-bold tracking-widest uppercase mb-4"
-                        style={{ color: "var(--brand-muted)" }}>
-                        Защо ни се доверяват
-                    </p>
-                    <h2
-                        className="text-2xl md:text-4xl font-bold"
-                        style={{
-                            color: "var(--brand-text)",
-                            letterSpacing: "-0.02em",
-                            textWrap: "balance",
-                        }}
+            <m.div
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.15 }}
+                transition={{ duration: 0.9, ease: EASE }}
+                className="max-w-6xl mx-auto"
+            >
+                <div className="text-center mb-14">
+                    <div
+                        className="inline-flex items-center px-4 py-1 rounded-full mb-5 text-xs font-bold tracking-widest uppercase"
+                        style={{ border: "1px solid var(--brand-border)", color: "var(--brand-muted)", background: "var(--brand-surface)" }}
                     >
-                        Изграден върху наука, не на интуиция
+                        Отзиви
+                    </div>
+                    <h2
+                        id="testimonials-heading"
+                        className="text-3xl md:text-5xl font-extrabold"
+                        style={{ color: "var(--brand-text)", letterSpacing: "-0.03em", textWrap: "balance", lineHeight: 1.1 }}
+                    >
+                        Ученици, които вече са{" "}
+                        <span style={{ background: "linear-gradient(130deg, #06B6D4, #8B5CF6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                            намерили пътя си
+                        </span>
                     </h2>
-                </Reveal>
+                    <p className="mt-4 max-w-md mx-auto" style={{ color: "var(--brand-muted)", fontSize: "1.0625rem", lineHeight: 1.7 }}>
+                        Не ни вярвай само на думи — виж какво казват тези, които вече са кандидатствали с УниПът.
+                    </p>
+                </div>
 
-                <m.div
-                    className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5"
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    variants={stagger}
+                <div
+                    role="region"
+                    aria-label="Отзиви на потребители"
+                    className="flex justify-center gap-6"
+                    style={{ maskImage: "linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)", maxHeight: "720px", overflow: "hidden" }}
                 >
-                    {TRUST.map((item) => {
-                        const Icon = item.icon;
-                        return (
-                            <m.div
-                                key={item.label}
-                                variants={fadeUp}
-                                transition={{ duration: 0.5, ease: EASE }}
-                                className="text-center p-6 rounded-2xl"
-                                style={{
-                                    background: "var(--brand-surface)",
-                                    border: "1px solid var(--brand-card-border)",
-                                }}
-                            >
-                                <div
-                                    className="inline-flex p-3 rounded-xl mb-3"
-                                    style={{ background: "rgba(6,182,212,0.09)" }}
-                                >
-                                    <Icon size={20} style={{ color: "var(--brand-cyan)" }} />
-                                </div>
-                                <p className="font-semibold text-sm" style={{ color: "var(--brand-text)" }}>
-                                    {item.label}
-                                </p>
-                                <p className="text-xs mt-1" style={{ color: "var(--brand-muted)" }}>
-                                    {item.sub}
-                                </p>
-                            </m.div>
-                        );
-                    })}
-                </m.div>
-            </div>
+                    <TestimonialsColumn testimonials={T_COL1} duration={18} />
+                    <TestimonialsColumn testimonials={T_COL2} duration={22} className="hidden md:block" />
+                    <TestimonialsColumn testimonials={T_COL3} duration={20} className="hidden lg:block" />
+                </div>
+            </m.div>
         </section>
     );
 }
@@ -670,17 +746,29 @@ function TrustSection() {
 // ── FINAL CTA ────────────────────────────────────────────────────────────────
 
 function CTASection() {
-    // Only load Globe on desktop to reduce mobile render overhead
-    const isDesktop = useMediaQuery("(min-width: 1024px)");
     const { user } = useAuth();
+    const sectionRef = useRef(null);
+    const [globeReady, setGlobeReady] = useState(false);
+
+    useEffect(() => {
+        const el = sectionRef.current;
+        if (!el) return;
+        const obs = new IntersectionObserver(
+            ([entry]) => { if (entry.isIntersecting) { setGlobeReady(true); obs.disconnect(); } },
+            { rootMargin: "300px" }
+        );
+        obs.observe(el);
+        return () => obs.disconnect();
+    }, []);
 
     return (
         <section
+            ref={sectionRef}
             className="relative overflow-hidden"
             style={{ background: "var(--brand-bg-alt)", minHeight: "560px" }}
         >
-            {/* ── Three.js globe — absolute right side, behind all text — desktop only ── */}
-            {isDesktop && (
+            {/* ── Three.js globe — only mounted once section nears viewport ── */}
+            {globeReady && (
                 <div
                     aria-hidden
                     style={{
@@ -688,8 +776,8 @@ function CTASection() {
                         top: "50%",
                         right: "-8%",
                         transform: "translateY(-50%)",
-                        width: "min(620px, 65vw)",
-                        height: "min(620px, 65vw)",
+                        width: "min(520px, 90vw)",
+                        height: "min(520px, 90vw)",
                         zIndex: 0,
                         pointerEvents: "none",
                     }}

@@ -1,12 +1,8 @@
 // @vitest-environment happy-dom
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import Home from "@/components/common/Home";
-
-vi.mock("../../../components/landing/ConstellationBackground", () => ({
-    default: () => null,
-}));
 
 describe("Home landing page", () => {
     it("renders the hero section", () => {
