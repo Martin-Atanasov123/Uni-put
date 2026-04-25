@@ -209,11 +209,21 @@ export default function AnoAI({ style, className }) {
       rafId = requestAnimationFrame(render);
     };
 
-    // Delay init so the LCP element (H1) can paint before WebGL competes for the main thread
-    timerId = setTimeout(init, 350);
+    // Defer shader compilation until after the main thread is idle so LCP (H1) can paint first.
+    // requestIdleCallback guarantees we don't compete for main-thread time at startup.
+    // Fallback to a generous setTimeout for browsers without rIC (e.g. Safari < 16).
+    if ("requestIdleCallback" in window) {
+      timerId = requestIdleCallback(init, { timeout: 4000 });
+    } else {
+      timerId = setTimeout(init, 1500);
+    }
 
     return () => {
-      clearTimeout(timerId);
+      if ("requestIdleCallback" in window && typeof timerId === "number") {
+        cancelIdleCallback(timerId);
+      } else {
+        clearTimeout(timerId);
+      }
       if (rafId) cancelAnimationFrame(rafId);
       if (ro) ro.disconnect();
     };
