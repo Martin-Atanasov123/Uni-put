@@ -7,7 +7,7 @@ import {
     Calculator, Search, Settings, Building2, Heart, ChevronDown,
     Sun, Moon, Brain
 } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 // CLAUDE.md nav order: Университети / Калкулатор / Кариерен тест / Общежития (max 4 items)
 const NAV_LINKS = [
@@ -33,9 +33,19 @@ export default function Header() {
     const isAdmin = user?.app_metadata?.role === "admin";
 
     useEffect(() => {
-        const onScroll = () => setScrolled(window.scrollY > 20);
-        window.addEventListener("scroll", onScroll);
-        return () => window.removeEventListener("scroll", onScroll);
+        let rafId = null;
+        const onScroll = () => {
+            if (rafId) return;
+            rafId = requestAnimationFrame(() => {
+                setScrolled(window.scrollY > 20);
+                rafId = null;
+            });
+        };
+        window.addEventListener("scroll", onScroll, { passive: true });
+        return () => {
+            window.removeEventListener("scroll", onScroll, { passive: true });
+            if (rafId) cancelAnimationFrame(rafId);
+        };
     }, []);
 
     useEffect(() => {
@@ -46,14 +56,14 @@ export default function Header() {
 
     useEffect(() => { setIsMenuOpen(false); setIsUserMenuOpen(false); }, [location.pathname]);
 
-    const handleLogout = async () => {
+    const handleLogout = useCallback(async () => {
         await sessionService.logout();
         setIsUserMenuOpen(false);
         setIsMenuOpen(false);
         navigate("/login");
-    };
+    }, [navigate]);
 
-    const isActive = (path) => location.pathname === path;
+    const isActive = useCallback((path) => location.pathname === path, [location.pathname]);
 
     return (
         <>
@@ -98,17 +108,7 @@ export default function Header() {
                                 <Link
                                     key={link.path}
                                     to={link.path}
-                                    style={{
-                                        display: "flex", alignItems: "center", gap: "0.375rem",
-                                        padding: "0.5rem 0.875rem", borderRadius: "0.625rem",
-                                        fontSize: "13px", fontWeight: 600, textDecoration: "none",
-                                        color: active ? "var(--brand-cyan)" : "var(--brand-muted)",
-                                        background: active ? "rgba(6,182,212,0.1)" : "transparent",
-                                        border: active ? "1px solid rgba(6,182,212,0.25)" : "1px solid transparent",
-                                        transition: "all 0.2s",
-                                    }}
-                                    onMouseEnter={(e) => { if (!active) e.currentTarget.style.color = "var(--brand-text)"; }}
-                                    onMouseLeave={(e) => { if (!active) e.currentTarget.style.color = "var(--brand-muted)"; }}
+                                    className={`uni-nav-link${active ? " uni-nav-link--active" : ""}`}
                                 >
                                     <Icon size={14} /> {link.name}
                                 </Link>
@@ -133,16 +133,7 @@ export default function Header() {
                         {/* Primary CTA — always visible on desktop */}
                         <Link
                             to="/calculator"
-                            className="uni-nav-desktop"
-                            style={{
-                                padding: "0.5rem 1rem", borderRadius: "0.625rem",
-                                fontSize: "13px", fontWeight: 700, color: "var(--brand-cyan)", textDecoration: "none",
-                                border: "1px solid rgba(6,182,212,0.4)",
-                                background: "rgba(6,182,212,0.06)",
-                                transition: "background 0.2s, border-color 0.2s",
-                            }}
-                            onMouseEnter={e => { e.currentTarget.style.background = "rgba(6,182,212,0.12)"; e.currentTarget.style.borderColor = "rgba(6,182,212,0.7)"; }}
-                            onMouseLeave={e => { e.currentTarget.style.background = "rgba(6,182,212,0.06)"; e.currentTarget.style.borderColor = "rgba(6,182,212,0.4)"; }}
+                            className="uni-nav-desktop uni-nav-cta"
                         >
                             Изчисли бал →
                         </Link>
@@ -203,8 +194,7 @@ export default function Header() {
                                             fontSize: "13px", fontWeight: 600, color: "#f87171",
                                             background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", textAlign: "left",
                                         }}
-                                        onMouseEnter={e => (e.currentTarget.style.background = "rgba(248,113,113,0.08)")}
-                                        onMouseLeave={e => (e.currentTarget.style.background = "none")}
+                                        className="uni-logout-btn"
                                         >
                                             <LogOut size={14} /> Изход
                                         </button>
@@ -356,6 +346,46 @@ export default function Header() {
                     .uni-nav-mobile { display: none; }
                 }
                 @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+                /* Nav link — replaces inline onMouseEnter/onMouseLeave handlers */
+                .uni-nav-link {
+                    display: flex; align-items: center; gap: 0.375rem;
+                    padding: 0.5rem 0.875rem; border-radius: 0.625rem;
+                    font-size: 13px; font-weight: 600; text-decoration: none;
+                    color: var(--brand-muted);
+                    background: transparent;
+                    border: 1px solid transparent;
+                    transition: color 0.2s, background 0.2s, border-color 0.2s;
+                }
+                .uni-nav-link:hover {
+                    color: var(--brand-text);
+                }
+                .uni-nav-link--active {
+                    color: var(--brand-cyan) !important;
+                    background: rgba(6,182,212,0.1);
+                    border-color: rgba(6,182,212,0.25);
+                }
+
+                /* Calculator CTA button — replaces inline hover handlers */
+                .uni-nav-cta {
+                    padding: 0.5rem 1rem; border-radius: 0.625rem;
+                    font-size: 13px; font-weight: 700; color: var(--brand-cyan); text-decoration: none;
+                    border: 1px solid rgba(6,182,212,0.4);
+                    background: rgba(6,182,212,0.06);
+                    transition: background 0.2s, border-color 0.2s;
+                }
+                .uni-nav-cta:hover {
+                    background: rgba(6,182,212,0.12);
+                    border-color: rgba(6,182,212,0.7);
+                }
+
+                /* Dropdown menu item */
+                .uni-menu-item { transition: background 0.15s; }
+                .uni-menu-item:hover { background: rgba(148,163,184,0.06) !important; }
+
+                /* Logout button */
+                .uni-logout-btn { transition: background 0.15s; }
+                .uni-logout-btn:hover { background: rgba(248,113,113,0.08) !important; }
             `}</style>
         </>
     );
@@ -369,8 +399,7 @@ function MenuItem({ to, icon: Icon, label, color = "var(--brand-text)" }) {
             fontSize: "13px", fontWeight: 600, color, textDecoration: "none",
             transition: "background 0.15s",
         }}
-        onMouseEnter={e => (e.currentTarget.style.background = "rgba(148,163,184,0.06)")}
-        onMouseLeave={e => (e.currentTarget.style.background = "none")}
+        className="uni-menu-item"
         >
             <Icon size={14} /> {label}
         </Link>
