@@ -749,8 +749,11 @@ function CTASection() {
     const { user } = useAuth();
     const sectionRef = useRef(null);
     const [globeReady, setGlobeReady] = useState(false);
+    // Skip loading Three.js globe entirely on small screens — saves ~600KB parse on mobile
+    const isDesktop = useMediaQuery("(min-width: 1024px)");
 
     useEffect(() => {
+        if (!isDesktop) return; // never mount globe on mobile
         const el = sectionRef.current;
         if (!el) return;
         const obs = new IntersectionObserver(
@@ -759,7 +762,7 @@ function CTASection() {
         );
         obs.observe(el);
         return () => obs.disconnect();
-    }, []);
+    }, [isDesktop]);
 
     return (
         <section
