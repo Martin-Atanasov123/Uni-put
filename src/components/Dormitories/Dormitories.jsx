@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { m } from "motion/react";
 import { getAllDormitories } from "@/lib/api";
 import {
     Building2,
@@ -297,7 +298,12 @@ const Dormitories = () => {
 
             <div style={{ maxWidth: "1200px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "2rem" }}>
                 {/* Header */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}>
+                <m.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}
+                >
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                         <div style={{ width: 8, height: 8, borderRadius: 999, background: "var(--brand-violet)", boxShadow: "0 0 12px rgba(139,92,246,0.6)" }} />
                         <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.14em" }}>
@@ -311,7 +317,7 @@ const Dormitories = () => {
                     <p style={{ margin: 0, color: "var(--brand-muted)", fontSize: "1rem", maxWidth: "640px" }}>
                         Намери най-доброто място за студентския си живот — бюджет, транспорт и условия на едно място.
                     </p>
-                </div>
+                </m.div>
 
                 {/* Filter bar */}
                 <div
@@ -434,9 +440,26 @@ const Dormitories = () => {
                         )}
                     </div>
                 ) : (
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "1.25rem" }}>
-                        {filteredDorms.map(dorm => <DormCard key={dorm.id} dorm={dorm} />)}
-                    </div>
+                    <m.div
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, margin: "-40px" }}
+                        variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
+                        style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "1.25rem" }}
+                    >
+                        {filteredDorms.map(dorm => (
+                            <m.div
+                                key={dorm.id}
+                                variants={{
+                                    hidden: { opacity: 0, y: 20 },
+                                    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } },
+                                }}
+                                whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                            >
+                                <DormCard dorm={dorm} />
+                            </m.div>
+                        ))}
+                    </m.div>
                 )}
             </div>
         </div>

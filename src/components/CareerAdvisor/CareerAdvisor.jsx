@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useLayoutEffect, useRef } from "react";
+import { m } from "motion/react";
 import { calculateScores, calculateRiasecCode } from "@/lib/riasec-matcher";
 import { getRiasecMatches } from "@/lib/api";
 import riasecData from "@/data/riasec_questions.json";
@@ -184,12 +185,21 @@ const CareerAdvisor = () => {
                 </p>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "1.25rem" }}>
+            <m.div
+                style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "1.25rem" }}
+                initial="hidden"
+                animate="visible"
+                variants={{ visible: { transition: { staggerChildren: 0.07 } } }}
+            >
                 {VERSIONS.map(v => {
                     const Icon = v.icon;
                     return (
-                        <button
+                        <m.button
                             key={v.id}
+                            variants={{
+                                hidden: { opacity: 0, y: 16 },
+                                visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } },
+                            }}
                             type="button"
                             onClick={() => handleVersionSelect(v.id)}
                             style={{
@@ -233,10 +243,10 @@ const CareerAdvisor = () => {
                                     <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--brand-text)", fontFamily: "monospace" }}>{v.time}</span>
                                 </div>
                             </div>
-                        </button>
+                        </m.button>
                     );
                 })}
-            </div>
+            </m.div>
         </div>
     );
 
@@ -423,7 +433,12 @@ const CareerAdvisor = () => {
     };
 
     return (
-        <div style={{ minHeight: "100vh", background: "var(--brand-bg)", color: "var(--brand-text)", paddingTop: step === "quiz" ? "5rem" : "6rem", paddingBottom: "5rem", position: "relative", overflow: "hidden" }}>
+        <m.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            style={{ minHeight: "100vh", background: "var(--brand-bg)", color: "var(--brand-text)", paddingTop: step === "quiz" ? "5rem" : "6rem", paddingBottom: "5rem", position: "relative", overflow: "hidden" }}
+        >
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
             {/* ambient glow */}
@@ -487,7 +502,7 @@ const CareerAdvisor = () => {
                     </div>
                 )}
             </div>
-        </div>
+        </m.div>
     );
 };
 

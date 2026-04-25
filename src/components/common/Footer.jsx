@@ -9,6 +9,7 @@ import {
     Database,
 } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
+import { m } from "motion/react";
 
 const LINK_COLUMNS = [
     {
@@ -108,7 +109,13 @@ const Footer = () => {
                 }}
             />
 
-            <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "3.5rem 1.5rem 2rem", position: "relative" }}>
+            <m.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                style={{ maxWidth: "1200px", margin: "0 auto", padding: "3.5rem 1.5rem 2rem", position: "relative" }}
+            >
                 <div
                     style={{
                         display: "grid",
@@ -218,7 +225,7 @@ const Footer = () => {
                         Направено с <Heart size={11} style={{ color: "#f87171", fill: "#f87171" }} /> в България
                     </p> */}
                 </div>
-            </div>
+            </m.div>
         </footer>
     );
 };

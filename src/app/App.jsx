@@ -1,6 +1,6 @@
-import { Route, Routes } from "react-router";
+import { Route, Routes, useLocation } from "react-router";
 import { Suspense, lazy } from "react";
-import { LazyMotion, domAnimation } from "framer-motion";
+import { LazyMotion, domAnimation, m, AnimatePresence } from "motion/react";
 
 import { AuthProvider } from "@/hooks/AuthContext";
 import ProtectedRoute from "@/routes/ProtectedRoute";
@@ -31,6 +31,19 @@ const AdminReports    = lazy(() => import("@/components/admin/AdminReports"));
 const TermsOfService  = lazy(() => import("@/components/common/TermsOfService"));
 const PrivacyPolicy   = lazy(() => import("@/components/common/PrivacyPolicy"));
 
+function PageWrap({ children }) {
+    return (
+        <m.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        >
+            {children}
+        </m.div>
+    );
+}
+
 function PageLoader() {
     return (
         <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center',
@@ -44,6 +57,7 @@ function PageLoader() {
 }
 
 function App() {
+    const location = useLocation();
     return (
         <GlobalErrorBoundary>
             <LazyMotion features={domAnimation}>
@@ -52,47 +66,53 @@ function App() {
                     <Header />
                     <main id="main" role="main">
                         <Suspense fallback={<PageLoader />}>
-                            <Routes>
-                                {/* Публични маршрути */}
-                                <Route path="*" element={<NotFound />} />
-                                <Route path="/" element={<Home />} />
-                                <Route path="/login" element={<Login />} />
-                                <Route path="/register" element={<Register />} />
-                                <Route path="/forgot-password" element={<ForgotPassword />} />
-                                <Route path="/update-password" element={<UpdatePassword />} />
-                                <Route path="/about" element={<About />} />
-                                <Route path="/terms" element={<TermsOfService />} />
-                                <Route path="/privacy" element={<PrivacyPolicy />} />
-                                <Route path="/universities" element={<UniversitiesPage />} />
-                                <Route path="/career-advisor" element={
-                                    <GlobalErrorBoundary><CareerAdvisor /></GlobalErrorBoundary>
-                                } />
-                                <Route path="/test-career" element={
-                                    <GlobalErrorBoundary><TestCareer /></GlobalErrorBoundary>
-                                } />
-                                <Route path="/dormitories" element={<Dormitories />} />
-                                <Route path="/favorites" element={
-                                    <ProtectedRoute><FavoritesPage /></ProtectedRoute>
-                                } />
-                                {/* Калкулаторът е публичен — CLAUDE.md: "Never put a login wall between a user and their first calculator result" */}
-                                <Route path="/calculator" element={
-                                    <GlobalErrorBoundary><CalculatorPage /></GlobalErrorBoundary>
-                                } />
-                                <Route path="/profile" element={
-                                    <ProtectedRoute><Profile /></ProtectedRoute>
-                                } />
-                                {/* Админ маршрути (изискват админ роля) */}
-                                <Route path="/admin" element={
-                                    <AdminRoute>
-                                        <GlobalErrorBoundary><AdminDashboard /></GlobalErrorBoundary>
-                                    </AdminRoute>
-                                } />
-                                <Route path="/admin/reports" element={
-                                    <AdminRoute>
-                                        <GlobalErrorBoundary><AdminReports /></GlobalErrorBoundary>
-                                    </AdminRoute>
-                                } />
-                            </Routes>
+                            <AnimatePresence mode="wait">
+                                <Routes location={location} key={location.pathname}>
+                                    {/* Публични маршрути */}
+                                    <Route path="*" element={<PageWrap><NotFound /></PageWrap>} />
+                                    <Route path="/" element={<PageWrap><Home /></PageWrap>} />
+                                    <Route path="/login" element={<PageWrap><Login /></PageWrap>} />
+                                    <Route path="/register" element={<PageWrap><Register /></PageWrap>} />
+                                    <Route path="/forgot-password" element={<PageWrap><ForgotPassword /></PageWrap>} />
+                                    <Route path="/update-password" element={<PageWrap><UpdatePassword /></PageWrap>} />
+                                    <Route path="/about" element={<PageWrap><About /></PageWrap>} />
+                                    <Route path="/terms" element={<PageWrap><TermsOfService /></PageWrap>} />
+                                    <Route path="/privacy" element={<PageWrap><PrivacyPolicy /></PageWrap>} />
+                                    <Route path="/universities" element={<PageWrap><UniversitiesPage /></PageWrap>} />
+                                    <Route path="/career-advisor" element={
+                                        <PageWrap><GlobalErrorBoundary><CareerAdvisor /></GlobalErrorBoundary></PageWrap>
+                                    } />
+                                    <Route path="/test-career" element={
+                                        <PageWrap><GlobalErrorBoundary><TestCareer /></GlobalErrorBoundary></PageWrap>
+                                    } />
+                                    <Route path="/dormitories" element={<PageWrap><Dormitories /></PageWrap>} />
+                                    <Route path="/favorites" element={
+                                        <PageWrap><ProtectedRoute><FavoritesPage /></ProtectedRoute></PageWrap>
+                                    } />
+                                    {/* Калкулаторът е публичен — CLAUDE.md: "Never put a login wall between a user and their first calculator result" */}
+                                    <Route path="/calculator" element={
+                                        <PageWrap><GlobalErrorBoundary><CalculatorPage /></GlobalErrorBoundary></PageWrap>
+                                    } />
+                                    <Route path="/profile" element={
+                                        <PageWrap><ProtectedRoute><Profile /></ProtectedRoute></PageWrap>
+                                    } />
+                                    {/* Админ маршрути (изискват админ роля) */}
+                                    <Route path="/admin" element={
+                                        <PageWrap>
+                                            <AdminRoute>
+                                                <GlobalErrorBoundary><AdminDashboard /></GlobalErrorBoundary>
+                                            </AdminRoute>
+                                        </PageWrap>
+                                    } />
+                                    <Route path="/admin/reports" element={
+                                        <PageWrap>
+                                            <AdminRoute>
+                                                <GlobalErrorBoundary><AdminReports /></GlobalErrorBoundary>
+                                            </AdminRoute>
+                                        </PageWrap>
+                                    } />
+                                </Routes>
+                            </AnimatePresence>
                         </Suspense>
                     </main>
                     <Footer />
