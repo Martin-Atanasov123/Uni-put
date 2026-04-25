@@ -4,7 +4,7 @@ const TEAM = [
     {
         name: "Мартин Атанасов",
         role: "Съосновател, архитект на платформата и full-stack разработчик",
-        image: "/martin_snimka.jpg",
+        image: "/martin_snimka.webp",
         bio: "Мартин е фокусиран върху изграждането на дигитални продукти, които решават реални проблеми за ученици, родители и университети. В УниПът той отговаря за архитектурата на приложението, интеграцията със Supabase и проектирането на основните модули – от калкулатора за бал и логиката за RIASEC препоръки, до администраторския панел и инфраструктурата за данните. Вярва, че прозрачността и точната информация могат да променят начина, по който младите хора взимат решения за образованието си.",
         skills: ["React", "JavaScript / TypeScript", "Tailwind / DaisyUI", "Supabase / SQL", "GitHub / CI"],
         focus: "Архитектура на системи, синхронизация на данни между фронтенд и база, кандидатстудентски кампании, аналитика и инструменти за администратори.",
@@ -61,6 +61,7 @@ function MemberCard({ member, reverse }) {
                         width={400}
                         height={400}
                         loading="lazy"
+                        decoding="async"
                         style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                     />
                     <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 60%, var(--brand-surface))", pointerEvents: "none" }} />
