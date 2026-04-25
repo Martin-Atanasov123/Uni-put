@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { m } from "motion/react";
 import { useAuth } from "@/hooks/useAuth";
 import { universityService } from "@/services/universityService";
 import { Search, MapPin, School, Heart, Calculator, Filter, X } from "lucide-react";
@@ -117,7 +118,12 @@ const FavoritesPage = () => {
     return (
         <div style={{ minHeight: "100vh", background: "var(--brand-bg)", color: "var(--brand-text)", padding: "7rem 1.5rem 3rem" }}>
             <div style={{ maxWidth: "1200px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "2rem" }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}>
+                <m.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}
+                >
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                         <Heart size={14} style={{ color: "#f87171", fill: "#f87171" }} />
                         <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.14em" }}>
@@ -130,7 +136,7 @@ const FavoritesPage = () => {
                     <p style={{ margin: 0, color: "var(--brand-muted)", fontSize: "1rem", maxWidth: "640px" }}>
                         Запазени университети и специалности, достъпни от всеки твой вход.
                     </p>
-                </div>
+                </m.div>
 
                 <div
                     style={{
@@ -199,7 +205,10 @@ const FavoritesPage = () => {
                         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
                     </div>
                 ) : filtered.length === 0 ? (
-                    <div
+                    <m.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                         style={{
                             textAlign: "center",
                             padding: "4rem 2rem",
@@ -243,14 +252,23 @@ const FavoritesPage = () => {
                         >
                             Към университетите
                         </Link>
-                    </div>
+                    </m.div>
                 ) : (
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "1.25rem" }}>
+                    <m.div
+                        initial="hidden"
+                        animate="visible"
+                        variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
+                        style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "1.25rem" }}
+                    >
                         {filtered.map(uni => {
                             const favorite = isFavorite(String(uni.id));
                             return (
-                                <div
+                                <m.div
                                     key={uni.id}
+                                    variants={{
+                                        hidden: { opacity: 0, y: 20 },
+                                        visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } },
+                                    }}
                                     style={{
                                         position: "relative",
                                         padding: "1.5rem",
@@ -342,10 +360,10 @@ const FavoritesPage = () => {
                                             <Calculator size={13} /> Изчисли бал
                                         </Link>
                                     </div>
-                                </div>
+                                </m.div>
                             );
                         })}
-                    </div>
+                    </m.div>
                 )}
             </div>
         </div>

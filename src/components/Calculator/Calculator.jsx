@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 // eslint-disable-next-line no-unused-vars
-import { m, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "motion/react";
 import { supabase } from "@/lib/supabase";
 import { useLocation } from "react-router-dom";
 import {

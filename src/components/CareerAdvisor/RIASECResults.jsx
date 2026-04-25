@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { m } from "motion/react";
 import { useNavigate, Link } from "react-router-dom";
 import {
     Target,
@@ -51,7 +52,12 @@ const RIASECResults = ({ results, onRestart }) => {
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: "3rem" }}>
             {/* Profile header */}
-            <div style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+            <m.div
+                initial={{ opacity: 0, scale: 0.92 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
+                style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: "1.25rem" }}
+            >
                 <div
                     style={{
                         width: "4rem",
@@ -128,7 +134,7 @@ const RIASECResults = ({ results, onRestart }) => {
                         </div>
                     ))}
                 </div>
-            </div>
+            </m.div>
 
             {error && (
                 <div
@@ -193,10 +199,20 @@ const RIASECResults = ({ results, onRestart }) => {
                         <GraduationCap size={22} style={{ color: "var(--brand-cyan)" }} />
                         Топ специалности за теб
                     </h3>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                    <m.div
+                        style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, margin: "-40px" }}
+                        variants={{ visible: { transition: { staggerChildren: 0.06 } } }}
+                    >
                         {visibleSpecialties.length > 0 ? visibleSpecialties.map((spec, index) => (
-                            <div
+                            <m.div
                                 key={spec.id}
+                                variants={{
+                                    hidden: { opacity: 0, y: 16 },
+                                    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } },
+                                }}
                                 style={{
                                     ...S.surface,
                                     padding: "1.25rem",
@@ -318,11 +334,11 @@ const RIASECResults = ({ results, onRestart }) => {
                                         <Calculator size={13} /> Изчисли бал
                                     </button>
                                 </div>
-                            </div>
+                            </m.div>
                         )) : (
                             <EmptyState label="Няма намерени специалности с над 50% съвпадение." />
                         )}
-                    </div>
+                    </m.div>
                     {specialties.length > 5 && (
                         <div style={{ display: "flex", justifyContent: "center" }}>
                             <button

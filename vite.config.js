@@ -27,7 +27,7 @@ export default defineConfig({
           'vendor-three-core':  ['three'],
           'vendor-three-fiber': ['@react-three/fiber'],
           'vendor-three-drei':  ['@react-three/drei'],
-          'vendor-motion': ['framer-motion'],
+          'vendor-motion': ['motion'],
           'vendor-ui':     ['lucide-react'],
           'vendor-supa':   ['@supabase/supabase-js'],
         },

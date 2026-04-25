@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
-import { m, useInView } from "framer-motion";
+import { m, useInView } from "motion/react";
 import { useAuth } from "@/hooks/useAuth";
 
 import {
@@ -639,9 +639,9 @@ const T_COL1 = TESTIMONIALS.slice(0, 3);
 const T_COL2 = TESTIMONIALS.slice(3, 6);
 const T_COL3 = TESTIMONIALS.slice(6, 9);
 
-function TestimonialsColumn({ testimonials, duration = 15 }) {
+function TestimonialsColumn({ testimonials, duration = 15, className = "" }) {
     return (
-        <div style={{ overflow: "hidden", willChange: "transform" }}>
+        <div className={className} style={{ overflow: "hidden", willChange: "transform" }}>
             <m.ul
                 animate={{ translateY: "-50%" }}
                 transition={{ duration, repeat: Infinity, ease: "linear", repeatType: "loop" }}
@@ -777,10 +777,10 @@ function CTASection() {
                     style={{
                         position: "absolute",
                         top: "50%",
-                        right: "-8%",
+                        right: "5%",
                         transform: "translateY(-50%)",
-                        width: "min(520px, 90vw)",
-                        height: "min(520px, 90vw)",
+                        width: "min(480px, 42vw)",
+                        height: "min(480px, 42vw)",
                         zIndex: 0,
                         pointerEvents: "none",
                     }}

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { m } from "motion/react";
 import { supabase } from "@/lib/supabase";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -148,7 +149,10 @@ const SignUp = () => {
                 <div aria-hidden style={{ position: "absolute", top: "-200px", left: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(139,92,246,0.1), transparent 70%)", pointerEvents: "none" }} />
                 <div aria-hidden style={{ position: "absolute", bottom: "-200px", right: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(6,182,212,0.1), transparent 70%)", pointerEvents: "none" }} />
 
-                <div
+                <m.div
+                    initial={{ opacity: 0, y: 24, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                     style={{
                         width: "100%",
                         maxWidth: "440px",
@@ -281,7 +285,7 @@ const SignUp = () => {
                             Влез тук
                         </Link>
                     </p>
-                </div>
+                </m.div>
             </div>
 
             <style>{`

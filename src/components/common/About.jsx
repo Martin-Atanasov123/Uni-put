@@ -1,4 +1,5 @@
 import { Mail, Github, Code2, Briefcase, Users, Lightbulb, Database, BookOpen, Calculator, Brain } from "lucide-react";
+import { m } from "motion/react";
 
 const TEAM = [
     {
@@ -171,7 +172,13 @@ const About = () => {
             <div aria-hidden style={{ position: "absolute", bottom: "20%", left: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(139,92,246,0.08), transparent 70%)", pointerEvents: "none" }} />
 
             <div style={{ maxWidth: "1100px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "5rem", position: "relative" }}>
-                <header style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: "1rem" }}>
+                <m.header
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-80px" }}
+                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                    style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: "1rem" }}
+                >
                     <div style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.4rem 0.875rem", background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.3)", borderRadius: "999px", color: "var(--brand-cyan)", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 auto" }}>
                         <Users size={12} /> За нас
                     </div>
@@ -200,10 +207,17 @@ const About = () => {
                     <p style={{ margin: "0.5rem auto 0", maxWidth: "720px", fontSize: "1rem", color: "var(--brand-muted)", lineHeight: 1.65 }}>
                         УниПът е създаден, за да помогне на кандидат-студентите в България да вземат информирани решения за своето бъдеще. Комбинираме данни за университети, специалности, балове и общежития в една интуитивна платформа и я развиваме с внимание към детайла, достъпността и високия перформанс.
                     </p>
-                </header>
+                </m.header>
 
                 {/* ── Why We Built This ── */}
-                <section aria-labelledby="why-title" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "3rem", alignItems: "start" }}>
+                <m.section
+                    aria-labelledby="why-title"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-80px" }}
+                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                    style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "3rem", alignItems: "start" }}
+                >
                     <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
                         <div style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.35rem 0.75rem", background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.3)", borderRadius: "999px", color: "var(--brand-violet)", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.18em", width: "fit-content" }}>
                             <Lightbulb size={11} /> Защо го изградихме
@@ -239,11 +253,15 @@ const About = () => {
                             </div>
                         ))}
                     </div>
-                </section>
+                </m.section>
 
                 {/* ── Data Transparency ── */}
-                <section
+                <m.section
                     aria-labelledby="data-title"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-80px" }}
+                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                     style={{
                         padding: "2rem",
                         background: "linear-gradient(135deg, rgba(6,182,212,0.05), rgba(139,92,246,0.05))",
@@ -282,13 +300,20 @@ const About = () => {
                     <p style={{ margin: "1.25rem 0 0", fontSize: "12px", color: "var(--brand-muted)", opacity: 0.7, lineHeight: 1.6 }}>
                         Данните се актуализират при публикуване на нови наредби. Признаваме честно когато нещо не е покрито — виж известието в калкулатора. Ако забележиш грешка, използвай бутона „Докладвай грешка" до всеки резултат.
                     </p>
-                </section>
+                </m.section>
 
-                <section aria-label="Екип" style={{ display: "flex", flexDirection: "column", gap: "5rem" }}>
+                <m.section
+                    aria-label="Екип"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-80px" }}
+                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                    style={{ display: "flex", flexDirection: "column", gap: "5rem" }}
+                >
                     {TEAM.map((member, idx) => (
                         <MemberCard key={member.name} member={member} reverse={idx % 2 === 1} />
                     ))}
-                </section>
+                </m.section>
             </div>
         </main>
     );

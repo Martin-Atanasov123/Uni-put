@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { m, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "motion/react";
 import { Search, MapPin, Calculator, School, Heart, X, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import { universityService } from "@/services/universityService";
