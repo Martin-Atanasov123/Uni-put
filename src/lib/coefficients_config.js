@@ -27,7 +27,7 @@ const COEFFICIENT_KEYS = [
   "dzi_portugалски", "dzi_portugalski", "dzi_predpriemachestvo", "dzi_profesiq", "dzi_ris",
   "dzi_rumunski", "dzi_turski", "dzi_yaponski", "ese_obsht_tema", "etika_pravo", "exam_bel",
   "exam_bio", "exam_chu", "exam_fiz", "exam_geo", "exam_him", "exam_informatika", "exam_ist",
-  "exam_mat", "exam_muz", "exam_ris",
+  "exam_mat", "exam_muz", "exam_ris", "exam_fizicheska_godnost",
   "fil", "fiz", "fiz_vazpitanie", "geo", "himija", "him", "informatika",
   "ist", "it", "izpit_drugo_vu", "konkursen_izpit_1", "konkursen_izpit_2", "logika_psihologiya",
   "mat", "muz", "muzika", "obsht_uspeh", "obshtoobrazovatelen_test", "obshtestvoznanie",
@@ -37,7 +37,7 @@ const COEFFICIENT_KEYS = [
   "tournament", "vtor_dzi_drug_predmet",
   "dzi_nai_visoka", "dzi_profilirasht_predmet", "eakt_ocenka", "exam_angliiski",
   "exam_angliyski", "exam_etika", "exam_fizika", "exam_iq", "exam_phys", "exam_ris_1",
-  "exam_ris_2", "exam_skulptirane", "exam_sport", "exam_test", "grazhdansko_obrazovanie",
+  "exam_ris_2", "exam_skulptirane", "exam_sport", "exam_test", "exam_ikonomika", "exam_modelirane", "grazhdansko_obrazovanie",
   "him_udostoverenie", "hsk4_combo", "istoriq_diploma", "izpit_bel",
   "matematika", "obsht_prirodonauchen_test", "obsht_tehnicheski_test", "ocenka_matematika",
   "prakticheski_izpit_horeografiq", "profilirasht_predmet", "psihologicheska_ocenka", "ris",
@@ -206,7 +206,10 @@ const FIELD_LABELS = {
   exam_ris_2: "Изпит по рисуване 2",
   exam_skulptirane: "Изпит по скулптиране",
   exam_sport: "Изпит по спорт",
+  exam_fizicheska_godnost: "Физическа годност (точки)",
   exam_test: "Приемен тест",
+  exam_ikonomika: "Изпит по икономика",
+  exam_modelirane: "Изпит по моделиране",
   grazhdansko_obrazovanie: "Диплома: Гражданско образование",
   him_udostoverenie: "Химия удостоверение",
   hsk4_combo: "HSK4 комбинация",
@@ -373,7 +376,7 @@ const SLOT_GROUPS = {
   
   // Business
   business_group: ["dzi1_predpriemachestvo", "dzi_predpriemachestvo", "predpriemachestvo",
-    "dzi_profil_predp"],
+    "dzi_profil_predp", "exam_ikonomika"],
   
   // Professional
   professional_group: ["dzi_profesiq", "profesionalna_kvalifikaciq", "prof_kv",
