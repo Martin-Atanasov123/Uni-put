@@ -5,7 +5,7 @@ import { useTheme } from "@/hooks/useTheme";
 import {
     User, LogOut, LayoutDashboard, Menu, X, GraduationCap,
     Calculator, Search, Settings, Building2, Heart, ChevronDown,
-    Sun, Moon, Brain
+    Sun, Moon, Brain, ClipboardList
 } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 
@@ -185,7 +185,7 @@ export default function Header() {
                                         </div>
                                         {isAdmin && <MenuItem to="/admin" icon={Settings} label="Админ панел" color="var(--brand-violet)" />}
                                         <MenuItem to="/profile" icon={User} label="Профил" />
-                                        <MenuItem to="/calculator" icon={LayoutDashboard} label="Моите балове" />
+                                        <MenuItem to="/my-grades" icon={ClipboardList} label="Моите оценки" />
                                         <MenuItem to="/favorites" icon={Heart} label="Любими" />
                                         <div style={{ height: "1px", background: "rgba(148,163,184,0.1)", margin: "0.375rem 0" }} />
                                         <button onClick={handleLogout} style={{

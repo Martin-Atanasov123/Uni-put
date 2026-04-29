@@ -3,6 +3,7 @@ import { CheckCircle2, ArrowUpDown } from "lucide-react";
 import { FIELD_LABELS, SLOT_GROUPS } from "@/lib/coefficients_config";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
+import { loadGrades } from "@/lib/gradeStore";
 
 const STORAGE_PREFIX = "uniput_grades";
 
@@ -64,13 +65,22 @@ export default function GradeInputSection({ coefficients = {}, faculty, specialt
     const slots = useMemo(() => buildSlots(coefficients), [coefficients]);
 
     useEffect(() => {
+        // 1. Зареди централните оценки ("Моите оценки") като base
+        const globalGrades = loadGrades();
+
+        // 2. Зареди per-specialty override (ако студентът е промeнил нещо за тази специалност)
+        let perSpecialty = {};
         try {
             const raw = localStorage.getItem(getStorageKey(faculty, specialty));
-            if (!raw) return;
-            const parsed = JSON.parse(raw);
-            if (parsed.valuesByKey) setValuesByKey(parsed.valuesByKey);
-            if (parsed.activeAltBySlot) setActiveAltBySlot(parsed.activeAltBySlot);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (parsed.valuesByKey) perSpecialty = parsed.valuesByKey;
+                if (parsed.activeAltBySlot) setActiveAltBySlot(parsed.activeAltBySlot);
+            }
         } catch {}
+
+        // 3. Merge: per-specialty override взима приоритет над глобалните
+        setValuesByKey({ ...globalGrades, ...perSpecialty });
     }, [faculty, specialty]);
 
     useEffect(() => {
