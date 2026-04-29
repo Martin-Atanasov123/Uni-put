@@ -30,6 +30,7 @@ const AdminDashboard  = lazy(() => import("@/components/admin/AdminDashboard"));
 const AdminReports    = lazy(() => import("@/components/admin/AdminReports"));
 const TermsOfService  = lazy(() => import("@/components/common/TermsOfService"));
 const PrivacyPolicy   = lazy(() => import("@/components/common/PrivacyPolicy"));
+const MyGradesPage    = lazy(() => import("@/components/MyGrades/MyGrades"));
 
 function PageWrap({ children }) {
     return (
@@ -92,6 +93,9 @@ function App() {
                                     {/* Калкулаторът е публичен — CLAUDE.md: "Never put a login wall between a user and their first calculator result" */}
                                     <Route path="/calculator" element={
                                         <PageWrap><GlobalErrorBoundary><CalculatorPage /></GlobalErrorBoundary></PageWrap>
+                                    } />
+                                    <Route path="/my-grades" element={
+                                        <PageWrap><MyGradesPage /></PageWrap>
                                     } />
                                     <Route path="/profile" element={
                                         <PageWrap><ProtectedRoute><Profile /></ProtectedRoute></PageWrap>
