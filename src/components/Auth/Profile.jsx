@@ -73,9 +73,9 @@ const Profile = () => {
                     }));
 
                     if (favorites.length > 0) {
-                        const allUnis = await universityService.searchUniversities({});
-                        const details = allUnis.filter(u => favorites.includes(u.id.toString()));
-                        setFavoriteDetails(details.slice(0, 3));
+                        // Server-side: дърпаме само първите 3 favorite-а (вместо цялата таблица)
+                        const details = await universityService.getByIds(favorites.slice(0, 3));
+                        setFavoriteDetails(details);
                     }
 
                     const history = JSON.parse(localStorage.getItem("calculator_history") || "[]");

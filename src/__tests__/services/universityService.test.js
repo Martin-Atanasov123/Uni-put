@@ -4,136 +4,203 @@ import { universityService } from '@/services/universityService';
 import { supabase } from '@/lib/supabase';
 
 vi.mock('@/lib/supabase', () => ({
-    supabase: {
-        from: vi.fn().mockReturnThis(),
-        select: vi.fn()
-    }
+    supabase: { from: vi.fn() }
 }));
 
 // Mock LocalStorage
-const localStorageMock = (function() {
+const localStorageMock = (function () {
     let store = {};
     return {
-        getItem: function(key) {
-            return store[key] || null;
-        },
-        setItem: function(key, value) {
-            store[key] = value.toString();
-        },
-        removeItem: function(key) {
-            delete store[key];
-        },
-        clear: function() {
-            store = {};
-        }
+        getItem: (key) => store[key] || null,
+        setItem: (key, value) => { store[key] = String(value); },
+        removeItem: (key) => { delete store[key]; },
+        clear: () => { store = {}; },
     };
 })();
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
-describe('UniversityService', () => {
+/**
+ * Помощна функция: създава chainable mock на Supabase query builder.
+ * Записва извикваните методи в `calls`, така че тестовете да валидират
+ * че сме приложили server-side .ilike()/.or()/.eq()/.range().
+ */
+function makeQueryMock({ resolveData = [], resolveError = null } = {}) {
+    const calls = { or: [], eq: [], range: [], order: [], in: [], select: [] };
+    const builder = {
+        select: vi.fn(function (cols) { calls.select.push(cols); return this; }),
+        or:     vi.fn(function (s)    { calls.or.push(s);     return this; }),
+        eq:     vi.fn(function (c, v) { calls.eq.push([c, v]); return this; }),
+        in:     vi.fn(function (c, v) { calls.in.push([c, v]); return this; }),
+        order:  vi.fn(function (c, o) { calls.order.push([c, o]); return this; }),
+        range:  vi.fn(function (a, b) {
+            calls.range.push([a, b]);
+            return Promise.resolve({ data: resolveData, error: resolveError });
+        }),
+        // За getCities / getByIds които не извикват range() — финалният .select връща Promise.
+        // За тази цел връщаме thenable след .select() ако чейнът свършва там.
+    };
+    // Make the builder thenable-able for queries that end after .in()/.select()
+    builder.then = (resolve) => resolve({ data: resolveData, error: resolveError });
+    return { builder, calls };
+}
+
+describe('universityService.searchUniversities (server-side)', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         localStorage.clear();
     });
 
-    it('should fetch universities from API if cache is empty', async () => {
-        const mockData = [
-            { id: 1, university_name: 'Uni 1', specialty: 'CS', city: 'Sofia' },
-            { id: 2, university_name: 'Uni 2', specialty: 'Math', city: 'Plovdiv' }
-        ];
-
-        supabase.from.mockReturnValue({
-            select: vi.fn().mockResolvedValue({ data: mockData, error: null })
-        });
+    it('прилага .range() на сървъра и връща резултата', async () => {
+        const data = [{ id: 1, university_name: 'СУ', specialty: 'Информатика' }];
+        const { builder, calls } = makeQueryMock({ resolveData: data });
+        supabase.from.mockReturnValue(builder);
 
         const result = await universityService.searchUniversities({});
-        
+
         expect(supabase.from).toHaveBeenCalledWith('universities');
-        expect(result).toHaveLength(2);
-        expect(result[0].university_name).toBe('Uni 1');
+        expect(calls.range.length).toBe(1);
+        expect(calls.range[0][0]).toBe(0);
+        expect(result).toHaveLength(1);
     });
 
-    it('should return cached data if valid', async () => {
-        const mockData = [{ id: 1, university_name: 'Cached Uni', specialty: 'CS', city: 'Sofia' }];
-        const cacheEntry = {
-            timestamp: Date.now(),
-            data: mockData
-        };
-        localStorage.setItem('universities_cache_v2', JSON.stringify(cacheEntry));
+    it('изпраща .or() с ilike патърни когато има query', async () => {
+        const { builder, calls } = makeQueryMock({ resolveData: [] });
+        supabase.from.mockReturnValue(builder);
 
-        // Ensure supabase is NOT called
-        const result = await universityService.searchUniversities({});
-        
+        await universityService.searchUniversities({ query: 'Технически' });
+
+        expect(calls.or.length).toBe(1);
+        const orStr = calls.or[0];
+        // Query се нормализира до lowercase преди да се вгради в pattern (ilike е case-insensitive)
+        expect(orStr).toContain('specialty.ilike.%технически%');
+        expect(orStr).toContain('university_name.ilike.%технически%');
+        expect(orStr).toContain('faculty.ilike.%технически%');
+    });
+
+    it('разширява "право" със синонимите ("юридически науки", "правни науки")', async () => {
+        const { builder, calls } = makeQueryMock({ resolveData: [] });
+        supabase.from.mockReturnValue(builder);
+
+        await universityService.searchUniversities({ query: 'право' });
+
+        const orStr = calls.or[0];
+        expect(orStr).toContain('право');
+        expect(orStr).toContain('юридически науки');
+        expect(orStr).toContain('правни науки');
+    });
+
+    it('прилага .eq() за град когато не е "Всички"', async () => {
+        const { builder, calls } = makeQueryMock({ resolveData: [] });
+        supabase.from.mockReturnValue(builder);
+
+        await universityService.searchUniversities({ city: 'София' });
+
+        expect(calls.eq).toEqual(expect.arrayContaining([['city', 'София']]));
+    });
+
+    it('прилага .eq() за education_level когато не е "Всички"', async () => {
+        const { builder, calls } = makeQueryMock({ resolveData: [] });
+        supabase.from.mockReturnValue(builder);
+
+        await universityService.searchUniversities({ level: 'бакалавър' });
+
+        expect(calls.eq).toEqual(expect.arrayContaining([['education_level', 'бакалавър']]));
+    });
+
+    it('НЕ прилага .eq() когато филтърът е "Всички"', async () => {
+        const { builder, calls } = makeQueryMock({ resolveData: [] });
+        supabase.from.mockReturnValue(builder);
+
+        await universityService.searchUniversities({ city: 'Всички', level: 'Всички' });
+
+        expect(calls.eq.length).toBe(0);
+    });
+
+    it('почиства user input от метасимволи преди .ilike()', async () => {
+        const { builder, calls } = makeQueryMock({ resolveData: [] });
+        supabase.from.mockReturnValue(builder);
+
+        // Опасни символи: %, _ (SQL wildcards), запетая (PostgREST .or() separator),
+        // кавички, скоби, наклонена черта.
+        await universityService.searchUniversities({ query: "test%_',()\\" });
+
+        const orStr = calls.or[0];
+        // Pattern-ите които ние добавяме ('%test%') са OK, но user-provided метасимволи
+        // вътре в текста трябва да са изчистени:
+        expect(orStr).toContain('%test%');
+        expect(orStr).not.toContain("'");
+        expect(orStr).not.toContain('(');
+        expect(orStr).not.toContain('\\');
+        // Никакви вътрешни % или _ от user input — само нашите wrapper-и
+        // (3 wrapper-а × 2 % = 6 общо в string-а, нито един друг)
+        expect((orStr.match(/%/g) || []).length).toBe(6);
+    });
+
+    it('хвърля грешка нагоре (за UI error handling)', async () => {
+        const { builder } = makeQueryMock({ resolveError: { message: 'network down' } });
+        supabase.from.mockReturnValue(builder);
+
+        await expect(universityService.searchUniversities({})).rejects.toMatchObject({ message: 'network down' });
+    });
+});
+
+describe('universityService.getByIds', () => {
+    beforeEach(() => { vi.clearAllMocks(); });
+
+    it('връща празен масив за празен input', async () => {
+        const result = await universityService.getByIds([]);
+        expect(result).toEqual([]);
         expect(supabase.from).not.toHaveBeenCalled();
-        expect(result).toHaveLength(1);
-        expect(result[0].university_name).toBe('Cached Uni');
     });
 
-    it('should filter results by query', async () => {
-        const mockData = [
-            { id: 1, university_name: 'Technical University', specialty: 'Computer Science', city: 'Sofia' },
-            { id: 2, university_name: 'Medical University', specialty: 'Medicine', city: 'Varna' }
-        ];
+    it('прилага .in() с числови ID-та', async () => {
+        const data = [{ id: 5, university_name: 'X' }];
+        const { builder, calls } = makeQueryMock({ resolveData: data });
+        supabase.from.mockReturnValue(builder);
 
-        supabase.from.mockReturnValue({
-            select: vi.fn().mockResolvedValue({ data: mockData, error: null })
-        });
+        const result = await universityService.getByIds(['5', '7', 'invalid']);
 
-        const result = await universityService.searchUniversities({ query: 'Technical' });
-        expect(result).toHaveLength(1);
-        expect(result[0].university_name).toBe('Technical University');
+        expect(calls.in.length).toBe(1);
+        expect(calls.in[0][0]).toBe('id');
+        expect(calls.in[0][1]).toEqual([5, 7]);
+        expect(result).toEqual(data);
+    });
+});
+
+describe('universityService.getCities', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        localStorage.clear();
     });
 
-    it('should match specialty by synonym when query is "право"', async () => {
-        const mockData = [
-            { id: 1, university_name: 'SU', specialty: 'Юридически науки', city: 'Sofia' },
-            { id: 2, university_name: 'UNWE', specialty: 'Правни науки', city: 'Sofia' },
-            { id: 3, university_name: 'TU', specialty: 'Computer Science', city: 'Sofia' }
+    it('дърпа само колоната "city" и кешира', async () => {
+        const data = [
+            { city: 'София' }, { city: 'Пловдив' }, { city: 'София' }, { city: null }
         ];
+        const { builder, calls } = makeQueryMock({ resolveData: data });
+        supabase.from.mockReturnValue(builder);
 
-        supabase.from.mockReturnValue({
-            select: vi.fn().mockResolvedValue({ data: mockData, error: null })
-        });
+        const result = await universityService.getCities();
 
-        const result = await universityService.searchUniversities({ query: 'право' });
-        expect(result).toHaveLength(2);
-        const specs = result.map(r => r.specialty).sort();
-        expect(specs).toEqual(['Правни науки', 'Юридически науки'].sort());
+        expect(calls.select).toContain('city');
+        expect(result[0]).toBe('Всички');
+        expect(result).toContain('София');
+        expect(result).toContain('Пловдив');
+        // Без дубликати, без null
+        expect(result.filter(c => c === 'София').length).toBe(1);
+        // Запазено в localStorage
+        expect(localStorage.getItem('uniput_cities_cache_v1')).toBeTruthy();
     });
 
-    it('should return fresh fetch fallback when cache misses "право"', async () => {
-        const cachedEntry = {
-            timestamp: Date.now(),
-            data: [
-                { id: 10, university_name: 'Cached Uni', specialty: 'Biology', city: 'Varna' }
-            ]
-        };
-        localStorage.setItem('universities_cache_v2', JSON.stringify(cachedEntry));
+    it('връща кеширания списък без втора заявка', async () => {
+        localStorage.setItem('uniput_cities_cache_v1', JSON.stringify({
+            ts: Date.now(),
+            data: ['Всички', 'Бургас']
+        }));
 
-        const freshData = [
-            { id: 20, university_name: 'SU', specialty: 'Право', city: 'Sofia' }
-        ];
+        const result = await universityService.getCities();
 
-        supabase.from.mockReturnValue({
-            select: vi.fn().mockResolvedValue({ data: freshData, error: null })
-        });
-
-        const result = await universityService.searchUniversities({ query: 'право' });
-        expect(result).toHaveLength(1);
-        expect(result[0].specialty.toLowerCase()).toContain('право');
-    });
-    it('should filter results by city', async () => {
-        const mockData = [
-            { id: 1, university_name: 'Uni 1', specialty: 'CS', city: 'Sofia' },
-            { id: 2, university_name: 'Uni 2', specialty: 'Math', city: 'Plovdiv' }
-        ];
-
-        supabase.from.mockReturnValue({
-            select: vi.fn().mockResolvedValue({ data: mockData, error: null })
-        });
-
-        const result = await universityService.searchUniversities({ city: 'Sofia' });
-        expect(result).toHaveLength(1);
-        expect(result[0].city).toBe('Sofia');
+        expect(supabase.from).not.toHaveBeenCalled();
+        expect(result).toEqual(['Всички', 'Бургас']);
     });
 });

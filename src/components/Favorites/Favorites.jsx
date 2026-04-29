@@ -21,10 +21,11 @@ const FavoritesPage = () => {
             }
             setLoading(true);
             try {
-                const data = await universityService.searchUniversities({});
-                const mapped = data.filter(item => favorites.includes(String(item.id)));
-                setAllFavoritesData(mapped);
-            } catch {
+                // Server-side: дърпаме само записите с тези ID-та (а не цялата таблица)
+                const data = await universityService.getByIds(favorites);
+                setAllFavoritesData(data);
+            } catch (err) {
+                console.error("Favorites load failed:", err);
                 setAllFavoritesData([]);
             } finally {
                 setLoading(false);

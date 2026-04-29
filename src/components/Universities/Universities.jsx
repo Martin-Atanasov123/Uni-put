@@ -38,54 +38,80 @@ export default function UniversitiesPage() {
     const { user, isFavorite, toggleFavorite } = useAuth();
     const [universities, setUniversities] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedCity, setSelectedCity] = useState("Всички");
     const [selectedLevel, setSelectedLevel] = useState("Всички");
     const [cities, setCities] = useState([]);
     const [suggestions, setSuggestions] = useState([]);
-    const [searchResults, setSearchResults] = useState(null);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [visibleCount, setVisibleCount] = useState(60);
 
-    useEffect(() => {
-        (async () => {
-            setLoading(true);
+    // Initial load — само когато няма филтри. Server връща първите PAGE_SIZE_DEFAULT.
+    const loadInitial = async () => {
+        setLoading(true);
+        setError(null);
+        try {
             const [unis, cityList] = await Promise.all([
-                universityService.searchUniversities({}),
+                universityService.searchUniversities({ limit: 500 }),
                 universityService.getCities(),
             ]);
             setUniversities(unis);
             setCities(cityList);
+        } catch (err) {
+            console.error("Universities initial load failed:", err);
+            setError("Не успяхме да заредим данните. Провери връзката и опитай пак.");
+        } finally {
             setLoading(false);
-        })();
-    }, []);
+        }
+    };
 
+    useEffect(() => { loadInitial(); }, []);
+
+    // Debounced server-side search. 300ms след спирането на писането правим една заявка.
     useEffect(() => {
-        (async () => {
-            if (searchTerm.length > 1) {
-                const results = await universityService.searchUniversities({
-                    query: searchTerm,
-                    city: selectedCity === "Всички" ? "Всички" : selectedCity,
-                });
-                setSearchResults(results);
-                setSuggestions(results.slice(0, 5));
-                setShowSuggestions(true);
-            } else {
-                setSuggestions([]);
-                setShowSuggestions(false);
-                setSearchResults(null);
-            }
-        })();
-    }, [searchTerm, selectedCity]);
+        const hasFilters = searchTerm.trim().length > 1
+            || selectedCity !== "Всички"
+            || selectedLevel !== "Всички";
 
-    const filteredUnis = useMemo(() => {
-        const base = searchResults ?? universities;
-        return base.filter((u) => {
-            const matchesCity = selectedCity === "Всички" || u.city === selectedCity;
-            const matchesLevel = selectedLevel === "Всички" || u.education_level === selectedLevel;
-            return matchesCity && matchesLevel;
-        });
-    }, [universities, searchResults, selectedCity, selectedLevel]);
+        if (!hasFilters) {
+            setSuggestions([]);
+            setShowSuggestions(false);
+            return;
+        }
+
+        const timer = setTimeout(async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const results = await universityService.searchUniversities({
+                    query: searchTerm.trim(),
+                    city: selectedCity,
+                    level: selectedLevel,
+                    limit: 500,
+                });
+                setUniversities(results);
+                if (searchTerm.trim().length > 1) {
+                    setSuggestions(results.slice(0, 5));
+                    setShowSuggestions(true);
+                } else {
+                    setSuggestions([]);
+                    setShowSuggestions(false);
+                }
+            } catch (err) {
+                console.error("Universities search failed:", err);
+                setError("Грешка при търсене. Опитай отново.");
+            } finally {
+                setLoading(false);
+            }
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [searchTerm, selectedCity, selectedLevel]);
+
+    // Сървърът връща вече филтрирано — клиентът само показва. Само education_level
+    // не е изпратен към сървъра в search, затова държим тук filtering за safety.
+    const filteredUnis = useMemo(() => universities, [universities]);
 
     useEffect(() => { setVisibleCount(60); }, [searchTerm, selectedCity, selectedLevel]);
 
@@ -135,30 +161,16 @@ export default function UniversitiesPage() {
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.1 }}
-                    style={{
-                        background: "var(--brand-surface-2)",
-                        backdropFilter: "blur(16px)",
-                        border: "1px solid var(--brand-border)",
-                        borderRadius: "1.25rem",
-                        padding: "0.875rem",
-                        display: "grid",
-                        gridTemplateColumns: "1fr auto auto",
-                        gap: "0.625rem",
-                        position: "sticky",
-                        top: "5rem",
-                        zIndex: 20,
-                        marginBottom: "1.5rem",
-                    }}
+                    className="uni-filter-bar"
                 >
-                    {/* Search */}
-                    <div style={{ position: "relative" }}>
+                    {/* Search — full width, always on top row */}
+                    <div style={{ position: "relative" }} className="uni-filter-search">
                         <Search size={16} style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: "var(--brand-muted)", pointerEvents: "none" }} />
                         <input
                             type="text"
-                            placeholder="Търси специалност или университет..."
+                            placeholder="Търси специалност..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            onFocus={() => searchTerm.length > 1 && setShowSuggestions(true)}
                             onClick={(e) => e.stopPropagation()}
                             style={{ ...inputStyle, paddingLeft: "2.5rem", paddingRight: "1rem" }}
                             onFocus={(e) => { e.target.style.borderColor = "rgba(6,182,212,0.5)"; if (searchTerm.length > 1) setShowSuggestions(true); }}
@@ -194,8 +206,8 @@ export default function UniversitiesPage() {
                                             onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                                         >
                                             <School size={14} style={{ color: "var(--brand-cyan)", flexShrink: 0 }} />
-                                            <div>
-                                                <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--brand-text)" }}>{s.specialty}</div>
+                                            <div style={{ minWidth: 0 }}>
+                                                <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--brand-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.specialty}</div>
                                                 <div style={{ fontSize: "12px", color: "var(--brand-muted)" }}>{s.university_name}</div>
                                             </div>
                                         </div>
@@ -205,27 +217,30 @@ export default function UniversitiesPage() {
                         </AnimatePresence>
                     </div>
 
-                    {/* City */}
-                    <select
-                        value={selectedCity}
-                        onChange={(e) => setSelectedCity(e.target.value)}
-                        style={{ ...inputStyle, padding: "0 0.875rem", width: "auto", minWidth: "130px", cursor: "pointer" }}
-                    >
-                        {cities.map((city) => (
-                            <option key={city} value={city} style={{ background: "var(--brand-dropdown-bg)" }}>{city}</option>
-                        ))}
-                    </select>
+                    {/* City + Level — second row on mobile, same row on desktop */}
+                    <div className="uni-filter-selects">
+                        <select
+                            value={selectedCity}
+                            onChange={(e) => setSelectedCity(e.target.value)}
+                            className="uni-filter-select"
+                            style={{ ...inputStyle, padding: "0 0.875rem", cursor: "pointer" }}
+                        >
+                            {cities.map((city) => (
+                                <option key={city} value={city} style={{ background: "var(--brand-dropdown-bg)" }}>{city}</option>
+                            ))}
+                        </select>
 
-                    {/* Level */}
-                    <select
-                        value={selectedLevel}
-                        onChange={(e) => setSelectedLevel(e.target.value)}
-                        style={{ ...inputStyle, padding: "0 0.875rem", width: "auto", minWidth: "140px", cursor: "pointer" }}
-                    >
-                        <option value="Всички" style={{ background: "var(--brand-dropdown-bg)" }}>Всички степени</option>
-                        <option value="бакалавър" style={{ background: "var(--brand-dropdown-bg)" }}>Бакалавър</option>
-                        <option value="магистър" style={{ background: "var(--brand-dropdown-bg)" }}>Магистър</option>
-                    </select>
+                        <select
+                            value={selectedLevel}
+                            onChange={(e) => setSelectedLevel(e.target.value)}
+                            className="uni-filter-select"
+                            style={{ ...inputStyle, padding: "0 0.875rem", cursor: "pointer" }}
+                        >
+                            <option value="Всички" style={{ background: "var(--brand-dropdown-bg)" }}>Всички степени</option>
+                            <option value="бакалавър" style={{ background: "var(--brand-dropdown-bg)" }}>Бакалавър</option>
+                            <option value="магистър" style={{ background: "var(--brand-dropdown-bg)" }}>Магистър</option>
+                        </select>
+                    </div>
                 </m.div>
 
                 {/* Active filter chips */}
@@ -270,8 +285,33 @@ export default function UniversitiesPage() {
                     </div>
                 )}
 
+                {/* Error state */}
+                {!loading && error && (
+                    <m.div
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        style={{ textAlign: "center", padding: "5rem 1rem" }}
+                    >
+                        <div style={{ width: "72px", height: "72px", borderRadius: "50%", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1.25rem" }}>
+                            <X size={28} style={{ color: "#f87171" }} />
+                        </div>
+                        <h3 style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--brand-text)", marginBottom: "0.5rem", textWrap: "balance" }}>
+                            Нещо се обърка
+                        </h3>
+                        <p style={{ color: "var(--brand-muted)", fontSize: "14px", marginBottom: "1.5rem", maxWidth: "28rem", margin: "0 auto 1.5rem" }}>
+                            {error}
+                        </p>
+                        <button
+                            onClick={loadInitial}
+                            style={{ padding: "0.75rem 1.5rem", background: "linear-gradient(135deg,var(--brand-cyan),var(--brand-violet))", border: "none", borderRadius: "0.75rem", color: "#fff", fontWeight: 700, fontSize: "14px", cursor: "pointer", fontFamily: "inherit" }}
+                        >
+                            Опитай отново
+                        </button>
+                    </m.div>
+                )}
+
                 {/* Empty state */}
-                {!loading && filteredUnis.length === 0 && (
+                {!loading && !error && filteredUnis.length === 0 && (
                     <m.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -296,7 +336,7 @@ export default function UniversitiesPage() {
                 )}
 
                 {/* Grid */}
-                {!loading && filteredUnis.length > 0 && (
+                {!loading && !error && filteredUnis.length > 0 && (
                     <>
                         <m.div
                             variants={containerVariants}
@@ -408,6 +448,62 @@ export default function UniversitiesPage() {
             <style>{`
                 @keyframes uni-spin { to { transform: rotate(360deg); } }
                 input[type="text"]::placeholder { color: var(--brand-muted); opacity: 0.6; }
+
+                /* ── Filter bar ─────────────────────────────────── */
+                .uni-filter-bar {
+                    background: var(--brand-surface-2);
+                    backdrop-filter: blur(16px);
+                    border: 1px solid var(--brand-border);
+                    border-radius: 1.25rem;
+                    padding: 0.75rem;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.5rem;
+                    position: sticky;
+                    top: 4.5rem;
+                    z-index: 20;
+                    margin-bottom: 1.25rem;
+                }
+
+                /* Search занима целия ред */
+                .uni-filter-search {
+                    width: 100%;
+                }
+
+                /* City + Level — в ред, всеки взима половин ширина */
+                .uni-filter-selects {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 0.5rem;
+                }
+
+                /* Select-ите се свиват с container-а */
+                .uni-filter-select {
+                    width: 100%;
+                    min-width: 0;
+                }
+
+                /* Desktop 768px+ — всичко в един ред */
+                @media (min-width: 768px) {
+                    .uni-filter-bar {
+                        flex-direction: row;
+                        align-items: center;
+                        top: 5rem;
+                        padding: 0.875rem;
+                        gap: 0.625rem;
+                    }
+                    .uni-filter-search {
+                        flex: 1;
+                    }
+                    .uni-filter-selects {
+                        display: contents; /* разпада grid-а — city и level стават директни деца на flex */
+                    }
+                    .uni-filter-select {
+                        width: auto;
+                        min-width: 130px;
+                        flex-shrink: 0;
+                    }
+                }
             `}</style>
         </div>
     );

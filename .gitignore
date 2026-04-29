@@ -27,6 +27,7 @@ CLAUDE.md
 .env
 .env.local
 .env.*
+universities_data
 
 # Claude Code local config
 .claude/

@@ -102,6 +102,7 @@ export default function CalculatorPage() {
     const [dziPoints, setDziPoints] = useState("");
     const [dziError, setDziError] = useState("");
     const [copied, setCopied] = useState(false);
+    const [loadError, setLoadError] = useState(null);
     const location = useLocation();
 
     const handleDziChange = (e) => {
@@ -168,12 +169,24 @@ export default function CalculatorPage() {
                     const parsed = JSON.parse(cached);
                     if (Array.isArray(parsed) && parsed.length > 0) setFaculties(parsed);
                 }
-            } catch {}
+            } catch {
+                // corrupt cache — игнорираме, ще се презапише
+            }
             const { data, error } = await supabase.from("universities").select("faculty");
-            if (!error && data) {
-                const list = [...new Set(data.map(i => i.faculty).filter(Boolean))];
-                setFaculties(list);
-                try { localStorage.setItem("uniput_faculties_cache", JSON.stringify(list)); } catch {}
+            if (error) {
+                // Ако вече имаме факултети от cache-а — продължаваме да работим без да тревожим UI.
+                // Ако нямаме — показваме грешка.
+                setFaculties(prev => {
+                    if (!prev.length) setLoadError("Не успяхме да заредим факултетите. Провери връзката и опитай пак.");
+                    return prev;
+                });
+                return;
+            }
+            const list = [...new Set(data.map(i => i.faculty).filter(Boolean))];
+            setFaculties(list);
+            setLoadError(null);
+            try { localStorage.setItem("uniput_faculties_cache", JSON.stringify(list)); } catch {
+                // localStorage недостъпен / пълен
             }
         })();
     }, []);
@@ -181,8 +194,17 @@ export default function CalculatorPage() {
     useEffect(() => {
         if (!selectedFaculty) return;
         (async () => {
-            const { data, error } = await supabase.from("universities").select("id,faculty,specialty,university_name,city,coefficients,formula_description,max_ball").eq("faculty", selectedFaculty);
-            if (!error && data) setAllData(data);
+            const { data, error } = await supabase
+                .from("universities")
+                .select("id,faculty,specialty,university_name,city,coefficients,formula_description,max_ball")
+                .eq("faculty", selectedFaculty);
+            if (error) {
+                setLoadError("Не успяхме да заредим специалностите за този факултет. Опитай отново.");
+                setAllData([]);
+                return;
+            }
+            setAllData(data || []);
+            setLoadError(null);
         })();
     }, [selectedFaculty]);
 
@@ -339,6 +361,52 @@ export default function CalculatorPage() {
                         </p>
                     </div>
                 </m.div>
+
+                {/* Load error banner */}
+                <AnimatePresence>
+                    {loadError && (
+                        <m.div
+                            initial={{ opacity: 0, y: -8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -8 }}
+                            style={{
+                                display: "flex",
+                                alignItems: "flex-start",
+                                gap: "0.75rem",
+                                padding: "1rem 1.125rem",
+                                background: "rgba(248,113,113,0.08)",
+                                border: "1px solid rgba(248,113,113,0.25)",
+                                borderRadius: "0.875rem",
+                                marginBottom: "1rem",
+                            }}
+                        >
+                            <AlertCircle size={16} style={{ color: "#f87171", flexShrink: 0, marginTop: "2px" }} />
+                            <div style={{ flex: 1 }}>
+                                <p style={{ fontSize: "13px", color: "var(--brand-text)", margin: 0, lineHeight: 1.5, fontWeight: 600 }}>
+                                    {loadError}
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => window.location.reload()}
+                                style={{
+                                    padding: "0.4rem 0.875rem",
+                                    background: "rgba(248,113,113,0.15)",
+                                    border: "1px solid rgba(248,113,113,0.35)",
+                                    borderRadius: "0.5rem",
+                                    color: "#f87171",
+                                    fontWeight: 700,
+                                    fontSize: "12px",
+                                    cursor: "pointer",
+                                    fontFamily: "inherit",
+                                    flexShrink: 0,
+                                }}
+                            >
+                                Опитай пак
+                            </button>
+                        </m.div>
+                    )}
+                </AnimatePresence>
 
                 {/* Selectors */}
                 <m.div
