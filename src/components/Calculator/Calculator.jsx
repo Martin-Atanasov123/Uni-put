@@ -88,6 +88,7 @@ const TIPS = [
 ];
 
 export default function CalculatorPage() {
+    const currentYear = new Date().getFullYear();
     const [allData, setAllData] = useState([]);
     const [faculties, setFaculties] = useState([]);
     const [selectedFaculty, setSelectedFaculty] = useState("");
@@ -325,6 +326,26 @@ export default function CalculatorPage() {
             return { item, score, formatted: Number.isFinite(score) ? score.toFixed(2) : "0.00", isAbove, diff, hasStarted, hasMissing: missingSlots.length > 0, missingSlots, midPoint, avgMaxBall };
         });
     }, [rowsForSelectedSpecialty, grades, hasAnyValidGrade]);
+
+    // Save to calculator history whenever a full score is reached
+    useEffect(() => {
+        if (!selectedSpecialtyName || !hasAnyValidGrade) return;
+        const complete = calcResults.filter(r => r.hasStarted && !r.hasMissing && r.score > 0);
+        if (!complete.length) return;
+        const best = complete.reduce((a, b) => a.score > b.score ? a : b);
+        const entry = {
+            faculty: selectedFaculty,
+            specialty: selectedSpecialtyName,
+            score: parseFloat(best.formatted),
+            university: best.item.university_name,
+            maxBall: best.avgMaxBall,
+            isAbove: best.isAbove,
+            date: Date.now(),
+        };
+        const prev = JSON.parse(localStorage.getItem("calculator_history") || "[]");
+        const deduped = prev.filter(h => !(h.faculty === entry.faculty && h.specialty === entry.specialty));
+        localStorage.setItem("calculator_history", JSON.stringify([entry, ...deduped].slice(0, 10)));
+    }, [calcResults, selectedSpecialtyName, hasAnyValidGrade, selectedFaculty]);
 
     const clearFaculty = () => {
         setFacultySearch("");
@@ -814,7 +835,7 @@ export default function CalculatorPage() {
             {/* CLAUDE.md: data source trust signal */}
             {calcResults.length > 0 && (
                 <p style={{ marginTop: "1.5rem", fontSize: "11px", color: "var(--brand-muted)", opacity: 0.6, textAlign: "center", letterSpacing: "0.04em" }}>
-                    Данните са от официалните наредби на МОН, актуализирани за 2025 г. Средният бал е изчислен от историческия максимален бал.
+                    Данните са от официалните наредби на МОН, актуализирани за {currentYear} г. Средният бал е изчислен от историческия максимален бал.
                 </p>
             )}
 

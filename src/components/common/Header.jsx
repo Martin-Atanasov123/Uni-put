@@ -165,7 +165,13 @@ export default function Header() {
                                         width: "28px", height: "28px", borderRadius: "50%",
                                         background: "linear-gradient(135deg,var(--brand-cyan),var(--brand-violet))",
                                         display: "flex", alignItems: "center", justifyContent: "center",
-                                    }}><User size={14} color="#fff" /></div>
+                                        overflow: "hidden", flexShrink: 0,
+                                    }}>
+                                        {user?.user_metadata?.avatar_url
+                                            ? <img src={user.user_metadata.avatar_url} alt="Профил" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                            : <User size={14} color="#fff" />
+                                        }
+                                    </div>
                                     <ChevronDown size={14} color="var(--brand-muted)" />
                                 </button>
                                 {isUserMenuOpen && (
