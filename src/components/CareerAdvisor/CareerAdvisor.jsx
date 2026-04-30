@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useLayoutEffect, useRef } from "react";
 import { m } from "motion/react";
 import { calculateScores, calculateRiasecCode } from "@/lib/riasec-matcher";
 import { getRiasecMatches } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 import riasecData from "@/data/riasec_questions.json";
 import {
     CheckCircle2,
@@ -171,6 +172,16 @@ const CareerAdvisor = () => {
             const riasecCode = calculateRiasecCode(scores);
             const { specialties, careers, error } = await getRiasecMatches(scores);
             setResults({ scores, riasecCode, specialties, careers, error });
+
+            // Persist primary RIASEC type
+            const primaryType = riasecCode?.[0];
+            if (primaryType) {
+                localStorage.setItem("riasec_result", primaryType);
+                try {
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (user) await supabase.auth.updateUser({ data: { riasec_type: primaryType } });
+                } catch { /* not logged in — that's fine */ }
+            }
         } catch { /* empty */ } finally { setLoading(false); }
     };
 
