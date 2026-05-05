@@ -223,7 +223,7 @@ export default function UniversitiesPage() {
                             value={selectedCity}
                             onChange={(e) => setSelectedCity(e.target.value)}
                             className="uni-filter-select"
-                            style={{ ...inputStyle, padding: "0 0.875rem", cursor: "pointer" }}
+                            style={{ ...inputStyle, width: "100%", padding: "0 0.875rem", cursor: "pointer" }}
                         >
                             {cities.map((city) => (
                                 <option key={city} value={city} style={{ background: "var(--brand-dropdown-bg)" }}>{city}</option>
@@ -234,7 +234,7 @@ export default function UniversitiesPage() {
                             value={selectedLevel}
                             onChange={(e) => setSelectedLevel(e.target.value)}
                             className="uni-filter-select"
-                            style={{ ...inputStyle, padding: "0 0.875rem", cursor: "pointer" }}
+                            style={{ ...inputStyle, width: "100%", padding: "0 0.875rem", cursor: "pointer" }}
                         >
                             <option value="Всички" style={{ background: "var(--brand-dropdown-bg)" }}>Всички степени</option>
                             <option value="бакалавър" style={{ background: "var(--brand-dropdown-bg)" }}>Бакалавър</option>
@@ -491,16 +491,22 @@ export default function UniversitiesPage() {
                         top: 5rem;
                         padding: 0.875rem;
                         gap: 0.625rem;
+                        overflow: visible;
                     }
                     .uni-filter-search {
-                        flex: 1;
+                        flex: 1 1 0;
+                        min-width: 0;
                     }
                     .uni-filter-selects {
-                        display: contents; /* разпада grid-а — city и level стават директни деца на flex */
+                        display: flex;
+                        flex-direction: row;
+                        gap: 0.5rem;
+                        flex-shrink: 0;
                     }
                     .uni-filter-select {
-                        width: auto;
-                        min-width: 130px;
+                        width: auto !important;
+                        min-width: 140px;
+                        max-width: 190px;
                         flex-shrink: 0;
                     }
                 }

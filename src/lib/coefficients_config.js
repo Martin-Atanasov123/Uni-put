@@ -23,7 +23,7 @@ const COEFFICIENT_KEYS = [
   "dzi_him", "dzi_hим_obshto",
   "dzi_him_profil", "dzi_himiq", "dzi_informatika", "dzi_inf", "dzi_ist", "dzi_istoriq",
   "dzi_it", "dzi_kitayski", "dzi_kitayski_b2", "dzi_koreiski", "dzi_latin", "dzi_mat",
-  "dzi_matematika", "dzi_muz", "dzi_obsht", "dzi_obshtoobrazovatelen_predmet",
+  "dzi_izobrazitelno", "dzi_matematika", "dzi_muz", "dzi_obsht", "dzi_obshtoobrazovatelen_predmet",
   "dzi_portugалски", "dzi_portugalski", "dzi_predpriemachestvo", "dzi_profesiq", "dzi_ris",
   "dzi_rumunski", "dzi_turski", "dzi_yaponski", "ese_obsht_tema", "etika_pravo", "exam_bel",
   "exam_bio", "exam_chu", "exam_fiz", "exam_geo", "exam_him", "exam_informatika", "exam_ist",
@@ -37,7 +37,7 @@ const COEFFICIENT_KEYS = [
   "tournament", "vtor_dzi_drug_predmet",
   "dzi_nai_visoka", "dzi_profilirasht_predmet", "eakt_ocenka", "exam_angliiski",
   "exam_angliyski", "exam_etika", "exam_fizika", "exam_iq", "exam_phys", "exam_ris_1",
-  "exam_ris_2", "exam_skulptirane", "exam_sport", "exam_test", "exam_ikonomika", "exam_modelirane", "grazhdansko_obrazovanie",
+  "exam_ris_2", "exam_skulptirane", "exam_sport", "exam_test", "exam_ikonomika", "exam_kompoziciq", "exam_modelirane", "grazhdansko_obrazovanie",
   "him_udostoverenie", "hsk4_combo", "istoriq_diploma", "izpit_bel",
   "matematika", "obsht_prirodonauchen_test", "obsht_tehnicheski_test", "ocenka_matematika",
   "prakticheski_izpit_horeografiq", "profilirasht_predmet", "psihologicheska_ocenka", "ris",
@@ -127,6 +127,7 @@ const FIELD_LABELS = {
   dzi_him_profil: "ДЗИ Химия (профил)",
   dzi_himiq: "ДЗИ Химия",
   dzi_informatika: "ДЗИ Информатика",
+  dzi_izobrazitelno: "ДЗИ Изобразително изкуство",
   dzi_inf: "ДЗИ Информатика",
   dzi_ist: "ДЗИ История",
   dzi_istoriq: "ДЗИ История",
@@ -209,6 +210,7 @@ const FIELD_LABELS = {
   exam_fizicheska_godnost: "Физическа годност (точки)",
   exam_test: "Приемен тест",
   exam_ikonomika: "Изпит по икономика",
+  exam_kompoziciq: "Изпит по композиция",
   exam_modelirane: "Изпит по моделиране",
   grazhdansko_obrazovanie: "Диплома: Гражданско образование",
   him_udostoverenie: "Химия удостоверение",
@@ -364,10 +366,10 @@ const SLOT_GROUPS = {
     "dzi_profil_filosofiya"],
 
   // Arts
-  arts_group: ["exam_muz", "dzi_muz", "muz", "muzika", "exam_ris", "dzi_ris",
+  arts_group: ["exam_muz", "dzi_muz", "muz", "muzika", "exam_ris", "dzi_ris", "dzi_izobrazitelno",
     "portfolio", "exam_ris_1", "exam_ris_2", "exam_skulptirane", "ris",
     "risuvane_cvetna_kompoziciq", "risuvane_obemno_prostranstvena_kompoziciq",
-    "risuvane_perspektiva", "prakticheski_izpit_horeografiq"],
+    "risuvane_perspektiva", "exam_kompoziciq", "prakticheski_izpit_horeografiq"],
 
   // Diploma and general
   diploma_group: ["diploma", "obsht_uspeh", "diploma_semestrial", "diploma_state_exams",

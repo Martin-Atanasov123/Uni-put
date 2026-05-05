@@ -788,9 +788,9 @@ export default function CalculatorPage() {
                                     </div>
 
                                     {/* Formula */}
-                                    <div style={{ display: "flex", gap: "0.5rem", padding: "0.75rem", background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.15)", borderRadius: "0.75rem" }}>
+                                    <div style={{ display: "flex", gap: "0.5rem", padding: "0.75rem", background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.15)", borderRadius: "0.75rem", minWidth: 0 }}>
                                         <Info size={14} style={{ color: "var(--brand-violet)", flexShrink: 0, marginTop: "1px" }} />
-                                        <p style={{ fontSize: "12px", color: "var(--brand-muted)", margin: 0, lineHeight: 1.5 }}>
+                                        <p style={{ fontSize: "12px", color: "var(--brand-muted)", margin: 0, lineHeight: 1.5, wordBreak: "break-word", overflowWrap: "anywhere", minWidth: 0 }}>
                                             <strong style={{ color: "var(--brand-text)" }}>Формула:</strong> {item.formula_description}
                                         </p>
                                     </div>
