@@ -78,6 +78,18 @@ function dziToGrade(pts) {
     return { grade: +grade.toFixed(2), band };
 }
 
+// ── Formula legend ───────────────────────────────────────────────────────────
+const FORMULA_LEGEND = [
+    { symbol: "Изпит(X)",  desc: "Конкурсен изпит по предмет X, организиран от университета" },
+    { symbol: "ДЗИ(X)",    desc: "Държавен зрелостен изпит (матура) по предмет X" },
+    { symbol: "ДЗИ¹ / ДЗИ²", desc: "Първи или втори зрелостен изпит (когато са различни предмети)" },
+    { symbol: "X(д)",      desc: "Оценка по предмет X от дипломата за средно образование" },
+    { symbol: "СО",        desc: "Среден успех (средноаритметична оценка) от дипломата" },
+    { symbol: "×N",        desc: "Коефициент N — оценката се умножава по N преди събиране" },
+    { symbol: "/",         desc: "ИЛИ — взима се резултатът с по-висока стойност" },
+    { symbol: "+",         desc: "И — двата компонента се сумират (задължителни)" },
+];
+
 // ── Tips ────────────────────────────────────────────────────────────────────
 const TIPS = [
     "Коефициентите се прилагат автоматично — не е нужно да ги пресмяташ ръчно.",
@@ -715,6 +727,31 @@ export default function CalculatorPage() {
                                     );
                                 })}
                             </div>
+                        </div>
+                    </m.div>
+                )}
+
+                {/* Formula legend — shown only when no faculty selected AND dropdown is closed */}
+                {!selectedFaculty && !isFacultyDropdownOpen && (
+                    <m.div
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.26 }}
+                        style={{ background: S.surface, backdropFilter: "blur(12px)", border: `1px solid ${S.border}`, borderRadius: "1.25rem", padding: "1.25rem", marginBottom: "2rem" }}
+                    >
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.875rem" }}>
+                            <div style={{ padding: "0.375rem", borderRadius: "0.5rem", background: "linear-gradient(135deg,rgba(139,92,246,0.12),rgba(6,182,212,0.12))", display: "inline-flex" }}>
+                                <Info size={15} style={{ color: "var(--brand-violet)" }} />
+                            </div>
+                            <p style={{ fontSize: "13px", fontWeight: 700, color: "var(--brand-text)", margin: 0 }}>Легенда на формулите</p>
+                        </div>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
+                            {FORMULA_LEGEND.map(({ symbol, desc }) => (
+                                <div key={symbol} style={{ display: "grid", gridTemplateColumns: "7.5rem 1fr", gap: "0.75rem", alignItems: "baseline", padding: "0.375rem 0.5rem", borderRadius: "0.5rem" }}>
+                                    <code style={{ fontSize: "12px", fontWeight: 700, color: "var(--brand-cyan)", fontFamily: "monospace", whiteSpace: "nowrap" }}>{symbol}</code>
+                                    <span style={{ fontSize: "12px", color: "var(--brand-muted)", lineHeight: 1.5 }}>{desc}</span>
+                                </div>
+                            ))}
                         </div>
                     </m.div>
                 )}
