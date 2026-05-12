@@ -28,6 +28,9 @@ CLAUDE.md
 .env.local
 .env.*
 universities_data
+list-tables.js
+sync-local-db.js
+uniput-local.db
 
 # Claude Code local config
 .claude/
