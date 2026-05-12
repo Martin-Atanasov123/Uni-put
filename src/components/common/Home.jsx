@@ -26,6 +26,23 @@ const GlobeScene = lazy(() => import("@/components/landing/GlobeScene"));
 // AnoAI aurora shader — lazy loaded (Three.js chunk, shared with GlobeScene)
 const AnoAI = lazy(() => import("@/components/landing/AnoAI"));
 
+// ── Gradient dot grid background ────────────────────────────────────────────
+function DotsBg({ cyanOpacity = 0.1, violetOpacity = 0.07, size = 26 }) {
+    return (
+        <div
+            aria-hidden
+            style={{
+                position: "absolute", inset: 0,
+                backgroundImage: `radial-gradient(circle, rgba(6,182,212,${cyanOpacity}) 1px, transparent 1px), radial-gradient(circle, rgba(139,92,246,${violetOpacity}) 1px, transparent 1px)`,
+                backgroundSize: `${size}px ${size}px, ${size}px ${size}px`,
+                backgroundPosition: `0 0, ${size / 2}px ${size / 2}px`,
+                pointerEvents: "none",
+                zIndex: 0,
+            }}
+        />
+    );
+}
+
 // ── Animation primitives ────────────────────────────────────────────────────
 
 const EASE = [0.16, 1, 0.3, 1];
@@ -97,6 +114,7 @@ function HeroSection() {
             className="relative min-h-screen overflow-hidden"
             style={{ background: "var(--brand-bg)" }}
         >
+            <DotsBg cyanOpacity={0.07} violetOpacity={0.05} size={32} />
             {/* ── Layer 0: AnoAI shader — само в долната половина ── */}
             <Suspense fallback={null}>
                 <div
@@ -374,10 +392,11 @@ const STEPS = [
 function HowItWorksSection() {
     return (
         <section
-            className="py-28 px-6"
+            className="py-28 px-6 relative overflow-hidden"
             style={{ background: "var(--brand-bg)" }}
         >
-            <div className="max-w-6xl mx-auto">
+            <DotsBg cyanOpacity={0.09} violetOpacity={0.06} size={28} />
+            <div className="max-w-6xl mx-auto" style={{ position: "relative", zIndex: 1 }}>
                 <Reveal className="text-center mb-16">
                     <p className="text-xs font-bold tracking-widest uppercase mb-4"
                         style={{ color: "var(--brand-cyan)" }}>
@@ -496,8 +515,9 @@ const FEATURES = [
 
 function FeaturesSection() {
     return (
-        <section className="py-28 px-6" style={{ background: "var(--brand-bg-alt)" }}>
-            <div className="max-w-6xl mx-auto">
+        <section className="py-28 px-6 relative overflow-hidden" style={{ background: "var(--brand-bg-alt)" }}>
+            <DotsBg cyanOpacity={0.06} violetOpacity={0.09} size={30} />
+            <div className="max-w-6xl mx-auto" style={{ position: "relative", zIndex: 1 }}>
                 <Reveal className="text-center mb-16">
                     <p className="text-xs font-bold tracking-widest uppercase mb-4"
                         style={{ color: "var(--brand-violet)" }}>
@@ -699,6 +719,7 @@ function TrustSection() {
             className="py-24 px-6 relative overflow-hidden"
             style={{ background: "var(--brand-bg)", borderTop: "1px solid var(--brand-border)" }}
         >
+            <DotsBg cyanOpacity={0.08} violetOpacity={0.06} size={26} />
             <m.div
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -813,16 +834,7 @@ function CTASection() {
             />
 
             {/* Dot grid */}
-            <div
-                aria-hidden
-                style={{
-                    position: "absolute", inset: 0,
-                    backgroundImage: "radial-gradient(rgba(148,163,184,0.05) 1px, transparent 1px)",
-                    backgroundSize: "32px 32px",
-                    pointerEvents: "none",
-                    zIndex: 1,
-                }}
-            />
+            <DotsBg cyanOpacity={0.08} violetOpacity={0.07} size={30} />
 
             {/* ── Text content — left-aligned on desktop, centred on mobile ── */}
             <div

@@ -318,7 +318,7 @@ function GroupCard({ group, total, specialties, univCount, cityCount, onSelect, 
                 <div style={{ flex: 1, position: "relative", zIndex: 1, minWidth: 0 }}>
                     {/* Group name instead of generic "НАПРАВЛЕНИЕ" */}
                     <div style={{
-                        fontSize: "11px", fontWeight: 700, color: group.accent,
+                        fontSize: "13px", fontWeight: 700, color: group.accent,
                         marginBottom: "0.25rem", lineHeight: 1.3,
                         overflow: "hidden", textOverflow: "ellipsis",
                         display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",

@@ -390,7 +390,7 @@ export default function CalculatorPage() {
                     <div style={{ display: "flex", alignItems: "flex-start", gap: "0.625rem", padding: "0.875rem 1rem", background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.2)", borderRadius: "0.875rem", maxWidth: "36rem" }}>
                         <AlertCircle size={15} style={{ color: "var(--brand-violet)", flexShrink: 0, marginTop: "1px" }} />
                         <p style={{ fontSize: "13px", color: "var(--brand-muted)", margin: 0, lineHeight: 1.5 }}>
-                            Все още се работи по добавянето на всички университети. Ако не намирате своята специалност, изчакайте скоро.
+                            Все още се работи по добавянето на всички университети. Ако не намирате своята специалност, очаквайте скоро.
                         </p>
                     </div>
                 </m.div>
