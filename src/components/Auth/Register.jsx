@@ -210,6 +210,7 @@ const SignUp = () => {
                             icon={Lock}
                             type={showPassword ? "text" : "password"}
                             placeholder="••••••••"
+                            autoComplete="new-password"
                             value={password}
                             onChange={e => setPassword(e.target.value)}
                             right={

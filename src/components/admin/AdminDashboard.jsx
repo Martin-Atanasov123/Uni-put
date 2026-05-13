@@ -50,7 +50,7 @@ const AdminDashboard = () => {
         try {
             const { data, error } = await supabase
                 .from("admin_audit_log")
-                .select("*")
+                .select("id,created_at,action,table_name,payload")
                 .order("created_at", { ascending: false })
                 .limit(50);
             if (error) throw error;

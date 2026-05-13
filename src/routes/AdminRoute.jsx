@@ -2,7 +2,7 @@
 // Описание: Осигурява достъп до административни секции само за потребители
 //   с роля "admin", дефинирана в app_metadata (не може да се променя от клиента).
 // Вход: { children } - JSX за рендериране при налична админ роля
-// Изход: children ако потребителят е администратор; пренасочване към "/" иначе
+// Изход: children ако потребителят е администратор; 404 иначе (не разкрива съществуването на маршрута)
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -15,11 +15,12 @@ const AdminRoute = ({ children }) => {
         </div>
     );
 
-    // Проверка за админ роля чрез app_metadata (защитена от клиентска промяна)
+    // Проверка за админ роля чрез app_metadata (защитена от клиентска промяна).
+    // При отказ → 404 вместо "/" за да не се разкрива съществуването на admin панела.
     const isAdmin = user?.app_metadata?.role === "admin";
 
     if (!user || !isAdmin) {
-        return <Navigate to="/" replace />;
+        return <Navigate to="/not-found" replace />;
     }
 
     return children;

@@ -157,22 +157,31 @@ export default function CalculatorPage() {
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const cities = [...new Set(allData.map(d => d.city).filter(Boolean))].sort();
-    const universities = [...new Set(allData.map(d => d.university_name).filter(Boolean))].sort();
+    const cities = useMemo(
+        () => [...new Set(allData.map(d => d.city).filter(Boolean))].sort(),
+        [allData]
+    );
+    const universities = useMemo(
+        () => [...new Set(allData.map(d => d.university_name).filter(Boolean))].sort(),
+        [allData]
+    );
 
     const filteredFaculties = useMemo(() => {
         if (dropdownShowAll || !facultySearch) return faculties;
         return faculties.filter(f => f.toLowerCase().includes(facultySearch.toLowerCase()));
     }, [faculties, facultySearch, dropdownShowAll]);
 
-    const filteredData = allData.filter(d => {
+    const filteredData = useMemo(() => allData.filter(d => {
         const matchFaculty = !selectedFaculty || d.faculty === selectedFaculty;
         const matchCity = !selectedCity || d.city === selectedCity;
         const matchUni = !selectedUniversity || d.university_name === selectedUniversity;
         return matchFaculty && matchCity && matchUni;
-    });
+    }), [allData, selectedFaculty, selectedCity, selectedUniversity]);
 
-    const availableSpecialties = [...new Set(filteredData.map(d => d.specialty))].sort();
+    const availableSpecialties = useMemo(
+        () => [...new Set(filteredData.map(d => d.specialty))].sort(),
+        [filteredData]
+    );
 
     useEffect(() => {
         (async () => {
@@ -185,7 +194,7 @@ export default function CalculatorPage() {
             } catch {
                 // corrupt cache — игнорираме, ще се презапише
             }
-            const { data, error } = await supabase.from("universities").select("faculty");
+            const { data, error } = await supabase.from("universities").select("faculty").limit(2000);
             if (error) {
                 // Ако вече имаме факултети от cache-а — продължаваме да работим без да тревожим UI.
                 // Ако нямаме — показваме грешка.
@@ -210,7 +219,8 @@ export default function CalculatorPage() {
             const { data, error } = await supabase
                 .from("universities")
                 .select("id,faculty,specialty,university_name,city,coefficients,formula_description,max_ball")
-                .eq("faculty", selectedFaculty);
+                .eq("faculty", selectedFaculty)
+                .limit(500);
             if (error) {
                 setLoadError("Не успяхме да заредим специалностите за този факултет. Опитай отново.");
                 setAllData([]);

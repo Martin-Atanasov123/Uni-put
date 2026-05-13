@@ -1,4 +1,4 @@
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
@@ -51,6 +51,8 @@ function Arc({ p1, p2, color, opacity = 0.55 }) {
         return new THREE.BufferGeometry().setFromPoints(curve.getPoints(56));
     }, [p1, p2]);
 
+    useEffect(() => () => { geo.dispose(); }, [geo]);
+
     return (
         <line geometry={geo}>
             <lineBasicMaterial color={color} opacity={opacity} transparent />
@@ -64,10 +66,12 @@ function GlobeGroup() {
     const groupRef = useRef();
     const ringsRef = useRef();
 
-    // Wireframe sphere
+    // Wireframe sphere — intermediate SphereGeometry disposed immediately
     const wireGeo = useMemo(() => {
         const sphere = new THREE.SphereGeometry(RADIUS, 30, 22);
-        return new THREE.WireframeGeometry(sphere);
+        const wf = new THREE.WireframeGeometry(sphere);
+        sphere.dispose();
+        return wf;
     }, []);
 
     // Surface dots — Fibonacci spiral for even distribution
@@ -100,6 +104,11 @@ function GlobeGroup() {
             })),
         []
     );
+
+    useEffect(() => () => {
+        wireGeo.dispose();
+        dotGeo.dispose();
+    }, [wireGeo, dotGeo]);
 
     // Continuous rotation — globe + independent ring drift
     useFrame(({ clock }) => {

@@ -125,7 +125,7 @@ export const adminService = {
     }
 
     if (!rows.length) {
-      const { data, error } = await supabase.from(table).select("*");
+      const { data, error } = await supabase.from(table).select("*").limit(5000);
       if (error) {
         throw error;
       }
@@ -191,7 +191,7 @@ export const adminService = {
    */
   async exportAll(table) {
     assertAllowedTable(table);
-    const { data, error } = await supabase.from(table).select("*");
+    const { data, error } = await supabase.from(table).select("*").limit(10000);
     if (error) throw error;
     return data || [];
   }

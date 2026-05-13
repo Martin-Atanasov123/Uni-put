@@ -1,8 +1,15 @@
 import { supabase } from './supabase';
-import { 
+import {
     calculateScores,
     calculateHybridCompatibility
 } from './riasec-matcher';
+
+const SPECIALTY_RIASEC_COLS =
+    'id,specialty_base_name,riasec_code,category';
+const CAREERS_COLS =
+    'id,career_name_bg,career_name_en,riasec_code,category,salary_range_bgn,required_education,growth_outlook';
+const DORMITORIES_COLS =
+    'id,name,university_id,city,address,price_min,price_max,rooms_available,website_url,notes';
 
 /**
  * Matching за специалности и професии на базата на RIASEC резултати.
@@ -14,13 +21,13 @@ export async function getRiasecMatches(userScores) {
     try {
         let { data: specialtiesData, error: specError } = await supabase
             .from('specialty_riasec_mapping')
-            .select('*, universities(id, university_name, city, max_ball)');
+            .select(`${SPECIALTY_RIASEC_COLS}, universities(id, university_name, city, max_ball)`);
 
         if (specError && specError.code === 'PGRST200') {
             const { data: standaloneSpecs, error: standaloneError } = await supabase
                 .from('specialty_riasec_mapping')
-                .select('*');
-            
+                .select(SPECIALTY_RIASEC_COLS);
+
             if (standaloneError) throw standaloneError;
             specialtiesData = standaloneSpecs;
         } else if (specError) {
@@ -29,7 +36,7 @@ export async function getRiasecMatches(userScores) {
 
         const { data: careersData, error: careerError } = await supabase
             .from('careers_riasec_mapping')
-            .select('*');
+            .select(CAREERS_COLS);
 
         if (careerError) {
             throw careerError;
@@ -86,11 +93,12 @@ export async function getRiasecMatches(userScores) {
 export async function getCareersByRiasec(riasecCode) {
     if (!riasecCode) return [];
     const firstLetter = riasecCode.charAt(0);
-    
+
     const { data, error } = await supabase
         .from('careers_riasec_mapping')
-        .select('*')
-        .ilike('riasec_code', `${firstLetter}%`);
+        .select(CAREERS_COLS)
+        .ilike('riasec_code', `${firstLetter}%`)
+        .limit(50);
 
     if (error) {
         return [];
@@ -108,8 +116,9 @@ export async function getSpecialtiesByRiasec(riasecCode) {
 
     const { data, error } = await supabase
         .from('specialty_riasec_mapping')
-        .select('*, universities(id)')
-        .ilike('riasec_code', `${firstLetter}%`);
+        .select(`${SPECIALTY_RIASEC_COLS}, universities(id)`)
+        .ilike('riasec_code', `${firstLetter}%`)
+        .limit(100);
 
     if (error) {
         return [];
@@ -125,7 +134,7 @@ export async function getSpecialtiesByRiasec(riasecCode) {
 export async function getCareerRecommendations(answers) {
     const rawScores = calculateScores(answers);
     const { careers } = await getRiasecMatches(rawScores);
-    
+
     return careers.map(c => ({
         ...c,
         matchScore: c.compatibility // Унифициране на именуването за обратна съвместимост
@@ -140,7 +149,7 @@ export async function getCareerRecommendations(answers) {
 export async function getUniversityRecommendations(answers) {
     const rawScores = calculateScores(answers);
     const { specialties } = await getRiasecMatches(rawScores);
-    
+
     // Преобразуваме структурата за обратна съвместимост с калкулатора
     const results = [];
     specialties.forEach(spec => {
@@ -165,9 +174,9 @@ export async function getAllRiasecCodes() {
         .from('careers_riasec_mapping')
         .select('riasec_code')
         .not('riasec_code', 'is', null);
-        
+
     if (error) return [];
-    
+
     // Уникални кодове
     const codes = [...new Set(data.map(item => item.riasec_code))].sort();
     return codes;
@@ -180,7 +189,8 @@ export async function getAllRiasecCodes() {
 export async function getAllDormitories() {
     const { data, error } = await supabase
         .from('dormitories')
-        .select('*');
+        .select(DORMITORIES_COLS)
+        .limit(200);
 
     if (error) {
         return [];
