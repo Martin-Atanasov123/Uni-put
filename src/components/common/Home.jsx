@@ -108,6 +108,19 @@ function useCountUp(end, duration = 1400, trigger) {
 // ── HERO ────────────────────────────────────────────────────────────────────
 
 function HeroSection() {
+    // Defer Three.js shader until AFTER the hero text has painted.
+    // Without this, the browser tries to download vendor-three-core (189 kB gzip)
+    // in parallel with the critical React bundle, adding ~400-700 ms to FCP on
+    // slow connections. Setting state in a double-rAF fires after first paint.
+    const [anoaiReady, setAnoaiReady] = useState(false);
+    useEffect(() => {
+        let r1, r2;
+        r1 = requestAnimationFrame(() => {
+            r2 = requestAnimationFrame(() => setAnoaiReady(true));
+        });
+        return () => { cancelAnimationFrame(r1); cancelAnimationFrame(r2); };
+    }, []);
+
     return (
         <section
             data-testid="hero-section"
@@ -115,22 +128,24 @@ function HeroSection() {
             style={{ background: "var(--brand-bg)" }}
         >
             <DotsBg cyanOpacity={0.07} violetOpacity={0.05} size={32} />
-            {/* ── Layer 0: AnoAI shader — само в долната половина ── */}
-            <Suspense fallback={null}>
-                <div
-                    aria-hidden
-                    style={{
-                        position: "absolute",
-                        top: "0%", bottom: 0, left: 0, right: 0,
-                        zIndex: 1,
-                        pointerEvents: "none",
-                        filter: "blur(2.5px)",
-                        transform: "scale(1.02)",
-                    }}
-                >
-                    <AnoAI style={{ position: "absolute", inset: 0 }} />
-                </div>
-            </Suspense>
+            {/* ── Layer 0: AnoAI shader — deferred until after first paint ── */}
+            {anoaiReady && (
+                <Suspense fallback={null}>
+                    <div
+                        aria-hidden
+                        style={{
+                            position: "absolute",
+                            top: "0%", bottom: 0, left: 0, right: 0,
+                            zIndex: 1,
+                            pointerEvents: "none",
+                            filter: "blur(2.5px)",
+                            transform: "scale(1.02)",
+                        }}
+                    >
+                        <AnoAI style={{ position: "absolute", inset: 0 }} />
+                    </div>
+                </Suspense>
+            )}
 
             {/* ── Layer 2: centred hero text ── */}
             <div

@@ -23,15 +23,23 @@ export default defineConfig({
   },
   build: {
     sourcemap: false,
-    // Inject <link rel="modulepreload"> for critical chunks so the browser can
-    // fetch them in parallel with the main bundle parse instead of sequentially.
-    modulePreload: { polyfill: true },
+    modulePreload: {
+      polyfill: true,
+      // Surgically exclude Three.js chunks from modulepreload injection.
+      // Without this filter, Vite would add <link rel="modulepreload"> for the
+      // 189 kB three-core chunk on EVERY page, stealing bandwidth from the 32 kB
+      // React bundle and delaying FCP/LCP by 300-700 ms on slow connections.
+      // Three.js is only needed after first paint (see AnoAI deferral in Home.jsx),
+      // so we let it download lazily instead of eagerly.
+      resolveDependencies: (filename, deps) =>
+        deps.filter(dep => !/vendor-three/.test(dep)),
+    },
     rollupOptions: {
       output: {
         manualChunks: {
           'vendor-react':  ['react', 'react-dom', 'react-router-dom'],
-          // Split Three.js into three separate chunks so only the core geometry
-          // math is fetched first; R3F and Drei load separately on demand.
+          // Three.js split into three chunks so each can be cached independently.
+          // No modulepreload hint (filtered above) — loads lazily after first paint.
           'vendor-three-core':  ['three'],
           'vendor-three-fiber': ['@react-three/fiber'],
           'vendor-three-drei':  ['@react-three/drei'],
@@ -41,6 +49,6 @@ export default defineConfig({
         },
       },
     },
-    chunkSizeWarningLimit: 1600, // Three.js chunks are large by nature; expected
+    chunkSizeWarningLimit: 1600,
   },
 })

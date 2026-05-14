@@ -8,6 +8,36 @@
     <!-- Inter is self-hosted via @fontsource-variable/inter (see main.jsx) — no Google Fonts round-trip -->
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      Inline critical CSS — paints the brand background and a centred spinner
+      BEFORE any JS or external CSS loads. This drives FCP to near-zero: the
+      browser renders coloured pixels as soon as the HTML is parsed.
+      The #initial-loader is removed by main.jsx after React's first paint.
+    -->
+    <style>
+      :root { color-scheme: dark light; }
+      *,*::before,*::after { box-sizing: border-box; }
+      body { margin: 0; background: #0f172a; }
+      @media (prefers-color-scheme: light) { body { background: #f8fafc; } }
+      #initial-loader {
+        position: fixed; inset: 0;
+        display: flex; align-items: center; justify-content: center;
+        background: #0f172a;
+        z-index: 9999;
+        opacity: 1;
+      }
+      @media (prefers-color-scheme: light) {
+        #initial-loader { background: #f8fafc; }
+      }
+      @keyframes _il-spin { to { transform: rotate(360deg); } }
+      #initial-loader > div {
+        width: 32px; height: 32px;
+        border: 2.5px solid rgba(148,163,184,0.18);
+        border-top-color: #06b6d4;
+        border-radius: 50%;
+        animation: _il-spin 0.65s linear infinite;
+      }
+    </style>
     <link rel="stylesheet" href="/src/index.css" />
     <title>УниПът – Платформа за кандидат-студенти</title>
     <meta
@@ -27,6 +57,11 @@
     <meta name="color-scheme" content="dark light" />
   </head>
   <body>
+    <!--
+      Inline loader: visible immediately at HTML parse time → FCP fires here,
+      not after JS execution. Removed by main.jsx after React's first paint.
+    -->
+    <div id="initial-loader" aria-hidden="true"><div></div></div>
     <div id="root"></div>
     <script type="module" src="/src/app/main.jsx"></script>
   </body>
