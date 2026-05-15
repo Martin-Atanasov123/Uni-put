@@ -21,6 +21,7 @@ import {
     Zap,
     Copy,
     Check,
+    ExternalLink,
 } from "lucide-react";
 import GradeInputSection from "./GradeInputSection";
 import ReportButton from "./ReportButton";
@@ -218,7 +219,7 @@ export default function CalculatorPage() {
         (async () => {
             const { data, error } = await supabase
                 .from("universities")
-                .select("id,faculty,specialty,university_name,city,coefficients,formula_description,max_ball")
+                .select("id,faculty,specialty,university_name,city,coefficients,formula_description,max_ball,website_url")
                 .eq("faculty", selectedFaculty)
                 .limit(500);
             if (error) {
@@ -823,7 +824,29 @@ export default function CalculatorPage() {
                                     {/* Top: name + score */}
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "1rem" }}>
                                         <div style={{ flex: 1, minWidth: 0 }}>
-                                            <div style={{ fontSize: "11px", color: "var(--brand-muted)", marginBottom: "0.25rem", fontWeight: 600 }}>{item.university_name}</div>
+                                            {item.website_url ? (
+                                                <a
+                                                    href={item.website_url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    title="Провери официалните данни за прием"
+                                                    style={{
+                                                        display: "inline-flex", alignItems: "center", gap: "0.25rem",
+                                                        fontSize: "11px", fontWeight: 600,
+                                                        color: "var(--brand-muted)",
+                                                        textDecoration: "none",
+                                                        marginBottom: "0.25rem",
+                                                        transition: "color 0.15s",
+                                                    }}
+                                                    onMouseEnter={e => e.currentTarget.style.color = "var(--brand-cyan)"}
+                                                    onMouseLeave={e => e.currentTarget.style.color = "var(--brand-muted)"}
+                                                >
+                                                    {item.university_name}
+                                                    <ExternalLink size={10} strokeWidth={2} />
+                                                </a>
+                                            ) : (
+                                                <div style={{ fontSize: "11px", color: "var(--brand-muted)", marginBottom: "0.25rem", fontWeight: 600 }}>{item.university_name}</div>
+                                            )}
                                             <h3 style={{ fontSize: "15px", fontWeight: 700, color: "var(--brand-text)", lineHeight: 1.4, margin: 0 }}>{item.specialty}</h3>
                                         </div>
                                         <div style={{ textAlign: "right", flexShrink: 0 }}>
