@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { m } from "motion/react";
-import { ArrowLeft, ArrowRight, Calculator, MapPin, GraduationCap, Building2, AlertCircle, Database } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calculator, MapPin, GraduationCap, Building2, AlertCircle, Database, ChevronRight } from "lucide-react";
 import { universityService } from "@/services/universityService";
 import { slugify } from "@/lib/slugify";
 import Seo from "@/components/common/Seo";
@@ -245,26 +245,34 @@ export default function UniversityPage() {
                                 gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
                             }}>
                                 {fac.specs.map((s) => (
-                                    <li
-                                        key={s.id}
-                                        style={{
-                                            padding: "0.625rem 0.875rem",
-                                            background: "var(--brand-surface-2)",
-                                            border: CARD_BORDER, borderRadius: "0.625rem",
-                                            display: "flex", alignItems: "center",
-                                            justifyContent: "space-between", gap: "0.75rem",
-                                            fontSize: "0.875rem",
-                                        }}
-                                    >
-                                        <span style={{ flex: 1 }}>{s.specialty}</span>
-                                        {s.max_ball ? (
-                                            <span style={{
-                                                fontFamily: "monospace", fontSize: "0.75rem",
-                                                color: "var(--brand-cyan)", fontWeight: 700,
-                                            }}>
-                                                макс. {s.max_ball}
-                                            </span>
-                                        ) : null}
+                                    <li key={s.id} style={{ display: "flex" }}>
+                                        <Link
+                                            to={`/calculator?specialty=${encodeURIComponent(s.specialty)}&university=${encodeURIComponent(uniName)}`}
+                                            style={{
+                                                flex: 1,
+                                                padding: "0.625rem 0.875rem",
+                                                background: "var(--brand-surface-2)",
+                                                border: CARD_BORDER, borderRadius: "0.625rem",
+                                                display: "flex", alignItems: "center",
+                                                justifyContent: "space-between", gap: "0.5rem",
+                                                fontSize: "0.875rem",
+                                                color: "var(--brand-text)",
+                                                textDecoration: "none",
+                                                transition: "border-color 0.18s, transform 0.18s, background 0.18s",
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.borderColor = "var(--brand-cyan)";
+                                                e.currentTarget.style.transform = "translateX(2px)";
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.borderColor = "var(--brand-card-border)";
+                                                e.currentTarget.style.transform = "translateX(0)";
+                                            }}
+                                            title="Изчисли бал за тази специалност"
+                                        >
+                                            <span style={{ flex: 1 }}>{s.specialty}</span>
+                                            <ChevronRight size={14} strokeWidth={1.5} color="var(--brand-cyan)" style={{ flexShrink: 0 }} />
+                                        </Link>
                                     </li>
                                 ))}
                             </ul>

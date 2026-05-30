@@ -236,14 +236,23 @@ export default function CalculatorPage() {
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const sp = params.get("specialty")?.slice(0, 100).replace(/[%_\\]/g, "");
+        const uni = params.get("university")?.slice(0, 200).replace(/[%_\\]/g, "");
         if (!sp) return;
         (async () => {
-            const { data, error } = await supabase.from("universities").select("faculty,specialty").ilike("specialty", `%${sp}%`).limit(1);
+            // Ако имаме и university — exact match (избягваме грешен hit от ilike при близки имена).
+            let q = supabase.from("universities").select("faculty,specialty,university_name");
+            if (uni) {
+                q = q.eq("specialty", sp).eq("university_name", uni);
+            } else {
+                q = q.ilike("specialty", `%${sp}%`);
+            }
+            const { data, error } = await q.limit(1);
             if (error || !data?.length) return;
             const match = data[0];
             setPendingSpecialty(match.specialty);
             setSelectedFaculty(match.faculty);
             setFacultySearch(match.faculty);
+            if (uni) setSelectedUniversity(match.university_name);
         })();
     }, [location.search]);
 

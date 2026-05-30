@@ -9,7 +9,9 @@ const SPECIALTY_RIASEC_COLS =
 const CAREERS_COLS =
     'id,career_name_bg,career_name_en,riasec_code,category,salary_range_bgn,required_education,growth_outlook';
 const DORMITORIES_COLS =
-    'id,name,university_id,city,address,price_min,price_max,rooms_available,website_url,notes';
+    'id,university_id,city,block_number,application_period,monthly_rent_avg,deposit_amount,' +
+    'condition_rating,commute_minutes,distance_to_uni_km,google_maps_url,' +
+    'has_private_bathroom,is_renovated,transport_lines';
 
 /**
  * Matching за специалности и професии на базата на RIASEC резултати.
@@ -193,6 +195,9 @@ export async function getAllDormitories() {
         .limit(200);
 
     if (error) {
+        // Не поглъщай мълчаливо — в миналото DORMITORIES_COLS се разминаваше
+        // със схемата и страницата показваше „0 резултата" без следа за причината.
+        console.error('[getAllDormitories] Supabase error:', error.message);
         return [];
     }
     return data;
