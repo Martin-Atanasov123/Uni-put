@@ -12,6 +12,7 @@ const PAGE_SIZE_DEFAULT = 200;
 
 const CITIES_CACHE_KEY = 'uniput_cities_cache_v1';
 const CITIES_CACHE_TTL = 1000 * 60 * 60 * 24; // 24h
+const UNI_NAMES_CACHE_KEY = 'uniput_uni_names_cache_v1';
 
 // Синоними — когато потребителят пише "право" искаме да хване и "юридически науки" и т.н.
 const SPECIALTY_SYNONYMS = {
@@ -99,6 +100,53 @@ export const universityService = {
      * Връща списък с уникални градове. Кешира се в localStorage за 24h.
      * @returns {Promise<Array<string>>}
      */
+    /**
+     * Списък с уникалните имена на университети. Малък payload (~24 записа),
+     * кешира се 24h. Използва се за резолване на /universities/[slug] → name.
+     * @returns {Promise<Array<string>>}
+     */
+    async getUniversityNames() {
+        try {
+            const raw = localStorage.getItem(UNI_NAMES_CACHE_KEY);
+            if (raw) {
+                const { ts, data } = JSON.parse(raw);
+                if (Date.now() - ts < CITIES_CACHE_TTL && Array.isArray(data) && data.length) {
+                    return data;
+                }
+            }
+        } catch { /* corrupt cache */ }
+
+        const { data, error } = await supabase
+            .from('universities')
+            .select('university_name');
+        if (error) throw error;
+
+        const unique = [...new Set((data || []).map((d) => d.university_name).filter(Boolean))]
+            .sort((a, b) => a.localeCompare(b, 'bg'));
+
+        try {
+            localStorage.setItem(UNI_NAMES_CACHE_KEY,
+                JSON.stringify({ ts: Date.now(), data: unique }));
+        } catch { /* localStorage full */ }
+        return unique;
+    },
+
+    /**
+     * Всички записи за конкретен университет — групирани по факултет в UI слоя.
+     * @param {string} name - точно име на университета (от getUniversityNames)
+     * @returns {Promise<Array>}
+     */
+    async getByUniversityName(name) {
+        if (!name) return [];
+        const { data, error } = await supabase
+            .from('universities')
+            .select(SLIM_COLS)
+            .eq('university_name', name)
+            .order('faculty', { ascending: true });
+        if (error) throw error;
+        return data || [];
+    },
+
     async getCities() {
         // 1. Опит за cache
         try {

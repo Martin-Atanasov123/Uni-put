@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import { universityService } from "@/services/universityService";
 import { useAuth } from "@/hooks/useAuth";
 import Seo from "@/components/common/Seo";
+import { slugify } from "@/lib/slugify";
 
 // ─── rsvu.mon.bg High-level groups ──────────────────────────────────────────
 // Matches the official МОН classification 
@@ -464,7 +465,13 @@ function SpecialtyCard({ uni, isFav, onToggleFav, showUser }) {
                 </h2>
                 <p style={{ fontSize: "12px", color: "var(--brand-muted)", display: "flex", alignItems: "center", gap: "0.3rem", fontWeight: 500, margin: 0 }}>
                     <School size={12} style={{ flexShrink: 0 }} />
-                    {uni.university_name}
+                    <Link
+                        to={`/universities/${slugify(uni.university_name)}`}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ color: "inherit", textDecoration: "none", borderBottom: "1px dotted var(--brand-border)" }}
+                    >
+                        {uni.university_name}
+                    </Link>
                 </p>
                 {uni.faculty && uni.faculty !== uni.specialty && (
                     <p style={{ fontSize: "11px", color: "var(--brand-muted)", display: "flex", alignItems: "center", gap: "0.3rem", fontWeight: 400, opacity: 0.65, margin: "0.2rem 0 0" }}>

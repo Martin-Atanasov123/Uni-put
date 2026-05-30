@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-const SITE_URL = "https://uniput.bg";
+const SITE_URL = "https://uniput.eu";
 const SITE_NAME = "УниПът";
 const DEFAULT_IMAGE = `${SITE_URL}/university.png`;
 

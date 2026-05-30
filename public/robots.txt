@@ -11,4 +11,4 @@ Disallow: /profile
 Disallow: /favorites
 Disallow: /my-grades
 
-Sitemap: https://uniput.bg/sitemap.xml
+Sitemap: https://uniput.eu/sitemap.xml
