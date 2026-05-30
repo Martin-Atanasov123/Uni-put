@@ -1,4 +1,5 @@
 import { ShieldCheck } from "lucide-react";
+import Seo from "@/components/common/Seo";
 
 const SECTIONS = [
     {
@@ -48,6 +49,11 @@ const SECTIONS = [
 const PrivacyPolicy = () => {
     return (
         <div style={{ minHeight: "100vh", background: "var(--brand-bg)", color: "var(--brand-text)", padding: "7rem 1.5rem 4rem", position: "relative", overflow: "hidden" }}>
+            <Seo
+                title="Политика за поверителност"
+                description="Как УниПът събира, използва и защитава личните ти данни — в съответствие с GDPR."
+                path="/privacy"
+            />
             <div aria-hidden style={{ position: "absolute", top: "-200px", left: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(139,92,246,0.1), transparent 70%)", pointerEvents: "none" }} />
 
             <div style={{ maxWidth: "820px", margin: "0 auto", position: "relative" }}>

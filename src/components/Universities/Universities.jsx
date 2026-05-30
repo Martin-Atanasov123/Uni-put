@@ -9,6 +9,7 @@ import {
 import { Link } from "react-router-dom";
 import { universityService } from "@/services/universityService";
 import { useAuth } from "@/hooks/useAuth";
+import Seo from "@/components/common/Seo";
 
 // ─── rsvu.mon.bg High-level groups ──────────────────────────────────────────
 // Matches the official МОН classification 
@@ -690,6 +691,11 @@ export default function UniversitiesPage() {
             style={{ minHeight: "100vh", background: "var(--brand-bg)", paddingTop: "7rem", paddingBottom: "5rem" }}
             onClick={() => setShowSuggestions(false)}
         >
+            <Seo
+                title="Университети и специалности"
+                description="Сравни факултети, специалности и градове в българските университети. Намери своята специалност и изчисли приемния си бал."
+                path="/universities"
+            />
             <div style={{ maxWidth: "80rem", margin: "0 auto", padding: "0 1.5rem" }}>
 
                 {/* ── Header ───────────────────────────────────────────── */}

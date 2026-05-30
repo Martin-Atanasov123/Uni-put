@@ -1,2 +1,14 @@
 User-agent: *
 Allow: /
+
+# Лични и административни маршрути — без индексиране
+Disallow: /admin
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /update-password
+Disallow: /profile
+Disallow: /favorites
+Disallow: /my-grades
+
+Sitemap: https://uniput.bg/sitemap.xml

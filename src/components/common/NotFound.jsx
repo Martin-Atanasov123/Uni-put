@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Home, ArrowRight, AlertCircle } from "lucide-react";
 import { m } from "motion/react";
+import Seo from "@/components/common/Seo";
 
 export default function NotFound() {
     return (
@@ -16,6 +17,7 @@ export default function NotFound() {
                 overflow: "hidden",
             }}
         >
+            <Seo title="Страницата не е намерена" path="/404" noindex />
             <div aria-hidden style={{ position: "absolute", top: "-200px", left: "50%", transform: "translateX(-50%)", width: "640px", height: "640px", background: "radial-gradient(circle, rgba(139,92,246,0.12), transparent 70%)", pointerEvents: "none" }} />
             <div aria-hidden style={{ position: "absolute", bottom: "-200px", left: "10%", width: "400px", height: "400px", background: "radial-gradient(circle, rgba(6,182,212,0.1), transparent 70%)", pointerEvents: "none" }} />
 

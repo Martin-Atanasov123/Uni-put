@@ -2,6 +2,7 @@ import { useRef, useState, useEffect, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { m, useInView } from "motion/react";
 import { useAuth } from "@/hooks/useAuth";
+import Seo from "@/components/common/Seo";
 
 import {
     Brain,
@@ -959,6 +960,11 @@ export default function Home() {
             className="landing-page"
             style={{ background: "var(--brand-bg)", minHeight: "100vh" }}
         >
+            <Seo
+                title="Платформа за кандидат-студенти"
+                description="Изчисли приемния си бал, открий подходяща кариера с RIASEC тест и сравни българските университети — безплатно, на едно място."
+                path="/"
+            />
             <HeroSection />
             <StatStripSection />
             <HowItWorksSection />

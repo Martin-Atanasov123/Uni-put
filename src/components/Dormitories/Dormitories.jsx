@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { m } from "motion/react";
 import { getAllDormitories } from "@/lib/api";
+import Seo from "@/components/common/Seo";
 import {
     Building2,
     MapPin,
@@ -294,6 +295,11 @@ const Dormitories = () => {
 
     return (
         <div style={{ minHeight: "100vh", background: "var(--brand-bg)", padding: "7rem 1.5rem 3rem", color: "var(--brand-text)" }}>
+            <Seo
+                title="Студентски общежития"
+                description="Намери студентско общежитие по град и университет — цени, условия и местоположение на едно място."
+                path="/dormitories"
+            />
             <style>{`@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`}</style>
 
             <div style={{ maxWidth: "1200px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "2rem" }}>

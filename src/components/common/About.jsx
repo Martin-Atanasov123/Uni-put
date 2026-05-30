@@ -1,5 +1,6 @@
 import { Mail, Github, Code2, Briefcase, Users, Lightbulb, Database, BookOpen, Calculator, Brain } from "lucide-react";
 import { m } from "motion/react";
+import Seo from "@/components/common/Seo";
 
 const TEAM = [
     {
@@ -169,6 +170,11 @@ const About = () => {
             style={{ minHeight: "100vh", background: "var(--brand-bg)", color: "var(--brand-text)", padding: "7rem 1.5rem 4rem", position: "relative", overflow: "hidden" }}
             aria-labelledby="about-title"
         >
+            <Seo
+                title="За нас"
+                description="Защо създадохме УниПът — безплатна платформа, която помага на българските кандидат-студенти да изчислят бал, открият кариера и сравнят университети."
+                path="/about"
+            />
             <div aria-hidden style={{ position: "absolute", top: "-200px", right: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(6,182,212,0.08), transparent 70%)", pointerEvents: "none" }} />
             <div aria-hidden style={{ position: "absolute", bottom: "20%", left: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(139,92,246,0.08), transparent 70%)", pointerEvents: "none" }} />
 

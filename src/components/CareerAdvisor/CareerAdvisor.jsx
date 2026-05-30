@@ -4,6 +4,7 @@ import { calculateScores, calculateRiasecCode } from "@/lib/riasec-matcher";
 import { getRiasecMatches } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import riasecData from "@/data/riasec_questions.json";
+import Seo from "@/components/common/Seo";
 import {
     CheckCircle2,
     ChevronRight,
@@ -450,6 +451,11 @@ const CareerAdvisor = () => {
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             style={{ minHeight: "100vh", background: "var(--brand-bg)", color: "var(--brand-text)", paddingTop: step === "quiz" ? "5rem" : "6rem", paddingBottom: "5rem", position: "relative", overflow: "hidden" }}
         >
+            <Seo
+                title="Кариерен тест RIASEC"
+                description="Направи безплатния RIASEC кариерен тест — 30 въпроса разкриват кои специалности пасват на твоите интереси и силни страни."
+                path="/career-advisor"
+            />
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
             {/* ambient glow */}

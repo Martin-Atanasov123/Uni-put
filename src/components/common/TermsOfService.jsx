@@ -1,4 +1,5 @@
 import { ScrollText } from "lucide-react";
+import Seo from "@/components/common/Seo";
 
 const SECTIONS = [
     {
@@ -36,6 +37,11 @@ const SECTIONS = [
 const TermsOfService = () => {
     return (
         <div style={{ minHeight: "100vh", background: "var(--brand-bg)", color: "var(--brand-text)", padding: "7rem 1.5rem 4rem", position: "relative", overflow: "hidden" }}>
+            <Seo
+                title="Условия за ползване"
+                description="Условия за ползване на платформата УниПът."
+                path="/terms"
+            />
             <div aria-hidden style={{ position: "absolute", top: "-200px", right: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(6,182,212,0.1), transparent 70%)", pointerEvents: "none" }} />
 
             <div style={{ maxWidth: "820px", margin: "0 auto", position: "relative" }}>

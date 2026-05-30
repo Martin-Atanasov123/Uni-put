@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from "react";
 import { m, AnimatePresence } from "motion/react";
 import { supabase } from "@/lib/supabase";
 import { useLocation } from "react-router-dom";
+import Seo from "@/components/common/Seo";
 import {
     Calculator,
     TrendingUp,
@@ -382,6 +383,11 @@ export default function CalculatorPage() {
 
     return (
         <div style={{ minHeight: "100vh", background: "var(--brand-bg)", paddingTop: "7rem", paddingBottom: "5rem" }}>
+            <Seo
+                title="Калкулатор за приемен бал"
+                description="Изчисли точния си кандидатстудентски бал по официалните коефициенти на МОН за всяка специалност. Безплатно и без регистрация."
+                path="/calculator"
+            />
             <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 1.5rem" }}>
 
                 {/* Header */}
@@ -824,29 +830,7 @@ export default function CalculatorPage() {
                                     {/* Top: name + score */}
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "1rem" }}>
                                         <div style={{ flex: 1, minWidth: 0 }}>
-                                            {item.website_url ? (
-                                                <a
-                                                    href={item.website_url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    title="Провери официалните данни за прием"
-                                                    style={{
-                                                        display: "inline-flex", alignItems: "center", gap: "0.25rem",
-                                                        fontSize: "11px", fontWeight: 600,
-                                                        color: "var(--brand-muted)",
-                                                        textDecoration: "none",
-                                                        marginBottom: "0.25rem",
-                                                        transition: "color 0.15s",
-                                                    }}
-                                                    onMouseEnter={e => e.currentTarget.style.color = "var(--brand-cyan)"}
-                                                    onMouseLeave={e => e.currentTarget.style.color = "var(--brand-muted)"}
-                                                >
-                                                    {item.university_name}
-                                                    <ExternalLink size={10} strokeWidth={2} />
-                                                </a>
-                                            ) : (
-                                                <div style={{ fontSize: "11px", color: "var(--brand-muted)", marginBottom: "0.25rem", fontWeight: 600 }}>{item.university_name}</div>
-                                            )}
+                                            <div style={{ fontSize: "11px", color: "var(--brand-muted)", marginBottom: "0.25rem", fontWeight: 600 }}>{item.university_name}</div>
                                             <h3 style={{ fontSize: "15px", fontWeight: 700, color: "var(--brand-text)", lineHeight: 1.4, margin: 0 }}>{item.specialty}</h3>
                                         </div>
                                         <div style={{ textAlign: "right", flexShrink: 0 }}>
@@ -892,7 +876,31 @@ export default function CalculatorPage() {
                                             </div>
                                         )}
 
-                                        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.5rem" }}>
+                                            {item.website_url ? (
+                                                <a
+                                                    href={item.website_url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    style={{
+                                                        display: "inline-flex", alignItems: "center", gap: "0.375rem",
+                                                        minHeight: "44px", padding: "0 0.875rem",
+                                                        border: "1px solid var(--brand-border)",
+                                                        borderRadius: "0.625rem",
+                                                        fontSize: "13px", fontWeight: 600,
+                                                        color: "var(--brand-cyan)",
+                                                        textDecoration: "none",
+                                                        background: "rgba(6,182,212,0.06)",
+                                                        transition: "background 0.15s, border-color 0.15s",
+                                                        flexShrink: 0,
+                                                    }}
+                                                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(6,182,212,0.14)"; e.currentTarget.style.borderColor = "var(--brand-cyan)"; }}
+                                                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(6,182,212,0.06)"; e.currentTarget.style.borderColor = "var(--brand-border)"; }}
+                                                >
+                                                    <ExternalLink size={13} strokeWidth={2} />
+                                                    Провери в сайта
+                                                </a>
+                                            ) : <span />}
                                             <ReportButton universityName={item.university_name} specialty={item.specialty} />
                                         </div>
                                     </div>
