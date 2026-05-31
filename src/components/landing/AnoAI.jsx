@@ -156,7 +156,9 @@ export default function AnoAI({ style, className }) {
 
     let rafId;
     let ro;
+    let io;
     let timerId;
+    let onVisibilityChange;
 
     const init = () => {
       const gl = canvas.getContext('webgl');
@@ -177,12 +179,32 @@ export default function AnoAI({ style, className }) {
       const resolutionLoc = gl.getUniformLocation(program, 'iResolution');
       const timeLoc       = gl.getUniformLocation(program, 'iTime');
 
+      // ── Performance стратегия (анимацията НИКОГА не спира) ──────────────
+      // 1) Half-resolution: canvas вътрешно е 50% по-малък, CSS го scale-ва
+      //    обратно. Hero обвивката има filter: blur(2.5px), което прави
+      //    загубата на резолюция визуално невидима. → 4× по-малко fragment
+      //    shader работа.
+      // 2) 30 FPS throttle: пропускаме всеки втори кадър. Ambient ефекти
+      //    изглеждат еднакво гладко при 30fps. → 2× по-малко GPU работа.
+      // 3) Pause при scroll-out (IntersectionObserver) — спираме draw-а
+      //    когато hero е извън viewport-а. Винаги възобновяваме при scroll-in.
+      // 4) Pause при tab не на фокус (Page Visibility API) — спираме draw-а
+      //    при minimized/background tab.
+      //
+      // Общо: ~8× по-малко GPU/compositor работа vs наивна имплементация.
+
+      const RESOLUTION_SCALE = 0.5;
+      const TARGET_FPS = 30;
+      const FRAME_INTERVAL_MS = 1000 / TARGET_FPS;
+
       const resize = () => {
         const { width, height } = canvas.getBoundingClientRect();
-        if (canvas.width !== width || canvas.height !== height) {
-          canvas.width  = width;
-          canvas.height = height;
-          gl.viewport(0, 0, width, height);
+        const targetW = Math.round(width  * RESOLUTION_SCALE);
+        const targetH = Math.round(height * RESOLUTION_SCALE);
+        if (canvas.width !== targetW || canvas.height !== targetH) {
+          canvas.width  = targetW;
+          canvas.height = targetH;
+          gl.viewport(0, 0, targetW, targetH);
         }
       };
 
@@ -191,8 +213,12 @@ export default function AnoAI({ style, className }) {
       resize();
 
       const startTime = Date.now();
+      let lastFrameTime = 0;
+      let isVisible = true;       // hero в viewport
+      let isTabFocused = !document.hidden;
+      let isRendering = false;
 
-      const render = () => {
+      const drawFrame = () => {
         const t = (Date.now() - startTime) / 1000;
         gl.clearColor(0, 0, 0, 1);
         gl.clear(gl.COLOR_BUFFER_BIT);
@@ -203,10 +229,44 @@ export default function AnoAI({ style, className }) {
         gl.vertexAttribPointer(vertexLoc, 2, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vertexLoc);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-        rafId = requestAnimationFrame(render);
       };
 
-      rafId = requestAnimationFrame(render);
+      const renderLoop = (now) => {
+        if (!isVisible || !isTabFocused) {
+          isRendering = false;
+          return; // pause loop напълно — нула GPU работа
+        }
+        // 30fps throttle — пропускаме кадри ако не е минал интервалът
+        if (now - lastFrameTime >= FRAME_INTERVAL_MS) {
+          drawFrame();
+          lastFrameTime = now;
+        }
+        rafId = requestAnimationFrame(renderLoop);
+      };
+
+      const startLoop = () => {
+        if (isRendering) return;
+        if (!isVisible || !isTabFocused) return;
+        isRendering = true;
+        lastFrameTime = 0; // force immediate first frame
+        rafId = requestAnimationFrame(renderLoop);
+      };
+
+      // IntersectionObserver — pause/resume при scroll
+      io = new IntersectionObserver(([entry]) => {
+        isVisible = entry.isIntersecting;
+        if (isVisible) startLoop();
+      }, { threshold: 0 });
+      io.observe(canvas);
+
+      // Page Visibility — pause при minimized/background tab
+      onVisibilityChange = () => {
+        isTabFocused = !document.hidden;
+        if (isTabFocused) startLoop();
+      };
+      document.addEventListener('visibilitychange', onVisibilityChange);
+
+      startLoop();
     };
 
     // Defer shader compilation until after the main thread is idle so LCP (H1) can paint first.
@@ -226,6 +286,8 @@ export default function AnoAI({ style, className }) {
       }
       if (rafId) cancelAnimationFrame(rafId);
       if (ro) ro.disconnect();
+      if (io) io.disconnect();
+      if (onVisibilityChange) document.removeEventListener('visibilitychange', onVisibilityChange);
     };
   }, []);
 
