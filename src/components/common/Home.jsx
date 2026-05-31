@@ -109,18 +109,25 @@ function useCountUp(end, duration = 1400, trigger) {
 // ── HERO ────────────────────────────────────────────────────────────────────
 
 function HeroSection() {
-    // Defer Three.js shader until AFTER the hero text has painted.
-    // Without this, the browser tries to download vendor-three-core (189 kB gzip)
-    // in parallel with the critical React bundle, adding ~400-700 ms to FCP on
-    // slow connections. Setting state in a double-rAF fires after first paint.
+    // Mobile + reduced-motion → пропускаме целия Three.js шейдър.
+    // На <768px устройство 3D ефектът е едва видим, а Three.js core (~730 KB raw)
+    // блокира main thread за 5-10s на по-слаби телефони. PageSpeed mobile тестът
+    // (Moto G Power + Slow 4G) спадаше до Performance 49 заради това.
+    const isMobile = useMediaQuery("(max-width: 768px)");
+    const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+    const enableShader = !isMobile && !prefersReducedMotion;
+
+    // На desktop — отлагаме шейдъра до СЛЕД първото изрисуване, за да не блокира
+    // FCP. Double-rAF гарантира paint-а да премине през compositor.
     const [anoaiReady, setAnoaiReady] = useState(false);
     useEffect(() => {
+        if (!enableShader) return;
         let r1, r2;
         r1 = requestAnimationFrame(() => {
             r2 = requestAnimationFrame(() => setAnoaiReady(true));
         });
         return () => { cancelAnimationFrame(r1); cancelAnimationFrame(r2); };
-    }, []);
+    }, [enableShader]);
 
     return (
         <section
@@ -129,8 +136,26 @@ function HeroSection() {
             style={{ background: "var(--brand-bg)" }}
         >
             <DotsBg cyanOpacity={0.07} violetOpacity={0.05} size={32} />
-            {/* ── Layer 0: AnoAI shader — deferred until after first paint ── */}
-            {anoaiReady && (
+
+            {/* ── Layer 0a: статичен gradient fallback (mobile / reduced-motion) ──
+                Заместване на Three.js шейдъра за phone виewport-и. Чисто CSS,
+                нула JS, нула main-thread cost. Двата radial-gradient-а имитират
+                cyan→violet aurora ефекта без 730 KB Three.js парсване. */}
+            {!enableShader && (
+                <div
+                    aria-hidden
+                    style={{
+                        position: "absolute", inset: 0, zIndex: 1,
+                        pointerEvents: "none",
+                        background:
+                            "radial-gradient(ellipse 80% 60% at 20% 30%, rgba(6,182,212,0.18), transparent 60%), " +
+                            "radial-gradient(ellipse 70% 50% at 80% 70%, rgba(139,92,246,0.18), transparent 60%)",
+                    }}
+                />
+            )}
+
+            {/* ── Layer 0b: AnoAI shader — desktop only, deferred until after first paint ── */}
+            {enableShader && anoaiReady && (
                 <Suspense fallback={null}>
                     <div
                         aria-hidden
@@ -617,55 +642,55 @@ function FeaturesSection() {
 const TESTIMONIALS = [
     {
         text: "Бях сигурна, че нямам шанс за Право в СУ. Сложих оценките в калкулатора и видях — Над средното с 23 точки. Кандидатствах. Взеха ме. УниПът буквално промени решението ми.",
-        image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150&h=150",
+        image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=126&h=126",
         name: "Мария Стоянова",
         role: "Студентка, Право — СУ",
     },
     {
         text: "Прекарах седмици в Excel таблици с коефициенти. После намерих УниПът — 10 минути и бях готов. Как не го открих по-рано?",
-        image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150&h=150",
+        image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=126&h=126",
         name: "Тодор Петков",
         role: "Студент, Бизнес администрация — УНСС",
     },
     {
         text: "Мислех, че ще уча счетоводство, защото баща ми каза така. Направих RIASEC теста — излезе Изследовател. Сега съм в Психология и за пръв път съм спокойна за избора си.",
-        image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=150&h=150",
+        image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=126&h=126",
         name: "Александра Димова",
         role: "Студентка, Психология — НБУ",
     },
     {
         text: "Препоръчвам УниПът на всичките ми 12-класници. Данните от МОН са точни, интерфейсът е ясен. Учениците реално го използват — не е поредният безполезен сайт.",
-        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150&h=150",
+        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=126&h=126",
         name: "Йордан Маринов",
         role: "Класен ръководител, ПГЕЕ — Варна",
     },
     {
         text: "Исках да уча в Пловдив, но не знаех дали баловете ми стигат. Филтрирах по град, изчислих и избрах ПУ. Сега съм втора година Информатика и не съжалявам.",
-        image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150&h=150",
+        image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=126&h=126",
         name: "Христо Иванов",
         role: "Студент, Информатика — ПУ",
     },
     {
         text: "Дъщеря ми ми показа сайта и за пръв път разбрах как се изчислява балът. Данните са официални, всичко е обяснено ясно. Вече не се притеснявам, че тя взима грешно решение.",
-        image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=150&h=150",
+        image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=126&h=126",
         name: "Надежда Великова",
         role: "Майка на кандидат-студентка",
     },
     {
         text: "Колебаях се между Медицина и Биохимия. В УниПът видях балове и за двете едновременно и веднага стана ясно. Записах Биохимия в МУ-Пловдив и съм доволен.",
-        image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=150&h=150",
+        image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=126&h=126",
         name: "Стефан Георгиев",
         role: "Студент, Биохимия — МУ Пловдив",
     },
     {
         text: "Никой в училище не ми обясни как работят коефициентите. Намерих УниПът, прочетох формулата и изведнъж всичко имаше смисъл. Жалко, че не съществуваше преди 3 години.",
-        image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=150&h=150",
+        image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=126&h=126",
         name: "Ивет Николова",
         role: "Студентка, Архитектура — УАСГ",
     },
     {
         text: "Пратих линка на 12 съученика в деня, в който го открих. Всички го използваме. Стана нашият референтен сайт за кандидатстването тази година.",
-        image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150&h=150",
+        image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=126&h=126",
         name: "Боян Христов",
         role: "12-ти клас, кандидатства за ТУ",
     },
