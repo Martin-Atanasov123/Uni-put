@@ -4,13 +4,19 @@ import {
     calculateHybridCompatibility
 } from './riasec-matcher';
 
+// Bug fix: добавена `riasec_scores_normalized` (6-измерен вектор {R,I,A,S,E,C}).
+// Без нея calculateHybridCompatibility получаваше item.riasec_scores_normalized
+// = undefined → euclideanScore = 0 → fallback на чист codeScore (дискретни
+// стойности 100/85/75/65/55). С нея: 70%×Euclidean + 30%×Code дава плавни,
+// прецизни проценти (1-100 без „стъпки").
 const SPECIALTY_RIASEC_COLS =
-    'id,specialty_base_name,riasec_code,category';
-// Bug fix: премахната `growth_outlook` (не съществува в схемата). Поради нея
-// careers_riasec_mapping query-то връщаше 400, което чупеше RIASEC резултатите
-// — потребителят завършваше теста и не виждаше нищо.
+    'id,specialty_base_name,riasec_code,category,riasec_scores_normalized';
+
+// Bug fix: премахната `growth_outlook` (не съществува в схемата);
+// добавена `riasec_scores_normalized` за същата причина като specialties.
 const CAREERS_COLS =
-    'id,career_name_bg,career_name_en,riasec_code,category,salary_range_bgn,required_education';
+    'id,career_name_bg,career_name_en,riasec_code,category,salary_range_bgn,' +
+    'required_education,riasec_scores_normalized';
 const DORMITORIES_COLS =
     'id,university_id,city,block_number,application_period,monthly_rent_avg,deposit_amount,' +
     'condition_rating,commute_minutes,distance_to_uni_km,google_maps_url,' +

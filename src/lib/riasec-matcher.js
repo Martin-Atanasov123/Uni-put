@@ -83,13 +83,16 @@ export function calculateScores(answers, questions = []) {
  */
 export function calculateRiasecCode(scores) {
     if (!scores) return "";
-    
+
+    // Bug fix: предишният sort comparator връщаше 0 при tie → JS използваше
+    // input order, който е дикторан от property insertion order — нестабилен.
+    // Сега експлицитно прилагаме Holland-каноничен ред R > I > A > S > E > C
+    // при равни резултати, за да са детерминистични резултатите между runs.
+    const HOLLAND_ORDER = { R: 0, I: 1, A: 2, S: 3, E: 4, C: 5 };
     return Object.entries(scores)
-        .sort(([, scoreA], [, scoreB]) => {
-            // Първо по резултат (descending)
+        .sort(([letterA, scoreA], [letterB, scoreB]) => {
             if (scoreB !== scoreA) return scoreB - scoreA;
-            // При равенство - запазваме консистентен ред (R > I > A > S > E > C)
-            return 0; 
+            return HOLLAND_ORDER[letterA] - HOLLAND_ORDER[letterB];
         })
         .slice(0, 3)
         .map(([letter]) => letter)
