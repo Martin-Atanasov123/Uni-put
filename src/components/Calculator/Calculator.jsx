@@ -2,8 +2,9 @@ import { useState, useEffect, useMemo } from "react";
 // eslint-disable-next-line no-unused-vars
 import { m, AnimatePresence } from "motion/react";
 import { supabase } from "@/lib/supabase";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import Seo from "@/components/common/Seo";
+import { useAuth } from "@/hooks/useAuth";
 import {
     Calculator,
     TrendingUp,
@@ -23,6 +24,9 @@ import {
     Copy,
     Check,
     ExternalLink,
+    Bookmark,
+    X as XIcon,
+    UserPlus,
 } from "lucide-react";
 import GradeInputSection from "./GradeInputSection";
 import ReportButton from "./ReportButton";
@@ -68,13 +72,20 @@ const DZI_BANDS = [
 
 function dziToGrade(pts) {
     const p = Math.max(0, Math.min(100, pts));
-    const band = DZI_BANDS.find(b => p >= b.min && p <= b.max)
-        ?? DZI_BANDS[0];
+    // Bug fix: DZI_BANDS имат микро-gap-ове между upper bound и следващото lower bound
+    // (напр. 83.75 → 84). Стойности като 83.8, 29.8, 40.6, 62.3, 94.8 пропадаха
+    // в дупките и find() връщаше undefined → fallback на "Слаб" (грешка от user).
+    // Решение: проверявай долна граница на ТЕКУЩАТА и долна граница на СЛЕДВАЩАТА band.
+    const band = DZI_BANDS.find((b, i) => {
+        const next = DZI_BANDS[i + 1];
+        return p >= b.min && (next ? p < next.min : p <= b.max);
+    }) ?? DZI_BANDS[0];
     let grade;
     if (band.grade_min === band.grade_max) {
         grade = band.grade_min;
     } else {
-        const t = (p - band.min) / (band.max - band.min);
+        // Clamp t in [0, 1] за да не overflow-ва grade при точки точно на upper bound.
+        const t = Math.min(1, Math.max(0, (p - band.min) / (band.max - band.min)));
         grade = band.grade_min + t * (band.grade_max - band.grade_min);
     }
     return { grade: +grade.toFixed(2), band };
@@ -119,6 +130,16 @@ export default function CalculatorPage() {
     const [copied, setCopied] = useState(false);
     const [loadError, setLoadError] = useState(null);
     const location = useLocation();
+    const { user } = useAuth();
+    // Signup prompt — показва се само за анонимни потребители след първи изчислен бал.
+    // Dismissal се пази в localStorage за да не дразним потребителя при повторно посещение.
+    const [signupCardDismissed, setSignupCardDismissed] = useState(() => {
+        try { return localStorage.getItem("calc_signup_dismissed") === "1"; } catch { return false; }
+    });
+    const dismissSignupCard = () => {
+        setSignupCardDismissed(true);
+        try { localStorage.setItem("calc_signup_dismissed", "1"); } catch { /* localStorage недостъпен */ }
+    };
 
     const handleDziChange = (e) => {
         const val = e.target.value;
@@ -915,6 +936,121 @@ export default function CalculatorPage() {
                                     </div>
                                 </div>
                         ))}
+                    </m.div>
+                )}
+
+                {/* ── Signup prompt (само за анонимни, след завършен резултат) ──
+                    CLAUDE.md §3: "Secondary CTA (Регистрирай се): after the user
+                    has seen value — never as the first ask." Тук сме точно в момента
+                    на стойност — потребителят току-що видя своя бал. */}
+                {!user && !signupCardDismissed && calcResults.some(r => r.hasStarted && !r.hasMissing) && (
+                    <m.div
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                        style={{
+                            marginTop: "1.5rem",
+                            position: "relative",
+                            background: "linear-gradient(135deg, rgba(6,182,212,0.08), rgba(139,92,246,0.08))",
+                            border: "1px solid var(--brand-card-border)",
+                            borderRadius: "1.25rem",
+                            padding: "1.5rem 1.75rem",
+                            overflow: "hidden",
+                        }}
+                    >
+                        {/* Subtle gradient glow accent */}
+                        <div aria-hidden style={{
+                            position: "absolute", top: 0, right: 0, width: "240px", height: "100%",
+                            background: "radial-gradient(ellipse at right, rgba(139,92,246,0.12), transparent 70%)",
+                            pointerEvents: "none",
+                        }} />
+
+                        {/* Dismiss бутон */}
+                        <button
+                            type="button"
+                            onClick={dismissSignupCard}
+                            aria-label="Скрий"
+                            title="Не сега"
+                            style={{
+                                position: "absolute", top: "0.75rem", right: "0.75rem",
+                                background: "transparent", border: "none", cursor: "pointer",
+                                padding: "0.375rem", borderRadius: "0.5rem",
+                                color: "var(--brand-muted)", opacity: 0.6,
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                transition: "opacity 0.15s, background 0.15s",
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.opacity = "1"; e.currentTarget.style.background = "var(--brand-surface-2)"; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.opacity = "0.6"; e.currentTarget.style.background = "transparent"; }}
+                        >
+                            <XIcon size={14} />
+                        </button>
+
+                        <div style={{ display: "flex", alignItems: "flex-start", gap: "1rem", position: "relative" }}>
+                            {/* Иконка */}
+                            <div style={{
+                                flexShrink: 0,
+                                width: "44px", height: "44px", borderRadius: "0.75rem",
+                                background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                boxShadow: "0 8px 24px rgba(6,182,212,0.25)",
+                            }}>
+                                <Bookmark size={20} color="#fff" strokeWidth={2} fill="#fff" />
+                            </div>
+
+                            {/* Текст + CTA */}
+                            <div style={{ flex: 1, minWidth: 0, paddingRight: "1.5rem" }}>
+                                <h3 style={{
+                                    margin: 0, fontSize: "1.0625rem", fontWeight: 800,
+                                    color: "var(--brand-text)", letterSpacing: "-0.01em",
+                                }}>
+                                    Запази резултата си
+                                </h3>
+                                <p style={{
+                                    margin: "0.375rem 0 1rem", fontSize: "0.875rem",
+                                    color: "var(--brand-muted)", lineHeight: 1.55, maxWidth: "44ch",
+                                }}>
+                                    Регистрирай се за 30 секунди и резултатите ти ще те чакат при следващото посещение. Безплатно, без спам.
+                                </p>
+
+                                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.625rem" }}>
+                                    <Link
+                                        to="/register"
+                                        style={{
+                                            display: "inline-flex", alignItems: "center", gap: "0.5rem",
+                                            padding: "0.625rem 1.25rem",
+                                            background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                            color: "#fff", borderRadius: "0.625rem",
+                                            fontSize: "0.875rem", fontWeight: 700,
+                                            textDecoration: "none",
+                                            transition: "transform 0.18s, box-shadow 0.18s",
+                                        }}
+                                        onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 8px 20px rgba(6,182,212,0.3)"; }}
+                                        onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+                                    >
+                                        <UserPlus size={14} strokeWidth={2} />
+                                        Регистрирай се
+                                    </Link>
+                                    <Link
+                                        to="/login"
+                                        style={{
+                                            display: "inline-flex", alignItems: "center",
+                                            padding: "0.625rem 1.125rem",
+                                            background: "transparent",
+                                            color: "var(--brand-text)",
+                                            border: "1px solid var(--brand-border)",
+                                            borderRadius: "0.625rem",
+                                            fontSize: "0.875rem", fontWeight: 600,
+                                            textDecoration: "none",
+                                            transition: "border-color 0.18s, color 0.18s",
+                                        }}
+                                        onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--brand-cyan)"; e.currentTarget.style.color = "var(--brand-cyan)"; }}
+                                        onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--brand-border)"; e.currentTarget.style.color = "var(--brand-text)"; }}
+                                    >
+                                        Вече имам акаунт
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
                     </m.div>
                 )}
             </div>

@@ -1,30 +1,14 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
-// "dark" → DaisyUI "dark" theme
-// "light" → DaisyUI "nord" theme (light)
-const DAISYUI_MAP = { dark: "dark", light: "nord" };
-
+// Light theme премахната по UX решение — продуктът е изцяло dark mode.
+// Hook-ът се запазва за backward compat (компоненти, които still го викат),
+// но винаги връща "dark" и принудително форсира data-theme="dark" на mount.
 export function useTheme() {
-    const [theme, setTheme] = useState(() => {
-        try {
-            const saved = localStorage.getItem("uniput_theme");
-            if (saved) return saved;
-            return window.matchMedia?.("(prefers-color-scheme: light)").matches ? "light" : "dark";
-        } catch {
-            return "dark";
-        }
-    });
-
     useEffect(() => {
-        // Set DaisyUI-compatible theme on <html> so both DaisyUI
-        // classes AND our custom CSS variables respond correctly
-        document.documentElement.setAttribute("data-theme", DAISYUI_MAP[theme]);
-        try {
-            localStorage.setItem("uniput_theme", theme);
-        } catch {}
-    }, [theme]);
+        document.documentElement.setAttribute("data-theme", "dark");
+        // Cleanup на стар theme preference от localStorage (ако е "light")
+        try { localStorage.removeItem("uniput_theme"); } catch { /* noop */ }
+    }, []);
 
-    const toggle = () => setTheme(t => (t === "dark" ? "light" : "dark"));
-
-    return { theme, toggle };
+    return { theme: "dark", toggle: () => { /* noop — theme toggle премахнат */ } };
 }

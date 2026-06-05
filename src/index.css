@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @plugin "daisyui" {
-  themes: dark --default, dark --prefersdark, nord;
+  themes: dark --default, dark --prefersdark;
 };
 
 :root,
@@ -47,48 +47,12 @@
   --color-error-content: #F1F5F9;
 }
 
-/* "nord" is the DaisyUI light theme name — triggered by useTheme when user picks "light" */
-[data-theme="nord"] {
-  --brand-bg: #F8FAFC;
-  --brand-bg-alt: #EFF4FA;
-  --brand-surface: #FFFFFF;
-  --brand-surface-2: rgba(255,255,255,0.92);
-  --brand-cyan: #0891B2;
-  --brand-violet: #7C3AED;
-  --brand-text: #0F172A;
-  --brand-muted: #64748B;
-  --brand-border: rgba(15, 23, 42, 0.08);
-  --brand-input-bg: #FFFFFF;
-  --brand-input-border: rgba(15,23,42,0.14);
-  --brand-dropdown-bg: #FFFFFF;
-  --brand-nav-bg: rgba(248,250,252,0.82);
-  --brand-nav-scrolled: rgba(248,250,252,0.96);
-  --brand-shadow: rgba(0,0,0,0.1);
-  --brand-card-hover: rgba(124,58,237,0.05);
-  --brand-card-border: rgba(15,23,42,0.08);
-  --brand-progress-bg: rgba(248,250,252,0.9);
+/* Light theme премахната по продуктово решение (юни 2026).
+   Целият продукт е dark-only. data-theme винаги е "dark" (force-set от useTheme).
+   Старият [data-theme="nord"] CSS блок е напълно изтрит за да освободи CSS bundle-а. */
 
-  /* Map DaisyUI v5 tokens to brand light palette */
-  --color-base-100: #F8FAFC;
-  --color-base-200: #EFF4FA;
-  --color-base-300: #E2EBF5;
-  --color-base-content: #0F172A;
-  --color-primary: #0891B2;
-  --color-primary-content: #F8FAFC;
-  --color-secondary: #7C3AED;
-  --color-secondary-content: #F8FAFC;
-  --color-accent: #7C3AED;
-  --color-accent-content: #F8FAFC;
-  --color-neutral: #E2EBF5;
-  --color-neutral-content: #0F172A;
-  --color-info: #0891B2;
-  --color-info-content: #F8FAFC;
-  --color-success: #059669;
-  --color-success-content: #F8FAFC;
-  --color-warning: #D97706;
-  --color-warning-content: #F8FAFC;
-  --color-error: #DC2626;
-  --color-error-content: #F8FAFC;
+html, body {
+  background: var(--brand-bg);
 }
 
 body {

@@ -1,5 +1,5 @@
 <!doctype html>
-<html data-theme="dark" lang="bg">
+<html data-theme="dark" lang="bg" class="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/university.png" />
@@ -15,19 +15,15 @@
       The #initial-loader is removed by main.jsx after React's first paint.
     -->
     <style>
-      :root { color-scheme: dark light; }
+      :root { color-scheme: dark; }
       *,*::before,*::after { box-sizing: border-box; }
-      body { margin: 0; background: #0f172a; }
-      @media (prefers-color-scheme: light) { body { background: #f8fafc; } }
+      html, body { margin: 0; background: #0f172a; }
       #initial-loader {
         position: fixed; inset: 0;
         display: flex; align-items: center; justify-content: center;
         background: #0f172a;
         z-index: 9999;
         opacity: 1;
-      }
-      @media (prefers-color-scheme: light) {
-        #initial-loader { background: #f8fafc; }
       }
       @keyframes _il-spin { to { transform: rotate(360deg); } }
       #initial-loader > div {
@@ -72,9 +68,8 @@
     />
     <meta data-seo-default name="twitter:image" content="https://uniput.eu/university.png" />
     <meta data-seo-default name="robots" content="index,follow" />
-    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
-    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#0f172a" />
+    <meta name="color-scheme" content="dark" />
   </head>
   <body>
     <!--

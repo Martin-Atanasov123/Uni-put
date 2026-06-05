@@ -74,6 +74,7 @@ function DormCard({ dorm }) {
                 display: "flex",
                 flexDirection: "column",
                 gap: "0.875rem",
+                height: "100%",  // alignment fix: всяка карта запълва grid cell-а
                 transition: "border-color 0.2s, transform 0.2s, box-shadow 0.2s",
             }}
             onMouseEnter={e => {
@@ -214,13 +215,16 @@ function DormCard({ dorm }) {
                 )}
             </div>
 
-            {/* Maps link */}
+            {/* Maps link — marginTop: auto подравнява бутона към дъното на всяка
+                карта, така че редовете в grid-а изглеждат подредени дори когато
+                някои карти имат повече badges / application_period / т.н. */}
             {dorm.google_maps_url && (
                 <a
                     href={dorm.google_maps_url}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
+                        marginTop: "auto",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",

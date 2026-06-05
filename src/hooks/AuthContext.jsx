@@ -26,16 +26,22 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [favorites, setFavorites] = useState([]);
 
+    // Bug fix: университи IDs в Supabase са bigint (числа). Старият filter
+    // приемаше само string → всички numeric IDs се изхвърляха → Favorites
+    // страницата винаги показваше „празно" дори след save. Сега приемаме
+    // string И number (>0), което покрива и legacy string записи.
+    const normalizeFavoriteIds = (arr) =>
+        (arr || []).filter((id) =>
+            (typeof id === "string" && id.length > 0) ||
+            (typeof id === "number" && Number.isFinite(id) && id > 0)
+        );
+
     useEffect(() => {
         // 1. Провери текущата сесия при зареждане
         supabase.auth.getSession().then(({ data: { session } }) => {
             const currentUser = session?.user ?? null;
             setUser(currentUser);
-            setFavorites(
-                (currentUser?.user_metadata?.favorite_universities || []).filter(
-                    (id) => typeof id === "string" && id.length > 0
-                )
-            );
+            setFavorites(normalizeFavoriteIds(currentUser?.user_metadata?.favorite_universities));
             setLoading(false);
         });
 
@@ -45,11 +51,7 @@ export const AuthProvider = ({ children }) => {
         } = supabase.auth.onAuthStateChange((_event, session) => {
             const nextUser = session?.user ?? null;
             setUser(nextUser);
-            setFavorites(
-                (nextUser?.user_metadata?.favorite_universities || []).filter(
-                    (id) => typeof id === "string" && id.length > 0
-                )
-            );
+            setFavorites(normalizeFavoriteIds(nextUser?.user_metadata?.favorite_universities));
             setLoading(false);
         });
 

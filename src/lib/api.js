@@ -6,8 +6,11 @@ import {
 
 const SPECIALTY_RIASEC_COLS =
     'id,specialty_base_name,riasec_code,category';
+// Bug fix: премахната `growth_outlook` (не съществува в схемата). Поради нея
+// careers_riasec_mapping query-то връщаше 400, което чупеше RIASEC резултатите
+// — потребителят завършваше теста и не виждаше нищо.
 const CAREERS_COLS =
-    'id,career_name_bg,career_name_en,riasec_code,category,salary_range_bgn,required_education,growth_outlook';
+    'id,career_name_bg,career_name_en,riasec_code,category,salary_range_bgn,required_education';
 const DORMITORIES_COLS =
     'id,university_id,city,block_number,application_period,monthly_rent_avg,deposit_amount,' +
     'condition_rating,commute_minutes,distance_to_uni_km,google_maps_url,' +
@@ -75,7 +78,6 @@ export async function getRiasecMatches(userScores) {
                 category: item.category,
                 salary: item.salary_range_bgn,
                 required_education: item.required_education,
-                growth_outlook: item.growth_outlook,
                 compatibility: calculateHybridCompatibility(userScores, item)
             }))
             .filter(item => item.compatibility >= 50)

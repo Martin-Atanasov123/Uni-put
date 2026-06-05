@@ -5,7 +5,7 @@ import { useTheme } from "@/hooks/useTheme";
 import {
     User, LogOut, LayoutDashboard, Menu, X, GraduationCap,
     Calculator, Search, Settings, Building2, Heart, ChevronDown,
-    Sun, Moon, Brain, ClipboardList
+    Brain, ClipboardList
 } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 
@@ -23,12 +23,12 @@ export default function Header() {
     const { user } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
-    const { theme, toggle: toggleTheme } = useTheme();
+    // useTheme сега принуждава dark mode (light theme премахната). Извикваме за side effect.
+    useTheme();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const userMenuRef = useRef();
-    const isLight = theme === "light";
 
     const isAdmin = user?.app_metadata?.role === "admin";
 
@@ -208,27 +208,6 @@ export default function Header() {
                                 )}
                             </div>
                         )}
-
-                        {/* Theme toggle */}
-                        <button
-                            onClick={toggleTheme}
-                            aria-label={isLight ? "Превключи на тъмна тема" : "Превключи на светла тема"}
-                            title={isLight ? "Тъмна тема" : "Светла тема"}
-                            style={{
-                                padding: "0.5rem",
-                                background: isLight ? "rgba(124,58,237,0.08)" : "rgba(250,204,21,0.08)",
-                                border: `1px solid ${isLight ? "rgba(124,58,237,0.2)" : "rgba(250,204,21,0.2)"}`,
-                                borderRadius: "0.625rem",
-                                color: isLight ? "var(--brand-violet)" : "#FBBF24",
-                                cursor: "pointer",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                transition: "all 0.25s",
-                            }}
-                        >
-                            {isLight ? <Moon size={16} /> : <Sun size={16} />}
-                        </button>
 
                         <button
                             className="uni-nav-mobile"

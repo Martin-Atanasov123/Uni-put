@@ -37,7 +37,10 @@ export default function AdminReports() {
         setLoading(true);
         let query = supabase
             .from("reports")
-            .select("id,status,type,description,admin_notes,screenshot_url,university_name,specialty,created_at,resolved_at")
+            // Bug fix: колоната е `report_type`, не `type`. ReportButton.jsx insert-ва
+            // `report_type`. AdminReports query-то използваше грешно `type` → 400 →
+            // admin страницата гърмеше при отваряне.
+            .select("id,status,report_type,description,admin_notes,screenshot_url,university_name,specialty,created_at,resolved_at")
             .order("created_at", { ascending: false })
             .limit(200);
 
