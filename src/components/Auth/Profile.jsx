@@ -92,7 +92,12 @@ const Profile = () => {
                             showActivity: metadata.privacy?.showActivity ?? true,
                         },
                     }));
-                    setAvatarUrl(metadata.avatar_url || "");
+                    // Cachebust на avatar URL. Strip-ваме съществуващи query
+                    // параметри (legacy URLs от стария код имаха ?t=... вграден),
+                    // после прилагаме fresh stamp от avatar_updated_at.
+                    const baseAvatar = (metadata.avatar_url || "").split("?")[0];
+                    const avatarStamp = metadata.avatar_updated_at || "";
+                    setAvatarUrl(baseAvatar ? `${baseAvatar}?t=${avatarStamp || Date.now()}` : "");
                     setRiasecType(
                         metadata.riasec_type ||
                         localStorage.getItem("riasec_result") ||
@@ -158,30 +163,59 @@ const Profile = () => {
 
         setUploadingAvatar(true);
         try {
-            const ext = file.name.split(".").pop().toLowerCase();
-            const path = `${user.id}/avatar.${ext}`;
+            // Винаги към ЕДИН и същ файл (`avatar`, без extension) с upsert →
+            // няма orphan файлове от стари upload-и с различни extension-и.
+            // Content-type-ът се пази в storage metadata-та и browser-ът
+            // го използва за render-а.
+            const path = `${user.id}/avatar`;
 
             const { error: uploadError } = await supabase.storage
                 .from("avatars")
-                .upload(path, file, { upsert: true, contentType: file.type });
+                .upload(path, file, {
+                    upsert: true,
+                    contentType: file.type,
+                    cacheControl: "60",
+                });
             if (uploadError) throw uploadError;
 
             const { data } = supabase.storage.from("avatars").getPublicUrl(path);
-            const publicUrl = `${data.publicUrl}?t=${Date.now()}`;
+            const baseUrl = data.publicUrl;
+            const stamp = Date.now();
 
+            // В metadata пазим базовия URL (стабилен) + timestamp за cachebust.
+            // При следващо влизане Profile/Header генерират `${url}?t=${stamp}`
+            // и виждат най-новата версия дори ако path не се е променил.
             const { error: updateError } = await supabase.auth.updateUser({
-                data: { avatar_url: publicUrl },
+                data: { avatar_url: baseUrl, avatar_updated_at: stamp },
             });
             if (updateError) throw updateError;
 
-            setAvatarUrl(publicUrl);
+            // Refresh local user state — гарантира че Header avatar дропдаунът
+            // също се обновява без full reload (USER_UPDATED event-ът понякога
+            // се закъснява в complex tab states).
+            const { data: { user: freshUser } } = await supabase.auth.getUser();
+            if (freshUser) setUser(freshUser);
+
+            setAvatarUrl(`${baseUrl}?t=${stamp}`);
             showMessage("success", "Профилната снимка е обновена!");
         } catch (err) {
+            console.error("[avatar upload]", err);
             showMessage("error", err.message || "Грешка при качване на снимката.");
         } finally {
             setUploadingAvatar(false);
             if (avatarInputRef.current) avatarInputRef.current.value = "";
         }
+    };
+
+    // Извежда 1-2 инициала от username или email — за placeholder gradient circle.
+    const getUserInitials = () => {
+        const username = formData.username?.trim();
+        const email = user?.email || "";
+        const source = username || email.split("@")[0] || "";
+        const words = source.split(/[.\s_-]+/).filter(Boolean);
+        if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
+        if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+        return "У";
     };
 
     const updatePrivacy = async () => {
@@ -296,9 +330,30 @@ const Profile = () => {
                                         src={avatarUrl}
                                         alt="Профилна снимка"
                                         style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                        // Ако URL-ът се счупи (изтрит от storage, мрежова грешка),
+                                        // връщаме се към placeholder-а с инициали.
+                                        onError={() => setAvatarUrl("")}
                                     />
                                 ) : (
-                                    <User size={56} strokeWidth={1.5} />
+                                    <div
+                                        style={{
+                                            width: "100%",
+                                            height: "100%",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                            color: "#fff",
+                                            fontSize: "3.25rem",
+                                            fontWeight: 900,
+                                            letterSpacing: "-0.04em",
+                                            fontFamily: "Inter, system-ui, sans-serif",
+                                            userSelect: "none",
+                                            textShadow: "0 2px 8px rgba(0,0,0,0.25)",
+                                        }}
+                                    >
+                                        {getUserInitials()}
+                                    </div>
                                 )}
                                 {uploadingAvatar && (
                                     <div

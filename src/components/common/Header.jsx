@@ -166,11 +166,31 @@ export default function Header() {
                                         background: "linear-gradient(135deg,var(--brand-cyan),var(--brand-violet))",
                                         display: "flex", alignItems: "center", justifyContent: "center",
                                         overflow: "hidden", flexShrink: 0,
+                                        color: "#fff", fontSize: "11px", fontWeight: 900, letterSpacing: "-0.02em",
                                     }}>
-                                        {user?.user_metadata?.avatar_url
-                                            ? <img src={user.user_metadata.avatar_url} alt="Профил" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                                            : <User size={14} color="#fff" />
-                                        }
+                                        {(() => {
+                                            // Inline initials extractor — синхронизирано с Profile.jsx.
+                                            // Извежда 1-2 инициала от username или email-а.
+                                            const md = user?.user_metadata || {};
+                                            // Strip legacy ?t=... от стария код.
+                                            const baseAvatar = (md.avatar_url || "").split("?")[0];
+                                            const stamp = md.avatar_updated_at || "";
+                                            if (baseAvatar) {
+                                                return (
+                                                    <img
+                                                        src={`${baseAvatar}?t=${stamp || ""}`}
+                                                        alt="Профил"
+                                                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                                    />
+                                                );
+                                            }
+                                            const source = (md.username || (user?.email || "").split("@")[0] || "").trim();
+                                            const words = source.split(/[.\s_-]+/).filter(Boolean);
+                                            let initials = "У";
+                                            if (words.length >= 2) initials = (words[0][0] + words[1][0]).toUpperCase();
+                                            else if (words.length === 1) initials = words[0].slice(0, 2).toUpperCase();
+                                            return <span>{initials}</span>;
+                                        })()}
                                     </div>
                                     <ChevronDown size={14} color="var(--brand-muted)" />
                                 </button>

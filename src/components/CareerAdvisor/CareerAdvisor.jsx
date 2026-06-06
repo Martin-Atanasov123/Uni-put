@@ -82,6 +82,9 @@ const CareerAdvisor = () => {
     const [showWarning, setShowWarning] = useState(false);
     const questionCardRef = useRef(null);
     const preservedScrollYRef = useRef(null);
+    // Държи последната дефиниция на calculateFinalResults, за да я викнем от
+    // setTimeout (auto-advance) без stale closure върху state-а.
+    const calculateFinalResultsRef = useRef(null);
     const shouldScrollToQuestionRef = useRef(false);
 
     useEffect(() => {
@@ -143,6 +146,16 @@ const CareerAdvisor = () => {
                 setCurrentQuestionIndex(prev => prev + 1);
                 setIsTransitioning(false);
             }, 500);
+        } else {
+            // ── Auto-advance към резултатите след отговор на последен въпрос ──
+            // 600ms забавяне дава време на потребителя да види че отговорът му
+            // е регистриран (button highlight) преди преходът към "results".
+            // useEffect долу е safety net в случай че setTimeout пропусне
+            // (напр. ако компонентът re-mount-не междувременно).
+            setIsTransitioning(true);
+            setTimeout(() => {
+                calculateFinalResultsRef.current?.();
+            }, 600);
         }
     };
 
@@ -165,7 +178,14 @@ const CareerAdvisor = () => {
         }
     };
 
+    // Sync на ref-а към актуалната версия на calculateFinalResults
+    // (всеки render създава нова, защото closure-ите ѝ зависят от state).
+    useEffect(() => {
+        calculateFinalResultsRef.current = calculateFinalResults;
+    });
+
     const calculateFinalResults = async () => {
+        if (step === "results") return; // вече се изпълнява — избягвай дубликат
         setLoading(true);
         setStep("results");
         try {
@@ -370,27 +390,20 @@ const CareerAdvisor = () => {
                     </button>
 
                     {currentQuestionIndex === filteredQuestions.length - 1 ? (
-                        <button
-                            type="button"
-                            disabled={!currentAnswer || loading}
-                            onClick={calculateFinalResults}
+                        // Последен въпрос — auto-advance към резултатите.
+                        // Subtle indicator вместо бутон, за да види потребителят
+                        // какво се случва когато отговори.
+                        <span
                             style={{
                                 display: "inline-flex", alignItems: "center", gap: "0.5rem",
-                                padding: "0.75rem 1.75rem",
-                                background: !currentAnswer ? "rgba(148,163,184,0.1)" : "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
-                                border: "none",
-                                borderRadius: "0.75rem",
-                                color: "#fff",
-                                fontSize: "14px",
-                                fontWeight: 800,
-                                cursor: !currentAnswer ? "not-allowed" : "pointer",
-                                opacity: !currentAnswer ? 0.5 : 1,
-                                boxShadow: !currentAnswer ? "none" : "0 10px 30px rgba(6,182,212,0.3)",
-                                fontFamily: "inherit",
+                                fontSize: "11px", fontWeight: 700, color: "var(--brand-muted)",
+                                textTransform: "uppercase", letterSpacing: "0.12em",
+                                opacity: currentAnswer ? 1 : 0.5,
+                                transition: "opacity 0.2s",
                             }}
                         >
-                            Виж резултатите <ChevronRight size={16} />
-                        </button>
+                            {currentAnswer ? "Анализираме резултатите..." : "Отговори за да видиш резултата"}
+                        </span>
                     ) : (
                         <button
                             type="button"

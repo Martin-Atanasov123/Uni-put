@@ -1,0 +1,153 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   УниПът — Brand Direction A: "Институционално доверие" (Trust Navy)
+   Navy primary + дисциплиниран gold accent.
+
+   DROP-IN: имената на всички --brand-* променливи са идентични с текущите,
+   затова никой от 25-те компонента не се чупи. Сменяш само СТОЙНОСТИТЕ.
+   Замести блока :root / [data-theme="dark"] в src/index.css с този по-долу.
+
+   НОВО: --brand-gold. Това е сигнатурата на бранда. Използвай я ДИСЦИПЛИНИРАНО,
+   само за момента на постижение — никога като фон:
+     • числото на бала (score reveal) — gradient navy→gold
+     • pill-а "Над средното"
+     • активния индикатор в навигацията
+     • ключови числа/милоустоуни
+   Основните CTA бутони остават СИНИ (azure→royal), за да не стане gold-ът wallpaper.
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root,
+[data-theme="dark"] {
+  /* Surfaces — истинско navy вместо slate */
+  --brand-bg: #0B1B33;
+  --brand-bg-alt: #071326;
+  --brand-surface: #122844;
+  --brand-surface-2: rgba(18, 40, 68, 0.7);
+
+  /* Accents.
+     --brand-cyan  = основен интерактивен azure (линкове, primary action)
+     --brand-violet = партньорът в gradient-а / вторичен (royal blue)
+     ⇒ gradient-ът cyan→violet вече е син→син: кохерентен, доверителен. */
+  --brand-cyan: #4C9BE8;
+  --brand-violet: #2F6BD6;
+
+  /* Сигнатурният gold — само за постижение. Виж бележката горе. */
+  --brand-gold: #E6A92B;
+
+  --brand-text: #EAF1FB;
+  --brand-muted: #93A6C2;
+  --brand-border: rgba(147, 166, 194, 0.12);
+  --brand-input-bg: rgba(7, 19, 38, 0.8);
+  --brand-input-border: rgba(147, 166, 194, 0.14);
+  --brand-dropdown-bg: #122844;
+  --brand-nav-bg: rgba(11, 27, 51, 0.55);
+  --brand-nav-scrolled: rgba(11, 27, 51, 0.78);
+  --brand-shadow: rgba(0, 0, 0, 0.55);
+  --brand-card-hover: rgba(76, 155, 232, 0.10);
+  --brand-card-border: rgba(147, 166, 194, 0.10);
+  --brand-progress-bg: rgba(7, 19, 38, 0.85);
+
+  /* DaisyUI v5 mapping (admin panel + DaisyUI компоненти) */
+  --color-base-100: #0B1B33;
+  --color-base-200: #0F2139;
+  --color-base-300: #122844;
+  --color-base-content: #EAF1FB;
+  --color-primary: #4C9BE8;
+  --color-primary-content: #071326;
+  --color-secondary: #2F6BD6;
+  --color-secondary-content: #EAF1FB;
+  --color-accent: #E6A92B;       /* gold */
+  --color-accent-content: #071326;
+  --color-neutral: #122844;
+  --color-neutral-content: #93A6C2;
+  --color-info: #4C9BE8;
+  --color-info-content: #071326;
+  --color-success: #10B981;
+  --color-success-content: #071326;
+  --color-warning: #FBBF24;      /* виж бележката за clash с gold по-долу */
+  --color-warning-content: #071326;
+  --color-error: #F87171;
+  --color-error-content: #071326;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   СВЕТЪЛ РЕЖИМ — Trust Navy on light.
+   В момента е ИНЕРТЕН: продуктът е dark-only (useTheme форсира "dark", а
+   [data-theme="nord"] блокът е изтрит). Този блок е готов за деня, в който
+   решиш да върнеш light темата — просто спри force-set-а в useTheme.
+   ───────────────────────────────────────────────────────────────────────── */
+[data-theme="nord"] {
+  --brand-bg: #F7F9FC;
+  --brand-bg-alt: #EEF2F8;
+  --brand-surface: #FFFFFF;
+  --brand-surface-2: #F2F5FA;
+
+  --brand-cyan: #1D4E89;   /* deep navy като интерактивен цвят на бяло */
+  --brand-violet: #2F6BD6;
+  --brand-gold: #B7790A;   /* по-тъмен gold за контраст върху бяло */
+
+  --brand-text: #0E1726;
+  --brand-muted: #5A6B85;
+  --brand-border: rgba(14, 23, 38, 0.10);
+  --brand-input-bg: #FFFFFF;
+  --brand-input-border: rgba(14, 23, 38, 0.14);
+  --brand-dropdown-bg: #FFFFFF;
+  --brand-nav-bg: rgba(247, 249, 252, 0.65);
+  --brand-nav-scrolled: rgba(247, 249, 252, 0.85);
+  --brand-shadow: rgba(15, 30, 60, 0.12);
+  --brand-card-hover: rgba(29, 78, 137, 0.10);
+  --brand-card-border: rgba(14, 23, 38, 0.08);
+  --brand-progress-bg: rgba(238, 242, 248, 0.9);
+
+  --color-base-100: #FFFFFF;
+  --color-base-200: #F2F5FA;
+  --color-base-300: #EEF2F8;
+  --color-base-content: #0E1726;
+  --color-primary: #1D4E89;
+  --color-primary-content: #FFFFFF;
+  --color-secondary: #2F6BD6;
+  --color-secondary-content: #FFFFFF;
+  --color-accent: #B7790A;
+  --color-accent-content: #FFFFFF;
+  --color-neutral: #0F2A43;
+  --color-neutral-content: #5A6B85;
+  --color-info: #1D4E89;
+  --color-info-content: #FFFFFF;
+  --color-success: #0E8C5A;
+  --color-success-content: #FFFFFF;
+  --color-warning: #B7790A;
+  --color-warning-content: #FFFFFF;
+  --color-error: #C0392B;
+  --color-error-content: #FFFFFF;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   ПОМОЩНИ ЕЛЕМЕНТИ — копирай където ти трябва сигнатурният момент.
+
+   1) Score number (постижение) — navy→gold gradient текст:
+      .score-number {
+        background: linear-gradient(135deg, var(--brand-cyan), var(--brand-gold));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-family: monospace;
+        font-weight: 900;
+      }
+
+   2) Primary CTA бутон — остава СИН (gold-ът не влиза тук):
+      .btn-primary {
+        background: linear-gradient(135deg, var(--brand-cyan), var(--brand-violet));
+        color: #fff;
+      }
+
+   3) "Над средното" pill — сигнатурен gold:
+      .pill-above {
+        background: rgba(230, 169, 43, 0.14);
+        color: var(--brand-gold);
+        border: 1px solid rgba(230, 169, 43, 0.35);
+      }
+
+   БЕЛЕЖКА за clash: --brand-gold (#E6A92B) и --color-warning (#FBBF24) са
+   близки. Те живеят в различни контексти (постижение vs предупреждение), но
+   ако някъде се появят един до друг, направи warning по-кехлибарено-оранжев
+   (#F59E0B) за ясно разграничение.
+   ───────────────────────────────────────────────────────────────────────── */
