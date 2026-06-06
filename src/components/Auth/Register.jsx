@@ -21,6 +21,8 @@ const BENEFITS = [
 const SignUp = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    // Silent strip на whitespace — едно и също UX правило като Login.
+    const handlePasswordChange = e => setPassword(e.target.value.replace(/\s/g, ""));
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -212,7 +214,7 @@ const SignUp = () => {
                             placeholder="••••••••"
                             autoComplete="new-password"
                             value={password}
-                            onChange={e => setPassword(e.target.value)}
+                            onChange={handlePasswordChange}
                             right={
                                 <button
                                     type="button"

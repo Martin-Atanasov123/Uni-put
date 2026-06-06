@@ -122,7 +122,9 @@ const UpdatePassword = () => {
                             type={showPassword ? "text" : "password"}
                             placeholder="••••••••"
                             value={password}
-                            onChange={e => setPassword(e.target.value)}
+                            // Silent strip на whitespace — потребители случайно
+                            // натискат space, после виждат „грешна парола" и не разбират защо.
+                            onChange={e => setPassword(e.target.value.replace(/\s/g, ""))}
                             right={
                                 <button
                                     type="button"

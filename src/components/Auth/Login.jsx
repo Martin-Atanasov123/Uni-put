@@ -33,7 +33,14 @@ const Login = () => {
 
     const navigate = useNavigate();
     const location = useLocation();
-    const from = location.state?.from?.pathname + (location.state?.from?.search || "") || "/calculator";
+    // Bug fix: преди беше `?.pathname + (?.search || "") || "/calculator"`.
+    // Когато няма state.from (потребител отива директно на /login), pathname
+    // връща undefined, конкатенацията дава "undefined" (string!), което
+    // falsy fallback пропуска → navigate("undefined") → /undefined → 404.
+    // User вижда NotFound и мисли че логинът е fail-нал.
+    const fromPath = location.state?.from?.pathname;
+    const fromSearch = location.state?.from?.search || "";
+    const from = fromPath ? `${fromPath}${fromSearch}` : "/calculator";
 
     const handleGoogleLogin = async () => {
         const { error } = await supabase.auth.signInWithOAuth({
@@ -180,7 +187,9 @@ const Login = () => {
                             type={showPassword ? "text" : "password"}
                             placeholder="••••••••"
                             value={password}
-                            onChange={e => setPassword(e.target.value)}
+                            // Silent strip на whitespace — потребители случайно
+                            // натискат space, виждат „grешна парола" и не разбират защо.
+                            onChange={e => setPassword(e.target.value.replace(/\s/g, ""))}
                             right={
                                 <button
                                     type="button"

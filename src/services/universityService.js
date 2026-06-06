@@ -76,21 +76,26 @@ export const universityService = {
 
     /**
      * Дърпа само записите със зададени ID-та (за Favorites/Profile).
-     * @param {Array<string|number>} ids
+     * Bug fix: universities.id е UUID (string), не bigint. Старият код
+     * правеше Number(uuid) → NaN → filter изхвърляше всичко → връщаше [].
+     * Затова Favorites винаги изглеждаше празна. Сега валидираме UUID-и.
+     * @param {Array<string>} ids - UUID strings
      * @returns {Promise<Array>}
      */
     async getByIds(ids) {
         if (!Array.isArray(ids) || ids.length === 0) return [];
-        // Нормализираме към числа (PostgreSQL bigint), филтрираме невалидни
-        const numericIds = ids
-            .map((id) => Number(id))
-            .filter((n) => Number.isFinite(n) && n > 0);
-        if (numericIds.length === 0) return [];
+        // Валидираме като UUID v4-style strings (8-4-4-4-12 hex chars).
+        // Това предпазва и от SQL injection в `.in()` clause-а.
+        const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        const validIds = ids.filter(
+            (id) => typeof id === 'string' && UUID_RE.test(id)
+        );
+        if (validIds.length === 0) return [];
 
         const { data, error } = await supabase
             .from('universities')
             .select(SLIM_COLS)
-            .in('id', numericIds);
+            .in('id', validIds);
 
         if (error) throw error;
         return data || [];
