@@ -20,26 +20,15 @@ const NAV_LINKS = [
 ];
 
 /**
- * Малък avatar badge за хедъра — gradient circle с initials или снимка.
- * Идентичен fallback pattern като в Profile.jsx: при счупен URL на снимката
- * (изтрит файл, мрежова грешка, broken legacy url) автоматично пада
- * към initials placeholder, вместо да рендерира scuena/сива икона.
+ * Малък avatar badge за хедъра — gradient circle с първата буква.
+ * Avatar upload е премахнат напълно по UX решение; всички профили имат
+ * единен initial-based avatar (като много модерни SaaS apps).
  */
 function HeaderAvatar({ user, size = 28 }) {
-    const [imgBroken, setImgBroken] = useState(false);
     const md = user?.user_metadata || {};
-    const baseAvatar = (md.avatar_url || "").split("?")[0];
-    const stamp = md.avatar_updated_at || "";
-
-    // Изчисляваме initials в случай че трябва fallback.
     const source = (md.username || (user?.email || "").split("@")[0] || "").trim();
-    const words = source.split(/[.\s_-]+/).filter(Boolean);
-    let initials = "У";
-    if (words.length >= 2) initials = (words[0][0] + words[1][0]).toUpperCase();
-    else if (words.length === 1) initials = words[0].slice(0, 2).toUpperCase();
-
-    const showImage = baseAvatar && !imgBroken;
-    const fontSize = Math.round(size * 0.4); // 11px при 28px circle
+    const initial = (source[0] || "У").toUpperCase();
+    const fontSize = Math.round(size * 0.5); // 14px при 28px circle
 
     return (
         <div style={{
@@ -49,16 +38,7 @@ function HeaderAvatar({ user, size = 28 }) {
             overflow: "hidden", flexShrink: 0,
             color: "#fff", fontSize: `${fontSize}px`, fontWeight: 900, letterSpacing: "-0.02em",
         }}>
-            {showImage ? (
-                <img
-                    src={`${baseAvatar}?t=${stamp || ""}`}
-                    alt="Профил"
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    onError={() => setImgBroken(true)}
-                />
-            ) : (
-                <span>{initials}</span>
-            )}
+            <span>{initial}</span>
         </div>
     );
 }

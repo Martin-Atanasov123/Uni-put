@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useNavigate, Link } from "react-router-dom";
 import { sessionService } from "@/services/sessionService";
@@ -22,7 +22,6 @@ import {
     GraduationCap,
     Trash2,
     Settings,
-    Edit3,
     Brain,
     Check,
     Target,
@@ -52,15 +51,12 @@ const Profile = () => {
     const [activeTab, setActiveTab] = useState("overview");
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
-    const [uploadingAvatar, setUploadingAvatar] = useState(false);
-    const [avatarUrl, setAvatarUrl] = useState("");
     const [riasecType, setRiasecType] = useState("");
     const [message, setMessage] = useState({ type: "", text: "" });
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [deleteConfirmEmail, setDeleteConfirmEmail] = useState("");
     const [deletingAccount, setDeletingAccount] = useState(false);
     const [updatingPrivacy, setUpdatingPrivacy] = useState(false);
-    const avatarInputRef = useRef(null);
 
     const [user, setUser] = useState(null);
     const [favoriteDetails, setFavoriteDetails] = useState([]);
@@ -92,12 +88,6 @@ const Profile = () => {
                             showActivity: metadata.privacy?.showActivity ?? true,
                         },
                     }));
-                    // Cachebust на avatar URL. Strip-ваме съществуващи query
-                    // параметри (legacy URLs от стария код имаха ?t=... вграден),
-                    // после прилагаме fresh stamp от avatar_updated_at.
-                    const baseAvatar = (metadata.avatar_url || "").split("?")[0];
-                    const avatarStamp = metadata.avatar_updated_at || "";
-                    setAvatarUrl(baseAvatar ? `${baseAvatar}?t=${avatarStamp || Date.now()}` : "");
                     setRiasecType(
                         metadata.riasec_type ||
                         localStorage.getItem("riasec_result") ||
@@ -148,74 +138,14 @@ const Profile = () => {
         }
     };
 
-    const handleAvatarUpload = async e => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        if (!file.type.startsWith("image/")) {
-            showMessage("error", "Моля, изберете изображение (JPG, PNG, WebP).");
-            return;
-        }
-        if (file.size > 5 * 1024 * 1024) {
-            showMessage("error", "Снимката трябва да е под 5 MB.");
-            return;
-        }
-
-        setUploadingAvatar(true);
-        try {
-            // Винаги към ЕДИН и същ файл (`avatar`, без extension) с upsert →
-            // няма orphan файлове от стари upload-и с различни extension-и.
-            // Content-type-ът се пази в storage metadata-та и browser-ът
-            // го използва за render-а.
-            const path = `${user.id}/avatar`;
-
-            const { error: uploadError } = await supabase.storage
-                .from("avatars")
-                .upload(path, file, {
-                    upsert: true,
-                    contentType: file.type,
-                    cacheControl: "60",
-                });
-            if (uploadError) throw uploadError;
-
-            const { data } = supabase.storage.from("avatars").getPublicUrl(path);
-            const baseUrl = data.publicUrl;
-            const stamp = Date.now();
-
-            // В metadata пазим базовия URL (стабилен) + timestamp за cachebust.
-            // При следващо влизане Profile/Header генерират `${url}?t=${stamp}`
-            // и виждат най-новата версия дори ако path не се е променил.
-            const { error: updateError } = await supabase.auth.updateUser({
-                data: { avatar_url: baseUrl, avatar_updated_at: stamp },
-            });
-            if (updateError) throw updateError;
-
-            // Refresh local user state — гарантира че Header avatar дропдаунът
-            // също се обновява без full reload (USER_UPDATED event-ът понякога
-            // се закъснява в complex tab states).
-            const { data: { user: freshUser } } = await supabase.auth.getUser();
-            if (freshUser) setUser(freshUser);
-
-            setAvatarUrl(`${baseUrl}?t=${stamp}`);
-            showMessage("success", "Профилната снимка е обновена!");
-        } catch (err) {
-            console.error("[avatar upload]", err);
-            showMessage("error", err.message || "Грешка при качване на снимката.");
-        } finally {
-            setUploadingAvatar(false);
-            if (avatarInputRef.current) avatarInputRef.current.value = "";
-        }
-    };
-
-    // Извежда 1-2 инициала от username или email — за placeholder gradient circle.
+    // Извежда първата буква от username или email — за gradient circle avatar.
+    // Avatar upload е премахнат напълно по UX решение; всички профили имат
+    // единен initial-based avatar (като много модерни SaaS apps).
     const getUserInitials = () => {
         const username = formData.username?.trim();
         const email = user?.email || "";
-        const source = username || email.split("@")[0] || "";
-        const words = source.split(/[.\s_-]+/).filter(Boolean);
-        if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
-        if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
-        return "У";
+        const source = (username || email.split("@")[0] || "").trim();
+        return (source[0] || "У").toUpperCase();
     };
 
     const updatePrivacy = async () => {
@@ -308,100 +238,27 @@ const Profile = () => {
                 <div style={{ ...SURFACE, padding: "1.75rem 1.5rem", overflow: "hidden" }}>
                     {/* Header */}
                     <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", gap: "1.5rem", marginBottom: "2.5rem" }}>
-                        <div style={{ position: "relative" }}>
-                            <div
-                                style={{
-                                    width: "9rem",
-                                    height: "9rem",
-                                    borderRadius: "1.5rem",
-                                    background: "linear-gradient(135deg, rgba(6,182,212,0.15), rgba(139,92,246,0.15))",
-                                    border: "3px solid var(--brand-surface)",
-                                    boxShadow: "0 16px 40px var(--brand-shadow)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    color: "var(--brand-cyan)",
-                                    overflow: "hidden",
-                                    position: "relative",
-                                }}
-                            >
-                                {avatarUrl ? (
-                                    <img
-                                        src={avatarUrl}
-                                        alt="Профилна снимка"
-                                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                                        // Ако URL-ът се счупи (изтрит от storage, мрежова грешка),
-                                        // връщаме се към placeholder-а с инициали.
-                                        onError={() => setAvatarUrl("")}
-                                    />
-                                ) : (
-                                    <div
-                                        style={{
-                                            width: "100%",
-                                            height: "100%",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                            background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
-                                            color: "#fff",
-                                            fontSize: "3.25rem",
-                                            fontWeight: 900,
-                                            letterSpacing: "-0.04em",
-                                            fontFamily: "Inter, system-ui, sans-serif",
-                                            userSelect: "none",
-                                            textShadow: "0 2px 8px rgba(0,0,0,0.25)",
-                                        }}
-                                    >
-                                        {getUserInitials()}
-                                    </div>
-                                )}
-                                {uploadingAvatar && (
-                                    <div
-                                        style={{
-                                            position: "absolute",
-                                            inset: 0,
-                                            background: "rgba(0,0,0,0.55)",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                        }}
-                                    >
-                                        <Loader2 size={28} style={{ color: "#fff", animation: "spin 1s linear infinite" }} />
-                                    </div>
-                                )}
-                            </div>
-                            <input
-                                ref={avatarInputRef}
-                                type="file"
-                                accept="image/*"
-                                style={{ display: "none" }}
-                                onChange={handleAvatarUpload}
-                            />
-                            <button
-                                onClick={() => avatarInputRef.current?.click()}
-                                disabled={uploadingAvatar}
-                                title="Смени профилната снимка"
-                                style={{
-                                    position: "absolute",
-                                    bottom: "-0.375rem",
-                                    right: "-0.375rem",
-                                    width: "2.25rem",
-                                    height: "2.25rem",
-                                    borderRadius: "50%",
-                                    background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
-                                    border: "2px solid var(--brand-bg)",
-                                    color: "#fff",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    cursor: uploadingAvatar ? "not-allowed" : "pointer",
-                                    boxShadow: "0 8px 20px rgba(6,182,212,0.3)",
-                                    opacity: uploadingAvatar ? 0.6 : 1,
-                                    transition: "opacity 0.2s",
-                                }}
-                            >
-                                <Edit3 size={13} />
-                            </button>
+                        <div
+                            style={{
+                                width: "9rem",
+                                height: "9rem",
+                                borderRadius: "1.5rem",
+                                background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                border: "3px solid var(--brand-surface)",
+                                boxShadow: "0 16px 40px var(--brand-shadow)",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                color: "#fff",
+                                fontSize: "4.5rem",
+                                fontWeight: 900,
+                                letterSpacing: "-0.04em",
+                                fontFamily: "Inter, system-ui, sans-serif",
+                                userSelect: "none",
+                                textShadow: "0 2px 8px rgba(0,0,0,0.25)",
+                            }}
+                        >
+                            {getUserInitials()}
                         </div>
 
                         <div style={{ flex: 1, minWidth: "240px", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
