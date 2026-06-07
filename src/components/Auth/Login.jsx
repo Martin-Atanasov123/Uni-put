@@ -12,6 +12,7 @@ import {
     GraduationCap,
 } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import Seo from "@/components/common/Seo";
 
 const SAFE_ORIGIN = import.meta.env.VITE_APP_URL || window.location.origin;
 
@@ -74,6 +75,7 @@ const Login = () => {
                 overflow: "hidden",
             }}
         >
+            <Seo title="Вход" path="/login" noindex />
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
             {/* ambient glows */}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getCareersByRiasec, getUniversitiesByRiasec, getAllRiasecCodes } from '@/lib/api';
+import Seo from "@/components/common/Seo";
 
 /**
  * Тестова конзола за проверка на RIASEC API интеграцията.
@@ -48,6 +49,7 @@ const TestCareer = () => {
 
     return (
         <div className="pt-28 p-10 max-w-6xl mx-auto space-y-8">
+            <Seo title="RIASEC Тестова Конзола" path="/test-career" noindex />
             <h1 className="text-3xl font-bold">RIASEC Тестова Конзола</h1>
             
             <div className="flex gap-4 items-end bg-base-200 p-6 rounded-xl">

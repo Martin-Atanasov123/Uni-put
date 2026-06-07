@@ -3,6 +3,7 @@ import { supabase } from "@/lib/supabase";
 import { Mail, ArrowLeft, Loader2, AlertCircle, CheckCircle2, KeyRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Field } from "./Login";
+import Seo from "@/components/common/Seo";
 
 const SAFE_ORIGIN = import.meta.env.VITE_APP_URL || window.location.origin;
 
@@ -44,6 +45,7 @@ const ForgotPassword = () => {
                 overflow: "hidden",
             }}
         >
+            <Seo title="Забравена парола" path="/forgot-password" noindex />
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
             <div aria-hidden style={{ position: "absolute", top: "-200px", right: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(6,182,212,0.1), transparent 70%)", pointerEvents: "none" }} />

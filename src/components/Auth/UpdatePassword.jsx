@@ -4,6 +4,7 @@ import { Lock, Eye, EyeOff, Loader2, AlertCircle, CheckCircle2 } from "lucide-re
 import { useNavigate } from "react-router-dom";
 import { Field } from "./Login";
 import { Alert } from "./ForgotPassword";
+import Seo from "@/components/common/Seo";
 
 const UpdatePassword = () => {
     const [password, setPassword] = useState("");
@@ -66,6 +67,7 @@ const UpdatePassword = () => {
                 overflow: "hidden",
             }}
         >
+            <Seo title="Нова парола" path="/update-password" noindex />
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
             <div aria-hidden style={{ position: "absolute", top: "-200px", left: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(139,92,246,0.1), transparent 70%)", pointerEvents: "none" }} />

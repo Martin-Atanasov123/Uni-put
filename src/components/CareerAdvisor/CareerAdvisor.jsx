@@ -5,6 +5,21 @@ import { getRiasecMatches } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import riasecData from "@/data/riasec_questions.json";
 import Seo from "@/components/common/Seo";
+import JsonLd from "@/components/common/JsonLd";
+
+// Quiz schema — Google rich result за интерактивни тестове.
+// Подчертава че е безплатен + достъпен на български → AI Overview eligibility.
+const RIASEC_SCHEMA = {
+    "@context": "https://schema.org",
+    "@type": "Quiz",
+    name: "RIASEC кариерен тест",
+    about: "Психометричен тест на Холанд за кариерно ориентиране",
+    educationalLevel: "Secondary education",
+    inLanguage: "bg-BG",
+    isAccessibleForFree: true,
+    numberOfQuestions: 30,
+    timeRequired: "PT3M",
+};
 import {
     CheckCircle2,
     ChevronRight,
@@ -465,10 +480,11 @@ const CareerAdvisor = () => {
             style={{ minHeight: "100vh", background: "var(--brand-bg)", color: "var(--brand-text)", paddingTop: step === "quiz" ? "5rem" : "6rem", paddingBottom: "5rem", position: "relative", overflow: "hidden" }}
         >
             <Seo
-                title="Кариерен тест RIASEC"
-                description="Направи безплатния RIASEC кариерен тест — 30 въпроса разкриват кои специалности пасват на твоите интереси и силни страни."
+                title="Безплатен RIASEC кариерен тест — Открий подходящата специалност"
+                description="Направи безплатния RIASEC кариерен тест — 30 въпроса за около 3 минути. Алгоритъмът сравнява профила ти с 912 специалности и 1002 кариери, за да открие най-подходящите. Без регистрация."
                 path="/career-advisor"
             />
+            <JsonLd data={RIASEC_SCHEMA} />
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
             {/* ambient glow */}

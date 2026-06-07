@@ -4,7 +4,24 @@ import { m, AnimatePresence } from "motion/react";
 import { supabase } from "@/lib/supabase";
 import { useLocation, Link } from "react-router-dom";
 import Seo from "@/components/common/Seo";
+import JsonLd from "@/components/common/JsonLd";
 import { useAuth } from "@/hooks/useAuth";
+
+// HowTo schema — Google rich result за стъпковите процеси.
+// Прави калкулатора eligible за show-eshte със стъпки в SERP.
+const CALCULATOR_SCHEMA = {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: "Как да изчислиш кандидатстудентския си бал",
+    description: "Стъпки за изчисление на приемен бал по официалните МОН формули за български университет",
+    totalTime: "PT2M",
+    step: [
+        { "@type": "HowToStep", position: 1, name: "Избери факултет", text: "Изберете факултета, в който искате да кандидатствате." },
+        { "@type": "HowToStep", position: 2, name: "Избери специалност", text: "Изберете конкретната специалност от списъка." },
+        { "@type": "HowToStep", position: 3, name: "Въведи оценките", text: "Въведете оценките от диплома, матура (ДЗИ) и кандидатстудентски изпити." },
+        { "@type": "HowToStep", position: 4, name: "Виж приемния бал", text: "Калкулаторът прилага официалните коефициенти и показва резултата ви спрямо историческия праг за прием." },
+    ],
+};
 import {
     Calculator,
     TrendingUp,
@@ -414,10 +431,11 @@ export default function CalculatorPage() {
     return (
         <div style={{ minHeight: "100vh", background: "var(--brand-bg)", paddingTop: "7rem", paddingBottom: "5rem" }}>
             <Seo
-                title="Калкулатор за приемен бал"
-                description="Изчисли точния си кандидатстудентски бал по официалните коефициенти на МОН за всяка специалност. Безплатно и без регистрация."
+                title="Кандидатстудентски бал калкулатор — Балообразуване по МОН формули"
+                description="Изчисли своя кандидатстудентски бал за 2026 г. Калкулаторът прилага точните коефициенти и формули за балообразуване от МОН — за 47 университета и 833 специалности. Безплатно, без регистрация."
                 path="/calculator"
             />
+            <JsonLd data={CALCULATOR_SCHEMA} />
             <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 1.5rem" }}>
 
                 {/* Header */}
@@ -600,9 +618,9 @@ export default function CalculatorPage() {
                         transition={{ duration: 0.5, delay: 0.15 }}
                         style={{ marginBottom: "2rem"  }}
                     >
-                        <p style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--brand-cyan)", marginBottom: "1rem" }}>
-                            Как работи
-                        </p>
+                        <h2 style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--brand-cyan)", marginBottom: "1rem", margin: 0 }}>
+                            Как се изчислява баловия резултат
+                        </h2>
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: "0.875rem" }}>
                             {HOW_STEPS.map(step => {
                                 const Icon = step.icon;
@@ -638,9 +656,9 @@ export default function CalculatorPage() {
                             <div style={{ padding: "0.375rem", borderRadius: "0.5rem", background: "linear-gradient(135deg,rgba(6,182,212,0.12),rgba(139,92,246,0.12))", display: "inline-flex" }}>
                                 <Zap size={15} style={{ color: "var(--brand-cyan)" }} />
                             </div>
-                            <p style={{ fontSize: "14px", fontWeight: 800, color: "var(--brand-text)", margin: 0 }}>
-                                Конвертор: Точки ДЗИ → Оценка
-                            </p>
+                            <h2 style={{ fontSize: "14px", fontWeight: 800, color: "var(--brand-text)", margin: 0 }}>
+                                Конвертор: точки от ДЗИ → оценка
+                            </h2>
                         </div>
 
                         {/* Input + Slider */}

@@ -39,7 +39,7 @@ const TermsOfService = () => {
         <div style={{ minHeight: "100vh", background: "var(--brand-bg)", color: "var(--brand-text)", padding: "7rem 1.5rem 4rem", position: "relative", overflow: "hidden" }}>
             <Seo
                 title="Условия за ползване"
-                description="Условия за ползване на платформата УниПът."
+                description="Условия за ползване на УниПът — безплатна платформа за изчисляване на приемен бал и кариерно ориентиране. Какво обещаваме и какви са правата ти като потребител."
                 path="/terms"
             />
             <div aria-hidden style={{ position: "absolute", top: "-200px", right: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(6,182,212,0.1), transparent 70%)", pointerEvents: "none" }} />

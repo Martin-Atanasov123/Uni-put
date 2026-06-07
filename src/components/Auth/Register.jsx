@@ -2,6 +2,7 @@ import { useState } from "react";
 import { m } from "motion/react";
 import { supabase } from "@/lib/supabase";
 import { Link, useNavigate } from "react-router-dom";
+import Seo from "@/components/common/Seo";
 import {
     UserPlus, Mail, Lock, Eye, EyeOff, AlertCircle, Loader2,
     GraduationCap, BookmarkCheck, GitCompareArrows, TrendingUp,
@@ -77,6 +78,7 @@ const SignUp = () => {
                 overflow: "hidden",
             }}
         >
+            <Seo title="Регистрация" path="/register" noindex />
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
             {/* ── Left panel — brand / benefits (desktop only) ── */}

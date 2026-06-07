@@ -9,6 +9,7 @@ import { ArrowLeft, ArrowRight, Calculator, MapPin, GraduationCap, Building2, Al
 import { universityService } from "@/services/universityService";
 import { slugify } from "@/lib/slugify";
 import Seo from "@/components/common/Seo";
+import JsonLd from "@/components/common/JsonLd";
 
 const CARD_BORDER = "1px solid var(--brand-card-border)";
 
@@ -119,7 +120,34 @@ export default function UniversityPage() {
     if (status === "error") return <NotFound slug={uniSlug} />;
 
     const primaryCity = cities[0] || "";
-    const seoDesc = `Изчисли приемния си бал за ${uniName}. ${totalSpecialties} специалности в ${faculties.length} факултета${primaryCity ? `, ${primaryCity}` : ""}. Коефициенти и формули от МОН.`;
+    // SEO copy от SEO-AUDIT-REPORT.md §3.2 — enriched за прием 2026
+    const seoTitle = `Прием в ${uniName} 2026 — Балообразуване, ${faculties.length} факултета, ${totalSpecialties} специалности`;
+    const seoDesc = `Подготвяш се за ${uniName}? Виж точните коефициенти за балообразуване по МОН за всичките ${totalSpecialties} специалности в ${faculties.length} факултета. Изчисли своя приемен бал за 2026 г. — безплатно, без регистрация.${primaryCity ? ` Кампусът е в ${primaryCity}.` : ""}`;
+
+    // Schema.org EducationalOrganization — описва университета като субект.
+    // Department-ите са факултетите, дърпани от actual DB data.
+    const uniSchema = {
+        "@context": "https://schema.org",
+        "@type": "EducationalOrganization",
+        name: uniName,
+        url: `https://uniput.eu/universities/${uniSlug}`,
+        ...(primaryCity && {
+            address: { "@type": "PostalAddress", addressLocality: primaryCity, addressCountry: "BG" },
+        }),
+        areaServed: { "@type": "Country", name: "България" },
+        department: faculties.map(f => ({ "@type": "EducationalOrganization", name: f.name })),
+    };
+
+    // BreadcrumbList — Google показва пътя в SERP-а вместо суров URL.
+    const breadcrumbSchema = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Начало", item: "https://uniput.eu/" },
+            { "@type": "ListItem", position: 2, name: "Университети", item: "https://uniput.eu/universities" },
+            { "@type": "ListItem", position: 3, name: uniName, item: `https://uniput.eu/universities/${uniSlug}` },
+        ],
+    };
 
     return (
         <m.div
@@ -129,10 +157,12 @@ export default function UniversityPage() {
             style={{ minHeight: "100vh", background: "var(--brand-bg)", color: "var(--brand-text)", padding: "7rem 1.5rem 5rem" }}
         >
             <Seo
-                title={`Прием в ${uniName} 2025 — Балообразуване и Специалности`}
+                title={seoTitle}
                 description={seoDesc}
                 path={`/universities/${uniSlug}`}
             />
+            <JsonLd data={uniSchema} />
+            <JsonLd data={breadcrumbSchema} />
 
             <div style={{ maxWidth: "72rem", margin: "0 auto" }}>
 
@@ -162,7 +192,7 @@ export default function UniversityPage() {
                     background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
                     WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
                 }}>
-                    Прием в {uniName} 2025
+                    Прием в {uniName} 2026
                 </h1>
 
                 {/* Stat chips */}
@@ -209,7 +239,7 @@ export default function UniversityPage() {
                     background: "var(--brand-surface-2)", border: CARD_BORDER,
                     borderRadius: "0.625rem", fontSize: "0.75rem", color: "var(--brand-muted)",
                 }}>
-                    <Database size={12} /> Данни от наредбите на МОН, актуализирани за 2025 г.
+                    <Database size={12} /> Данни от наредбите на МОН, актуализирани за 2026 г.
                 </div>
 
                 {/* Faculties + specialties */}

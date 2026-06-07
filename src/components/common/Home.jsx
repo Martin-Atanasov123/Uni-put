@@ -3,6 +3,35 @@ import { Link } from "react-router-dom";
 import { m, useInView } from "motion/react";
 import { useAuth } from "@/hooks/useAuth";
 import Seo from "@/components/common/Seo";
+import JsonLd from "@/components/common/JsonLd";
+
+// Schema.org structured data — описание на УниПът като организация и сайт.
+// Помага на Google + AI Overview да разберат scope-а на платформата.
+const HOME_SCHEMA = {
+    "@context": "https://schema.org",
+    "@graph": [
+        {
+            "@type": "Organization",
+            name: "УниПът",
+            url: "https://uniput.eu",
+            logo: "https://uniput.eu/university.png",
+            description: "Безплатна платформа за изчисляване на кандидатстудентски бал и кариерно ориентиране на български кандидат-студенти",
+            areaServed: { "@type": "Country", name: "България" },
+            knowsAbout: [
+                "Балообразуване",
+                "Кандидатстудентски бал",
+                "RIASEC кариерен тест",
+                "Висше образование в България",
+            ],
+        },
+        {
+            "@type": "WebSite",
+            url: "https://uniput.eu",
+            name: "УниПът",
+            inLanguage: "bg-BG",
+        },
+    ],
+};
 
 import {
     Brain,
@@ -986,10 +1015,11 @@ export default function Home() {
             style={{ background: "var(--brand-bg)", minHeight: "100vh" }}
         >
             <Seo
-                title="Платформа за кандидат-студенти"
-                description="Изчисли приемния си бал, открий подходяща кариера с RIASEC тест и сравни българските университети — безплатно, на едно място."
+                title="УниПът — Калкулатор за приемен бал и кариерен ориентир за кандидат-студенти"
+                description="Изчисли своя кандидатстудентски бал по МОН формулите, открий подходящи специалности с RIASEC тест и сравни 47 университета — безплатно, на едно място. За 2026 г."
                 path="/"
             />
+            <JsonLd data={HOME_SCHEMA} />
             <HeroSection />
             <StatStripSection />
             <HowItWorksSection />

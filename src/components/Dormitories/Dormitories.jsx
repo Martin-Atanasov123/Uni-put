@@ -300,8 +300,8 @@ const Dormitories = () => {
     return (
         <div style={{ minHeight: "100vh", background: "var(--brand-bg)", padding: "7rem 1.5rem 3rem", color: "var(--brand-text)" }}>
             <Seo
-                title="Студентски общежития"
-                description="Намери студентско общежитие по град и университет — цени, условия и местоположение на едно място."
+                title="Студентски общежития в България — 68 блока, цени и условия за 2026"
+                description="Сравни 68 студентски общежития в 16 града. Месечен наем, депозит, разстояние до университета и транспортни линии — на едно място. Данни към 2026 г."
                 path="/dormitories"
             />
             <style>{`@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`}</style>
@@ -342,7 +342,7 @@ const Dormitories = () => {
                 >
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--brand-muted)" }}>
                         <Filter size={14} />
-                        <span style={{ fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em" }}>Филтри</span>
+                        <h2 style={{ fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Филтриране по университет</h2>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flex: 1, minWidth: "240px" }}>
                         <School size={14} style={{ color: "var(--brand-muted)" }} />
