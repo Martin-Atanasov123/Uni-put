@@ -702,6 +702,7 @@ export default function UniversitiesPage() {
                 title="Висши училища в България — 47 университета, 833 специалности за прием 2026"
                 description="Виж всички 47 висши училища в България и техните 833 специалности. Филтрирай по град, факултет или степен. Изчисли приемния си бал за 2026 г. с точните коефициенти от МОН."
                 path="/universities"
+                image="https://uniput.eu/og/universities.png"
             />
             <div style={{ maxWidth: "80rem", margin: "0 auto", padding: "0 1.5rem" }}>
 

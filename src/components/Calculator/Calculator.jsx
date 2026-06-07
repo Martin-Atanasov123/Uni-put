@@ -434,6 +434,7 @@ export default function CalculatorPage() {
                 title="Кандидатстудентски бал калкулатор — Балообразуване по МОН формули"
                 description="Изчисли своя кандидатстудентски бал за 2026 г. Калкулаторът прилага точните коефициенти и формули за балообразуване от МОН — за 47 университета и 833 специалности. Безплатно, без регистрация."
                 path="/calculator"
+                image="https://uniput.eu/og/calculator.png"
             />
             <JsonLd data={CALCULATOR_SCHEMA} />
             <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 1.5rem" }}>

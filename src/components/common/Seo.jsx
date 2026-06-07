@@ -2,7 +2,10 @@ import { useEffect } from "react";
 
 const SITE_URL = "https://uniput.eu";
 const SITE_NAME = "УниПът";
-const DEFAULT_IMAGE = `${SITE_URL}/university.png`;
+// Default OG e branded 1200×630 шаблон (генериран от scripts/generate-og-images.mjs).
+// Per-page override-ва се чрез `image` prop. Платформи като Facebook кешират по URL,
+// затова рядко променяме файла; ако се промени дизайнът — нов filename или append ?v=N.
+const DEFAULT_IMAGE = `${SITE_URL}/og/default.png`;
 
 /**
  * Per-страница SEO мета тагове. React 19 ги повдига автоматично в <head>,
@@ -39,11 +42,15 @@ export default function Seo({ title, description, path = "/", image = DEFAULT_IM
             <meta property="og:title" content={fullTitle} />
             {description && <meta property="og:description" content={description} />}
             <meta property="og:image" content={image} />
+            <meta property="og:image:width" content="1200" />
+            <meta property="og:image:height" content="630" />
+            <meta property="og:image:alt" content={fullTitle} />
 
             <meta name="twitter:card" content="summary_large_image" />
             <meta name="twitter:title" content={fullTitle} />
             {description && <meta name="twitter:description" content={description} />}
             <meta name="twitter:image" content={image} />
+            <meta name="twitter:image:alt" content={fullTitle} />
         </>
     );
 }

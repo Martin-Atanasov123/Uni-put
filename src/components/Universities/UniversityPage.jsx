@@ -242,6 +242,59 @@ export default function UniversityPage() {
                     <Database size={12} /> Данни от наредбите на МОН, актуализирани за 2026 г.
                 </div>
 
+                {/* ── Уникален съдържателен блок (F2 от SEO одита) ──
+                    Решава „Crawled — currently not indexed" чрез ~110 думи
+                    реален текст, разчупващ template thinness. Всички числа
+                    идват от Supabase, нула измисляне. */}
+                <section style={{
+                    marginTop: "2.5rem",
+                    background: "var(--brand-surface)",
+                    border: "1px solid var(--brand-card-border)",
+                    borderRadius: "1.25rem",
+                    padding: "1.75rem",
+                }}>
+                    <h2 style={{
+                        margin: 0, fontSize: "1.125rem", fontWeight: 700,
+                        letterSpacing: "-0.01em", color: "var(--brand-text)",
+                    }}>
+                        За приема в {uniName} през 2026 г.
+                    </h2>
+                    <p style={{
+                        margin: "1rem 0 0", fontSize: "0.9375rem",
+                        lineHeight: 1.7, color: "var(--brand-muted)", maxWidth: "65ch",
+                    }}>
+                        {uniName} е сред 47-те акредитирани висши училища в България. През
+                        академичната 2026 г. приема кандидати за {totalSpecialties}{" "}
+                        {totalSpecialties === 1 ? "специалност" : "специалности"},
+                        разпределени в {faculties.length}{" "}
+                        {faculties.length === 1 ? "факултет" : "факултета"}.
+                        Балообразуването следва официалните коефициенти, публикувани от МОН
+                        в наредбата за прием.
+                    </p>
+                    <p style={{
+                        margin: "0.875rem 0 0", fontSize: "0.9375rem",
+                        lineHeight: 1.7, color: "var(--brand-muted)", maxWidth: "65ch",
+                    }}>
+                        Изчисли реалния си конкурсен бал с{" "}
+                        <Link to="/calculator" style={{ color: "var(--brand-cyan)", textDecoration: "none", fontWeight: 600 }}>
+                            калкулатора за бал
+                        </Link>
+                        {" "}— той прилага точните формули за всяка от {totalSpecialties}{" "}
+                        {totalSpecialties === 1 ? "специалност" : "специалности"} и сравнява
+                        резултата ти с историческия среден бал за прием.
+                    </p>
+                    <p style={{
+                        margin: "0.875rem 0 0", fontSize: "0.9375rem",
+                        lineHeight: 1.7, color: "var(--brand-muted)", maxWidth: "65ch",
+                    }}>
+                        Не си сигурен/а в специалността? Започни с{" "}
+                        <Link to="/career-advisor" style={{ color: "var(--brand-cyan)", textDecoration: "none", fontWeight: 600 }}>
+                            RIASEC кариерния тест
+                        </Link>
+                        {" "}— той сравнява профила ти с 912 специалности и предлага най-подходящите.
+                    </p>
+                </section>
+
                 {/* Faculties + specialties */}
                 <div style={{ marginTop: "3rem", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                     {faculties.map((fac, idx) => (

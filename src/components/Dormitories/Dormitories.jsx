@@ -303,6 +303,7 @@ const Dormitories = () => {
                 title="Студентски общежития в България — 68 блока, цени и условия за 2026"
                 description="Сравни 68 студентски общежития в 16 града. Месечен наем, депозит, разстояние до университета и транспортни линии — на едно място. Данни към 2026 г."
                 path="/dormitories"
+                image="https://uniput.eu/og/dormitories.png"
             />
             <style>{`@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`}</style>
 
