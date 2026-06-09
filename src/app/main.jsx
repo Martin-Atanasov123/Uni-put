@@ -6,6 +6,26 @@ import "@fontsource-variable/inter/wght.css"
 
 import App from './App.jsx'
 
+// Auto-recover от stale chunk references след deploy.
+// Когато Netlify пуска нов build, старите chunk hashes изчезват от сървъра.
+// User-и с cached index.html продължават да ги искат → 404 → React ErrorBoundary.
+// Vite emit-ва "vite:preloadError" → reload-ваме за да вземе свежи hashes.
+// `sessionStorage` guard предотвратява infinite reload loop ако грешката е реална.
+window.addEventListener("vite:preloadError", (event) => {
+    if (sessionStorage.getItem("__chunk_reload_attempted")) {
+        // Вече сме опитали reload — оставяме ErrorBoundary да го хване
+        return;
+    }
+    sessionStorage.setItem("__chunk_reload_attempted", "1");
+    event.preventDefault();
+    window.location.reload();
+});
+
+// Изчисти guard-а след успешен mount.
+window.addEventListener("load", () => {
+    setTimeout(() => sessionStorage.removeItem("__chunk_reload_attempted"), 2000);
+});
+
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <App />

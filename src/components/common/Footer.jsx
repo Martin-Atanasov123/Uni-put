@@ -126,7 +126,7 @@ const Footer = () => {
                 >
                     <div style={{ display: "flex", flexDirection: "column", gap: "1rem", maxWidth: "320px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}>
-                            <div
+                            {/* <div
                                 style={{
                                     width: "2.25rem",
                                     height: "2.25rem",
@@ -139,7 +139,15 @@ const Footer = () => {
                                 }}
                             >
                                 <GraduationCap size={20} color="#fff" />
-                            </div>
+                                
+                            </div> */} {/* Brand */}
+                    <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+                        <img
+                            src="/transparent logo .png"
+                            alt="УниПът лого"
+                            style={{ height: "70px", width: "auto", objectFit: "contain", borderRadius: "0.5rem"  }}
+                        />
+                    </Link>
                             <span
                                 style={{
                                     fontSize: "1.25rem",

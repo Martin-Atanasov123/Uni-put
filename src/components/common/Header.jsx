@@ -107,20 +107,12 @@ export default function Header() {
                     boxShadow: "0 10px 40px var(--brand-shadow)",
                 }}>
                     {/* Brand */}
-                    <Link to="/" style={{ display: "flex", alignItems: "center", gap: "0.5rem", textDecoration: "none" }}>
-                        <div style={{
-                            padding: "0.5rem", borderRadius: "0.625rem",
-                            background: "linear-gradient(135deg,var(--brand-cyan),var(--brand-violet))",
-                            display: "flex", alignItems: "center", justifyContent: "center",
-                            boxShadow: "0 8px 24px rgba(6,182,212,0.3)",
-                        }}>
-                            <GraduationCap size={18} color="#fff" />
-                        </div>
-                        <span style={{
-                            fontSize: "1.125rem", fontWeight: 800, letterSpacing: "-0.02em",
-                            background: "linear-gradient(135deg,var(--brand-cyan),var(--brand-violet))",
-                            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                        }}>УниПът</span>
+                    <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+                        <img
+                            src="/logo with title2.png"
+                            alt="УниПът лого"
+                            style={{ height: "70px", width: "auto", objectFit: "contain", borderRadius: "0.5rem"  }}
+                        />
                     </Link>
 
                     {/* Desktop nav */}
