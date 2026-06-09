@@ -109,7 +109,7 @@ export default function Header() {
                     {/* Brand */}
                     <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
                         <img
-                            src="/logo with title2.png"
+                            src="/logo with title.png"
                             alt="УниПът лого"
                             style={{ height: "70px", width: "auto", objectFit: "contain", borderRadius: "0.5rem"  }}
                         />
