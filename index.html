@@ -2,7 +2,20 @@
 <html data-theme="dark" lang="bg" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/university.png"  />
+    <link rel="icon" type="image/png" href="/logo-icon.png" />
+    <!-- Google Analytics 4 — Consent Mode v2 (GDPR compliant) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-62XEXEWDLC"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      var _c = localStorage.getItem('uniput_cookie_consent');
+      gtag('consent', 'default', {
+        analytics_storage: _c === 'granted' ? 'granted' : 'denied',
+        ad_storage: 'denied'
+      });
+      gtag('js', new Date());
+      gtag('config', 'G-62XEXEWDLC', { anonymize_ip: true });
+    </script>
     <link rel="preconnect" href="https://vryaoxncvtnpsngkqteq.supabase.co" crossorigin />
     <link rel="dns-prefetch" href="https://images.unsplash.com" />
     <!-- Inter is self-hosted via @fontsource-variable/inter (see main.jsx) — no Google Fonts round-trip -->
