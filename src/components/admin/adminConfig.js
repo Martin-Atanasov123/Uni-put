@@ -36,5 +36,20 @@ export const ADMIN_TABLES = [
       { id: "transport_lines", label: "Транспортни линии (масив)", type: "json" }
     ],
     defaultSort: { field: "block_number", direction: "asc" }
+  },
+  {
+    id: "admission_min_scores",
+    table: "admission_min_scores",
+    label: "Минимални балове (класиране)",
+    primaryKey: "id",
+    fields: [
+      { id: "university_id", label: "Запис от universities (UUID)", type: "text", required: true },
+      { id: "year", label: "Година (КСК)", type: "number", step: "1", required: true },
+      { id: "round", label: "Класиране (1/2/3, празно = финално)", type: "number", step: "1" },
+      { id: "min_ball", label: "Мин. бал", type: "number", step: "0.01", required: true },
+      { id: "quota", label: "Квота (жени/мъже, празно = обща)", type: "text" },
+      { id: "source_url", label: "Източник (URL)", type: "text" }
+    ],
+    defaultSort: { field: "year", direction: "desc" }
   }
 ];

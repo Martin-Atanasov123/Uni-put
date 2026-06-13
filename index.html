@@ -60,7 +60,13 @@
       name="description"
       content="УниПът помага на кандидат-студенти да открият специалност, да изчислят кандидатстудентски бал и да сравнят приема в българските университети."
     />
-    <link data-seo-default rel="canonical" href="https://uniput.eu/" />
+    <!-- ВНИМАНИЕ: НЕ добавяй статичен canonical тук! SPA-то сервира този HTML
+         за ВСИЧКИ routes — статичен canonical href="/" казва на Google, че
+         всяка страница е "alternate" на началната → деиндексира целия сайт.
+         (GSC: "Alternate page with proper canonical tag", юни 2026.)
+         Per-route canonical се инжектира от <Seo> при JS render — Google го
+         чете във втория (rendered) pass. Липсващ canonical в суровия HTML е
+         безвреден; грешен е катастрофа. -->
     <meta data-seo-default property="og:type" content="website" />
     <meta data-seo-default property="og:site_name" content="УниПът" />
     <meta data-seo-default property="og:locale" content="bg_BG" />

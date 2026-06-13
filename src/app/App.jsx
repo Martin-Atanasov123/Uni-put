@@ -24,6 +24,7 @@ const UniversitiesPage= lazy(() => import("@/components/Universities/Universitie
 const UniversityPage  = lazy(() => import("@/components/Universities/UniversityPage"));
 const CareerAdvisor   = lazy(() => import("@/components/CareerAdvisor/CareerAdvisor"));
 const TestCareer      = lazy(() => import("@/components/CareerAdvisor/TestCareer"));
+const DziStrategist   = lazy(() => import("@/components/DziStrategist/DziStrategist"));
 const Dormitories     = lazy(() => import("@/components/Dormitories/Dormitories"));
 const FavoritesPage   = lazy(() => import("@/components/Favorites/Favorites"));
 const CalculatorPage  = lazy(() => import("@/components/Calculator/Calculator"));
@@ -90,6 +91,9 @@ function App() {
                                     } />
                                     <Route path="/test-career" element={
                                         <PageWrap><GlobalErrorBoundary><TestCareer /></GlobalErrorBoundary></PageWrap>
+                                    } />
+                                    <Route path="/dzi-strateg" element={
+                                        <PageWrap><GlobalErrorBoundary><DziStrategist /></GlobalErrorBoundary></PageWrap>
                                     } />
                                     <Route path="/dormitories" element={<PageWrap><Dormitories /></PageWrap>} />
                                     <Route path="/favorites" element={

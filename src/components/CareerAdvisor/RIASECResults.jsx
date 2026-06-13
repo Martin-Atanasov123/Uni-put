@@ -500,7 +500,7 @@ const RIASECResults = ({ results, onRestart }) => {
                         Виж дали ще влезеш в тези специалности
                     </h3>
                     <p style={{ margin: "0.4rem 0 0", fontSize: "13px", color: "var(--brand-muted)" }}>
-                        Изчисли своя приемен бал и сравни с историческия среден бал за прием.
+                        Изчисли своя приемен бал и сравни с реалния минимален бал за прием.
                     </p>
                 </div>
                 <Link
@@ -515,6 +515,15 @@ const RIASECResults = ({ results, onRestart }) => {
                     }}
                 >
                     <Calculator size={18} /> Изчисли бал за тези специалности <ArrowRight size={16} />
+                </Link>
+                <Link
+                    to="/dzi-strateg"
+                    style={{
+                        display: "inline-flex", alignItems: "center", gap: "0.4rem",
+                        fontSize: "13px", fontWeight: 700, color: "var(--brand-cyan)", textDecoration: "none",
+                    }}
+                >
+                    Още в 11. клас? Виж кой втори ДЗИ да избереш <ArrowRight size={14} />
                 </Link>
             </div>
 

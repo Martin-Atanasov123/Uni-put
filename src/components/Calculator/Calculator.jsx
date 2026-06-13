@@ -44,6 +44,7 @@ import {
     Bookmark,
     X as XIcon,
     UserPlus,
+    Compass,
 } from "lucide-react";
 import GradeInputSection from "./GradeInputSection";
 import ReportButton from "./ReportButton";
@@ -132,6 +133,7 @@ const TIPS = [
 export default function CalculatorPage() {
     const currentYear = new Date().getFullYear();
     const [allData, setAllData] = useState([]);
+    const [minScores, setMinScores] = useState({}); // university_id → {minBall, minBallMax, year, round}
     const [faculties, setFaculties] = useState([]);
     const [selectedFaculty, setSelectedFaculty] = useState("");
     const [selectedCity, setSelectedCity] = useState("");
@@ -268,6 +270,42 @@ export default function CalculatorPage() {
             }
             setAllData(data || []);
             setLoadError(null);
+
+            // Официални минимални балове от класиране (где са публикувани).
+            // Отделна slim заявка — не пипаме основната, кешираме по запис.
+            const ids = (data || []).map(r => r.id);
+            if (ids.length) {
+                const { data: msData, error: msError } = await supabase
+                    .from("admission_min_scores")
+                    .select("university_id,year,round,min_ball,quota")
+                    .in("university_id", ids);
+                if (!msError && msData?.length) {
+                    const byId = {};
+                    msData.forEach(r => { (byId[r.university_id] ||= []).push(r); });
+                    const resolved = {};
+                    Object.entries(byId).forEach(([id, rows]) => {
+                        // Последна година → най-късно класиране (null round = финално).
+                        const latestYear = Math.max(...rows.map(r => r.year));
+                        const yearRows = rows.filter(r => r.year === latestYear);
+                        const roundRank = r => (r.round === null ? 99 : r.round);
+                        const bestRound = Math.max(...yearRows.map(roundRank));
+                        const finalRows = yearRows.filter(r => roundRank(r) === bestRound);
+                        const values = finalRows.map(r => Number(r.min_ball)).filter(v => !Number.isNaN(v));
+                        if (!values.length) return;
+                        resolved[id] = {
+                            minBall: Math.min(...values),          // прагът = най-ниският приет бал
+                            minBallMax: Math.max(...values),       // при квоти (жени/мъже) — горен край на диапазона
+                            year: latestYear,
+                            round: finalRows[0].round,
+                        };
+                    });
+                    setMinScores(resolved);
+                } else {
+                    setMinScores({});
+                }
+            } else {
+                setMinScores({});
+            }
         })();
     }, [selectedFaculty]);
 
@@ -386,17 +424,19 @@ export default function CalculatorPage() {
 
     const calcResults = useMemo(() => {
         if (!rowsForSelectedSpecialty.length) return [];
-        const maxBallValues = rowsForSelectedSpecialty.map(r => Number(r.max_ball)).filter(v => !Number.isNaN(v) && v > 0);
-        const avgMaxBall = maxBallValues.length ? maxBallValues.reduce((a, b) => a + b, 0) / maxBallValues.length : null;
         return rowsForSelectedSpecialty.map(item => {
             const { score, missingSlots } = calculateScore(item.coefficients, grades);
-            const midPoint = avgMaxBall ? avgMaxBall / 2 : null;
-            const isAbove = avgMaxBall !== null && score >= midPoint;
-            const diff = midPoint !== null ? Math.abs(midPoint - score).toFixed(2) : null;
+            const maxBall = Number(item.max_ball) > 0 ? Number(item.max_ball) : null;
+            // Тристепенен модел: реален минимум от класиране → сравнение с него;
+            // няма публикуван → само % от максималния бал, без „влизаш/не влизаш" присъда.
+            const minScore = minScores[item.id] || null;
+            const isAbove = minScore ? score >= minScore.minBall : null;
+            const diff = minScore ? Math.abs(score - minScore.minBall).toFixed(2) : null;
+            const percentOfMax = !minScore && maxBall && score > 0 ? Math.min((score / maxBall) * 100, 100) : null;
             const hasStarted = score > 0 || hasAnyValidGrade;
-            return { item, score, formatted: Number.isFinite(score) ? score.toFixed(2) : "0.00", isAbove, diff, hasStarted, hasMissing: missingSlots.length > 0, missingSlots, midPoint, avgMaxBall };
+            return { item, score, formatted: Number.isFinite(score) ? score.toFixed(2) : "0.00", minScore, isAbove, diff, percentOfMax, maxBall, hasStarted, hasMissing: missingSlots.length > 0, missingSlots };
         });
-    }, [rowsForSelectedSpecialty, grades, hasAnyValidGrade]);
+    }, [rowsForSelectedSpecialty, grades, hasAnyValidGrade, minScores]);
 
     // Save to calculator history whenever a full score is reached
     useEffect(() => {
@@ -409,8 +449,10 @@ export default function CalculatorPage() {
             specialty: selectedSpecialtyName,
             score: parseFloat(best.formatted),
             university: best.item.university_name,
-            maxBall: best.avgMaxBall,
-            isAbove: best.isAbove,
+            maxBall: best.maxBall,
+            minBall: best.minScore?.minBall ?? null,
+            minBallYear: best.minScore?.year ?? null,
+            isAbove: best.isAbove, // null когато няма публикуван минимален бал
             date: Date.now(),
         };
         const prev = JSON.parse(localStorage.getItem("calculator_history") || "[]");
@@ -574,6 +616,7 @@ export default function CalculatorPage() {
                             value={selectedSpecialtyName}
                             onChange={e => setSelectedSpecialtyName(e.target.value)}
                             disabled={!selectedFaculty}
+                            aria-label="Избери специалност"
                             style={{ ...S.input, cursor: selectedFaculty ? "pointer" : "not-allowed", opacity: selectedFaculty ? 1 : 0.5 }}
                         >
                             <option value="" style={{ background: "var(--brand-dropdown-bg)" }}>Избери специалност</option>
@@ -641,6 +684,41 @@ export default function CalculatorPage() {
                                 );
                             })}
                         </div>
+                    </m.div>
+                )}
+
+                {/* ДЗИ Стратег промо — за 11-класници, които още нямат оценки */}
+                {!selectedFaculty && !isFacultyDropdownOpen && (
+                    <m.div
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.18 }}
+                        style={{ marginBottom: "2rem" }}
+                    >
+                        <Link
+                            to="/dzi-strateg"
+                            style={{
+                                display: "flex", alignItems: "center", gap: "1rem",
+                                padding: "1.25rem 1.5rem",
+                                background: "linear-gradient(135deg, rgba(6,182,212,0.08), rgba(139,92,246,0.08))",
+                                border: "1px solid var(--brand-card-border)",
+                                borderRadius: "1.25rem",
+                                textDecoration: "none",
+                            }}
+                        >
+                            <div style={{ flexShrink: 0, padding: "0.625rem", borderRadius: "0.75rem", background: "linear-gradient(135deg,var(--brand-cyan),var(--brand-violet))", display: "inline-flex" }}>
+                                <Compass size={20} color="#fff" strokeWidth={1.5} />
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                                <p style={{ fontSize: "14px", fontWeight: 800, color: "var(--brand-text)", margin: "0 0 0.2rem", letterSpacing: "-0.01em" }}>
+                                    Още нямаш оценки? Виж кой втори ДЗИ ти отваря най-много специалности
+                                </p>
+                                <p style={{ fontSize: "12px", color: "var(--brand-muted)", margin: 0, lineHeight: 1.5 }}>
+                                    ДЗИ Стратег — за 11. клас и всеки, който планира матурите си.
+                                </p>
+                            </div>
+                            <ArrowRight size={18} style={{ flexShrink: 0, color: "var(--brand-cyan)" }} />
+                        </Link>
                     </m.div>
                 )}
 
@@ -873,7 +951,7 @@ export default function CalculatorPage() {
                         transition={{ duration: 0.4, delay: 0.1 }}
                         style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(320px,1fr))", gap: "1rem" }}
                     >
-                        {calcResults.map(({ item, formatted, isAbove, diff, hasStarted, hasMissing, missingSlots, midPoint, avgMaxBall }) => (
+                        {calcResults.map(({ item, formatted, minScore, isAbove, diff, percentOfMax, hasStarted, hasMissing, missingSlots }) => (
                                 <div key={item.id} style={{ background: S.surface, backdropFilter: "blur(12px)", border: `1px solid ${S.border}`, borderRadius: "1.25rem", padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
 
                                     {/* Top: name + score */}
@@ -883,7 +961,7 @@ export default function CalculatorPage() {
                                             <h3 style={{ fontSize: "15px", fontWeight: 700, color: "var(--brand-text)", lineHeight: 1.4, margin: 0 }}>{item.specialty}</h3>
                                         </div>
                                         <div style={{ textAlign: "right", flexShrink: 0 }}>
-                                            <div style={{ fontSize: "2.5rem", fontWeight: 900, lineHeight: 1, letterSpacing: "-0.04em", color: hasMissing ? "var(--brand-muted)" : isAbove && hasStarted ? "#10b981" : "var(--brand-cyan)" }}>
+                                            <div style={{ fontSize: "2.5rem", fontWeight: 900, lineHeight: 1, letterSpacing: "-0.04em", color: hasMissing ? "var(--brand-muted)" : isAbove === true && hasStarted ? "#10b981" : "var(--brand-cyan)" }}>
                                                 {hasMissing && hasStarted ? "—" : !hasStarted ? "—" : formatted}
                                             </div>
                                             <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>бал</div>
@@ -900,9 +978,13 @@ export default function CalculatorPage() {
 
                                     {/* Status */}
                                     <div style={{ paddingTop: "0.75rem", borderTop: "1px solid rgba(148,163,184,0.08)", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                                        {midPoint && (
+                                        {minScore && (
                                             <div style={{ fontSize: "12px", color: "var(--brand-muted)" }}>
-                                                Среден бал за прием: <strong style={{ color: "var(--brand-text)", fontFamily: "monospace" }}>{midPoint.toFixed(2)}</strong>
+                                                Минимален бал {minScore.year}{minScore.round ? ` (${minScore.round}-${minScore.round === 1 ? "во" : minScore.round === 2 ? "ро" : "то"} класиране)` : ""}:{" "}
+                                                <strong style={{ color: "var(--brand-text)", fontFamily: "monospace" }}>
+                                                    {minScore.minBall.toFixed(2)}{minScore.minBallMax > minScore.minBall ? `–${minScore.minBallMax.toFixed(2)}` : ""}
+                                                </strong>
+                                                {" "}· официални данни от КСК {minScore.year}
                                             </div>
                                         )}
 
@@ -913,16 +995,33 @@ export default function CalculatorPage() {
                                             </div>
                                         )}
 
-                                        {!hasMissing && hasStarted && avgMaxBall && (
+                                        {!hasMissing && hasStarted && minScore && (
                                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                                                 <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "12px", fontWeight: 700, color: isAbove ? "#10b981" : "#f87171" }}>
                                                     {isAbove ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                                                    {isAbove ? `Над средното с ${diff} т.` : `Под средното с ${diff} т.`}
+                                                    {isAbove ? `Над минималния с ${diff} т.` : `Под минималния с ${diff} т.`}
                                                 </div>
                                                 <span style={{ padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", background: isAbove ? "rgba(16,185,129,0.1)" : "rgba(248,113,113,0.1)", color: isAbove ? "#10b981" : "#f87171", border: `1px solid ${isAbove ? "rgba(16,185,129,0.25)" : "rgba(248,113,113,0.25)"}` }}>
-                                                    {isAbove ? "НАД СРЕДНОТО" : "ПОД СРЕДНОТО"}
+                                                    {isAbove ? "НАД МИНИМАЛНИЯ" : "ПОД МИНИМАЛНИЯ"}
                                                 </span>
                                             </div>
+                                        )}
+
+                                        {!hasMissing && hasStarted && !minScore && percentOfMax !== null && (
+                                            <>
+                                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                                                    <div style={{ fontSize: "12px", fontWeight: 700, color: "var(--brand-text)" }}>
+                                                        Твоят бал е <span style={{ fontFamily: "monospace" }}>{percentOfMax.toFixed(0)}%</span> от максималния
+                                                    </div>
+                                                    <span style={{ padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", background: "rgba(251,191,36,0.1)", color: "#FBBF24", border: "1px solid rgba(251,191,36,0.25)" }}>
+                                                        {percentOfMax.toFixed(0)}% ОТ МАКС.
+                                                    </span>
+                                                </div>
+                                                <div style={{ display: "flex", alignItems: "flex-start", gap: "0.375rem", fontSize: "11px", color: "var(--brand-muted)", lineHeight: 1.5 }}>
+                                                    <AlertCircle size={12} style={{ flexShrink: 0, marginTop: "2px" }} />
+                                                    {item.university_name} не публикува минимални балове за прием, затова не можем да кажем дали влизаш.
+                                                </div>
+                                            </>
                                         )}
 
                                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.5rem" }}>

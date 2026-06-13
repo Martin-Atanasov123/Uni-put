@@ -23,23 +23,32 @@ const mockDataByFaculty = {
 vi.mock("@/lib/supabase", () => {
   const select = vi.fn((columns) => {
     if (columns === "faculty") {
-      // return list of faculties
-      return Promise.resolve({
-        data: [
-          { faculty: "Факултет A" },
-          { faculty: "Факултет B" }
-        ],
-        error: null
-      });
+      // списък факултети: .select("faculty").limit(N)
+      return {
+        limit: () => Promise.resolve({
+          data: [
+            { faculty: "Факултет A" },
+            { faculty: "Факултет B" }
+          ],
+          error: null
+        })
+      };
     }
-    // for select("*"), return chainable with eq
+    if (typeof columns === "string" && columns.includes("min_ball")) {
+      // минимални балове: .select(...).in("university_id", ids)
+      return { in: () => Promise.resolve({ data: [], error: null }) };
+    }
+    // специалности по факултет: .select(...).eq("faculty", v).limit(N)
     return {
-      eq: vi.fn((col, val) => {
-        return Promise.resolve({
+      eq: vi.fn((col, val) => ({
+        limit: () => Promise.resolve({
           data: mockDataByFaculty[val] || [],
           error: null
-        });
-      })
+        })
+      })),
+      ilike: vi.fn(() => ({
+        limit: () => Promise.resolve({ data: [], error: null })
+      }))
     };
   });
   const from = vi.fn(() => ({ select }));

@@ -80,18 +80,26 @@ async function fetchDynamicRoutes() {
     });
 
     // Взимаме уникални комбинации university_name + specialty.
-    // Лимитът е голям, защото базата може да расте; ако някога мине 10k, добави pagination.
-    const { data, error } = await supabase
-        .from("universities")
-        .select("university_name, specialty")
-        .limit(10000);
-
-    if (error) throw new Error(`Supabase грешка: ${error.message}`);
+    // PostgREST капва на ~1000 rows per request (db-max-rows), независимо от
+    // .limit() — затова пагинираме с .range(), иначе университети/специалности
+    // след 1000-тия ред мълчаливо изпадат от sitemap-а.
+    const PAGE = 1000;
+    const allRows = [];
+    for (let from = 0; ; from += PAGE) {
+        const { data, error } = await supabase
+            .from("universities")
+            .select("university_name, specialty")
+            .range(from, from + PAGE - 1);
+        if (error) throw new Error(`Supabase грешка: ${error.message}`);
+        if (!data || data.length === 0) break;
+        allRows.push(...data);
+        if (data.length < PAGE) break;
+    }
 
     const universities = new Map(); // uniSlug -> name (за дедупликация)
     const specialties = new Set();  // "uniSlug/specSlug" pairs
 
-    for (const row of data ?? []) {
+    for (const row of allRows) {
         const uniSlug = slugify(row.university_name);
         const specSlug = slugify(row.specialty);
         if (!uniSlug) continue;

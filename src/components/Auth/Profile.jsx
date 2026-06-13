@@ -492,30 +492,37 @@ const Profile = () => {
                                             </Link>
                                         </div>
                                         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "0.75rem" }}>
-                                            {calculatorHistory.map((h, i) => (
-                                                <div key={i} style={{ padding: "1rem", background: "var(--brand-input-bg)", border: `1px solid ${h.isAbove ? "rgba(16,185,129,0.25)" : "var(--brand-border)"}`, borderRadius: "1rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                                            {calculatorHistory.map((h, i) => {
+                                                // Сравнение само срещу реален минимален бал; стари записи (без minBall) са неутрални.
+                                                const hasMin = h.minBall != null;
+                                                const above = hasMin && h.isAbove === true;
+                                                return (
+                                                <div key={i} style={{ padding: "1rem", background: "var(--brand-input-bg)", border: `1px solid ${above ? "rgba(16,185,129,0.25)" : "var(--brand-border)"}`, borderRadius: "1rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "0.5rem" }}>
                                                         <div style={{ minWidth: 0 }}>
                                                             <p style={{ margin: 0, fontSize: "13px", fontWeight: 800, color: "var(--brand-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{h.specialty || "Неизвестна"}</p>
                                                             <p style={{ margin: "0.2rem 0 0", fontSize: "10px", color: "var(--brand-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{h.university || h.faculty}</p>
                                                         </div>
-                                                        <span style={{ fontFamily: "monospace", fontSize: "1.25rem", fontWeight: 800, color: h.isAbove ? "#34d399" : "var(--brand-muted)", flexShrink: 0 }}>{h.score?.toFixed ? h.score.toFixed(2) : h.score}</span>
+                                                        <span style={{ fontFamily: "monospace", fontSize: "1.25rem", fontWeight: 800, color: above ? "#34d399" : "var(--brand-text)", flexShrink: 0 }}>{h.score?.toFixed ? h.score.toFixed(2) : h.score}</span>
                                                     </div>
                                                     {h.maxBall > 0 && (
                                                         <div style={{ height: "3px", background: "var(--brand-border)", borderRadius: "2px" }}>
-                                                            <div style={{ height: "3px", borderRadius: "2px", background: h.isAbove ? "#34d399" : "rgba(248,113,113,0.6)", width: `${Math.min((h.score / h.maxBall) * 100, 100)}%` }} />
+                                                            <div style={{ height: "3px", borderRadius: "2px", background: hasMin ? (above ? "#34d399" : "rgba(248,113,113,0.6)") : "var(--brand-cyan)", width: `${Math.min((h.score / h.maxBall) * 100, 100)}%` }} />
                                                         </div>
                                                     )}
                                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                                        <span style={{ fontSize: "10px", color: h.isAbove ? "#34d399" : "#fca5a5", fontWeight: 700 }}>
-                                                            {h.isAbove ? "Над средното" : "Под средното"}
+                                                        <span style={{ fontSize: "10px", color: hasMin ? (above ? "#34d399" : "#fca5a5") : "var(--brand-muted)", fontWeight: 700 }}>
+                                                            {hasMin
+                                                                ? (above ? `Над минималния (${Number(h.minBall).toFixed(2)})` : `Под минималния (${Number(h.minBall).toFixed(2)})`)
+                                                                : (h.maxBall > 0 ? `${Math.min((h.score / h.maxBall) * 100, 100).toFixed(0)}% от макс. бал` : "")}
                                                         </span>
                                                         <span style={{ display: "inline-flex", alignItems: "center", gap: "0.2rem", fontSize: "10px", color: "var(--brand-muted)", opacity: 0.6 }}>
                                                             <Clock size={9} /> {h.date ? new Date(h.date).toLocaleDateString("bg-BG", { day: "numeric", month: "short" }) : ""}
                                                         </span>
                                                     </div>
                                                 </div>
-                                            ))}
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 )}

@@ -58,7 +58,7 @@ describe("GradeInputSection", () => {
         fireEvent.blur(input);
 
         expect(
-            screen.getByText(/Моля въведете валидна оценка/i)
+            screen.getByText(/Оценка между 2\.00 и 6\.00/i)
         ).toBeTruthy();
     });
 
