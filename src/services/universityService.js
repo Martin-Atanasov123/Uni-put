@@ -7,7 +7,7 @@
 
 import { supabase } from '@/lib/supabase';
 
-const SLIM_COLS = 'id,university_name,specialty,faculty,city,education_level,max_ball';
+const SLIM_COLS = 'id,university_name,specialty,faculty,city,education_level,max_ball,accreditation_status';
 const PAGE_SIZE_DEFAULT = 200;
 
 const CITIES_CACHE_KEY = 'uniput_cities_cache_v1';

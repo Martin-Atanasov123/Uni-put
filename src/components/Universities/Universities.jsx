@@ -11,6 +11,7 @@ import { universityService } from "@/services/universityService";
 import { useAuth } from "@/hooks/useAuth";
 import Seo from "@/components/common/Seo";
 import { slugify } from "@/lib/slugify";
+import AccreditationWarning from "@/components/common/AccreditationWarning";
 
 // ─── rsvu.mon.bg High-level groups ──────────────────────────────────────────
 // Matches the official МОН classification 
@@ -478,6 +479,11 @@ function SpecialtyCard({ uni, isFav, onToggleFav, showUser }) {
                         <BookOpen size={10} style={{ flexShrink: 0 }} />
                         {uni.faculty}
                     </p>
+                )}
+                {uni.accreditation_status && (
+                    <div style={{ marginTop: "0.4rem" }}>
+                        <AccreditationWarning status={uni.accreditation_status} variant="chip" />
+                    </div>
                 )}
             </div>
 

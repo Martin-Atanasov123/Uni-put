@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { useLocation, Link } from "react-router-dom";
 import Seo from "@/components/common/Seo";
 import JsonLd from "@/components/common/JsonLd";
+import AccreditationWarning from "@/components/common/AccreditationWarning";
 import { useAuth } from "@/hooks/useAuth";
 
 // HowTo schema — Google rich result за стъпковите процеси.
@@ -260,7 +261,7 @@ export default function CalculatorPage() {
         (async () => {
             const { data, error } = await supabase
                 .from("universities")
-                .select("id,faculty,specialty,university_name,city,coefficients,formula_description,max_ball,website_url")
+                .select("id,faculty,specialty,university_name,city,coefficients,formula_description,max_ball,website_url,accreditation_status")
                 .eq("faculty", selectedFaculty)
                 .limit(500);
             if (error) {
@@ -967,6 +968,11 @@ export default function CalculatorPage() {
                                             <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>бал</div>
                                         </div>
                                     </div>
+
+                                    {/* Trust warning — преди да зарадваме ученика с „влизаш", го предупреждаваме за акредитацията */}
+                                    {item.accreditation_status && (
+                                        <AccreditationWarning status={item.accreditation_status} />
+                                    )}
 
                                     {/* Formula */}
                                     <div style={{ display: "flex", gap: "0.5rem", padding: "0.75rem", background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.15)", borderRadius: "0.75rem", minWidth: 0 }}>

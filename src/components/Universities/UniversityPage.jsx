@@ -10,6 +10,7 @@ import { universityService } from "@/services/universityService";
 import { slugify } from "@/lib/slugify";
 import Seo from "@/components/common/Seo";
 import JsonLd from "@/components/common/JsonLd";
+import AccreditationWarning from "@/components/common/AccreditationWarning";
 
 const CARD_BORDER = "1px solid var(--brand-card-border)";
 
@@ -120,6 +121,8 @@ export default function UniversityPage() {
     if (status === "error") return <NotFound slug={uniSlug} />;
 
     const primaryCity = cities[0] || "";
+    // Статус на акредитация (един за целия университет) — за warning банер.
+    const accreditationStatus = rows[0]?.accreditation_status;
     // SEO copy от SEO-AUDIT-REPORT.md §3.2 — enriched за прием 2026
     const seoTitle = `Прием в ${uniName} 2026 — Балообразуване, ${faculties.length} факултета, ${totalSpecialties} специалности`;
     const seoDesc = `Подготвяш се за ${uniName}? Виж точните коефициенти за балообразуване по МОН за всичките ${totalSpecialties} специалности в ${faculties.length} факултета. Изчисли своя приемен бал за 2026 г. — безплатно, без регистрация.${primaryCity ? ` Кампусът е в ${primaryCity}.` : ""}`;
@@ -241,6 +244,13 @@ export default function UniversityPage() {
                 }}>
                     <Database size={12} /> Данни от наредбите на МОН, актуализирани за 2026 г.
                 </div>
+
+                {/* Trust warning — показва се само за университети с проблемна акредитация */}
+                {accreditationStatus && (
+                    <div style={{ marginTop: "1.25rem" }}>
+                        <AccreditationWarning status={accreditationStatus} />
+                    </div>
+                )}
 
                 {/* ── Уникален съдържателен блок (F2 от SEO одита) ──
                     Решава „Crawled — currently not indexed" чрез ~110 думи
