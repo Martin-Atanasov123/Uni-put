@@ -18,6 +18,25 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+# GSC съобщава "Sitemap could not be read" — измерихме че Netlify Edge
+# Brotli-компресира sitemap.xml/robots.txt при content negotiation
+# (Content-Encoding: br). Не сме потвърдили на 100%, че GSC's sitemap
+# fetcher не декодира Brotli правилно, но е документиран repeat pattern
+# в community threads и `no-transform` е нискорисков стандартен fix:
+# казва на Netlify's edge да не re-encode-ва отговора, независимо от
+# Accept-Encoding на клиента. Ако проблемът беше Brotli decoding, това
+# го решава; ако не — няма downside (файловете са малки, некомпресирани
+# е незначителна разлика в bandwidth).
+[[headers]]
+  for = "/sitemap.xml"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, no-transform"
+
+[[headers]]
+  for = "/robots.txt"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, no-transform"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
