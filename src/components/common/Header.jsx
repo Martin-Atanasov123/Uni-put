@@ -5,7 +5,7 @@ import { useTheme } from "@/hooks/useTheme";
 import {
     User, LogOut, LayoutDashboard, Menu, X, GraduationCap,
     Calculator, Search, Settings, Building2, Heart, ChevronDown,
-    Brain, ClipboardList
+    Brain, ClipboardList, CalendarDays
 } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 
@@ -14,9 +14,9 @@ const NAV_LINKS = [
     { name: "Университети",   path: "/universities",   icon: Search },
     { name: "Калкулатор",     path: "/calculator",     icon: Calculator },
     { name: "Кариерен тест",  path: "/career-advisor", icon: Brain },
+    { name: "Календар",       path: "/calendar",       icon: CalendarDays },
     { name: "Общежития",      path: "/dormitories",    icon: Building2 },
-    { name: "За нас",      path: "/about",    icon: GraduationCap },
-
+    { name: "За нас",         path: "/about",          icon: GraduationCap },
 ];
 
 /**

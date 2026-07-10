@@ -26,6 +26,7 @@ const CareerAdvisor   = lazy(() => import("@/components/CareerAdvisor/CareerAdvi
 const TestCareer      = lazy(() => import("@/components/CareerAdvisor/TestCareer"));
 const DziStrategist   = lazy(() => import("@/components/DziStrategist/DziStrategist"));
 const Dormitories     = lazy(() => import("@/components/Dormitories/Dormitories"));
+const CalendarPage    = lazy(() => import("@/components/Calendar/Calendar"));
 const FavoritesPage   = lazy(() => import("@/components/Favorites/Favorites"));
 const CalculatorPage  = lazy(() => import("@/components/Calculator/Calculator"));
 const Profile         = lazy(() => import("@/components/Auth/Profile"));
@@ -96,6 +97,9 @@ function App() {
                                         <PageWrap><GlobalErrorBoundary><DziStrategist /></GlobalErrorBoundary></PageWrap>
                                     } />
                                     <Route path="/dormitories" element={<PageWrap><Dormitories /></PageWrap>} />
+                                    <Route path="/calendar" element={
+                                        <PageWrap><GlobalErrorBoundary><CalendarPage /></GlobalErrorBoundary></PageWrap>
+                                    } />
                                     <Route path="/favorites" element={
                                         <PageWrap><ProtectedRoute><FavoritesPage /></ProtectedRoute></PageWrap>
                                     } />

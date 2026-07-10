@@ -51,5 +51,23 @@ export const ADMIN_TABLES = [
       { id: "source_url", label: "Източник (URL)", type: "text" }
     ],
     defaultSort: { field: "year", direction: "desc" }
+  },
+  {
+    id: "admission_events",
+    table: "admission_events",
+    label: "Календар за прием (дати)",
+    primaryKey: "id",
+    fields: [
+      { id: "university_name", label: "Университет (точно име от universities)", type: "text", required: true },
+      { id: "city", label: "Град", type: "text" },
+      { id: "event_type", label: "Тип събитие", type: "select", options: ["application", "exam", "ranking", "enrollment"], required: true },
+      { id: "title", label: "Заглавие", type: "text", required: true },
+      { id: "description", label: "Описание", type: "text" },
+      { id: "start_date", label: "Начална дата (ГГГГ-ММ-ДД)", type: "date", required: true },
+      { id: "end_date", label: "Крайна дата (празно = еднодневно)", type: "date" },
+      { id: "is_confirmed", label: "Потвърдено", type: "boolean" },
+      { id: "source_url", label: "Източник (URL)", type: "text" }
+    ],
+    defaultSort: { field: "start_date", direction: "asc" }
   }
 ];
