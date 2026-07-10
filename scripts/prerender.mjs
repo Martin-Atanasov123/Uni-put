@@ -93,7 +93,8 @@ const esc = (s) =>
 // компонентът ги премахва при hydration и инжектира идентични → нула дубликати.
 function buildHead({ path, title, description, image }) {
     const fullTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
-    const canonical = `${SITE_URL}${path === "/" ? "/" : path.replace(/\/$/, "")}`;
+    // Trailing slash — съвпада с Netlify's 200 URL (no-slash 301-redirect-ва).
+    const canonical = `${SITE_URL}${path === "/" ? "/" : "/" + path.replace(/^\/|\/$/g, "") + "/"}`;
     return [
         `<title data-seo-default>${esc(fullTitle)}</title>`,
         `<meta data-seo-default name="description" content="${esc(description)}" />`,

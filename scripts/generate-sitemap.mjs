@@ -55,8 +55,11 @@ const STATIC_ROUTES = [
 ];
 
 function urlEntry({ path, changefreq, priority }) {
+    // Trailing slash — Netlify 301-redirect-ва no-slash → slash, затова sitemap-ът
+    // трябва да изброява реалните 200 URL-и (slash-версиите), не redirect-ите.
+    const slashed = path === "/" ? "/" : "/" + path.replace(/^\/|\/$/g, "") + "/";
     return `  <url>
-    <loc>${SITE_URL}${path}</loc>
+    <loc>${SITE_URL}${slashed}</loc>
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
   </url>`;

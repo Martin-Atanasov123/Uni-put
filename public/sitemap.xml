@@ -6,37 +6,37 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://uniput.eu/calculator</loc>
+    <loc>https://uniput.eu/calculator/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://uniput.eu/career-advisor</loc>
+    <loc>https://uniput.eu/career-advisor/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://uniput.eu/universities</loc>
+    <loc>https://uniput.eu/universities/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://uniput.eu/dormitories</loc>
+    <loc>https://uniput.eu/dormitories/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://uniput.eu/about</loc>
+    <loc>https://uniput.eu/about/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://uniput.eu/terms</loc>
+    <loc>https://uniput.eu/terms/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://uniput.eu/privacy</loc>
+    <loc>https://uniput.eu/privacy/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>

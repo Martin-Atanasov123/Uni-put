@@ -19,7 +19,10 @@ const DEFAULT_IMAGE = `${SITE_URL}/og/default.png`;
  */
 export default function Seo({ title, description, path = "/", image = DEFAULT_IMAGE, noindex = false }) {
     const fullTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
-    const canonical = `${SITE_URL}${path === "/" ? "/" : path.replace(/\/$/, "")}`;
+    // Trailing slash е ЗАДЪЛЖИТЕЛЕН — Netlify 301-redirect-ва no-slash → slash,
+    // затова canonical/og:url трябва да сочат към slash-версията (реалния 200 URL),
+    // иначе Google вижда конфликт (canonical сочи към redirect-ващ URL).
+    const canonical = `${SITE_URL}${path === "/" ? "/" : "/" + path.replace(/^\/|\/$/g, "") + "/"}`;
 
     // Премахва статичните default SEO тагове от index.html при първия mount, за да
     // няма дублиращи canonical / description тагове редом с per-route таговете долу.
