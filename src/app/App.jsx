@@ -1,6 +1,6 @@
 import { Route, Routes, useLocation } from "react-router";
 import { Suspense, lazy } from "react";
-import { LazyMotion, domAnimation, m, AnimatePresence } from "motion/react";
+import { LazyMotion, domAnimation, m } from "motion/react";
 
 import { AuthProvider } from "@/hooks/AuthContext";
 import ProtectedRoute from "@/routes/ProtectedRoute";
@@ -41,7 +41,6 @@ function PageWrap({ children }) {
         <m.div
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
         >
             {children}
@@ -71,8 +70,12 @@ function App() {
                     <Header />
                     <main id="main" role="main">
                         <Suspense fallback={<PageLoader />}>
-                            <AnimatePresence mode="wait">
-                                <Routes location={location} key={location.pathname}>
+                            {/* Без AnimatePresence mode="wait": exit-анимацията чакаше
+                                старата страница да излезе преди новата да се монтира.
+                                При бързо превключване + lazy chunks (Suspense) това
+                                губеше навигации — URL се сменя, страницата не.
+                                key-ът остава: нов mount (и entry анимация) на всеки път. */}
+                            <Routes location={location} key={location.pathname}>
                                     {/* Публични маршрути */}
                                     <Route path="*" element={<PageWrap><NotFound /></PageWrap>} />
                                     <Route path="/" element={<PageWrap><Home /></PageWrap>} />
@@ -129,7 +132,6 @@ function App() {
                                         </PageWrap>
                                     } />
                                 </Routes>
-                            </AnimatePresence>
                         </Suspense>
                     </main>
                     <Footer />

@@ -143,7 +143,7 @@ const Footer = () => {
                             </div> */} {/* Brand */}
                     <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
                         <img
-                            src="/transparent logo .png"
+                            src="/logo-wordmark.png"
                             alt="УниПът лого"
                             style={{ height: "70px", width: "auto", objectFit: "contain", borderRadius: "0.5rem"  }}
                         />
@@ -158,7 +158,7 @@ const Footer = () => {
                                     WebkitTextFillColor: "transparent",
                                 }}
                             >
-                                УниПът
+                                
                             </span>
                         </div>
                         <p style={{ fontSize: "13px", color: "var(--brand-muted)", lineHeight: 1.6, margin: 0 }}>
