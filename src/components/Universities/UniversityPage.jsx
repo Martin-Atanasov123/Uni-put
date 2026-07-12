@@ -124,8 +124,8 @@ export default function UniversityPage() {
     // Статус на акредитация (един за целия университет) — за warning банер.
     const accreditationStatus = rows[0]?.accreditation_status;
     // SEO copy от SEO-AUDIT-REPORT.md §3.2 — enriched за прием 2026
-    const seoTitle = `Прием в ${uniName} 2026 — Балообразуване, ${faculties.length} факултета, ${totalSpecialties} специалности`;
-    const seoDesc = `Подготвяш се за ${uniName}? Виж точните коефициенти за балообразуване по МОН за всичките ${totalSpecialties} специалности в ${faculties.length} факултета. Изчисли своя приемен бал за 2026 г. — безплатно, без регистрация.${primaryCity ? ` Кампусът е в ${primaryCity}.` : ""}`;
+    const seoTitle = `${uniName} — прием и балообразуване 2026`;
+    const seoDesc = `${uniName} — балообразуване 2026: точните коефициенти на МОН за ${totalSpecialties} специалности в ${faculties.length} факултета. Изчисли приемния си бал безплатно.`;
 
     // Schema.org EducationalOrganization — описва университета като субект.
     // Department-ите са факултетите, дърпани от actual DB data.

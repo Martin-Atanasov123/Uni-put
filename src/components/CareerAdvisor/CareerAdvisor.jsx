@@ -480,8 +480,8 @@ const CareerAdvisor = () => {
             style={{ minHeight: "100vh", background: "var(--brand-bg)", color: "var(--brand-text)", paddingTop: step === "quiz" ? "5rem" : "6rem", paddingBottom: "5rem", position: "relative", overflow: "hidden" }}
         >
             <Seo
-                title="Безплатен RIASEC кариерен тест — Открий подходящата специалност"
-                description="Направи безплатния RIASEC кариерен тест — 30 въпроса за около 3 минути. Алгоритъмът сравнява профила ти с 912 специалности и 1002 кариери, за да открие най-подходящите. Без регистрация."
+                title="Безплатен RIASEC кариерен тест за специалност"
+                description="Безплатен RIASEC кариерен тест — 30 въпроса за 3 минути. Сравняваме профила ти с 912 специалности, за да откриеш най-подходящите. Без регистрация."
                 path="/career-advisor"
                 image="https://uniput.eu/og/career-advisor.png"
             />

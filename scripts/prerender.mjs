@@ -29,44 +29,64 @@ const SITE_NAME = "УниПът";
 const DEFAULT_IMAGE = `${SITE_URL}/og/default.png`;
 const INCLUDE_DYNAMIC = process.env.SITEMAP_DYNAMIC === "1";
 
+// Sitewide structured data (Organization + WebSite). Инжектира се в СУРОВИЯ HTML
+// на всяка страница, за да го виждат и ботове без JS (AI crawlers, first-wave
+// Googlebot). React <JsonLd> добавя per-page schema при hydration; маркерът
+// data-seo-default кара <Seo> да премахне тази при mount → нула дубликати.
+const ORG_SCHEMA = {
+    "@context": "https://schema.org",
+    "@graph": [
+        {
+            "@type": "Organization",
+            name: SITE_NAME,
+            url: SITE_URL,
+            logo: `${SITE_URL}/university.png`,
+            description: "Безплатна платформа за изчисляване на кандидатстудентски бал и кариерно ориентиране на български кандидат-студенти",
+            areaServed: { "@type": "Country", name: "България" },
+            knowsAbout: ["Балообразуване", "Кандидатстудентски бал", "RIASEC кариерен тест", "Висше образование в България"],
+        },
+        { "@type": "WebSite", url: SITE_URL, name: SITE_NAME, inLanguage: "bg-BG" },
+    ],
+};
+
 // ── Статични публични routes — keep in sync с <Seo> props в компонентите ──
 // (canonical се деривира от path → нула риск от разминаване;
 //  title/description се копират от компонентите.)
 const STATIC_ROUTES = [
     {
         path: "/",
-        title: "УниПът — Калкулатор за приемен бал и кариерен ориентир за кандидат-студенти",
-        description: "Изчисли своя кандидатстудентски бал по МОН формулите, открий подходящи специалности с RIASEC тест и сравни 51 университета — безплатно, на едно място. За 2026 г.",
+        title: "Калкулатор за приемен бал и кариерен тест",
+        description: "Изчисли приемния си бал по МОН формулите, направи RIASEC кариерен тест и сравни 51 университета — безплатно, на едно място. За 2026 г.",
         image: DEFAULT_IMAGE,
     },
     {
         path: "/calculator",
-        title: "Кандидатстудентски бал калкулатор — Балообразуване по МОН формули",
-        description: "Изчисли своя кандидатстудентски бал за 2026 г. Калкулаторът прилага точните коефициенти и формули за балообразуване от МОН — за 51 университета и 845 специалности. Безплатно, без регистрация.",
+        title: "Калкулатор за приемен бал — балообразуване по МОН",
+        description: "Изчисли приемния си бал за 2026 г. Точните коефициенти и формули на МОН за 51 университета и 845 специалности. Безплатно, без регистрация.",
         image: `${SITE_URL}/og/calculator.png`,
     },
     {
         path: "/career-advisor",
-        title: "Безплатен RIASEC кариерен тест — Открий подходящата специалност",
-        description: "Направи безплатния RIASEC кариерен тест — 30 въпроса за около 3 минути. Алгоритъмът сравнява профила ти с 912 специалности и 1002 кариери, за да открие най-подходящите. Без регистрация.",
+        title: "Безплатен RIASEC кариерен тест за специалност",
+        description: "Безплатен RIASEC кариерен тест — 30 въпроса за 3 минути. Сравняваме профила ти с 912 специалности, за да откриеш най-подходящите. Без регистрация.",
         image: `${SITE_URL}/og/career-advisor.png`,
     },
     {
         path: "/universities",
-        title: "Висши училища в България — 51 университета, 845 специалности за прием 2026",
-        description: "Виж всички 51 висши училища в България и техните 845 специалности. Филтрирай по град, факултет или степен. Изчисли приемния си бал за 2026 г. с точните коефициенти от МОН.",
+        title: "51 университета и 845 специалности за прием 2026",
+        description: "Всички 51 висши училища в България и 845 специалности. Филтрирай по град, факултет и степен. Изчисли приемния си бал по коефициентите на МОН.",
         image: `${SITE_URL}/og/universities.png`,
     },
     {
         path: "/dormitories",
-        title: "Студентски общежития в България — 68 блока, цени и условия за 2026",
+        title: "68 студентски общежития в България за 2026",
         description: "Сравни 68 студентски общежития в 16 града. Месечен наем, депозит, разстояние до университета и транспортни линии — на едно място. Данни към 2026 г.",
         image: `${SITE_URL}/og/dormitories.png`,
     },
     {
         path: "/calendar",
-        title: "Календар за прием 2026 — изпити, срокове и класирания по университети",
-        description: "Всички важни дати за прием 2026 на едно място: кандидатстудентски изпити, срокове за подаване на документи, класирания и записвания по университети. Данни от официалните източници.",
+        title: "Календар за прием 2026 — изпити и срокове",
+        description: "Всички дати за прием 2026: изпити, срокове за кандидатстване, класирания и записвания по университети. Данни от официалните източници.",
         image: DEFAULT_IMAGE,
     },
     {
@@ -117,6 +137,7 @@ function buildHead({ path, title, description, image }) {
         `<meta data-seo-default name="twitter:title" content="${esc(fullTitle)}" />`,
         `<meta data-seo-default name="twitter:description" content="${esc(description)}" />`,
         `<meta data-seo-default name="twitter:image" content="${esc(image)}" />`,
+        `<script type="application/ld+json" data-seo-default>${JSON.stringify(ORG_SCHEMA)}</script>`,
     ].join("\n    ");
 }
 
@@ -197,8 +218,8 @@ async function fetchUniversityRoutes() {
         const total = u.total;
         const primaryCity = [...u.cities.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || "";
         // Шаблоните трябва да съвпадат с UniversityPage.jsx seoTitle / seoDesc.
-        const title = `Прием в ${name} 2026 — Балообразуване, ${facCount} факултета, ${total} специалности`;
-        const description = `Подготвяш се за ${name}? Виж точните коефициенти за балообразуване по МОН за всичките ${total} специалности в ${facCount} факултета. Изчисли своя приемен бал за 2026 г. — безплатно, без регистрация.${primaryCity ? ` Кампусът е в ${primaryCity}.` : ""}`;
+        const title = `${name} — прием и балообразуване 2026`;
+        const description = `${name} — балообразуване 2026: точните коефициенти на МОН за ${total} специалности в ${facCount} факултета. Изчисли приемния си бал безплатно.`;
         routes.push({ path: `/universities/${slug}`, title, description, image: DEFAULT_IMAGE });
     }
     return routes;
