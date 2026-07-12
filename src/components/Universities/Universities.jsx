@@ -7,6 +7,7 @@ import {
     ArrowLeft, ChevronRight,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import SignupPrompt from "@/components/common/SignupPrompt";
 import { universityService } from "@/services/universityService";
 import { useAuth } from "@/hooks/useAuth";
 import Seo from "@/components/common/Seo";
@@ -529,6 +530,12 @@ export default function UniversitiesPage() {
     const [selectedGroup, setSelectedGroup] = useState(null);   // group id
     const [selectedFaculty, setSelectedFaculty] = useState(null); // exact faculty name from DB
     const gridRef = useRef(null);
+    // Покана за акаунт — показва се само когато АНОНИМЕН потребител добави любима.
+    const [showFavNudge, setShowFavNudge] = useState(false);
+    const handleToggleFav = async (id) => {
+        const res = await toggleFavorite(id);
+        if (res?.added && res?.anonymous) setShowFavNudge(true);
+    };
 
     const loadInitial = async () => {
         setLoading(true);
@@ -1039,8 +1046,8 @@ export default function UniversitiesPage() {
                                                 key={uni.id}
                                                 uni={uni}
                                                 isFav={isFavorite(String(uni.id))}
-                                                onToggleFav={() => toggleFavorite(String(uni.id))}
-                                                showUser={!!user}
+                                                onToggleFav={() => handleToggleFav(String(uni.id))}
+                                                showUser={true}
                                             />
                                         ))}
                                     </m.div>
@@ -1149,6 +1156,17 @@ export default function UniversitiesPage() {
                     .uni-filter-select { width: auto !important; min-width: 140px; max-width: 190px; flex-shrink: 0; }
                 }
             `}</style>
+
+            {/* Покана за акаунт — плаващ банер, само за анонимни след добавена любима */}
+            <AnimatePresence>
+                {showFavNudge && (
+                    <div style={{ position: "fixed", left: "1rem", right: "1rem", bottom: "1rem", zIndex: 90, display: "flex", justifyContent: "center", pointerEvents: "none" }}>
+                        <div style={{ width: "100%", maxWidth: "34rem", pointerEvents: "auto" }}>
+                            <SignupPrompt variant="favorite" onDismiss={() => setShowFavNudge(false)} />
+                        </div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

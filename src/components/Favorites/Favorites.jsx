@@ -2,8 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { m } from "motion/react";
 import { useAuth } from "@/hooks/useAuth";
 import { universityService } from "@/services/universityService";
-import { Search, MapPin, School, Heart, Calculator, Filter, X } from "lucide-react";
+import { Search, MapPin, School, Heart, Calculator } from "lucide-react";
 import { Link } from "react-router-dom";
+import SignupPrompt from "@/components/common/SignupPrompt";
 
 const FavoritesPage = () => {
     const { user, favorites, isFavorite, toggleFavorite } = useAuth();
@@ -14,7 +15,9 @@ const FavoritesPage = () => {
 
     useEffect(() => {
         const load = async () => {
-            if (!user || favorites.length === 0) {
+            // Любимите вече работят и без акаунт (localStorage) — зареждаме винаги,
+            // независимо дали има логнат потребител.
+            if (favorites.length === 0) {
                 setAllFavoritesData([]);
                 setLoading(false);
                 return;
@@ -50,72 +53,6 @@ const FavoritesPage = () => {
         });
     }, [allFavoritesData, search, cityFilter]);
 
-    if (!user) {
-        return (
-            <div
-                style={{
-                    minHeight: "100vh",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    background: "var(--brand-bg)",
-                    color: "var(--brand-text)",
-                    padding: "7rem 1.5rem 3rem",
-                }}
-            >
-                <div
-                    style={{
-                        maxWidth: "440px",
-                        textAlign: "center",
-                        background: "var(--brand-surface)",
-                        backdropFilter: "blur(12px)",
-                        border: "1px solid var(--brand-border)",
-                        borderRadius: "1.5rem",
-                        padding: "2.5rem 2rem",
-                    }}
-                >
-                    <div
-                        style={{
-                            width: "3.5rem",
-                            height: "3.5rem",
-                            margin: "0 auto 1rem",
-                            borderRadius: "1rem",
-                            background: "rgba(248,113,113,0.1)",
-                            border: "1px solid rgba(248,113,113,0.25)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                        }}
-                    >
-                        <Heart size={24} style={{ color: "#fca5a5" }} />
-                    </div>
-                    <h1 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, letterSpacing: "-0.02em", textWrap: "balance" }}>
-                        Любимите са само за логнати потребители
-                    </h1>
-                    <p style={{ margin: "0.75rem 0 1.5rem", color: "var(--brand-muted)", fontSize: "14px" }}>
-                        Влез в профила си, за да запазваш и виждаш любимите специалности.
-                    </p>
-                    <Link
-                        to="/login"
-                        style={{
-                            display: "inline-flex",
-                            padding: "0.75rem 1.5rem",
-                            background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
-                            borderRadius: "0.75rem",
-                            color: "#fff",
-                            fontSize: "14px",
-                            fontWeight: 800,
-                            textDecoration: "none",
-                            boxShadow: "0 12px 30px rgba(6,182,212,0.3)",
-                        }}
-                    >
-                        Към вход
-                    </Link>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div style={{ minHeight: "100vh", background: "var(--brand-bg)", color: "var(--brand-text)", padding: "7rem 1.5rem 3rem" }}>
             <div style={{ maxWidth: "1200px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "2rem" }}>
@@ -135,9 +72,14 @@ const FavoritesPage = () => {
                         Моите любими специалности
                     </h1>
                     <p style={{ margin: 0, color: "var(--brand-muted)", fontSize: "1rem", maxWidth: "640px" }}>
-                        Запазени университети и специалности, достъпни от всеки твой вход.
+                        Запазени университети и специалности, готови за сравнение.
                     </p>
                 </m.div>
+
+                {/* Анонимните любими се пазят локално — подканваме към акаунт за синхрон */}
+                {!user && favorites.length > 0 && (
+                    <SignupPrompt variant="favorites-page" />
+                )}
 
                 <div
                     style={{

@@ -103,8 +103,10 @@ function App() {
                                     <Route path="/calendar" element={
                                         <PageWrap><GlobalErrorBoundary><CalendarPage /></GlobalErrorBoundary></PageWrap>
                                     } />
+                                    {/* Любими: публично — работят и без акаунт (localStorage),
+                                        синхронизират се при вход. CLAUDE.md: без login wall пред стойност. */}
                                     <Route path="/favorites" element={
-                                        <PageWrap><ProtectedRoute><FavoritesPage /></ProtectedRoute></PageWrap>
+                                        <PageWrap><FavoritesPage /></PageWrap>
                                     } />
                                     {/* Калкулаторът е публичен — CLAUDE.md: "Never put a login wall between a user and their first calculator result" */}
                                     <Route path="/calculator" element={
