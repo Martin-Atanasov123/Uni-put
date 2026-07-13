@@ -37,7 +37,108 @@
   [headers.values]
     Cache-Control = "public, max-age=3600, no-transform"
 
+# ── SPA routing + истински 404 ────────────────────────────────────────────────
+# Netlify сервира статичните файлове (prerender-натите страници, assets, og,
+# sitemap, robots, llms.txt, 404.html) ПРЕДИ тези правила, затова всички
+# prerender-нати страници (/, /calculator, /universities/[slug], …) се сервират
+# директно и не стигат дотук.
+#
+# Тук падат само пътища БЕЗ статичен файл. Client-only маршрутите (нямат
+# prerender) трябва да получат app shell-а (200). Всеки е с две форми — точен
+# и с наклонена черта (/login и /login/*) — за нула съмнение при trailing slash.
+# Всичко останало (несъществуващи адреси) → истински 404 + noindex.
+
 [[redirects]]
-  from = "/*"
+  from = "/login"
   to = "/index.html"
   status = 200
+[[redirects]]
+  from = "/login/*"
+  to = "/index.html"
+  status = 200
+[[redirects]]
+  from = "/register"
+  to = "/index.html"
+  status = 200
+[[redirects]]
+  from = "/register/*"
+  to = "/index.html"
+  status = 200
+[[redirects]]
+  from = "/forgot-password"
+  to = "/index.html"
+  status = 200
+[[redirects]]
+  from = "/forgot-password/*"
+  to = "/index.html"
+  status = 200
+[[redirects]]
+  from = "/update-password"
+  to = "/index.html"
+  status = 200
+[[redirects]]
+  from = "/update-password/*"
+  to = "/index.html"
+  status = 200
+[[redirects]]
+  from = "/profile"
+  to = "/index.html"
+  status = 200
+[[redirects]]
+  from = "/profile/*"
+  to = "/index.html"
+  status = 200
+[[redirects]]
+  from = "/favorites"
+  to = "/index.html"
+  status = 200
+[[redirects]]
+  from = "/favorites/*"
+  to = "/index.html"
+  status = 200
+[[redirects]]
+  from = "/my-grades"
+  to = "/index.html"
+  status = 200
+[[redirects]]
+  from = "/my-grades/*"
+  to = "/index.html"
+  status = 200
+[[redirects]]
+  from = "/test-career"
+  to = "/index.html"
+  status = 200
+[[redirects]]
+  from = "/test-career/*"
+  to = "/index.html"
+  status = 200
+[[redirects]]
+  from = "/dzi-strateg"
+  to = "/index.html"
+  status = 200
+[[redirects]]
+  from = "/dzi-strateg/*"
+  to = "/index.html"
+  status = 200
+[[redirects]]
+  from = "/admin"
+  to = "/index.html"
+  status = 200
+[[redirects]]
+  from = "/admin/*"
+  to = "/index.html"
+  status = 200
+
+# Пази per-university страниците: валидните имат prerender файл (сервира се пръв);
+# невалиден slug → app shell (200), а не 404 — за да НЕ рискуваме реална уни
+# страница да върне 404 при промяна на prerender конфига.
+[[redirects]]
+  from = "/universities/*"
+  to = "/index.html"
+  status = 200
+
+# Всичко останало → истински 404 (страницата носи noindex)
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404
