@@ -152,6 +152,54 @@ function injectHead(shell, headTags) {
     return html.replace(/<\/head>/i, `    ${headTags}\n  </head>`);
 }
 
+// H1 текст per route (по-подходящ като заглавие от <title>). Fallback: route.title.
+const PAGE_H1 = {
+    "/": "УниПът — калкулатор за приемен бал и кариерен тест",
+    "/calculator": "Калкулатор за приемен бал 2026",
+    "/career-advisor": "Безплатен RIASEC кариерен тест",
+    "/universities": "Висши училища в България за прием 2026",
+    "/dormitories": "Студентски общежития в България",
+    "/calendar": "Календар за прием 2026",
+    "/about": "За УниПът",
+    "/terms": "Условия за ползване",
+    "/privacy": "Политика за поверителност",
+};
+
+// Вътрешни връзки — помагат на crawl depth (одитът отбеляза слабо internal linking).
+const SEO_LINKS = [
+    { href: "/calculator/", text: "Калкулатор за приемен бал" },
+    { href: "/career-advisor/", text: "Кариерен тест" },
+    { href: "/universities/", text: "Университети" },
+    { href: "/calendar/", text: "Календар за прием" },
+    { href: "/dormitories/", text: "Студентски общежития" },
+];
+
+// Изгражда КРАТКО, реално съдържание (h1 + абзац + вътрешни връзки) за суровия
+// HTML. Инжектира се В #root; #initial-loader (z-9999, непрозрачен) го покрива за
+// потребителите, а React (createRoot) го замества при mount → без мигване.
+// Ботовете без JS (AI crawlers, first-wave Googlebot) четат текста от DOM.
+function buildBody(route) {
+    const h1 = PAGE_H1[route.path] || route.title;
+    const selfHref = route.path === "/" ? "/" : route.path.replace(/\/$/, "") + "/";
+    const links = SEO_LINKS
+        .filter((l) => l.href !== selfHref)
+        .map((l) => `<a href="${l.href}">${esc(l.text)}</a>`)
+        .join(" · ");
+    return (
+        `<div style="max-width:720px;margin:0 auto;padding:96px 24px;color:#e2e8f0;` +
+        `font-family:system-ui,-apple-system,sans-serif;line-height:1.6">` +
+        `<h1 style="font-size:1.75rem;font-weight:800;letter-spacing:-0.02em">${esc(h1)}</h1>` +
+        `<p>${esc(route.description)}</p>` +
+        `<nav aria-label="Основни секции">${links}</nav>` +
+        `</div>`
+    );
+}
+
+// Вмъква съдържанието в празния #root на shell-а.
+function injectBody(html, body) {
+    return html.replace('<div id="root"></div>', `<div id="root">${body}</div>`);
+}
+
 async function loadDotEnvIfPresent(envPath) {
     if (!existsSync(envPath)) return;
     const content = await readFile(envPath, "utf8");
@@ -249,7 +297,8 @@ async function main() {
         // "/" вече е dist/index.html — презаписваме го с правилния head също.
         const outDir = route.path === "/" ? DIST : resolve(DIST, `.${route.path}`);
         await mkdir(outDir, { recursive: true });
-        const html = injectHead(shell, buildHead(route));
+        let html = injectHead(shell, buildHead(route));
+        html = injectBody(html, buildBody(route));
         await writeFile(resolve(outDir, "index.html"), html, "utf8");
         written++;
     }
