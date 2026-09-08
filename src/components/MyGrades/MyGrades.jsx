@@ -335,7 +335,7 @@ export default function MyGradesPage() {
 
                     {/* CTA */}
                     <Link
-                        to="/calculator"
+                        to="/calculator/"
                         style={{
                             display: "flex", alignItems: "center", gap: "0.375rem",
                             padding: "0.5rem 1rem", borderRadius: "0.625rem",

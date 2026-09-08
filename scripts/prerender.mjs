@@ -264,7 +264,7 @@ function buildUniversityBody(route) {
     // thinness и дава на Google 100+ вътрешни връзки към /calculator.
     const facSections = faculties.map((fac) => {
         const lis = fac.specs.map((sp) => {
-            const href = `/calculator?specialty=${encodeURIComponent(sp)}&university=${encodeURIComponent(name)}`;
+            const href = `/calculator/?specialty=${encodeURIComponent(sp)}&university=${encodeURIComponent(name)}`;
             return `<li><a href="${esc(href)}">${esc(sp)}</a></li>`;
         }).join("");
         return (

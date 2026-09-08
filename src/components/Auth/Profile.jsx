@@ -435,7 +435,7 @@ const Profile = () => {
                                                 {riasecInfo.label} ({riasecType})
                                             </p>
                                         </div>
-                                        <Link to="/career-advisor" style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", fontSize: "11px", fontWeight: 700, color: riasecInfo.color, textDecoration: "none", opacity: 0.8, whiteSpace: "nowrap" }}>
+                                        <Link to="/career-advisor/" style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", fontSize: "11px", fontWeight: 700, color: riasecInfo.color, textDecoration: "none", opacity: 0.8, whiteSpace: "nowrap" }}>
                                             Виж резултата <ArrowRight size={11} />
                                         </Link>
                                     </div>
@@ -473,7 +473,7 @@ const Profile = () => {
                                                 <div style={{ padding: "2rem", textAlign: "center", background: "var(--brand-input-bg)", border: "1px dashed var(--brand-input-border)", borderRadius: "1rem" }}>
                                                     <Heart size={28} style={{ color: "var(--brand-muted)", opacity: 0.3, margin: "0 auto 0.625rem" }} />
                                                     <p style={{ margin: "0 0 0.75rem", fontSize: "12px", color: "var(--brand-muted)", fontStyle: "italic" }}>Нямате добавени любими университети</p>
-                                                    <Link to="/universities" style={{ display: "inline-flex", padding: "0.4rem 0.875rem", background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.3)", borderRadius: "0.5rem", color: "var(--brand-cyan)", fontSize: "11px", fontWeight: 700, textDecoration: "none" }}>
+                                                    <Link to="/universities/" style={{ display: "inline-flex", padding: "0.4rem 0.875rem", background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.3)", borderRadius: "0.5rem", color: "var(--brand-cyan)", fontSize: "11px", fontWeight: 700, textDecoration: "none" }}>
                                                         Търсене
                                                     </Link>
                                                 </div>
@@ -487,7 +487,7 @@ const Profile = () => {
                                     <div style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
                                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                             <h3 style={{ margin: 0, fontSize: "1rem", fontWeight: 800, letterSpacing: "-0.01em" }}>История на изчисленията</h3>
-                                            <Link to="/calculator" style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", fontSize: "11px", fontWeight: 700, color: "var(--brand-cyan)", textDecoration: "none", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                                            <Link to="/calculator/" style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", fontSize: "11px", fontWeight: 700, color: "var(--brand-cyan)", textDecoration: "none", textTransform: "uppercase", letterSpacing: "0.08em" }}>
                                                 Изчисли пак <ArrowRight size={11} />
                                             </Link>
                                         </div>

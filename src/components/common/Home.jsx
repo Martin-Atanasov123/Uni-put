@@ -275,7 +275,7 @@ function HeroSection() {
                         {/* Primary — calculator (highest-intent action) */}
                         <m.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
                             <Link
-                                to="/calculator"
+                                to="/calculator/"
                                 className="inline-flex items-center gap-3 font-semibold"
                                 style={{
                                     background: "linear-gradient(135deg, #06B6D4, #8B5CF6)",
@@ -298,7 +298,7 @@ function HeroSection() {
                         {/* Secondary — with hover state */}
                         <m.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                             <Link
-                                to="/career-advisor"
+                                to="/career-advisor/"
                                 className="inline-flex items-center gap-2 font-medium"
                                 style={{
                                     border: "1px solid var(--brand-border)",
@@ -953,7 +953,7 @@ function CTASection() {
                         <div className="flex flex-col sm:flex-row gap-4">
                             <m.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.97 }}>
                                 <Link
-                                    to="/calculator"
+                                    to="/calculator/"
                                     className="inline-flex items-center gap-3 font-semibold"
                                     style={{
                                         background: "linear-gradient(135deg, #06B6D4, #8B5CF6)",

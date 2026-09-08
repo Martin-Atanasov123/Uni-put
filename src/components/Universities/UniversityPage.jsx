@@ -41,7 +41,7 @@ function NotFound({ slug }) {
                     Линкът, който си отворил, може да е остарял. Виж всички университети, които поддържаме.
                 </p>
                 <Link
-                    to="/universities"
+                    to="/universities/"
                     style={{
                         display: "inline-flex", alignItems: "center", gap: "0.5rem",
                         marginTop: "1.5rem", padding: "0.75rem 1.5rem",
@@ -171,7 +171,7 @@ export default function UniversityPage() {
 
                 {/* Breadcrumb / back */}
                 <Link
-                    to="/universities"
+                    to="/universities/"
                     style={{
                         display: "inline-flex", alignItems: "center", gap: "0.375rem",
                         fontSize: "0.8125rem", color: "var(--brand-muted)",
@@ -208,7 +208,7 @@ export default function UniversityPage() {
                 {/* CTAs */}
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", marginTop: "1.75rem" }}>
                     <Link
-                        to="/calculator"
+                        to="/calculator/"
                         style={{
                             display: "inline-flex", alignItems: "center", gap: "0.5rem",
                             padding: "0.875rem 1.5rem",
@@ -221,7 +221,7 @@ export default function UniversityPage() {
                     </Link>
                     {primaryCity && (
                         <Link
-                            to="/dormitories"
+                            to="/dormitories/"
                             style={{
                                 display: "inline-flex", alignItems: "center", gap: "0.5rem",
                                 padding: "0.875rem 1.5rem", background: "transparent",
@@ -286,7 +286,7 @@ export default function UniversityPage() {
                         lineHeight: 1.7, color: "var(--brand-muted)", maxWidth: "65ch",
                     }}>
                         Изчисли реалния си конкурсен бал с{" "}
-                        <Link to="/calculator" style={{ color: "var(--brand-cyan)", textDecoration: "none", fontWeight: 600 }}>
+                        <Link to="/calculator/" style={{ color: "var(--brand-cyan)", textDecoration: "none", fontWeight: 600 }}>
                             калкулатора за бал
                         </Link>
                         {" "}— той прилага точните формули за всяка от {totalSpecialties}{" "}
@@ -298,7 +298,7 @@ export default function UniversityPage() {
                         lineHeight: 1.7, color: "var(--brand-muted)", maxWidth: "65ch",
                     }}>
                         Не си сигурен/а в специалността? Започни с{" "}
-                        <Link to="/career-advisor" style={{ color: "var(--brand-cyan)", textDecoration: "none", fontWeight: 600 }}>
+                        <Link to="/career-advisor/" style={{ color: "var(--brand-cyan)", textDecoration: "none", fontWeight: 600 }}>
                             RIASEC кариерния тест
                         </Link>
                         {" "}— той сравнява профила ти с 912 специалности и предлага най-подходящите.
@@ -340,7 +340,7 @@ export default function UniversityPage() {
                                 {fac.specs.map((s) => (
                                     <li key={s.id} style={{ display: "flex" }}>
                                         <Link
-                                            to={`/calculator?specialty=${encodeURIComponent(s.specialty)}&university=${encodeURIComponent(uniName)}`}
+                                            to={`/calculator/?specialty=${encodeURIComponent(s.specialty)}&university=${encodeURIComponent(uniName)}`}
                                             style={{
                                                 flex: 1,
                                                 padding: "0.625rem 0.875rem",

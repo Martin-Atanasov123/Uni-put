@@ -143,11 +143,11 @@ export default function CookieConsent() {
                                     lineHeight: 1.55,
                                 }}>
                                     УниПът използва анонимна аналитика, за да разберем кои функции помагат най-много. Без лични данни.{" "}
-                                    <Link to="/privacy" style={{ color: "var(--brand-cyan)", textDecoration: "none", fontWeight: 600 }}>
+                                    <Link to="/privacy/" style={{ color: "var(--brand-cyan)", textDecoration: "none", fontWeight: 600 }}>
                                         Поверителност
                                     </Link>
                                     {" "}·{" "}
-                                    <Link to="/terms" style={{ color: "var(--brand-cyan)", textDecoration: "none", fontWeight: 600 }}>
+                                    <Link to="/terms/" style={{ color: "var(--brand-cyan)", textDecoration: "none", fontWeight: 600 }}>
                                         Условия
                                     </Link>
                                 </p>

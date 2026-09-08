@@ -159,7 +159,7 @@ export default function Header() {
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                         {/* Primary CTA — always visible on desktop */}
                         <Link
-                            to="/calculator"
+                            to="/calculator/"
                             className="uni-nav-desktop uni-nav-cta"
                         >
                             Изчисли бал →
@@ -302,7 +302,7 @@ export default function Header() {
 
                         <div style={{ paddingTop: "1rem", borderTop: "1px solid rgba(148,163,184,0.1)", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                             {/* Primary CTA always at bottom of mobile menu */}
-                            <Link to="/calculator" style={{
+                            <Link to="/calculator/" style={{
                                 padding: "0.875rem", borderRadius: "0.75rem", textAlign: "center",
                                 fontSize: "14px", fontWeight: 800, textDecoration: "none",
                                 color: "var(--brand-cyan)", border: "1px solid rgba(6,182,212,0.4)",

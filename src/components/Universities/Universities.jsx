@@ -468,7 +468,7 @@ function SpecialtyCard({ uni, isFav, onToggleFav, showUser }) {
                 <p style={{ fontSize: "12px", color: "var(--brand-muted)", display: "flex", alignItems: "center", gap: "0.3rem", fontWeight: 500, margin: 0 }}>
                     <School size={12} style={{ flexShrink: 0 }} />
                     <Link
-                        to={`/universities/${slugify(uni.university_name)}`}
+                        to={`/universities/${slugify(uni.university_name)}/`}
                         onClick={(e) => e.stopPropagation()}
                         style={{ color: "inherit", textDecoration: "none", borderBottom: "1px dotted var(--brand-border)" }}
                     >
@@ -491,7 +491,7 @@ function SpecialtyCard({ uni, isFav, onToggleFav, showUser }) {
             {/* Actions */}
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", paddingTop: "0.875rem", borderTop: "1px solid var(--brand-border)" }}>
                 <Link
-                    to={`/calculator?specialty=${encodeURIComponent(uni.specialty)}`}
+                    to={`/calculator/?specialty=${encodeURIComponent(uni.specialty)}`}
                     style={{ display: "flex", alignItems: "center", gap: "0.35rem", padding: "0.5rem 0.875rem", background: "linear-gradient(135deg,var(--brand-cyan),#0891b2)", border: "none", borderRadius: "0.625rem", color: "#fff", fontWeight: 700, fontSize: "12px", textDecoration: "none", fontFamily: "inherit", flexShrink: 0 }}
                 >
                     <Calculator size={13} /> Изчисли бал

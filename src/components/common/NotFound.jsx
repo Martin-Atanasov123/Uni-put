@@ -87,7 +87,7 @@ export default function NotFound() {
                         <Home size={16} /> Към началната
                     </Link>
                     <Link
-                        to="/universities"
+                        to="/universities/"
                         style={{
                             display: "inline-flex",
                             alignItems: "center",

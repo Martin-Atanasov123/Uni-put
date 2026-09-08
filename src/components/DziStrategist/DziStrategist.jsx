@@ -132,7 +132,7 @@ function SubjectRow({ rank, row, max, animate }) {
                     {row.samples.slice(0, 4).map((s, i) => (
                         <span key={s}>
                             <Link
-                                to={`/calculator?specialty=${encodeURIComponent(s)}`}
+                                to={`/calculator/?specialty=${encodeURIComponent(s)}`}
                                 style={{ color: "var(--brand-text)", textDecoration: "none", borderBottom: "1px dotted var(--brand-border)" }}
                             >
                                 {s}
@@ -330,7 +330,7 @@ export default function DziStrategist() {
                 {/* CTA */}
                 <div style={{ marginTop: "2.5rem", textAlign: "center" }}>
                     <Link
-                        to="/calculator"
+                        to="/calculator/"
                         style={{
                             display: "inline-flex",
                             alignItems: "center",

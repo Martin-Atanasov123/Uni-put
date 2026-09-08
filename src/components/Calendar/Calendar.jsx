@@ -155,7 +155,7 @@ function EventCard({ event, today }) {
                 )}
 
                 <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.75rem", marginTop: "0.5rem" }}>
-                    <Link to={`/universities/${slug}`} style={{
+                    <Link to={`/universities/${slug}/`} style={{
                         display: "inline-flex", alignItems: "center", gap: "0.3rem",
                         fontSize: "12px", fontWeight: 600, color: "var(--brand-cyan)", textDecoration: "none",
                     }}>

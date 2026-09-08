@@ -181,7 +181,7 @@ const FavoritesPage = () => {
                             Намери специалност, която те интересува, и я добави тук с натискане на сърцето.
                         </p>
                         <Link
-                            to="/universities"
+                            to="/universities/"
                             style={{
                                 display: "inline-flex",
                                 padding: "0.6rem 1.25rem",
@@ -285,7 +285,7 @@ const FavoritesPage = () => {
 
                                     <div style={{ marginTop: "auto", paddingTop: "0.875rem", borderTop: "1px solid var(--brand-border)", position: "relative" }}>
                                         <Link
-                                            to={`/calculator?specialty=${encodeURIComponent(uni.specialty)}`}
+                                            to={`/calculator/?specialty=${encodeURIComponent(uni.specialty)}`}
                                             style={{
                                                 display: "inline-flex",
                                                 alignItems: "center",

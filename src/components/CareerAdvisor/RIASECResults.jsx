@@ -313,7 +313,7 @@ const RIASECResults = ({ results, onRestart }) => {
                                         type="button"
                                         onClick={() => {
                                             const params = new URLSearchParams({ specialty: spec.name });
-                                            navigate(`/calculator?${params.toString()}`);
+                                            navigate(`/calculator/?${params.toString()}`);
                                         }}
                                         style={{
                                             display: "inline-flex",
@@ -504,7 +504,7 @@ const RIASECResults = ({ results, onRestart }) => {
                     </p>
                 </div>
                 <Link
-                    to="/calculator"
+                    to="/calculator/"
                     style={{
                         display: "inline-flex", alignItems: "center", gap: "0.5rem",
                         padding: "0.875rem 2rem",
