@@ -24,15 +24,15 @@ const LINK_COLUMNS = [
     {
         title: "Проектът",
         links: [
-            { label: "За нас", icon: Info, href: "/about" },
+            { label: "За нас", icon: Info, href: "/about/" },
             { label: "Лиценз GNU", icon: ShieldCheck, href: "https://www.gnu.org/licenses/gpl-3.0.html", external: true },
         ],
     },
     {
         title: "Правна част",
         links: [
-            { label: "Условия за ползване", href: "/terms" },
-            { label: "Поверителност", href: "/privacy" },
+            { label: "Условия за ползване", href: "/terms/" },
+            { label: "Поверителност", href: "/privacy/" },
         ],
     },
 ];

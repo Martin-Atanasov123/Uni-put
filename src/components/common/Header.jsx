@@ -10,13 +10,18 @@ import {
 import { useState, useEffect, useRef, useCallback } from "react";
 
 // CLAUDE.md nav order: Университети / Калкулатор / Кариерен тест / Общежития (max 4 items)
+//
+// Trailing slash е ЗАДЪЛЖИТЕЛЕН — това е канoничната форма (виж Seo.jsx). Netlify
+// 301-redirect-ва /about → /about/, така че връзка без наклонена черта праща
+// Googlebot през излишен redirect и GSC я отчита като "Page with redirect"
+// вместо да индексира директно канoничния URL.
 const NAV_LINKS = [
-    { name: "Университети",   path: "/universities",   icon: Search },
-    { name: "Калкулатор",     path: "/calculator",     icon: Calculator },
-    { name: "Кариерен тест",  path: "/career-advisor", icon: Brain },
-    { name: "Календар",       path: "/calendar",       icon: CalendarDays },
-    { name: "Общежития",      path: "/dormitories",    icon: Building2 },
-    { name: "За нас",         path: "/about",          icon: GraduationCap },
+    { name: "Университети",   path: "/universities/",   icon: Search },
+    { name: "Калкулатор",     path: "/calculator/",     icon: Calculator },
+    { name: "Кариерен тест",  path: "/career-advisor/", icon: Brain },
+    { name: "Календар",       path: "/calendar/",       icon: CalendarDays },
+    { name: "Общежития",      path: "/dormitories/",    icon: Building2 },
+    { name: "За нас",         path: "/about/",          icon: GraduationCap },
 ];
 
 /**
@@ -87,7 +92,13 @@ export default function Header() {
         navigate("/login");
     }, [navigate]);
 
-    const isActive = useCallback((path) => location.pathname === path, [location.pathname]);
+    // Сравнява без значение от trailing slash: NAV_LINKS сочат към канoничната
+    // форма (/about/), но потребител може да отвори и /about директно — активното
+    // състояние трябва да работи и в двата случая.
+    const isActive = useCallback((path) => {
+        const strip = (p) => (p.length > 1 ? p.replace(/\/+$/, "") : p);
+        return strip(location.pathname) === strip(path);
+    }, [location.pathname]);
 
     return (
         <>

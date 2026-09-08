@@ -176,6 +176,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://uniput.eu/universities/universitet-po-arhitektura-stroitelstvo-i-geodeziya-sofiya/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://uniput.eu/universities/shumenski-universitet-episkop-konstantin-preslavski/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -247,11 +252,6 @@
   </url>
   <url>
     <loc>https://uniput.eu/universities/yugozapaden-universitet-neofit-rilski-blagoevgrad/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/universitet-po-arhitektura-stroitelstvo-i-geodeziya-sofiya/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
