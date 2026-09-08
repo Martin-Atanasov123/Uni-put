@@ -11,4 +11,9 @@ Disallow: /profile
 Disallow: /favorites
 Disallow: /my-grades
 
+# Вътрешна конзола за дебъгване на RIASEC API — не е потребителска страница.
+# Компонентът има noindex, но той се вижда чак след JS рендиране; това го спира
+# още при crawl-а.
+Disallow: /test-career
+
 Sitemap: https://uniput.eu/sitemap.xml

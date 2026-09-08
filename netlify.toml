@@ -112,14 +112,10 @@
   from = "/test-career/*"
   to = "/index.html"
   status = 200
-[[redirects]]
-  from = "/dzi-strateg"
-  to = "/index.html"
-  status = 200
-[[redirects]]
-  from = "/dzi-strateg/*"
-  to = "/index.html"
-  status = 200
+# /dzi-strateg вече е prerender-нат (собствен canonical + h1 в суровия HTML),
+# затова НЯМА client-route правило тук — иначе /dzi-strateg (без наклонена черта)
+# щеше да получи 200 с shell-а на НАЧАЛНАТА страница вместо 301 към /dzi-strateg/.
+# Статичният файл се сервира пръв, точно както за /about, /calculator и т.н.
 [[redirects]]
   from = "/admin"
   to = "/index.html"
