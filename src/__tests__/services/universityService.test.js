@@ -3,6 +3,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { universityService } from '@/services/universityService';
 import { supabase } from '@/lib/supabase';
 
+import { ADMISSION_YEAR } from '@/lib/siteStats';
+
 vi.mock('@/lib/supabase', () => ({
     supabase: { from: vi.fn() }
 }));
@@ -107,13 +109,28 @@ describe('universityService.searchUniversities (server-side)', () => {
         expect(calls.eq).toEqual(expect.arrayContaining([['education_level', 'бакалавър']]));
     });
 
-    it('НЕ прилага .eq() когато филтърът е "Всички"', async () => {
+    it('НЕ прилага .eq() за град/ниво когато филтърът е "Всички"', async () => {
         const { builder, calls } = makeQueryMock({ resolveData: [] });
         supabase.from.mockReturnValue(builder);
 
         await universityService.searchUniversities({ city: 'Всички', level: 'Всички' });
 
-        expect(calls.eq.length).toBe(0);
+        const columns = calls.eq.map(([column]) => column);
+        expect(columns).not.toContain('city');
+        expect(columns).not.toContain('education_level');
+    });
+
+    it('ВИНАГИ филтрира по academic_year, дори без други филтри', async () => {
+        // Без този филтър, при вкарване на прием 2027 всяка специалност щеше да
+        // се появи по два пъти (веднъж за всяка година) във всички менюта.
+        const { builder, calls } = makeQueryMock({ resolveData: [] });
+        supabase.from.mockReturnValue(builder);
+
+        await universityService.searchUniversities({ city: 'Всички', level: 'Всички' });
+
+        expect(calls.eq).toEqual(
+            expect.arrayContaining([['academic_year', ADMISSION_YEAR]])
+        );
     });
 
     it('почиства user input от метасимволи преди .ilike()', async () => {

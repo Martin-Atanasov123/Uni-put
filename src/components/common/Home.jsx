@@ -4,6 +4,7 @@ import { m, useInView } from "motion/react";
 import { useAuth } from "@/hooks/useAuth";
 import Seo from "@/components/common/Seo";
 import JsonLd from "@/components/common/JsonLd";
+import { UNIVERSITIES, SPECIALTIES, CAREERS, RIASEC_SPECIALTIES, ADMISSION_YEAR_SHORT } from "@/lib/siteStats";
 
 // Schema.org structured data — описание на УниПът като организация и сайт.
 // Помага на Google + AI Overview да разберат scope-а на платформата.
@@ -361,9 +362,9 @@ function HeroSection() {
 // ── STAT STRIP ───────────────────────────────────────────────────────────────
 
 const STATS = [
-    { value: 500, suffix: "+", label: "различни специалности", sub: "в базата данни" },
-    { value: 51,  suffix: "",  label: "университета",  sub: "от цяла България" },
-    { value: 999,   suffix: "+",  label: "професии ",   sub: "кариерен профил" },
+    { value: SPECIALTIES,  suffix: "", label: "различни специалности", sub: "в базата данни" },
+    { value: UNIVERSITIES, suffix: "", label: "университета",           sub: "от цяла България" },
+    { value: CAREERS,      suffix: "", label: "професии",                sub: "кариерен профил" },
     { value: 100, suffix: "%", label: "безплатно",     sub: "без скрити такси" },
 ];
 
@@ -449,7 +450,7 @@ const STEPS = [
         num: "02",
         icon: Target,
         title: "Алгоритмичен Подбор",
-        desc: "Нашият алгоритъм сравнява профила ти с 912 специалности в 51 университета и генерира персонализиран списък.",
+        desc: `Нашият алгоритъм сравнява профила ти с ${RIASEC_SPECIALTIES} специалности в ${UNIVERSITIES} университета и генерира персонализиран списък.`,
     },
     {
         num: "03",
@@ -1016,7 +1017,7 @@ export default function Home() {
         >
             <Seo
                 title="Калкулатор за приемен бал и кариерен тест"
-                description="Изчисли приемния си бал по МОН формулите, направи RIASEC кариерен тест и сравни 51 университета — безплатно, на едно място. За 2026 г."
+                description={`Изчисли приемния си бал по МОН формулите, направи RIASEC кариерен тест и сравни ${UNIVERSITIES} университета — безплатно, на едно място. За ${ADMISSION_YEAR_SHORT} г.`}
                 path="/"
             />
             <JsonLd data={HOME_SCHEMA} />

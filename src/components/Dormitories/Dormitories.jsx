@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { m } from "motion/react";
 import { getAllDormitories } from "@/lib/api";
 import Seo from "@/components/common/Seo";
+import { DORMITORIES, DORMITORY_CITIES, ADMISSION_YEAR_SHORT } from "@/lib/siteStats";
 import {
     Building2,
     MapPin,
@@ -300,8 +301,8 @@ const Dormitories = () => {
     return (
         <div style={{ minHeight: "100vh", background: "var(--brand-bg)", padding: "7rem 1.5rem 3rem", color: "var(--brand-text)" }}>
             <Seo
-                title="Студентски общежития в България — 68 блока, цени и условия за 2026"
-                description="Сравни 68 студентски общежития в 16 града. Месечен наем, депозит, разстояние до университета и транспортни линии — на едно място. Данни към 2026 г."
+                title={`Студентски общежития в България — ${DORMITORIES} блока, цени и условия за ${ADMISSION_YEAR_SHORT}`}
+                description={`Сравни ${DORMITORIES} студентски общежития в ${DORMITORY_CITIES} града. Месечен наем, депозит, разстояние до университета и транспортни линии — на едно място. Данни към ${ADMISSION_YEAR_SHORT} г.`}
                 path="/dormitories"
                 image="https://uniput.eu/og/dormitories.png"
             />

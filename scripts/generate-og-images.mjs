@@ -10,6 +10,8 @@
 // Стартирай ръчно: `npm run generate:og`. Не е в prebuild — изображенията
 // се commit-ват веднъж и се регенерират само при дизайн промяна.
 
+import { UNIVERSITIES, SPECIALTIES, DORMITORIES, DORMITORY_CITIES, ADMISSION_YEAR_SHORT } from "../src/lib/siteStats.js";
+
 import { Resvg } from "@resvg/resvg-js";
 import { writeFile, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
@@ -32,7 +34,7 @@ const PAGES = [
         slug: "calculator",
         eyebrow: "КАЛКУЛАТОР",
         title: "Кандидатстудентски бал",
-        subtitle: "Точните коефициенти за 845 специалности",
+        subtitle: `Точните коефициенти за ${SPECIALTIES} специалности`,
         accent: "#06B6D4",
     },
     {
@@ -45,15 +47,15 @@ const PAGES = [
     {
         slug: "universities",
         eyebrow: "ВИСШИ УЧИЛИЩА",
-        title: "51 университета",
-        subtitle: "845 специалности за прием 2026",
+        title: `${UNIVERSITIES} университета`,
+        subtitle: `${SPECIALTIES} специалности за прием ${ADMISSION_YEAR_SHORT}`,
         accent: "#06B6D4",
     },
     {
         slug: "dormitories",
         eyebrow: "СТУДЕНТСКИ ЖИВОТ",
-        title: "68 общежития",
-        subtitle: "В 16 града на България",
+        title: `${DORMITORIES} общежития`,
+        subtitle: `В ${DORMITORY_CITIES} града на България`,
         accent: "#8B5CF6",
     },
     {

@@ -34,6 +34,7 @@ import {
 } from "lucide-react";
 
 import RIASECResults from "./RIASECResults";
+import { RIASEC_SPECIALTIES } from "@/lib/siteStats";
 
 const S = {
     surface: {
@@ -481,7 +482,7 @@ const CareerAdvisor = () => {
         >
             <Seo
                 title="Безплатен RIASEC кариерен тест за специалност"
-                description="Безплатен RIASEC кариерен тест — 30 въпроса за 3 минути. Сравняваме профила ти с 912 специалности, за да откриеш най-подходящите. Без регистрация."
+                description={`Безплатен RIASEC кариерен тест — 30 въпроса за 3 минути. Сравняваме профила ти с ${RIASEC_SPECIALTIES} специалности, за да откриеш най-подходящите. Без регистрация.`}
                 path="/career-advisor"
                 image="https://uniput.eu/og/career-advisor.png"
             />

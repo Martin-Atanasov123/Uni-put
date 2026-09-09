@@ -50,6 +50,7 @@ import {
 import GradeInputSection from "./GradeInputSection";
 import ReportButton from "./ReportButton";
 import { FIELD_LABELS, SLOT_GROUPS } from "@/lib/coefficients_config";
+import { UNIVERSITIES, SPECIALTIES, ADMISSION_YEAR, ADMISSION_YEAR_SHORT } from "@/lib/siteStats";
 
 const S = {
     surface: "var(--brand-surface-2)",
@@ -237,7 +238,8 @@ export default function CalculatorPage() {
             } catch {
                 // corrupt cache — игнорираме, ще се презапише
             }
-            const { data, error } = await supabase.from("universities").select("faculty").limit(2000);
+            const { data, error } = await supabase.from("universities")
+                .select("faculty").eq("academic_year", ADMISSION_YEAR).limit(2000);
             if (error) {
                 // Ако вече имаме факултети от cache-а — продължаваме да работим без да тревожим UI.
                 // Ако нямаме — показваме грешка.
@@ -262,6 +264,7 @@ export default function CalculatorPage() {
             const { data, error } = await supabase
                 .from("universities")
                 .select("id,faculty,specialty,university_name,city,coefficients,formula_description,max_ball,website_url,accreditation_status")
+                .eq("academic_year", ADMISSION_YEAR)
                 .eq("faculty", selectedFaculty)
                 .limit(500);
             if (error) {
@@ -285,11 +288,14 @@ export default function CalculatorPage() {
                     msData.forEach(r => { (byId[r.university_id] ||= []).push(r); });
                     const resolved = {};
                     Object.entries(byId).forEach(([id, rows]) => {
-                        // Последна година → най-късно класиране (null round = финално).
+                        // Последна година → НАЙ-РАННО класиране. Първото класиране е ориентирът,
+                        // към който се цели кандидатът; по-късните класирания запълват остатъчни
+                        // места и дават по-нисък, подвеждащо оптимистичен праг.
+                        // null round = финално/неуточнено → използва се само ако няма номерирано.
                         const latestYear = Math.max(...rows.map(r => r.year));
                         const yearRows = rows.filter(r => r.year === latestYear);
                         const roundRank = r => (r.round === null ? 99 : r.round);
-                        const bestRound = Math.max(...yearRows.map(roundRank));
+                        const bestRound = Math.min(...yearRows.map(roundRank));
                         const finalRows = yearRows.filter(r => roundRank(r) === bestRound);
                         const values = finalRows.map(r => Number(r.min_ball)).filter(v => !Number.isNaN(v));
                         if (!values.length) return;
@@ -317,7 +323,8 @@ export default function CalculatorPage() {
         if (!sp) return;
         (async () => {
             // Ако имаме и university — exact match (избягваме грешен hit от ilike при близки имена).
-            let q = supabase.from("universities").select("faculty,specialty,university_name");
+            let q = supabase.from("universities").select("faculty,specialty,university_name")
+                .eq("academic_year", ADMISSION_YEAR);
             if (uni) {
                 q = q.eq("specialty", sp).eq("university_name", uni);
             } else {
@@ -475,7 +482,7 @@ export default function CalculatorPage() {
         <div style={{ minHeight: "100vh", background: "var(--brand-bg)", paddingTop: "7rem", paddingBottom: "5rem" }}>
             <Seo
                 title="Калкулатор за приемен бал — балообразуване по МОН"
-                description="Изчисли приемния си бал за 2026 г. Точните коефициенти и формули на МОН за 51 университета и 845 специалности. Безплатно, без регистрация."
+                description={`Изчисли приемния си бал за ${ADMISSION_YEAR_SHORT} г. Точните коефициенти и формули на МОН за ${UNIVERSITIES} университета и ${SPECIALTIES} специалности. Безплатно, без регистрация.`}
                 path="/calculator"
                 image="https://uniput.eu/og/calculator.png"
             />
@@ -986,7 +993,7 @@ export default function CalculatorPage() {
                                     <div style={{ paddingTop: "0.75rem", borderTop: "1px solid rgba(148,163,184,0.08)", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                                         {minScore && (
                                             <div style={{ fontSize: "12px", color: "var(--brand-muted)" }}>
-                                                Минимален бал {minScore.year}{minScore.round ? ` (${minScore.round}-${minScore.round === 1 ? "во" : minScore.round === 2 ? "ро" : "то"} класиране)` : ""}:{" "}
+                                                Минимален бал {minScore.year}{minScore.round ? ` (${minScore.round}-${minScore.round === 1 ? "во" : minScore.round === 2 ? "ро" : "то"} класиране)` : " (финално класиране)"}:{" "}
                                                 <strong style={{ color: "var(--brand-text)", fontFamily: "monospace" }}>
                                                     {minScore.minBall.toFixed(2)}{minScore.minBallMax > minScore.minBall ? `–${minScore.minBallMax.toFixed(2)}` : ""}
                                                 </strong>

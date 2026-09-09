@@ -6,6 +6,7 @@
 // Експорти: getDziStrategy, getDziForSpecialty
 
 import { supabase } from '@/lib/supabase';
+import { ADMISSION_YEAR } from '@/lib/siteStats';
 
 // Ранкирането се мени само при промяна на коефициентите в базата → кешираме за 24h.
 const STRATEGY_CACHE_KEY = 'uniput_dzi_strategy_v1';
@@ -74,7 +75,8 @@ export const dziService = {
             // счупен кеш — игнорираме
         }
 
-        const { data, error } = await supabase.from('universities').select('specialty').limit(3000);
+        const { data, error } = await supabase.from('universities')
+            .select('specialty').eq('academic_year', ADMISSION_YEAR).limit(3000);
         if (error) throw error;
         const names = [...new Set((data || []).map(r => r.specialty).filter(Boolean))]
             .sort((a, b) => a.localeCompare(b, 'bg'));

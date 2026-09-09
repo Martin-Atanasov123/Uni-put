@@ -11,6 +11,7 @@ import { slugify } from "@/lib/slugify";
 import Seo from "@/components/common/Seo";
 import JsonLd from "@/components/common/JsonLd";
 import AccreditationWarning from "@/components/common/AccreditationWarning";
+import { UNIVERSITIES, RIASEC_SPECIALTIES } from "@/lib/siteStats";
 
 const CARD_BORDER = "1px solid var(--brand-card-border)";
 
@@ -273,7 +274,8 @@ export default function UniversityPage() {
                         margin: "1rem 0 0", fontSize: "0.9375rem",
                         lineHeight: 1.7, color: "var(--brand-muted)", maxWidth: "65ch",
                     }}>
-                        {uniName} е сред 47-те акредитирани висши училища в България. През
+                        {uniName} е сред {UNIVERSITIES} висши училища с публикувани условия
+                        за прием в УниПът. През
                         академичната 2026 г. приема кандидати за {totalSpecialties}{" "}
                         {totalSpecialties === 1 ? "специалност" : "специалности"},
                         разпределени в {faculties.length}{" "}
@@ -290,8 +292,9 @@ export default function UniversityPage() {
                             калкулатора за бал
                         </Link>
                         {" "}— той прилага точните формули за всяка от {totalSpecialties}{" "}
-                        {totalSpecialties === 1 ? "специалност" : "специалности"} и сравнява
-                        резултата ти с историческия среден бал за прием.
+                        {totalSpecialties === 1 ? "специалност" : "специалности"}, а където
+                        имаме официални данни от минали години — показва и историческия
+                        минимален бал за прием.
                     </p>
                     <p style={{
                         margin: "0.875rem 0 0", fontSize: "0.9375rem",
@@ -301,7 +304,7 @@ export default function UniversityPage() {
                         <Link to="/career-advisor/" style={{ color: "var(--brand-cyan)", textDecoration: "none", fontWeight: 600 }}>
                             RIASEC кариерния тест
                         </Link>
-                        {" "}— той сравнява профила ти с 912 специалности и предлага най-подходящите.
+                        {" "}— той сравнява профила ти с {RIASEC_SPECIALTIES} специалности и предлага най-подходящите.
                     </p>
                 </section>
 

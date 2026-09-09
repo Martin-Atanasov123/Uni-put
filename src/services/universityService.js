@@ -6,6 +6,7 @@
 //   за да може UI слоят да покаже error state.
 
 import { supabase } from '@/lib/supabase';
+import { ADMISSION_YEAR } from '@/lib/siteStats';
 
 const SLIM_COLS = 'id,university_name,specialty,faculty,city,education_level,max_ball,accreditation_status';
 const PAGE_SIZE_DEFAULT = 200;
@@ -47,7 +48,8 @@ export const universityService = {
         offset = 0,
     } = {}) {
         const normalizedQuery = normalize(query);
-        let q = supabase.from('universities').select(SLIM_COLS);
+        let q = supabase.from('universities').select(SLIM_COLS)
+            .eq('academic_year', ADMISSION_YEAR);
 
         if (normalizedQuery) {
             const synonyms = SPECIALTY_SYNONYMS[normalizedQuery] || [normalizedQuery];
@@ -95,6 +97,7 @@ export const universityService = {
         const { data, error } = await supabase
             .from('universities')
             .select(SLIM_COLS)
+            .eq('academic_year', ADMISSION_YEAR)
             .in('id', validIds);
 
         if (error) throw error;
@@ -123,7 +126,8 @@ export const universityService = {
 
         const { data, error } = await supabase
             .from('universities')
-            .select('university_name');
+            .select('university_name')
+            .eq('academic_year', ADMISSION_YEAR);
         if (error) throw error;
 
         const unique = [...new Set((data || []).map((d) => d.university_name).filter(Boolean))]
@@ -146,6 +150,7 @@ export const universityService = {
         const { data, error } = await supabase
             .from('universities')
             .select(SLIM_COLS)
+            .eq('academic_year', ADMISSION_YEAR)
             .eq('university_name', name)
             .order('faculty', { ascending: true });
         if (error) throw error;
@@ -169,7 +174,8 @@ export const universityService = {
         // 2. Fetch — само колоната `city`, малък payload
         const { data, error } = await supabase
             .from('universities')
-            .select('city');
+            .select('city')
+            .eq('academic_year', ADMISSION_YEAR);
         if (error) throw error;
 
         const unique = [...new Set((data || []).map((d) => d.city).filter(Boolean))]

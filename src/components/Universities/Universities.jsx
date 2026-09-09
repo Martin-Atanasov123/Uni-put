@@ -13,6 +13,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Seo from "@/components/common/Seo";
 import { slugify } from "@/lib/slugify";
 import AccreditationWarning from "@/components/common/AccreditationWarning";
+import { UNIVERSITIES, SPECIALTIES, ADMISSION_YEAR_SHORT } from "@/lib/siteStats";
 
 // ─── rsvu.mon.bg High-level groups ──────────────────────────────────────────
 // Matches the official МОН classification 
@@ -712,8 +713,8 @@ export default function UniversitiesPage() {
             onClick={() => setShowSuggestions(false)}
         >
             <Seo
-                title="51 университета и 845 специалности за прием 2026"
-                description="Всички 51 висши училища в България и 845 специалности. Филтрирай по град, факултет и степен. Изчисли приемния си бал по коефициентите на МОН."
+                title={`${UNIVERSITIES} университета и ${SPECIALTIES} специалности за прием ${ADMISSION_YEAR_SHORT}`}
+                description={`${UNIVERSITIES} висши училища в България и ${SPECIALTIES} специалности. Филтрирай по град, факултет и степен. Изчисли приемния си бал по коефициентите на МОН.`}
                 path="/universities"
                 image="https://uniput.eu/og/universities.png"
             />

@@ -13,11 +13,12 @@
 // реални статични файлове ПРЕДИ SPA fallback redirect-а, затова /calculator →
 // dist/calculator/index.html (правилен head), а React app-ът работи нормално.
 //
-// Per-uni routes (47) са gated зад SITEMAP_DYNAMIC=1 (нужен е Supabase), точно
+// Per-uni routes са gated зад SITEMAP_DYNAMIC=1 (нужен е Supabase), точно
 // както sitemap скрипта. Стартира се след `vite build` (виж package.json).
 
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
+import { UNIVERSITIES, SPECIALTIES, RIASEC_SPECIALTIES, DORMITORIES, DORMITORY_CITIES, ADMISSION_YEAR_SHORT } from "../src/lib/siteStats.js";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import { slugify } from "../src/lib/slugify.js";
@@ -56,31 +57,31 @@ const STATIC_ROUTES = [
     {
         path: "/",
         title: "Калкулатор за приемен бал и кариерен тест",
-        description: "Изчисли приемния си бал по МОН формулите, направи RIASEC кариерен тест и сравни 51 университета — безплатно, на едно място. За 2026 г.",
+        description: `Изчисли приемния си бал по МОН формулите, направи RIASEC кариерен тест и сравни ${UNIVERSITIES} университета — безплатно, на едно място. За ${ADMISSION_YEAR_SHORT} г.`,
         image: DEFAULT_IMAGE,
     },
     {
         path: "/calculator",
         title: "Калкулатор за приемен бал — балообразуване по МОН",
-        description: "Изчисли приемния си бал за 2026 г. Точните коефициенти и формули на МОН за 51 университета и 845 специалности. Безплатно, без регистрация.",
+        description: `Изчисли приемния си бал за ${ADMISSION_YEAR_SHORT} г. Точните коефициенти и формули на МОН за ${UNIVERSITIES} университета и ${SPECIALTIES} специалности. Безплатно, без регистрация.`,
         image: `${SITE_URL}/og/calculator.png`,
     },
     {
         path: "/career-advisor",
         title: "Безплатен RIASEC кариерен тест за специалност",
-        description: "Безплатен RIASEC кариерен тест — 30 въпроса за 3 минути. Сравняваме профила ти с 912 специалности, за да откриеш най-подходящите. Без регистрация.",
+        description: `Безплатен RIASEC кариерен тест — 30 въпроса за 3 минути. Сравняваме профила ти с ${RIASEC_SPECIALTIES} специалности, за да откриеш най-подходящите. Без регистрация.`,
         image: `${SITE_URL}/og/career-advisor.png`,
     },
     {
         path: "/universities",
-        title: "51 университета и 845 специалности за прием 2026",
-        description: "Всички 51 висши училища в България и 845 специалности. Филтрирай по град, факултет и степен. Изчисли приемния си бал по коефициентите на МОН.",
+        title: `${UNIVERSITIES} университета и ${SPECIALTIES} специалности за прием ${ADMISSION_YEAR_SHORT}`,
+        description: `${UNIVERSITIES} висши училища в България и ${SPECIALTIES} специалности. Филтрирай по град, факултет и степен. Изчисли приемния си бал по коефициентите на МОН.`,
         image: `${SITE_URL}/og/universities.png`,
     },
     {
         path: "/dormitories",
-        title: "68 студентски общежития в България за 2026",
-        description: "Сравни 68 студентски общежития в 16 града. Месечен наем, депозит, разстояние до университета и транспортни линии — на едно място. Данни към 2026 г.",
+        title: `${DORMITORIES} студентски общежития в България за ${ADMISSION_YEAR_SHORT}`,
+        description: `Сравни ${DORMITORIES} студентски общежития в ${DORMITORY_CITIES} града. Месечен наем, депозит, разстояние до университета и транспортни линии — на едно място. Данни към ${ADMISSION_YEAR_SHORT} г.`,
         image: `${SITE_URL}/og/dormitories.png`,
     },
     {
@@ -252,19 +253,19 @@ function buildUniversityBody(route) {
     // Трите абзаца — дословно същият текст като секцията в UniversityPage.jsx.
     const intro =
         `<section>` +
-        `<h2>За приема в ${esc(name)} през 2026 г.</h2>` +
-        `<p>${esc(name)} е сред 47-те акредитирани висши училища в България. През ` +
-        `академичната 2026 г. приема кандидати за ${totalSpecialties} ` +
+        `<h2>За приема в ${esc(name)} през ${ADMISSION_YEAR_SHORT} г.</h2>` +
+        `<p>${esc(name)} е сред ${UNIVERSITIES} висши училища с публикувани условия за прием ` +
+        `в УниПът. През академичната ${ADMISSION_YEAR_SHORT} г. приема кандидати за ${totalSpecialties} ` +
         `${plural(totalSpecialties, "специалност", "специалности")}, разпределени в ` +
         `${facCount} ${plural(facCount, "факултет", "факултета")}. Балообразуването следва ` +
         `официалните коефициенти, публикувани от МОН в наредбата за прием.</p>` +
         `<p>Изчисли реалния си конкурсен бал с <a href="/calculator/">калкулатора за бал</a> ` +
         `— той прилага точните формули за всяка от ${totalSpecialties} ` +
-        `${plural(totalSpecialties, "специалност", "специалности")} и сравнява резултата ти ` +
-        `с историческия среден бал за прием.</p>` +
+        `${plural(totalSpecialties, "специалност", "специалности")}, а където имаме официални ` +
+        `данни от минали години — показва и историческия минимален бал за прием.</p>` +
         `<p>Не си сигурен/а в специалността? Започни с ` +
         `<a href="/career-advisor/">RIASEC кариерния тест</a> — той сравнява профила ти ` +
-        `с 912 специалности и предлага най-подходящите.</p>` +
+        `с ${RIASEC_SPECIALTIES} специалности и предлага най-подходящите.</p>` +
         `</section>`;
 
     // Факултети + специалности, всяка с deep link към калкулатора (същия href
