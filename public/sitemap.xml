@@ -51,27 +51,7 @@
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://uniput.eu/universities/voenna-akademiya-georgi-s-rakovski-sofiya/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://uniput.eu/universities/agraren-universitet-plovdiv/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/velikotarnovski-universitet-sv-sv-kiril-i-metodiy/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/evropeyski-politehnicheski-universitet/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/plovdivski-universitet-paisiy-hilendarski/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -81,17 +61,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://uniput.eu/universities/burgaski-darzhaven-universitet-prof-d-r-asen-zlatarov/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/sofiyski-universitet-sv-kliment-ohridski/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/kolezh-po-turizam-blagoevgrad/</loc>
+    <loc>https://uniput.eu/universities/akademiya-po-natsionalna-i-informatsionna-sigurnost-plovdiv/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -101,52 +71,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://uniput.eu/universities/akademiya-po-natsionalna-i-informatsionna-sigurnost-plovdiv/</loc>
+    <loc>https://uniput.eu/universities/amerikanski-universitet-v-balgariya-blagoevgrad/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://uniput.eu/universities/visshe-stroitelno-uchilishte-lyuben-karavelov-sofiya/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/varnenski-svoboden-universitet-chernorizets-hrabar/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/tehnicheski-universitet-varna/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/visshe-uchilishte-po-agrobiznes-i-razvitie-na-regionite-plovdiv/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/visshe-voennomorsko-uchilishte-nikola-yonkov-vaptsarov/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/visshe-transportno-uchilishte-todor-kableshkov-sofiya/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/tehnicheski-universitet-gabrovo/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/trakiyski-universitet-stara-zagora/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/visshe-uchilishte-po-telekomunikatsii-i-poshti-sofiya/</loc>
+    <loc>https://uniput.eu/universities/burgaski-darzhaven-universitet-prof-d-r-asen-zlatarov/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -156,7 +86,52 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://uniput.eu/universities/evropeyski-politehnicheski-universitet/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/himikotehnologichen-i-metalurgichen-universitet-sofiya/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/ikonomicheski-universitet-varna/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/kolezh-po-menidzhmant-targoviya-i-marketing-sofiya/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/kolezh-po-turizam-blagoevgrad/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/lesotehnicheski-universitet-sofiya/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://uniput.eu/universities/meditsinski-universitet-pleven/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/meditsinski-universitet-plovdiv/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/meditsinski-universitet-prof-d-r-paraskev-stoyanov-varna/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/meditsinski-universitet-sofiya/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -171,82 +146,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://uniput.eu/universities/teatralen-kolezh-lyuben-groys-sofiya/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/kolezh-po-menidzhmant-targoviya-i-marketing-sofiya/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/universitet-po-arhitektura-stroitelstvo-i-geodeziya-sofiya/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/shumenski-universitet-episkop-konstantin-preslavski/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/visshe-voennovazdushno-uchilishte-georgi-benkovski/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/amerikanski-universitet-v-balgariya-blagoevgrad/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://uniput.eu/universities/natsionalen-voenen-universitet-vasil-levski-veliko-tarnovo/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/natsionalna-muzikalna-akademiya-prof-pancho-vladigerov/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/nov-balgarski-universitet/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/meditsinski-universitet-sofiya/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/stopanska-akademiya-dimitar-a-tsenov-svishtov/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/visshe-uchilishte-po-menidzhmant-varna/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/tehnicheski-universitet-sofiya/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/rusenski-universitet-angel-kanchev/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/meditsinski-universitet-plovdiv/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://uniput.eu/universities/universitet-za-natsionalno-i-svetovno-stopanstvo/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -256,27 +156,72 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://uniput.eu/universities/yugozapaden-universitet-neofit-rilski-blagoevgrad/</loc>
+    <loc>https://uniput.eu/universities/natsionalna-muzikalna-akademiya-prof-pancho-vladigerov/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://uniput.eu/universities/universitet-po-zastrahovane-i-finansi/</loc>
+    <loc>https://uniput.eu/universities/natsionalna-sportna-akademiya-vasil-levski/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://uniput.eu/universities/universitet-po-hranitelni-tehnologii-plovdiv/</loc>
+    <loc>https://uniput.eu/universities/nov-balgarski-universitet/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://uniput.eu/universities/himikotehnologichen-i-metalurgichen-universitet-sofiya/</loc>
+    <loc>https://uniput.eu/universities/plovdivski-universitet-paisiy-hilendarski/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://uniput.eu/universities/meditsinski-universitet-prof-d-r-paraskev-stoyanov-varna/</loc>
+    <loc>https://uniput.eu/universities/rusenski-universitet-angel-kanchev/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/shumenski-universitet-episkop-konstantin-preslavski/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/sofiyski-universitet-sv-kliment-ohridski/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/stopanska-akademiya-dimitar-a-tsenov-svishtov/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/teatralen-kolezh-lyuben-groys-sofiya/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/tehnicheski-universitet-gabrovo/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/tehnicheski-universitet-sofiya/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/tehnicheski-universitet-varna/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/trakiyski-universitet-stara-zagora/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/universitet-po-arhitektura-stroitelstvo-i-geodeziya-sofiya/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -286,17 +231,72 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://uniput.eu/universities/lesotehnicheski-universitet-sofiya/</loc>
+    <loc>https://uniput.eu/universities/universitet-po-hranitelni-tehnologii-plovdiv/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://uniput.eu/universities/ikonomicheski-universitet-varna/</loc>
+    <loc>https://uniput.eu/universities/universitet-po-zastrahovane-i-finansi/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://uniput.eu/universities/natsionalna-sportna-akademiya-vasil-levski/</loc>
+    <loc>https://uniput.eu/universities/universitet-za-natsionalno-i-svetovno-stopanstvo/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/varnenski-svoboden-universitet-chernorizets-hrabar/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/velikotarnovski-universitet-sv-sv-kiril-i-metodiy/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/visshe-stroitelno-uchilishte-lyuben-karavelov-sofiya/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/visshe-transportno-uchilishte-todor-kableshkov-sofiya/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/visshe-uchilishte-po-agrobiznes-i-razvitie-na-regionite-plovdiv/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/visshe-uchilishte-po-menidzhmant-varna/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/visshe-uchilishte-po-telekomunikatsii-i-poshti-sofiya/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/visshe-voennomorsko-uchilishte-nikola-yonkov-vaptsarov/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/visshe-voennovazdushno-uchilishte-georgi-benkovski/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/voenna-akademiya-georgi-s-rakovski-sofiya/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://uniput.eu/universities/yugozapaden-universitet-neofit-rilski-blagoevgrad/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

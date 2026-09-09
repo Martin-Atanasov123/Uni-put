@@ -112,7 +112,9 @@ async function fetchDynamicRoutes() {
         if (specSlug) specialties.add(`${uniSlug}/${specSlug}`);
     }
 
-    const uniRoutes = [...universities.keys()].map((slug) => ({
+    // Сортираме по slug: Supabase не гарантира ред, а несортираният изход дава
+    // 48-редов diff при всяко регенериране, в който истинските промени се губят.
+    const uniRoutes = [...universities.keys()].sort().map((slug) => ({
         path: `/universities/${slug}`,
         changefreq: "weekly",
         priority: "0.8",
@@ -120,7 +122,7 @@ async function fetchDynamicRoutes() {
 
     if (UNI_ONLY) return uniRoutes;
 
-    const specRoutes = [...specialties].map((pair) => ({
+    const specRoutes = [...specialties].sort().map((pair) => ({
         path: `/universities/${pair}`,
         changefreq: "weekly",
         priority: "0.7",
@@ -140,8 +142,8 @@ async function main() {
         routes.push(...dynamic);
         console.log(`   + ${dynamic.length} dynamic routes`);
     } else {
-        console.log("ℹ Dynamic routes са изключени (INCLUDE_DYNAMIC_ROUTES=false).");
-        console.log("  Включи ги САМО след като /universities/[slug] е имплементиран.");
+        console.log("ℹ Dynamic routes са изключени (SITEMAP_DYNAMIC≠1).");
+        console.log("  В Netlify е включено; локално сетни SITEMAP_DYNAMIC=1, ако искаш пълен sitemap.");
     }
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -150,8 +152,33 @@ ${routes.map(urlEntry).join("\n")}
 </urlset>
 `;
 
+    // ПРЕДПАЗИТЕЛ: `npm run build` върти този скрипт. Локално SITEMAP_DYNAMIC
+    // обикновено не е сетнат (в Netlify е), затова един най-обикновен локален
+    // билд презаписваше комитнатия sitemap от 60 URL-а на 10 — и ако след това
+    // комитнеш, деплойваш осакатен sitemap, без нищо да се е оплакало.
+    // Отказваме да смалим съществуващ файл; продукцията се пише само когато
+    // dynamic режимът наистина е включен.
+    const existingCount = await countExistingUrls(OUT_PATH);
+    if (!INCLUDE_DYNAMIC_ROUTES && existingCount > routes.length) {
+        console.log(
+            `⏭  Пропуснат запис: ${OUT_PATH} вече има ${existingCount} URL-а, ` +
+            `а без dynamic режим щяхме да запишем само ${routes.length}.`
+        );
+        console.log("   Пусни с SITEMAP_DYNAMIC=1, ако наистина искаш да го регенерираш.");
+        return;
+    }
+
     await writeFile(OUT_PATH, xml, "utf8");
     console.log(`✅ Записан ${OUT_PATH} (${routes.length} URL-и)`);
+}
+
+// Колко URL-а има вече записаният sitemap (0, ако липсва или е нечетим).
+async function countExistingUrls(path) {
+    try {
+        return ((await readFile(path, "utf8")).match(/<url>/g) || []).length;
+    } catch {
+        return 0;
+    }
 }
 
 main().catch((err) => {
