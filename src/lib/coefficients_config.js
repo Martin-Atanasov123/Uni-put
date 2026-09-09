@@ -37,7 +37,8 @@ const COEFFICIENT_KEYS = [
   "tournament", "vtor_dzi_drug_predmet",
   "dzi_nai_visoka", "dzi_profilirasht_predmet", "eakt_ocenka", "exam_angliiski",
   "exam_angliyski", "exam_etika", "exam_fizika", "exam_iq", "exam_phys", "exam_ris_1",
-  "exam_ris_2", "exam_skulptirane", "exam_sport", "exam_test", "exam_ikonomika", "exam_kompoziciq", "exam_modelirane", "grazhdansko_obrazovanie",
+  "exam_ris_2", "exam_skulptirane", "exam_sport", "exam_test", "exam_ikonomika", "exam_kompoziciq", "exam_modelirane",
+  "exam_ist_izkustvo", "grazhdansko_obrazovanie",
   "him_udostoverenie", "hsk4_combo", "istoriq_diploma", "izpit_bel",
   "matematika", "obsht_prirodonauchen_test", "obsht_tehnicheski_test", "ocenka_matematika",
   "prakticheski_izpit_horeografiq", "profilirasht_predmet", "psihologicheska_ocenka", "ris",
@@ -160,6 +161,8 @@ const FIELD_LABELS = {
   exam_him: "Изпит по химия",
   exam_informatika: "Изпит по информатика",
   exam_ist: "Изпит по история",
+  // Отделен от exam_ist: НХА изпитва по история на ИЗКУСТВОТО, не обща история.
+  exam_ist_izkustvo: "Изпит по история на изкуството",
   exam_mat: "Изпит по математика",
   exam_muz: "Изпит по музика",
   exam_ris: "Изпит по рисуване",
@@ -373,7 +376,8 @@ const SLOT_GROUPS = {
   arts_group: ["exam_muz", "dzi_muz", "muz", "muzika", "exam_ris", "dzi_ris", "dzi_izobrazitelno",
     "portfolio", "exam_ris_1", "exam_ris_2", "exam_skulptirane", "ris",
     "risuvane_cvetna_kompoziciq", "risuvane_obemno_prostranstvena_kompoziciq",
-    "risuvane_perspektiva", "exam_kompoziciq", "prakticheski_izpit_horeografiq"],
+    "risuvane_perspektiva", "exam_kompoziciq", "exam_ist_izkustvo",
+    "prakticheski_izpit_horeografiq"],
 
   // Diploma and general
   diploma_group: ["diploma", "obsht_uspeh", "diploma_semestrial", "diploma_state_exams",

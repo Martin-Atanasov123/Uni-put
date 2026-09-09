@@ -258,7 +258,7 @@ function buildUniversityBody(route) {
         `в УниПът. През академичната ${ADMISSION_YEAR_SHORT} г. приема кандидати за ${totalSpecialties} ` +
         `${plural(totalSpecialties, "специалност", "специалности")}, разпределени в ` +
         `${facCount} ${plural(facCount, "факултет", "факултета")}. Балообразуването следва ` +
-        `официалните коефициенти, публикувани от МОН в наредбата за прием.</p>` +
+        `коефициентите от официалния правилник за прием на висшето училище.</p>` +
         `<p>Изчисли реалния си конкурсен бал с <a href="/calculator/">калкулатора за бал</a> ` +
         `— той прилага точните формули за всяка от ${totalSpecialties} ` +
         `${plural(totalSpecialties, "специалност", "специалности")}, а където имаме официални ` +
@@ -405,12 +405,15 @@ async function fetchUniversityRoutes() {
     for (const row of allRows) {
         const name = row.university_name;
         if (!name) continue;
-        if (!byUni.has(name)) byUni.set(name, { faculties: new Map(), total: 0, cities: new Map() });
+        if (!byUni.has(name)) byUni.set(name, { faculties: new Map(), specialties: new Set(), cities: new Map() });
         const u = byUni.get(name);
         const fac = row.faculty || "Общи специалности";
         if (!u.faculties.has(fac)) u.faculties.set(fac, []);
         u.faculties.get(fac).push(row.specialty || "");
-        u.total += 1;
+        // Set, не брояч: университет с филиали има един и същ ред за всеки град
+        // (НХА го предлага в София и Бургас). Броенето на редове показваше 22
+        // специалности там, където реално са 17.
+        if (row.specialty) u.specialties.add(row.specialty);
         if (row.city) u.cities.set(row.city, (u.cities.get(row.city) || 0) + 1);
     }
 
@@ -425,12 +428,12 @@ async function fetchUniversityRoutes() {
             }))
             .sort((a, b) => a.name.localeCompare(b.name, "bg"));
         const facCount = faculties.length;
-        const total = u.total;
+        const total = u.specialties.size;
         const cities = [...u.cities.entries()].sort((a, b) => b[1] - a[1]).map(([c]) => c);
         const primaryCity = cities[0] || "";
         // Шаблоните трябва да съвпадат с UniversityPage.jsx seoTitle / seoDesc.
         const title = `${name} — прием и балообразуване 2026`;
-        const description = `${name} — балообразуване 2026: точните коефициенти на МОН за ${total} специалности в ${facCount} факултета. Изчисли приемния си бал безплатно.`;
+        const description = `${name} — балообразуване ${ADMISSION_YEAR_SHORT}: точните коефициенти за ${total} специалности в ${facCount} факултета. Изчисли приемния си бал безплатно.`;
 
         // Schema.org — идентично на uniSchema / breadcrumbSchema в UniversityPage.jsx.
         const schemas = [

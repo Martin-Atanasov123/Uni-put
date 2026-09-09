@@ -156,6 +156,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://uniput.eu/universities/natsionalna-hudozhestvena-akademiya/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://uniput.eu/universities/natsionalna-muzikalna-akademiya-prof-pancho-vladigerov/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

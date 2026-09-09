@@ -11,7 +11,7 @@ import { slugify } from "@/lib/slugify";
 import Seo from "@/components/common/Seo";
 import JsonLd from "@/components/common/JsonLd";
 import AccreditationWarning from "@/components/common/AccreditationWarning";
-import { UNIVERSITIES, RIASEC_SPECIALTIES } from "@/lib/siteStats";
+import { UNIVERSITIES, RIASEC_SPECIALTIES, ADMISSION_YEAR_SHORT } from "@/lib/siteStats";
 
 const CARD_BORDER = "1px solid var(--brand-card-border)";
 
@@ -114,7 +114,11 @@ export default function UniversityPage() {
             .map(([name, specs]) => ({ name, specs: specs.sort((a, b) => (a.specialty || "").localeCompare(b.specialty || "", "bg")) }))
             .sort((a, b) => a.name.localeCompare(b.name, "bg"));
         const cities = [...cityCount.entries()].sort((a, b) => b[1] - a[1]).map(([c]) => c);
-        return { faculties: facs, cities, totalSpecialties: rows.length };
+        // Броим различни имена, не редове: университет с филиали пази отделен
+        // ред за всеки град (НХА е и в София, и в Бургас), затова rows.length
+        // показваше 22 специалности там, където реално са 17.
+        const distinctSpecialties = new Set(rows.map((r) => r.specialty).filter(Boolean));
+        return { faculties: facs, cities, totalSpecialties: distinctSpecialties.size };
     }, [rows]);
 
     if (status === "loading") return <Loader />;
@@ -126,7 +130,7 @@ export default function UniversityPage() {
     const accreditationStatus = rows[0]?.accreditation_status;
     // SEO copy от SEO-AUDIT-REPORT.md §3.2 — enriched за прием 2026
     const seoTitle = `${uniName} — прием и балообразуване 2026`;
-    const seoDesc = `${uniName} — балообразуване 2026: точните коефициенти на МОН за ${totalSpecialties} специалности в ${faculties.length} факултета. Изчисли приемния си бал безплатно.`;
+    const seoDesc = `${uniName} — балообразуване ${ADMISSION_YEAR_SHORT}: точните коефициенти за ${totalSpecialties} специалности в ${faculties.length} факултета. Изчисли приемния си бал безплатно.`;
 
     // Schema.org EducationalOrganization — описва университета като субект.
     // Department-ите са факултетите, дърпани от actual DB data.
@@ -280,8 +284,8 @@ export default function UniversityPage() {
                         {totalSpecialties === 1 ? "специалност" : "специалности"},
                         разпределени в {faculties.length}{" "}
                         {faculties.length === 1 ? "факултет" : "факултета"}.
-                        Балообразуването следва официалните коефициенти, публикувани от МОН
-                        в наредбата за прием.
+                        Балообразуването следва коефициентите от официалния правилник
+                        за прием на висшето училище.
                     </p>
                     <p style={{
                         margin: "0.875rem 0 0", fontSize: "0.9375rem",

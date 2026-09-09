@@ -9,11 +9,20 @@
 //
 // Стартирай ръчно: `npm run generate:og`. Не е в prebuild — изображенията
 // се commit-ват веднъж и се регенерират само при дизайн промяна.
+//
+// ⚠️ ВНИМАНИЕ: комитнатите PNG-та в public/og/ НЕ идват от този скрипт. Те са
+// направени ръчно и са значително по-добри — носят логото на УниПът, Inter,
+// градиентното число в cyan→violet и илюстрацията. Този скрипт е само груб
+// fallback: Inter не е инсталиран в Node, затова Resvg рендерира със serif,
+// без лого и без илюстрация. Пускането му презаписваше брандираните файлове с
+// по-лоши. Затова сега по подразбиране НЕ пише върху съществуващ файл —
+// нужен е изричен --force.
 
 import { UNIVERSITIES, SPECIALTIES, DORMITORIES, DORMITORY_CITIES, ADMISSION_YEAR_SHORT } from "../src/lib/siteStats.js";
 
 import { Resvg } from "@resvg/resvg-js";
 import { writeFile, mkdir } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 
@@ -127,7 +136,10 @@ function svgTemplate({ eyebrow, title, subtitle, accent }) {
 </svg>`;
 }
 
+const FORCE = process.argv.includes("--force");
+
 async function main() {
+    let skipped = 0;
     await mkdir(OUT_DIR, { recursive: true });
     console.log(`📁 Output: ${OUT_DIR}\n`);
 
@@ -143,14 +155,23 @@ async function main() {
                 loadSystemFonts: true,
             },
         });
-        const pngBuffer = resvg.render().asPng();
         const outPath = resolve(OUT_DIR, `${page.slug}.png`);
+        if (existsSync(outPath) && !FORCE) {
+            console.log(`⏭  ${page.slug.padEnd(15)} вече съществува — пропуснат (--force за презапис)`);
+            skipped += 1;
+            continue;
+        }
+        const pngBuffer = resvg.render().asPng();
         await writeFile(outPath, pngBuffer);
         const sizeKB = (pngBuffer.length / 1024).toFixed(1);
         console.log(`✅ ${page.slug.padEnd(15)} → ${sizeKB} KB`);
     }
-
-    console.log(`\n✨ Generated ${PAGES.length} OG images.`);
+    const written = PAGES.length - skipped;
+    console.log(`
+Записани ${written} OG изображения, пропуснати ${skipped}.`);
+    if (skipped > 0) {
+        console.log("   Комитнатите PNG-та са ръчно брандирани — не ги презаписвай без нужда.");
+    }
 }
 
 main().catch((err) => {

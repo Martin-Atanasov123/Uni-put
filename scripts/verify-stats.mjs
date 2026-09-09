@@ -102,12 +102,12 @@ async function main() {
 
     let src = await readFile(STATS_FILE, "utf8");
     for (const { key, actual: v } of drift) {
-        const re = new RegExp(`(export const ${key} = )\d+(;)`);
+        const re = new RegExp(`(export const ${key} = )[0-9]+(;)`);
         if (!re.test(src)) throw new Error(`Не намирам "export const ${key}" в siteStats.js`);
         src = src.replace(re, `$1${v}$2`);
     }
     const today = new Date().toISOString().slice(0, 10);
-    src = src.replace(/(Последна проверка спрямо Supabase: )\d{4}-\d{2}-\d{2}/, `$1${today}`);
+    src = src.replace(/(Последна проверка спрямо Supabase: )[0-9]{4}-[0-9]{2}-[0-9]{2}/, `$1${today}`);
     await writeFile(STATS_FILE, src, "utf8");
     console.log(`\n✅ Обновени ${drift.length} стойности в src/lib/siteStats.js.`);
     console.log("   Пусни `npm run generate:og`, ако числата се показват в OG изображенията.");

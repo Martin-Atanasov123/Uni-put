@@ -8,17 +8,17 @@
  * За да ги обновиш след вкарване на нови данни:
  *     node scripts/verify-stats.mjs --fix
  *
- * Последна проверка спрямо Supabase: 2026-09-10
+ * Последна проверка спрямо Supabase: 2026-09-09
  */
 
 /** Брой различни висши училища с данни за прием в базата. */
-export const UNIVERSITIES = 50;
+export const UNIVERSITIES = 51;
 
 /** Брой различни имена на специалности с формула за балообразуване. */
-export const SPECIALTIES = 852;
+export const SPECIALTIES = 862;
 
 /** Брой двойки университет × специалност (реалният брой програми за прием). */
-export const PROGRAMS = 1254;
+export const PROGRAMS = 1271;
 
 /** Градове, в които има университет с данни за прием. */
 export const UNIVERSITY_CITIES = 17;
