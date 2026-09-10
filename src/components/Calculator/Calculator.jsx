@@ -41,6 +41,8 @@ import {
     Zap,
     Copy,
     Check,
+    Share2,
+    Download,
     ExternalLink,
     Bookmark,
     X as XIcon,
@@ -140,6 +142,184 @@ function admissionChanceBand(score, minBall, maxBall) {
         blurb: "Балът ти е доста под миналогодишния праг. Подготви и резервни варианти." };
 }
 
+// ── Споделяне на резултат ────────────────────────────────────────────────────
+// Growth move (CLAUDE.md §11): моментът след разкриване на бала е най-силният
+// за споделяне. Дава се (1) линк, който отваря калкулатора със същата
+// специалност — приятелят въвежда СВОИ оценки (нула PII в URL-а), и (2) канава
+// картинка за screenshot в Viber/WhatsApp/Instagram.
+
+function copyText(text) {
+    if (window.isSecureContext && navigator.clipboard) {
+        return navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+    }
+    fallbackCopy(text);
+    return Promise.resolve();
+}
+function fallbackCopy(text) {
+    const el = document.createElement("textarea");
+    el.value = text;
+    el.style.position = "fixed";
+    el.style.opacity = "0";
+    document.body.appendChild(el);
+    el.select();
+    try { document.execCommand("copy"); } catch { /* без clipboard — нищо не можем да направим */ }
+    document.body.removeChild(el);
+}
+
+function buildShareUrl(specialty, university) {
+    const p = new URLSearchParams({ specialty });
+    if (university) p.set("university", university);
+    return `${window.location.origin}/calculator/?${p.toString()}`;
+}
+
+// Рисува 1080×1350 (4:5) картинка на резултата — без външни шрифтове/asset-и,
+// за да е надеждно във всеки браузър. Връща canvas.
+function drawCalcResultCard({ university, specialty, score, maxBall, chance, marginPts, minBall, minYear }) {
+    const W = 1080;
+    const PAD = 88;
+    const INNER = W - PAD * 2;
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const font = (size, weight = 400) =>
+        `${weight} ${size}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif`;
+    const mono = (size, weight = 400) =>
+        `${weight} ${size}px ui-monospace, "SF Mono", Menlo, Consolas, monospace`;
+
+    // ── Фаза 1: пресмятаме реда, за да оразмерим канавата по съдържанието
+    ctx.font = font(28, 600);
+    const uniLines = wrapText(ctx, university, INNER).slice(0, 2);
+    ctx.font = font(58, 800);
+    const specLines = wrapText(ctx, specialty, INNER).slice(0, 2);
+
+    const LOGO_BLOCK = 96;
+    const uniH = uniLines.length * 40;
+    const specH = specLines.length * 70;
+    const scoreBlockH = 176 + 56;      // число + подредове
+    const bandH = chance ? 200 : 0;
+    const bandGap = chance ? 56 : 0;
+    const contentH = LOGO_BLOCK + 34 + uniH + 20 + specH + 48 + scoreBlockH + bandGap + bandH;
+    const FOOTER = 90;
+    const H = Math.round(PAD + contentH + FOOTER + PAD);
+
+    canvas.width = W; canvas.height = H;
+
+    // ── Фаза 2: рисуване
+    ctx.fillStyle = "#0F172A";
+    ctx.fillRect(0, 0, W, H);
+    const glow = ctx.createRadialGradient(W * 0.82, H * 0.16, 0, W * 0.82, H * 0.16, W * 0.85);
+    glow.addColorStop(0, "rgba(6,182,212,0.16)");
+    glow.addColorStop(1, "rgba(6,182,212,0)");
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+    ctx.textBaseline = "alphabetic";
+
+    // Лого
+    ctx.fillStyle = "#06B6D4";
+    ctx.fillRect(PAD, PAD, 8, 40);
+    ctx.fillStyle = "#F1F5F9";
+    ctx.font = font(38, 800);
+    ctx.fillText("УниПът", PAD + 24, PAD + 32);
+
+    // Университет + специалност
+    let y = PAD + LOGO_BLOCK + 34;
+    ctx.fillStyle = "#94A3B8";
+    ctx.font = font(28, 600);
+    for (const line of uniLines) { ctx.fillText(line, PAD, y); y += 40; }
+    y += 20;
+    ctx.fillStyle = "#F1F5F9";
+    ctx.font = font(58, 800);
+    for (const line of specLines) { ctx.fillText(line, PAD, y); y += 70; }
+
+    // Бал — голямо число с cyan→violet градиент
+    y += 48 + 176;
+    ctx.font = mono(176, 900);
+    const scoreText = score.toFixed(2);
+    const scoreW = ctx.measureText(scoreText).width;
+    const grad = ctx.createLinearGradient(PAD, 0, PAD + scoreW, 0);
+    grad.addColorStop(0, "#06B6D4");
+    grad.addColorStop(1, "#8B5CF6");
+    ctx.fillStyle = grad;
+    ctx.fillText(scoreText, PAD, y);
+    if (maxBall) {
+        ctx.fillStyle = "#64748B";
+        ctx.font = font(40, 700);
+        ctx.fillText(`/ ${Number(maxBall)}`, PAD + scoreW + 22, y);
+    }
+    ctx.fillStyle = "#64748B";
+    ctx.font = font(24, 700);
+    ctx.fillText("КОНКУРСЕН БАЛ", PAD + 4, y + 44);
+    if (minBall != null) {
+        ctx.fillStyle = "#94A3B8";
+        ctx.font = font(26, 500);
+        ctx.textAlign = "right";
+        ctx.fillText(`минимален бал ${minYear || ""}: ${minBall.toFixed(2)}`, W - PAD, y + 44);
+        ctx.textAlign = "left";
+    }
+
+    // Лента „шанс за прием"
+    if (chance) {
+        const tone = { green: "#10b981", amber: "#FBBF24", red: "#f87171" }[chance.tone];
+        y += bandGap;
+        roundRect(ctx, PAD, y, INNER, bandH, 24);
+        ctx.fillStyle = tone + "1A"; // ~10% алфа
+        ctx.fill();
+        ctx.strokeStyle = tone;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = "#94A3B8";
+        ctx.font = font(24, 700);
+        ctx.fillText("ШАНС ЗА ПРИЕМ", PAD + 44, y + 56);
+        ctx.fillStyle = tone;
+        ctx.font = font(56, 800);
+        ctx.fillText(chance.label, PAD + 44, y + 118);
+        if (marginPts != null) {
+            ctx.fillStyle = "#94A3B8";
+            ctx.font = font(28, 600);
+            const sign = marginPts >= 0 ? "+" : "−";
+            ctx.fillText(`${sign}${Math.abs(marginPts).toFixed(2)} т. спрямо миналогодишния праг`, PAD + 44, y + 162);
+        }
+    }
+
+    // Футър
+    ctx.fillStyle = "#64748B";
+    ctx.font = font(28, 700);
+    ctx.fillText("uniput.eu", PAD, H - PAD);
+    ctx.fillStyle = "#94A3B8";
+    ctx.font = font(26, 500);
+    ctx.textAlign = "right";
+    ctx.fillText("Изчисли своя бал безплатно", W - PAD, H - PAD);
+    ctx.textAlign = "left";
+
+    return canvas;
+}
+
+function wrapText(ctx, text, maxWidth) {
+    const words = String(text).split(/\s+/);
+    const lines = [];
+    let cur = "";
+    for (const w of words) {
+        const test = cur ? cur + " " + w : w;
+        if (ctx.measureText(test).width > maxWidth && cur) {
+            lines.push(cur); cur = w;
+        } else {
+            cur = test;
+        }
+    }
+    if (cur) lines.push(cur);
+    return lines;
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+}
+
 // ── Formula legend ───────────────────────────────────────────────────────────
 const FORMULA_LEGEND = [
     { symbol: "Изпит(X)",  desc: "Конкурсен изпит по предмет X, организиран от университета" },
@@ -178,6 +358,7 @@ export default function CalculatorPage() {
     const [dziPoints, setDziPoints] = useState("");
     const [dziError, setDziError] = useState("");
     const [copied, setCopied] = useState(false);
+    const [shareFeedback, setShareFeedback] = useState(null); // { id, kind: "link" | "image" }
     const [loadError, setLoadError] = useState(null);
     const location = useLocation();
     const { user } = useAuth();
@@ -213,21 +394,66 @@ export default function CalculatorPage() {
 
     const copyGrade = () => {
         if (!dziResult) return;
-        const text = String(dziResult.grade);
-        if (window.isSecureContext && navigator.clipboard) {
-            navigator.clipboard.writeText(text).catch(() => {});
-        } else {
-            const el = document.createElement("textarea");
-            el.value = text;
-            el.style.position = "fixed";
-            el.style.opacity = "0";
-            document.body.appendChild(el);
-            el.select();
-            try { document.execCommand("copy"); } catch {}
-            document.body.removeChild(el);
-        }
+        copyText(String(dziResult.grade));
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+    };
+
+    const flashShare = (id, kind) => {
+        setShareFeedback({ id, kind });
+        setTimeout(() => setShareFeedback(f => (f && f.id === id ? null : f)), 2400);
+    };
+
+    const shareResult = async (res) => {
+        const { item, score, chance } = res;
+        const url = buildShareUrl(item.specialty, item.university_name);
+        const verdict = chance ? ` — ${chance.label.toLowerCase()}` : "";
+        const text = `Моят приемен бал за ${item.specialty} (${item.university_name}): ${score.toFixed(2)}${verdict}. Изчисли своя:`;
+        try {
+            if (navigator.share) {
+                await navigator.share({ title: "УниПът — приемен бал", text, url });
+                return;
+            }
+        } catch (err) {
+            if (err?.name === "AbortError") return; // потребителят отказа
+        }
+        await copyText(`${text} ${url}`);
+        flashShare(item.id, "link");
+    };
+
+    const saveResultImage = async (res) => {
+        const { item, score, maxBall, chance, marginPts, minScore } = res;
+        const canvas = drawCalcResultCard({
+            university: item.university_name,
+            specialty: item.specialty,
+            score,
+            maxBall,
+            chance,
+            marginPts,
+            minBall: minScore?.minBall ?? null,
+            minYear: minScore?.year ?? null,
+        });
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+        if (!blob) return;
+        const fileName = `uniput-bal-${item.specialty}.png`.replace(/\s+/g, "-");
+        const file = new File([blob], fileName, { type: "image/png" });
+        try {
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({ files: [file], title: "УниПът — приемен бал" });
+                return;
+            }
+        } catch (err) {
+            if (err?.name === "AbortError") return;
+        }
+        const objUrl = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = objUrl;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(objUrl), 10000);
+        flashShare(item.id, "image");
     };
 
     const cities = useMemo(
@@ -990,7 +1216,7 @@ export default function CalculatorPage() {
                         transition={{ duration: 0.4, delay: 0.1 }}
                         style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(320px,1fr))", gap: "1rem" }}
                     >
-                        {calcResults.map(({ item, formatted, minScore, isAbove, marginPts, chance, percentOfMax, hasStarted, hasMissing, missingSlots }) => (
+                        {calcResults.map(({ item, score, maxBall, formatted, minScore, isAbove, marginPts, chance, percentOfMax, hasStarted, hasMissing, missingSlots }) => (
                                 <div key={item.id} style={{ background: S.surface, backdropFilter: "blur(12px)", border: `1px solid ${S.border}`, borderRadius: "1.25rem", padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
 
                                     {/* Top: name + score */}
@@ -1079,6 +1305,43 @@ export default function CalculatorPage() {
                                                     {item.university_name} не публикува минимални балове за прием, затова не можем да кажем дали влизаш.
                                                 </div>
                                             </>
+                                        )}
+
+                                        {hasStarted && !hasMissing && (
+                                            <div style={{ display: "flex", gap: "0.5rem" }}>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => shareResult({ item, score, chance })}
+                                                    style={{
+                                                        flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "0.375rem",
+                                                        minHeight: "44px", padding: "0 0.75rem",
+                                                        borderRadius: "0.625rem", border: "none", cursor: "pointer",
+                                                        fontSize: "13px", fontWeight: 700, color: "#fff",
+                                                        background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                                    }}
+                                                >
+                                                    {shareFeedback?.id === item.id && shareFeedback.kind === "link"
+                                                        ? <><Check size={14} /> Копирано</>
+                                                        : <><Share2 size={14} strokeWidth={2} /> Сподели</>}
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => saveResultImage({ item, score, maxBall, chance, marginPts, minScore })}
+                                                    title="Запази като картинка"
+                                                    style={{
+                                                        display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "0.375rem",
+                                                        minHeight: "44px", padding: "0 0.875rem",
+                                                        borderRadius: "0.625rem", border: "1px solid var(--brand-border)", cursor: "pointer",
+                                                        fontSize: "13px", fontWeight: 600, color: "var(--brand-text)",
+                                                        background: "var(--brand-surface-2)",
+                                                    }}
+                                                >
+                                                    {shareFeedback?.id === item.id && shareFeedback.kind === "image"
+                                                        ? <Check size={14} />
+                                                        : <Download size={14} strokeWidth={2} />}
+                                                    Картинка
+                                                </button>
+                                            </div>
                                         )}
 
                                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.5rem" }}>
