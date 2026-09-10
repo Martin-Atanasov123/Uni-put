@@ -35,6 +35,7 @@ const AdminReports    = lazy(() => import("@/components/admin/AdminReports"));
 const TermsOfService  = lazy(() => import("@/components/common/TermsOfService"));
 const PrivacyPolicy   = lazy(() => import("@/components/common/PrivacyPolicy"));
 const MyGradesPage    = lazy(() => import("@/components/MyGrades/MyGrades"));
+const ReminderAction  = lazy(() => import("@/components/common/ReminderAction"));
 
 function PageWrap({ children }) {
     return (
@@ -86,6 +87,8 @@ function App() {
                                     <Route path="/about" element={<PageWrap><About /></PageWrap>} />
                                     <Route path="/terms" element={<PageWrap><TermsOfService /></PageWrap>} />
                                     <Route path="/privacy" element={<PageWrap><PrivacyPolicy /></PageWrap>} />
+                                    <Route path="/reminders/confirm" element={<PageWrap><ReminderAction /></PageWrap>} />
+                                    <Route path="/reminders/unsubscribe" element={<PageWrap><ReminderAction /></PageWrap>} />
                                     <Route path="/universities" element={<PageWrap><UniversitiesPage /></PageWrap>} />
                                     <Route path="/universities/:uniSlug" element={
                                         <PageWrap><GlobalErrorBoundary><UniversityPage /></GlobalErrorBoundary></PageWrap>

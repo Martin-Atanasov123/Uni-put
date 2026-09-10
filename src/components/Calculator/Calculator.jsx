@@ -50,6 +50,7 @@ import {
     Compass,
 } from "lucide-react";
 import GradeInputSection from "./GradeInputSection";
+import DeadlineReminder from "@/components/common/DeadlineReminder";
 import ReportButton from "./ReportButton";
 import { FIELD_LABELS, SLOT_GROUPS } from "@/lib/coefficients_config";
 import { UNIVERSITIES, SPECIALTIES, ADMISSION_YEAR, ADMISSION_YEAR_SHORT } from "@/lib/siteStats";
@@ -1305,6 +1306,10 @@ export default function CalculatorPage() {
                                                     {item.university_name} не публикува минимални балове за прием, затова не можем да кажем дали влизаш.
                                                 </div>
                                             </>
+                                        )}
+
+                                        {hasStarted && !hasMissing && (
+                                            <DeadlineReminder universityName={item.university_name} />
                                         )}
 
                                         {hasStarted && !hasMissing && (

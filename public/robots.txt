@@ -10,6 +10,7 @@ Disallow: /update-password
 Disallow: /profile
 Disallow: /favorites
 Disallow: /my-grades
+Disallow: /reminders
 
 # Вътрешна конзола за дебъгване на RIASEC API — не е потребителска страница.
 # Компонентът има noindex, но той се вижда чак след JS рендиране; това го спира
