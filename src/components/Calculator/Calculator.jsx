@@ -111,6 +111,35 @@ function dziToGrade(pts) {
     return { grade: +grade.toFixed(2), band };
 }
 
+// ── Шанс за прием ────────────────────────────────────────────────────────────
+// Качествен ориентир, НЕ процент. Одитите са изрични: с ~1 година история на
+// повечето програми не може да се твърди статистическа вероятност. Показваме
+// лента спрямо миналогодишния праг, нормализирана към max_ball на програмата
+// (иначе „+5 т." значи различно на скала /42 и на /500).
+// Годишните колебания на минималния бал са около 15–20% от max_ball, затова
+// „на границата" е широка лента, а не точка.
+const CHANCE_TONES = {
+    green: { text: "#10b981", bg: "rgba(16,185,129,0.1)",  border: "rgba(16,185,129,0.25)" },
+    amber: { text: "#FBBF24", bg: "rgba(251,191,36,0.1)",  border: "rgba(251,191,36,0.25)" },
+    red:   { text: "#f87171", bg: "rgba(248,113,113,0.1)", border: "rgba(248,113,113,0.25)" },
+};
+
+function admissionChanceBand(score, minBall, maxBall) {
+    if (!(score > 0) || minBall == null || !(maxBall > 0)) return null;
+    const marginPts = score - minBall;
+    const marginPct = (marginPts / maxBall) * 100;
+    if (marginPct >= 12) return { key: "high", label: "Много добър шанс", tone: "green",
+        blurb: "Балът ти е доста над миналогодишния праг — с голяма преднина." };
+    if (marginPct >= 4) return { key: "good", label: "Добър шанс", tone: "green",
+        blurb: "Балът ти е над миналогодишния праг с удобна разлика." };
+    if (marginPct >= -2) return { key: "realistic", label: "Реалистичен шанс", tone: "amber",
+        blurb: "Балът ти е на границата на миналогодишния праг — може да падне и в двете посоки." };
+    if (marginPct >= -10) return { key: "borderline", label: "Граничен шанс", tone: "amber",
+        blurb: "Балът ти е под миналогодишния праг, но в рамките на обичайните годишни колебания." };
+    return { key: "low", label: "Малък шанс", tone: "red",
+        blurb: "Балът ти е доста под миналогодишния праг. Подготви и резервни варианти." };
+}
+
 // ── Formula legend ───────────────────────────────────────────────────────────
 const FORMULA_LEGEND = [
     { symbol: "Изпит(X)",  desc: "Конкурсен изпит по предмет X, организиран от университета" },
@@ -439,10 +468,11 @@ export default function CalculatorPage() {
             // няма публикуван → само % от максималния бал, без „влизаш/не влизаш" присъда.
             const minScore = minScores[item.id] || null;
             const isAbove = minScore ? score >= minScore.minBall : null;
-            const diff = minScore ? Math.abs(score - minScore.minBall).toFixed(2) : null;
+            const marginPts = minScore ? score - minScore.minBall : null;
+            const chance = minScore ? admissionChanceBand(score, minScore.minBall, maxBall) : null;
             const percentOfMax = !minScore && maxBall && score > 0 ? Math.min((score / maxBall) * 100, 100) : null;
             const hasStarted = score > 0 || hasAnyValidGrade;
-            return { item, score, formatted: Number.isFinite(score) ? score.toFixed(2) : "0.00", minScore, isAbove, diff, percentOfMax, maxBall, hasStarted, hasMissing: missingSlots.length > 0, missingSlots };
+            return { item, score, formatted: Number.isFinite(score) ? score.toFixed(2) : "0.00", minScore, isAbove, marginPts, chance, percentOfMax, maxBall, hasStarted, hasMissing: missingSlots.length > 0, missingSlots };
         });
     }, [rowsForSelectedSpecialty, grades, hasAnyValidGrade, minScores]);
 
@@ -461,6 +491,7 @@ export default function CalculatorPage() {
             minBall: best.minScore?.minBall ?? null,
             minBallYear: best.minScore?.year ?? null,
             isAbove: best.isAbove, // null когато няма публикуван минимален бал
+            chanceBand: best.chance?.key ?? null, // low|borderline|realistic|good|high
             date: Date.now(),
         };
         const prev = JSON.parse(localStorage.getItem("calculator_history") || "[]");
@@ -959,7 +990,7 @@ export default function CalculatorPage() {
                         transition={{ duration: 0.4, delay: 0.1 }}
                         style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(320px,1fr))", gap: "1rem" }}
                     >
-                        {calcResults.map(({ item, formatted, minScore, isAbove, diff, percentOfMax, hasStarted, hasMissing, missingSlots }) => (
+                        {calcResults.map(({ item, formatted, minScore, isAbove, marginPts, chance, percentOfMax, hasStarted, hasMissing, missingSlots }) => (
                                 <div key={item.id} style={{ background: S.surface, backdropFilter: "blur(12px)", border: `1px solid ${S.border}`, borderRadius: "1.25rem", padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
 
                                     {/* Top: name + score */}
@@ -1008,15 +1039,28 @@ export default function CalculatorPage() {
                                             </div>
                                         )}
 
-                                        {!hasMissing && hasStarted && minScore && (
-                                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                                                <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "12px", fontWeight: 700, color: isAbove ? "#10b981" : "#f87171" }}>
-                                                    {isAbove ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                                                    {isAbove ? `Над минималния с ${diff} т.` : `Под минималния с ${diff} т.`}
+                                        {!hasMissing && hasStarted && minScore && chance && (
+                                            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", padding: "0.75rem", borderRadius: "0.75rem", background: CHANCE_TONES[chance.tone].bg, border: `1px solid ${CHANCE_TONES[chance.tone].border}` }}>
+                                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem" }}>
+                                                    <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "12px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                                                        <Compass size={13} strokeWidth={1.5} />
+                                                        Шанс за прием
+                                                    </div>
+                                                    <span style={{ padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", background: CHANCE_TONES[chance.tone].bg, color: CHANCE_TONES[chance.tone].text, border: `1px solid ${CHANCE_TONES[chance.tone].border}` }}>
+                                                        {chance.label}
+                                                    </span>
                                                 </div>
-                                                <span style={{ padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", background: isAbove ? "rgba(16,185,129,0.1)" : "rgba(248,113,113,0.1)", color: isAbove ? "#10b981" : "#f87171", border: `1px solid ${isAbove ? "rgba(16,185,129,0.25)" : "rgba(248,113,113,0.25)"}` }}>
-                                                    {isAbove ? "НАД МИНИМАЛНИЯ" : "ПОД МИНИМАЛНИЯ"}
-                                                </span>
+                                                <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "12px", fontWeight: 700, color: CHANCE_TONES[chance.tone].text }}>
+                                                    {marginPts >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                                                    {marginPts >= 0 ? "+" : "−"}{Math.abs(marginPts).toFixed(2)} т. спрямо миналогодишния праг
+                                                </div>
+                                                <p style={{ margin: 0, fontSize: "11px", color: "var(--brand-muted)", lineHeight: 1.5 }}>
+                                                    {chance.blurb}
+                                                </p>
+                                                <p style={{ margin: 0, display: "flex", alignItems: "flex-start", gap: "0.375rem", fontSize: "11px", color: "var(--brand-muted)", lineHeight: 1.5 }}>
+                                                    <AlertCircle size={12} style={{ flexShrink: 0, marginTop: "2px" }} />
+                                                    Ориентир по данни от {minScore.year} г., не гаранция. Прагът се мени всяка година според броя кандидати.
+                                                </p>
                                             </div>
                                         )}
 
