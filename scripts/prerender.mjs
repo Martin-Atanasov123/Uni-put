@@ -308,8 +308,58 @@ function buildUniversityBody(route) {
     );
 }
 
+const RIASEC_LETTER_NAME = {
+    R: "Реалистичен", I: "Изследователски", A: "Артистичен",
+    S: "Социален", E: "Предприемачески", C: "Конвенционален",
+};
+
+// Per-специалност страница — огледало на SpecialtyPage.jsx.
+function buildSpecialtyBody(route) {
+    const { name, slug, riasecCode, cities, minRange, programs } = route.spec;
+    const uniCount = new Set(programs.map((p) => p.university_name)).size;
+    const letter = riasecCode ? RIASEC_LETTER_NAME[riasecCode[0]] : null;
+
+    const intro =
+        `<section>` +
+        `<h2>Къде да учиш ${esc(name)} през ${ADMISSION_YEAR_SHORT} г.</h2>` +
+        `<p>Специалност ${esc(name)} се предлага в ${uniCount} ` +
+        `${plural(uniCount, "университет", "университета")} в ${cities.length} ` +
+        `${plural(cities.length, "град", "града")} (${esc(cities.join(", "))}). Всеки университет ` +
+        `прилага собствена формула за балообразуване по официалните коефициенти на МОН.` +
+        (minRange
+            ? ` Историческите минимални балове се движат между ${minRange.lo.toFixed(2)} и ${minRange.hi.toFixed(2)} т.`
+            : "") +
+        `</p>` +
+        (letter
+            ? `<p>По RIASEC профил тази специалност пасва на тип ${esc(letter)} (${esc(riasecCode)}). ` +
+              `Направи <a href="/career-advisor/">кариерния тест</a>, за да провериш дали е за теб.</p>`
+            : "") +
+        `</section>`;
+
+    const items = programs.map((p) => {
+        const href = `/calculator/?specialty=${encodeURIComponent(name)}&university=${encodeURIComponent(p.university_name)}`;
+        const uniHref = `/universities/${slugify(p.university_name)}/`;
+        const bits = [p.city, p.education_level, p.min ? `мин. бал ${p.min.year}: ${p.min.minBall.toFixed(2)}` : null]
+            .filter(Boolean).join(" · ");
+        return `<li><a href="${esc(uniHref)}">${esc(p.university_name)}</a> — ${esc(bits)} ` +
+            `(<a href="${esc(href)}">изчисли бал</a>)</li>`;
+    }).join("");
+
+    return (
+        WRAP_OPEN +
+        `<p><a href="/universities/">Всички университети</a></p>` +
+        `<h1 style="font-size:1.75rem;font-weight:800;letter-spacing:-0.02em">${esc(name)} — прием ${ADMISSION_YEAR_SHORT}</h1>` +
+        `<p>${esc(route.description)}</p>` +
+        intro +
+        `<section><h2>Университети, които предлагат ${esc(name)}</h2><ul>${items}</ul></section>` +
+        `<nav aria-label="Основни секции">${navLinks(`/specialnosti/${slug}/`)}</nav>` +
+        `</div>`
+    );
+}
+
 function buildBody(route, uniIndex) {
     if (route.uni) return buildUniversityBody(route);
+    if (route.spec) return buildSpecialtyBody(route);
     if (route.path === "/universities" && uniIndex.length) {
         return buildUniversitiesIndexBody(route, uniIndex);
     }
@@ -482,6 +532,124 @@ async function fetchUniversityRoutes() {
     return routes;
 }
 
+// Per-специалност routes — огледало на SpecialtyPage.jsx. Само специалности с
+// ≥2 университета: под този праг агрегатната страница дублира per-uni страницата
+// и е thin (риск „Crawled - currently not indexed"). Всичко от базата.
+async function fetchSpecialtyRoutes() {
+    const { createClient } = await import("@supabase/supabase-js");
+    const WebSocket = (await import("ws")).default;
+    if (!process.env.VITE_SUPABASE_URL || !process.env.VITE_SUPABASE_ANON_KEY) {
+        console.warn("⚠ Липсват Supabase env vars — пропускам per-specialty prerender.");
+        return [];
+    }
+    const supabase = createClient(
+        process.env.VITE_SUPABASE_URL,
+        process.env.VITE_SUPABASE_ANON_KEY,
+        { auth: { persistSession: false }, realtime: { transport: WebSocket } },
+    );
+
+    const PAGE = 1000;
+    const rows = [];
+    for (let from = 0; ; from += PAGE) {
+        const { data, error } = await supabase
+            .from("universities")
+            .select("id, university_name, specialty, city, education_level, formula_description")
+            .eq("academic_year", "2026/2027")
+            .range(from, from + PAGE - 1);
+        if (error) { console.warn(`⚠ Supabase грешка (спец.): ${error.message}`); return []; }
+        if (!data || !data.length) break;
+        rows.push(...data);
+        if (data.length < PAGE) break;
+    }
+
+    // RIASEC карта: specialty → riasec_code
+    const riasecMap = new Map();
+    {
+        const { data } = await supabase
+            .from("specialty_riasec_mapping")
+            .select("specialty_base_name, riasec_code")
+            .range(0, 1499);
+        for (const r of data || []) riasecMap.set(r.specialty_base_name, r.riasec_code);
+    }
+
+    // Минимални балове: university_id → {minBall, year} (последна г., най-ранно класиране)
+    const minById = new Map();
+    {
+        const { data } = await supabase
+            .from("admission_min_scores")
+            .select("university_id, year, round, min_ball")
+            .range(0, 4999);
+        const byId = {};
+        for (const r of data || []) (byId[r.university_id] ||= []).push(r);
+        for (const [id, rs] of Object.entries(byId)) {
+            const ly = Math.max(...rs.map((r) => r.year));
+            const yr = rs.filter((r) => r.year === ly);
+            const rank = (r) => (r.round === null ? 99 : r.round);
+            const br = Math.min(...yr.map(rank));
+            const vals = yr.filter((r) => rank(r) === br).map((r) => Number(r.min_ball)).filter((v) => !Number.isNaN(v));
+            if (vals.length) minById.set(id, { minBall: Math.min(...vals), year: ly });
+        }
+    }
+
+    // Групиране по специалност
+    const bySpec = new Map();
+    for (const row of rows) {
+        const sp = row.specialty;
+        if (!sp) continue;
+        if (!bySpec.has(sp)) bySpec.set(sp, []);
+        bySpec.get(sp).push(row);
+    }
+
+    const routes = [];
+    for (const [sp, progs] of bySpec) {
+        const unis = new Set(progs.map((p) => p.university_name));
+        if (unis.size < 2) continue; // праг: смислена сравнителна страница
+        const slug = slugify(sp);
+        if (!slug) continue;
+        const cities = [...new Set(progs.map((p) => p.city).filter(Boolean))];
+        const riasecCode = riasecMap.get(sp) || null;
+        const minVals = progs.map((p) => minById.get(p.id)).filter(Boolean).map((m0) => m0.minBall);
+        const minRange = minVals.length ? { lo: Math.min(...minVals), hi: Math.max(...minVals), n: minVals.length } : null;
+
+        const seoTitle = `${sp} — университети и приемен бал ${ADMISSION_YEAR_SHORT}`;
+        const description =
+            `Къде да учиш ${sp} в България: ${unis.size} ${plural(unis.size, "университет", "университета")} в ` +
+            `${cities.length} ${plural(cities.length, "град", "града")}. Балообразуване по коефициентите на МОН` +
+            `${minRange ? ", минимални балове от минали години" : ""} и изчисли своя бал безплатно.`;
+
+        const schemas = [{
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+                { "@type": "ListItem", position: 1, name: "Начало", item: `${SITE_URL}/` },
+                { "@type": "ListItem", position: 2, name: "Специалности", item: `${SITE_URL}/universities` },
+                { "@type": "ListItem", position: 3, name: sp, item: `${SITE_URL}/specialnosti/${slug}` },
+            ],
+        }];
+
+        routes.push({
+            path: `/specialnosti/${slug}`,
+            title: seoTitle,
+            description,
+            image: DEFAULT_IMAGE,
+            schemas,
+            spec: {
+                name: sp, slug, riasecCode, cities, minRange,
+                programs: progs
+                    .map((p) => ({
+                        university_name: p.university_name,
+                        city: p.city,
+                        education_level: p.education_level,
+                        formula_description: p.formula_description,
+                        min: minById.get(p.id) || null,
+                    }))
+                    .sort((a, b) => a.university_name.localeCompare(b.university_name, "bg")),
+            },
+        });
+    }
+    return routes;
+}
+
 async function main() {
     await loadDotEnvIfPresent(resolve(__dirname, "..", ".env"));
 
@@ -502,6 +670,10 @@ async function main() {
             .map((r) => r.uni)
             .sort((a, b) => a.name.localeCompare(b.name, "bg"));
         console.log(`   + ${uniRoutes.length} per-uni routes`);
+
+        const specRoutes = await fetchSpecialtyRoutes();
+        routes.push(...specRoutes);
+        console.log(`   + ${specRoutes.length} per-specialty routes`);
     } else {
         console.log("ℹ Per-uni prerender изключен (SITEMAP_DYNAMIC≠1).");
     }

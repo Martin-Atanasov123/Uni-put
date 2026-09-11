@@ -22,6 +22,7 @@ const UpdatePassword  = lazy(() => import("@/components/Auth/UpdatePassword"));
 const About           = lazy(() => import("@/components/common/About"));
 const UniversitiesPage= lazy(() => import("@/components/Universities/Universities"));
 const UniversityPage  = lazy(() => import("@/components/Universities/UniversityPage"));
+const SpecialtyPage   = lazy(() => import("@/components/Universities/SpecialtyPage"));
 const CareerAdvisor   = lazy(() => import("@/components/CareerAdvisor/CareerAdvisor"));
 const TestCareer      = lazy(() => import("@/components/CareerAdvisor/TestCareer"));
 const DziStrategist   = lazy(() => import("@/components/DziStrategist/DziStrategist"));
@@ -92,6 +93,9 @@ function App() {
                                     <Route path="/universities" element={<PageWrap><UniversitiesPage /></PageWrap>} />
                                     <Route path="/universities/:uniSlug" element={
                                         <PageWrap><GlobalErrorBoundary><UniversityPage /></GlobalErrorBoundary></PageWrap>
+                                    } />
+                                    <Route path="/specialnosti/:specSlug" element={
+                                        <PageWrap><GlobalErrorBoundary><SpecialtyPage /></GlobalErrorBoundary></PageWrap>
                                     } />
                                     <Route path="/career-advisor" element={
                                         <PageWrap><GlobalErrorBoundary><CareerAdvisor /></GlobalErrorBoundary></PageWrap>

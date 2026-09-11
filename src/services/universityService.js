@@ -14,6 +14,7 @@ const PAGE_SIZE_DEFAULT = 200;
 const CITIES_CACHE_KEY = 'uniput_cities_cache_v1';
 const CITIES_CACHE_TTL = 1000 * 60 * 60 * 24; // 24h
 const UNI_NAMES_CACHE_KEY = 'uniput_uni_names_cache_v1';
+const SPEC_NAMES_CACHE_KEY = 'uniput_spec_names_cache_v1';
 
 // Синоними — когато потребителят пише "право" искаме да хване и "юридически науки" и т.н.
 const SPECIALTY_SYNONYMS = {
@@ -155,6 +156,97 @@ export const universityService = {
             .order('faculty', { ascending: true });
         if (error) throw error;
         return data || [];
+    },
+
+    /**
+     * Списък с уникалните имена на специалности (за резолване на
+     * /specialnosti/[slug] → име). Кешира се 24h.
+     * @returns {Promise<Array<string>>}
+     */
+    async getSpecialtyNames() {
+        try {
+            const raw = localStorage.getItem(SPEC_NAMES_CACHE_KEY);
+            if (raw) {
+                const { ts, data } = JSON.parse(raw);
+                if (Date.now() - ts < CITIES_CACHE_TTL && Array.isArray(data) && data.length) {
+                    return data;
+                }
+            }
+        } catch { /* corrupt cache */ }
+
+        // PostgREST капва на ~1000 реда; специалностите са >1200, затова пагинираме.
+        const PAGE = 1000;
+        const all = [];
+        for (let from = 0; ; from += PAGE) {
+            const { data, error } = await supabase
+                .from('universities')
+                .select('specialty')
+                .eq('academic_year', ADMISSION_YEAR)
+                .range(from, from + PAGE - 1);
+            if (error) throw error;
+            all.push(...data);
+            if (data.length < PAGE) break;
+        }
+        const unique = [...new Set(all.map((d) => d.specialty).filter(Boolean))]
+            .sort((a, b) => a.localeCompare(b, 'bg'));
+
+        try {
+            localStorage.setItem(SPEC_NAMES_CACHE_KEY,
+                JSON.stringify({ ts: Date.now(), data: unique }));
+        } catch { /* localStorage full */ }
+        return unique;
+    },
+
+    /**
+     * Всички програми (университети) за дадена специалност + RIASEC съответствие
+     * и историческите минимални балове. Всичко от базата — за per-specialty
+     * SEO страницата. Nothing invented.
+     * @param {string} name - точно име на специалността (от getSpecialtyNames)
+     * @returns {Promise<{ programs: Array, riasec: object|null, minScores: object }>}
+     */
+    async getBySpecialty(name) {
+        if (!name) return { programs: [], riasec: null, minScores: {} };
+        const { data: programs, error } = await supabase
+            .from('universities')
+            .select('id,university_name,specialty,faculty,city,education_level,max_ball,coefficients,formula_description,website_url,accreditation_status')
+            .eq('academic_year', ADMISSION_YEAR)
+            .eq('specialty', name)
+            .order('university_name', { ascending: true });
+        if (error) throw error;
+        if (!programs || !programs.length) return { programs: [], riasec: null, minScores: {} };
+
+        // RIASEC съответствие за специалността (за връзка към кариерния тест).
+        const { data: riasecRows } = await supabase
+            .from('specialty_riasec_mapping')
+            .select('riasec_code, category')
+            .eq('specialty_base_name', name)
+            .limit(1);
+        const riasec = riasecRows?.[0] || null;
+
+        // Исторически минимални балове за тези програми (където има).
+        const ids = programs.map((p) => p.id);
+        const minScores = {};
+        if (ids.length) {
+            const { data: ms } = await supabase
+                .from('admission_min_scores')
+                .select('university_id, year, round, min_ball, quota')
+                .in('university_id', ids);
+            if (ms?.length) {
+                const byId = {};
+                ms.forEach((r) => { (byId[r.university_id] ||= []).push(r); });
+                Object.entries(byId).forEach(([id, rows]) => {
+                    // Последна година, най-ранно класиране — същата логика като калкулатора.
+                    const latestYear = Math.max(...rows.map((r) => r.year));
+                    const yearRows = rows.filter((r) => r.year === latestYear);
+                    const roundRank = (r) => (r.round === null ? 99 : r.round);
+                    const bestRound = Math.min(...yearRows.map(roundRank));
+                    const finalRows = yearRows.filter((r) => roundRank(r) === bestRound);
+                    const vals = finalRows.map((r) => Number(r.min_ball)).filter((v) => !Number.isNaN(v));
+                    if (vals.length) minScores[id] = { minBall: Math.min(...vals), year: latestYear };
+                });
+            }
+        }
+        return { programs, riasec, minScores };
     },
 
     async getCities() {

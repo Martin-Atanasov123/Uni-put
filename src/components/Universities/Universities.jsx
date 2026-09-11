@@ -463,8 +463,14 @@ function SpecialtyCard({ uni, isFav, onToggleFav, showUser }) {
 
             {/* Title */}
             <div style={{ flex: 1 }}>
-                <h2 style={{ fontSize: "0.9375rem", fontWeight: 700, color: "var(--brand-text)", lineHeight: 1.45, margin: "0 0 0.375rem", textWrap: "balance" }}>
-                    {uni.specialty}
+                <h2 style={{ fontSize: "0.9375rem", fontWeight: 700, lineHeight: 1.45, margin: "0 0 0.375rem", textWrap: "balance" }}>
+                    <Link
+                        to={`/specialnosti/${slugify(uni.specialty)}/`}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ color: "var(--brand-text)", textDecoration: "none" }}
+                    >
+                        {uni.specialty}
+                    </Link>
                 </h2>
                 <p style={{ fontSize: "12px", color: "var(--brand-muted)", display: "flex", alignItems: "center", gap: "0.3rem", fontWeight: 500, margin: 0 }}>
                     <School size={12} style={{ flexShrink: 0 }} />

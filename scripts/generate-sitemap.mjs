@@ -103,13 +103,18 @@ async function fetchDynamicRoutes() {
 
     const universities = new Map(); // uniSlug -> name (за дедупликация)
     const specialties = new Set();  // "uniSlug/specSlug" pairs
+    const specUnis = new Map();     // specSlug -> Set(uniName) — за агрегатните /specialnosti/ страници
 
     for (const row of allRows) {
         const uniSlug = slugify(row.university_name);
         const specSlug = slugify(row.specialty);
         if (!uniSlug) continue;
         universities.set(uniSlug, row.university_name);
-        if (specSlug) specialties.add(`${uniSlug}/${specSlug}`);
+        if (specSlug) {
+            specialties.add(`${uniSlug}/${specSlug}`);
+            if (!specUnis.has(specSlug)) specUnis.set(specSlug, new Set());
+            specUnis.get(specSlug).add(row.university_name);
+        }
     }
 
     // Сортираме по slug: Supabase не гарантира ред, а несортираният изход дава
@@ -120,7 +125,15 @@ async function fetchDynamicRoutes() {
         priority: "0.8",
     }));
 
-    if (UNI_ONLY) return uniRoutes;
+    // Агрегатни per-специалност страници — САМО тези с ≥2 университета (същият
+    // праг като prerender.mjs, иначе sitemap обещава URL-и без prerender-нат HTML).
+    const aggSpecRoutes = [...specUnis.entries()]
+        .filter(([, unis]) => unis.size >= 2)
+        .map(([slug]) => slug)
+        .sort()
+        .map((slug) => ({ path: `/specialnosti/${slug}`, changefreq: "weekly", priority: "0.7" }));
+
+    if (UNI_ONLY) return [...uniRoutes, ...aggSpecRoutes];
 
     const specRoutes = [...specialties].sort().map((pair) => ({
         path: `/universities/${pair}`,
@@ -128,7 +141,7 @@ async function fetchDynamicRoutes() {
         priority: "0.7",
     }));
 
-    return [...uniRoutes, ...specRoutes];
+    return [...uniRoutes, ...aggSpecRoutes, ...specRoutes];
 }
 
 async function main() {
