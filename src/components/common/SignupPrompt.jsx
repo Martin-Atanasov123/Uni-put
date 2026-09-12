@@ -34,8 +34,12 @@ const VARIANTS = {
  * @param {string} variant  Ключ от VARIANTS (favorite | favorites-page | riasec | calendar)
  * @param {() => void} [onDismiss]  Ако е подаден — показва бутон „×" за затваряне
  * @param {string} [registerTo]  Дестинация на CTA (default /register)
+ * @param {{pathname: string, search?: string}} [from]  Къде да се върне потребителят
+ *   след регистрация/вход (Register/Login четат location.state.from). Без него
+ *   се връща на /calculator — и губи контекста, от който е тръгнал.
  */
-export default function SignupPrompt({ variant = "favorite", onDismiss, registerTo = "/register" }) {
+export default function SignupPrompt({ variant = "favorite", onDismiss, registerTo = "/register", from }) {
+    const linkState = from ? { from } : undefined;
     const cfg = VARIANTS[variant] || VARIANTS.favorite;
     const { Icon } = cfg;
 
@@ -78,7 +82,7 @@ export default function SignupPrompt({ variant = "favorite", onDismiss, register
                     {cfg.text}
                 </p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "0.625rem" }}>
-                    <Link to={registerTo} className="signup-prompt-cta" style={{
+                    <Link to={registerTo} state={linkState} className="signup-prompt-cta" style={{
                         display: "inline-flex", alignItems: "center", gap: "0.4rem",
                         padding: "0.6rem 1.1rem", borderRadius: "0.75rem",
                         background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
@@ -86,7 +90,7 @@ export default function SignupPrompt({ variant = "favorite", onDismiss, register
                     }}>
                         <UserPlus size={14} strokeWidth={2} /> Регистрирай се безплатно
                     </Link>
-                    <Link to="/login" style={{
+                    <Link to="/login" state={linkState} style={{
                         display: "inline-flex", alignItems: "center",
                         padding: "0.6rem 1rem", borderRadius: "0.75rem",
                         border: "1px solid var(--brand-border)", color: "var(--brand-text)",

@@ -100,7 +100,11 @@ const Profile = () => {
                         setFavoriteDetails(details);
                     }
 
-                    const history = JSON.parse(localStorage.getItem("calculator_history") || "[]");
+                    // Акаунтът е source of truth след AuthContext миграцията (мерджва
+                    // localStorage в metadata при вход); localStorage е само fallback
+                    // за старите сесии, при които миграцията още не е минала.
+                    const accountHistory = Array.isArray(metadata.calculator_history) ? metadata.calculator_history : null;
+                    const history = accountHistory || JSON.parse(localStorage.getItem("calculator_history") || "[]");
                     setCalculatorHistory(history.slice(0, 3));
                 }
             } catch {

@@ -4,6 +4,13 @@
 //   а при вход/регистрация локалните любими се сливат в акаунта (loss-aversion →
 //   регистрация, вместо стена пред функцията). CLAUDE.md §5/§12: favorites са
 //   „единственият най-важен retention механизъм" — не бива да са зад login wall.
+//
+//   При вход/регистрация мигрираме и историята на калкулатора + RIASEC типа от
+//   localStorage в акаунта (същият merge принцип като любимите) — без това
+//   „Регистрирай се и резултатите ти ще те чакат" (Calculator.jsx/SignupPrompt)
+//   е празно обещание: Profile.jsx досега четеше calculator_history САМО от
+//   localStorage, дори за логнат потребител, значи нищо реално не се пазеше в
+//   акаунта. Certainty principle — не обещавай синхронизация, която не правиш.
 // Изход: { user, loading, favorites, isFavorite, toggleFavorite }.
 //   toggleFavorite връща { added, anonymous } — UI слоят решава дали да покаже
 //   покана за акаунт (само при анонимно ДОБАВЯНЕ).
@@ -13,6 +20,9 @@ import { supabase } from "@/lib/supabase";
 export const AuthContext = createContext({});
 
 const ANON_FAVORITES_KEY = "uniput_anon_favorites";
+const CALC_HISTORY_KEY = "calculator_history";
+const RIASEC_RESULT_KEY = "riasec_result";
+const HISTORY_CAP = 10;
 
 // Bug fix: университи IDs в Supabase са UUID (string) / legacy bigint (number).
 // Приемаме и двете (non-empty string или positive finite number).
@@ -36,6 +46,31 @@ const writeLocalFavorites = (arr) => {
     } catch {
         /* localStorage недостъпен / пълен — игнорираме */
     }
+};
+
+const readLocalHistory = () => {
+    try {
+        const arr = JSON.parse(localStorage.getItem(CALC_HISTORY_KEY) || "[]");
+        return Array.isArray(arr) ? arr : [];
+    } catch {
+        return [];
+    }
+};
+
+// Слива история от акаунта с локалната по (faculty+specialty), пази по-новия
+// запис (по date) при конфликт, най-новите HISTORY_CAP отгоре. Огледало на
+// dedup логиката в Calculator.jsx, за да не се разминават на две места.
+const mergeCalculatorHistory = (accountHistory, localHistory) => {
+    const byKey = new Map();
+    for (const h of [...(accountHistory || []), ...(localHistory || [])]) {
+        if (!h?.faculty || !h?.specialty) continue;
+        const key = `${h.faculty}||${h.specialty}`;
+        const existing = byKey.get(key);
+        if (!existing || (h.date || 0) > (existing.date || 0)) byKey.set(key, h);
+    }
+    return [...byKey.values()]
+        .sort((a, b) => (b.date || 0) - (a.date || 0))
+        .slice(0, HISTORY_CAP);
 };
 
 export const AuthProvider = ({ children }) => {
@@ -65,11 +100,46 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    // Мигрира calculator_history + riasec_result от localStorage в акаунта.
+    // Идемпотентно (merge по ключ, не append) — безопасно да се извиква при
+    // всеки INITIAL_SESSION/SIGNED_IN, включително на всяко зареждане.
+    const applyUserExtras = async (currentUser) => {
+        const accountHistory = Array.isArray(currentUser?.user_metadata?.calculator_history)
+            ? currentUser.user_metadata.calculator_history : [];
+        const localHistory = readLocalHistory();
+        const mergedHistory = mergeCalculatorHistory(accountHistory, localHistory);
+
+        // riasec: не презаписваме вече запазен тип с по-стара локална гадка —
+        // само попълваме, ако акаунтът още няма стойност.
+        const accountRiasec = currentUser?.user_metadata?.riasec_type || null;
+        const localRiasec = (() => { try { return localStorage.getItem(RIASEC_RESULT_KEY); } catch { return null; } })();
+        const nextRiasec = accountRiasec || localRiasec || null;
+
+        const historyChanged = JSON.stringify(mergedHistory) !== JSON.stringify(accountHistory);
+        const riasecChanged = nextRiasec && nextRiasec !== accountRiasec;
+        if (!historyChanged && !riasecChanged) return;
+
+        try {
+            const patch = {};
+            if (historyChanged) patch.calculator_history = mergedHistory;
+            if (riasecChanged) patch.riasec_type = nextRiasec;
+            const { error } = await supabase.auth.updateUser({ data: patch });
+            // Само след успешен sync огледаляваме мърджнатата история обратно в
+            // localStorage — Calculator.jsx продължава да чете/пише оттам
+            // директно, без промяна в него самия.
+            if (!error && historyChanged) {
+                try { localStorage.setItem(CALC_HISTORY_KEY, JSON.stringify(mergedHistory)); } catch { /* пълен storage */ }
+            }
+        } catch {
+            /* мрежова грешка — локалните данни остават непокътнати за нов опит */
+        }
+    };
+
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
             const currentUser = session?.user ?? null;
             setUser(currentUser);
-            if (currentUser) applyUserFavorites(currentUser);
+            if (currentUser) { applyUserFavorites(currentUser); applyUserExtras(currentUser); }
             else setFavorites(readLocalFavorites());
             setLoading(false);
         });
@@ -79,7 +149,7 @@ export const AuthProvider = ({ children }) => {
         } = supabase.auth.onAuthStateChange((_event, session) => {
             const nextUser = session?.user ?? null;
             setUser(nextUser);
-            if (nextUser) applyUserFavorites(nextUser);
+            if (nextUser) { applyUserFavorites(nextUser); applyUserExtras(nextUser); }
             else setFavorites(readLocalFavorites());
             setLoading(false);
         });

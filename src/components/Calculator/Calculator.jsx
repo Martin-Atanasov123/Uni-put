@@ -48,12 +48,23 @@ import {
     X as XIcon,
     UserPlus,
     Compass,
+    Lock,
 } from "lucide-react";
 import GradeInputSection from "./GradeInputSection";
 import DeadlineReminder from "@/components/common/DeadlineReminder";
 import ReportButton from "./ReportButton";
 import { FIELD_LABELS, SLOT_GROUPS } from "@/lib/coefficients_config";
 import { UNIVERSITIES, SPECIALTIES, ADMISSION_YEAR, ADMISSION_YEAR_SHORT } from "@/lib/siteStats";
+
+const SAFE_ORIGIN = import.meta.env.VITE_APP_URL || window.location.origin;
+
+// Reciprocity + certainty (ux-psychology): първите GATE_LIMIT различни
+// специалности, за които анонимен потребител вижда пълен резултат, са
+// безплатни и НЕ се замъгляват — резултатът е истински, не примамка. Отвъд
+// прага искаме акаунт, за да не губи прогреса си (loss aversion, честна
+// версия): балът се пази само на този браузър.
+const GATE_LIMIT = 3;
+const historyKey = (h) => `${h.faculty}||${h.specialty}`;
 
 const S = {
     surface: "var(--brand-surface-2)",
@@ -371,6 +382,29 @@ export default function CalculatorPage() {
     const dismissSignupCard = () => {
         setSignupCardDismissed(true);
         try { localStorage.setItem("calc_signup_dismissed", "1"); } catch { /* localStorage недостъпен */ }
+    };
+
+    // Gate A (ux-psychology): кои специалности анонимният потребител вече е
+    // „отключил" (получил е пълен резултат за тях). Пазим пълните записи (не
+    // само ключове), за да можем да покажем имената им в gate картата —
+    // инициализира се от localStorage, за да оцелее презареждане на страницата.
+    const [unlockedHistory, setUnlockedHistory] = useState(() => {
+        try {
+            const arr = JSON.parse(localStorage.getItem("calculator_history") || "[]");
+            return Array.isArray(arr) ? arr : [];
+        } catch { return []; }
+    });
+    const unlockedSpecialtyKeys = useMemo(() => new Set(unlockedHistory.map(historyKey)), [unlockedHistory]);
+
+    // OAuth директно от gate картата — връща потребителя на СЪЩАТА заключена
+    // специалност (certainty: нищо не се губи), не на общ /calculator.
+    const handleGateGoogleSignup = () => {
+        window.gtag?.("event", "signup_gate_cta_click", { gate: "calculator_specialty_limit", method: "google" });
+        const dest = `${location.pathname}${location.search}`;
+        supabase.auth.signInWithOAuth({
+            provider: "google",
+            options: { redirectTo: `${SAFE_ORIGIN}${dest}` },
+        });
     };
 
     const handleDziChange = (e) => {
@@ -708,6 +742,16 @@ export default function CalculatorPage() {
         if (!selectedSpecialtyName || !hasAnyValidGrade) return;
         const complete = calcResults.filter(r => r.hasStarted && !r.hasMissing && r.score > 0);
         if (!complete.length) return;
+        const currentKey = `${selectedFaculty}||${selectedSpecialtyName}`;
+        const alreadyUnlocked = unlockedHistory.some(h => historyKey(h) === currentKey);
+
+        // Gate A hard cap: щом анонимен потребител вече е отключил GATE_LIMIT
+        // различни специалности, НЕ persist-ваме нова — иначе gate-ът се
+        // „върти" (нова специалност измества стара в last-10 и потребителят
+        // заобикаля лимита, просто изчислявайки друга след друга). За вече
+        // отключена специалност или за логнат потребител — без промяна.
+        if (!user && !alreadyUnlocked && unlockedHistory.length >= GATE_LIMIT) return;
+
         const best = complete.reduce((a, b) => a.score > b.score ? a : b);
         const entry = {
             faculty: selectedFaculty,
@@ -721,10 +765,37 @@ export default function CalculatorPage() {
             chanceBand: best.chance?.key ?? null, // low|borderline|realistic|good|high
             date: Date.now(),
         };
-        const prev = JSON.parse(localStorage.getItem("calculator_history") || "[]");
-        const deduped = prev.filter(h => !(h.faculty === entry.faculty && h.specialty === entry.specialty));
-        localStorage.setItem("calculator_history", JSON.stringify([entry, ...deduped].slice(0, 10)));
-    }, [calcResults, selectedSpecialtyName, hasAnyValidGrade, selectedFaculty]);
+        const deduped = unlockedHistory.filter(h => historyKey(h) !== currentKey);
+        const next = [entry, ...deduped].slice(0, 10);
+
+        // Guard срещу безкраен render loop: без него ВСЯКО re-render (дори
+        // само от повторно въвеждане на СЪЩАТА вече записана оценка) създава
+        // нов масив/Set с нова референция → setState → re-render → useMemo
+        // строи нов Set → ефектът пак вижда „нова" unlockedSpecialtyKeys
+        // референция в deps → изпълнява се пак → React хвърля „Maximum
+        // update depth exceeded" (наблюдавано на живо при QA). Сравняваме по
+        // съдържание (без `date`), не по референция на обекта.
+        const stripDate = (arr) => arr.map((h) => { const clone = { ...h }; delete clone.date; return clone; });
+        if (JSON.stringify(stripDate(next)) === JSON.stringify(stripDate(unlockedHistory))) return;
+
+        localStorage.setItem("calculator_history", JSON.stringify(next));
+        setUnlockedHistory(next);
+    }, [calcResults, selectedSpecialtyName, hasAnyValidGrade, selectedFaculty, user, unlockedHistory]);
+
+    const currentSpecialtyKey = selectedFaculty && selectedSpecialtyName ? `${selectedFaculty}||${selectedSpecialtyName}` : null;
+    const hasCompleteResult = calcResults.some(r => r.hasStarted && !r.hasMissing && r.score > 0);
+    const isSpecialtyLocked = !user
+        && !!currentSpecialtyKey
+        && hasCompleteResult
+        && !unlockedSpecialtyKeys.has(currentSpecialtyKey)
+        && unlockedSpecialtyKeys.size >= GATE_LIMIT;
+
+    // Аналитика: „показан gate" веднъж на специалност, не на всеки render.
+    useEffect(() => {
+        if (isSpecialtyLocked) {
+            window.gtag?.("event", "signup_gate_shown", { gate: "calculator_specialty_limit" });
+        }
+    }, [isSpecialtyLocked, currentSpecialtyKey]);
 
     const clearFaculty = () => {
         setFacultySearch("");
@@ -1209,8 +1280,97 @@ export default function CalculatorPage() {
                     )}
                 </AnimatePresence>
 
+                {/* Endowed progress: показва се от ПЪРВИЯ резултат нататък (никога 0/3) —
+                    честен брояч, не наказание. CLAUDE.md §17: loss aversion честна версия. */}
+                {!user && unlockedSpecialtyKeys.size > 0 && (
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.875rem", fontSize: "12px", color: "var(--brand-muted)" }}>
+                        <Bookmark size={13} style={{ color: "var(--brand-cyan)", flexShrink: 0 }} strokeWidth={1.5} />
+                        Без акаунт: <strong style={{ color: "var(--brand-text)", fontFamily: "monospace" }}>{Math.min(unlockedSpecialtyKeys.size, GATE_LIMIT)}/{GATE_LIMIT}</strong> специалности запазени на този браузър
+                    </div>
+                )}
+
+                {/* Gate A — заключена специалност (виж isSpecialtyLocked по-горе).
+                    Реален wall, не blur: НЕ пресмятаме/показваме бал тук — стойността
+                    отвъд GATE_LIMIT наистина е зад акаунта, не примамка. */}
+                {isSpecialtyLocked && (
+                    <m.div
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                        style={{
+                            background: "linear-gradient(135deg, rgba(6,182,212,0.08), rgba(139,92,246,0.08))",
+                            border: "1px solid var(--brand-card-border)",
+                            borderRadius: "1.25rem",
+                            padding: "2rem 1.75rem",
+                            textAlign: "center",
+                        }}
+                    >
+                        <div style={{
+                            width: 52, height: 52, borderRadius: "1rem", margin: "0 auto 1.25rem",
+                            background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            boxShadow: "0 12px 30px rgba(6,182,212,0.3)",
+                        }}>
+                            <Lock size={24} color="#fff" strokeWidth={2} />
+                        </div>
+                        <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 800, color: "var(--brand-text)", letterSpacing: "-0.01em", textWrap: "balance" }}>
+                            Сравни вече {unlockedHistory.length} специалности
+                        </h3>
+                        <p style={{ margin: "0.625rem auto 0", fontSize: "0.9375rem", color: "var(--brand-muted)", lineHeight: 1.6, maxWidth: "42ch" }}>
+                            {unlockedHistory.map(h => h.specialty).join(" · ")} — балът им се пази само на този браузър.
+                            Направи безплатен акаунт, за да ги запазиш и да продължиш без ограничение.
+                        </p>
+                        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "0.625rem", marginTop: "1.5rem" }}>
+                            <button
+                                type="button"
+                                onClick={handleGateGoogleSignup}
+                                style={{
+                                    display: "inline-flex", alignItems: "center", gap: "0.625rem",
+                                    height: "3rem", padding: "0 1.5rem",
+                                    background: "var(--brand-surface)", border: "1px solid var(--brand-input-border)",
+                                    borderRadius: "0.75rem", color: "var(--brand-text)", fontSize: "14px",
+                                    fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                                }}
+                            >
+                                <svg width="18" height="18" viewBox="0 0 24 24">
+                                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
+                                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+                                </svg>
+                                Продължи с Google
+                            </button>
+                            <Link
+                                to="/register"
+                                state={{ from: { pathname: location.pathname, search: location.search } }}
+                                onClick={() => window.gtag?.("event", "signup_gate_cta_click", { gate: "calculator_specialty_limit", method: "email" })}
+                                style={{
+                                    display: "inline-flex", alignItems: "center",
+                                    height: "3rem", padding: "0 1.25rem",
+                                    background: "transparent", border: "1px solid var(--brand-border)",
+                                    borderRadius: "0.75rem", color: "var(--brand-text)", fontSize: "14px",
+                                    fontWeight: 600, textDecoration: "none",
+                                }}
+                            >
+                                С имейл
+                            </Link>
+                        </div>
+                        {/* Равнопоставен изход — никога по-малък/по-сив от CTA-то (DSA чл. 25,
+                            без confirmshaming): регистрацията е избор, не капан. */}
+                        <div style={{ marginTop: "1.25rem" }}>
+                            <Link
+                                to="/universities/"
+                                onClick={() => window.gtag?.("event", "signup_gate_dismiss", { gate: "calculator_specialty_limit" })}
+                                style={{ fontSize: "13px", fontWeight: 600, color: "var(--brand-cyan)", textDecoration: "none" }}
+                            >
+                                Не сега — към университетите
+                            </Link>
+                        </div>
+                    </m.div>
+                )}
+
                 {/* Results */}
-                {calcResults.length > 0 && (
+                {calcResults.length > 0 && !isSpecialtyLocked && (
                     <m.div
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -1385,8 +1545,9 @@ export default function CalculatorPage() {
                 {/* ── Signup prompt (само за анонимни, след завършен резултат) ──
                     CLAUDE.md §3: "Secondary CTA (Регистрирай се): after the user
                     has seen value — never as the first ask." Тук сме точно в момента
-                    на стойност — потребителят току-що видя своя бал. */}
-                {!user && !signupCardDismissed && calcResults.some(r => r.hasStarted && !r.hasMissing) && (
+                    на стойност — потребителят току-що видя своя бал.
+                    !isSpecialtyLocked — не дублирай с твърдия gate по-горе. */}
+                {!user && !signupCardDismissed && !isSpecialtyLocked && calcResults.some(r => r.hasStarted && !r.hasMissing) && (
                     <m.div
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}

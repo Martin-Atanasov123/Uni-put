@@ -13,6 +13,12 @@ import {
     Calculator,
     ArrowRight,
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import SignupPrompt from "@/components/common/SignupPrompt";
+
+// След регистрация — обратно на СЪЩИЯ резултат (CareerAdvisor го възстановява
+// от localStorage при ?view=results), не на празния избор на версия.
+const RESULTS_RETURN = { pathname: "/career-advisor/", search: "?view=results" };
 
 // CLAUDE.md §14 Brand Moat — each RIASEC type has its own distinct color
 const RIASEC_LABELS = {
@@ -35,6 +41,7 @@ const S = {
 
 const RIASECResults = ({ results, onRestart }) => {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [viewMode, setViewMode] = useState("all");
     const [showAllSpecialties, setShowAllSpecialties] = useState(false);
     const [showAllCareers, setShowAllCareers] = useState(false);
@@ -340,25 +347,32 @@ const RIASECResults = ({ results, onRestart }) => {
                         )}
                     </m.div>
                     {specialties.length > 5 && (
-                        <div style={{ display: "flex", justifyContent: "center" }}>
-                            <button
-                                type="button"
-                                onClick={() => setShowAllSpecialties(v => !v)}
-                                style={{
-                                    padding: "0.6rem 1.25rem",
-                                    background: "transparent",
-                                    border: "1px solid rgba(148,163,184,0.2)",
-                                    borderRadius: "0.625rem",
-                                    color: "var(--brand-text)",
-                                    fontSize: "12px",
-                                    fontWeight: 700,
-                                    cursor: "pointer",
-                                    fontFamily: "inherit",
-                                }}
-                            >
-                                {showAllSpecialties ? "Скрий останалите" : `Покажи останалите ${specialties.length - 5}`}
-                            </button>
-                        </div>
+                        user ? (
+                            <div style={{ display: "flex", justifyContent: "center" }}>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowAllSpecialties(v => !v)}
+                                    style={{
+                                        padding: "0.6rem 1.25rem",
+                                        background: "transparent",
+                                        border: "1px solid rgba(148,163,184,0.2)",
+                                        borderRadius: "0.625rem",
+                                        color: "var(--brand-text)",
+                                        fontSize: "12px",
+                                        fontWeight: 700,
+                                        cursor: "pointer",
+                                        fontFamily: "inherit",
+                                    }}
+                                >
+                                    {showAllSpecialties ? "Скрий останалите" : `Покажи останалите ${specialties.length - 5}`}
+                                </button>
+                            </div>
+                        ) : (
+                            // Gate Б: топ 5 са пълна стойност (reciprocity), останалите
+                            // {specialties.length - 5} се отключват с акаунт — не блур,
+                            // истинска стена преди истинско количество данни.
+                            <SignupPrompt variant="riasec" from={RESULTS_RETURN} />
+                        )
                     )}
                 </div>
             )}
@@ -458,25 +472,29 @@ const RIASECResults = ({ results, onRestart }) => {
                         )}
                     </div>
                     {careers.length > 5 && (
-                        <div style={{ display: "flex", justifyContent: "center" }}>
-                            <button
-                                type="button"
-                                onClick={() => setShowAllCareers(v => !v)}
-                                style={{
-                                    padding: "0.6rem 1.25rem",
-                                    background: "transparent",
-                                    border: "1px solid rgba(148,163,184,0.2)",
-                                    borderRadius: "0.625rem",
-                                    color: "var(--brand-text)",
-                                    fontSize: "12px",
-                                    fontWeight: 700,
-                                    cursor: "pointer",
-                                    fontFamily: "inherit",
-                                }}
-                            >
-                                {showAllCareers ? "Скрий останалите" : `Покажи останалите ${careers.length - 5}`}
-                            </button>
-                        </div>
+                        user ? (
+                            <div style={{ display: "flex", justifyContent: "center" }}>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowAllCareers(v => !v)}
+                                    style={{
+                                        padding: "0.6rem 1.25rem",
+                                        background: "transparent",
+                                        border: "1px solid rgba(148,163,184,0.2)",
+                                        borderRadius: "0.625rem",
+                                        color: "var(--brand-text)",
+                                        fontSize: "12px",
+                                        fontWeight: 700,
+                                        cursor: "pointer",
+                                        fontFamily: "inherit",
+                                    }}
+                                >
+                                    {showAllCareers ? "Скрий останалите" : `Покажи останалите ${careers.length - 5}`}
+                                </button>
+                            </div>
+                        ) : (
+                            <SignupPrompt variant="riasec" from={RESULTS_RETURN} />
+                        )
                     )}
                 </div>
             )}

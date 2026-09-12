@@ -36,6 +36,8 @@ import {
 import RIASECResults from "./RIASECResults";
 import { RIASEC_SPECIALTIES } from "@/lib/siteStats";
 
+const LAST_RESULTS_KEY = "riasec_last_results";
+
 const S = {
     surface: {
         background: "var(--brand-surface)",
@@ -83,7 +85,17 @@ const VERSIONS = [
 ];
 
 const CareerAdvisor = () => {
-    const [step, setStep] = useState("version");
+    // Връщане след регистрация (Gate Б в RIASECResults): ?view=results + пазен
+    // резултат → показваме го директно. Иначе регистрацията „изтрива" 30-те
+    // отговора и човекът трябва да прави теста отново — endowment наобратно.
+    const [restoredResults] = useState(() => {
+        try {
+            if (new URLSearchParams(window.location.search).get("view") !== "results") return null;
+            const saved = JSON.parse(localStorage.getItem(LAST_RESULTS_KEY) || "null");
+            return saved?.riasecCode ? saved : null;
+        } catch { return null; }
+    });
+    const [step, setStep] = useState(() => (restoredResults ? "results" : "version"));
     const [loading, setLoading] = useState(false);
     const [questions, setQuestions] = useState([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -91,7 +103,7 @@ const CareerAdvisor = () => {
         const saved = localStorage.getItem("riasec_answers");
         return saved ? JSON.parse(saved) : {};
     });
-    const [results, setResults] = useState(null);
+    const [results, setResults] = useState(restoredResults);
     const [quizVersion, setQuizVersion] = useState(null);
     const [scaleLabels, setScaleLabels] = useState({});
     const [isTransitioning, setIsTransitioning] = useState(false);
@@ -209,6 +221,11 @@ const CareerAdvisor = () => {
             const riasecCode = calculateRiasecCode(scores);
             const { specialties, careers, error } = await getRiasecMatches(scores);
             setResults({ scores, riasecCode, specialties, careers, error });
+            if (!error) {
+                try {
+                    localStorage.setItem(LAST_RESULTS_KEY, JSON.stringify({ scores, riasecCode, specialties, careers }));
+                } catch { /* пълен storage — връщането след регистрация просто няма да възстанови */ }
+            }
 
             // Persist primary RIASEC type
             const primaryType = riasecCode?.[0];
@@ -468,6 +485,9 @@ const CareerAdvisor = () => {
                     setAnswers({});
                     setCurrentQuestionIndex(0);
                     localStorage.removeItem("riasec_answers");
+                    // Махаме ?view=results, иначе презареждане след рестарт
+                    // би възстановило стария резултат вместо новия тест.
+                    if (window.location.search) window.history.replaceState(null, "", window.location.pathname);
                 }}
             />
         );

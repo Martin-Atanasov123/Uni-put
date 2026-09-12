@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { m } from "motion/react";
 import { supabase } from "@/lib/supabase";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Seo from "@/components/common/Seo";
 import {
     UserPlus, Mail, Lock, Eye, EyeOff, AlertCircle, Loader2,
@@ -12,6 +12,9 @@ import { Field, Divider } from "./Login";
 // CLAUDE.md: "Never require name on signup — ask it later, optionally, in profile"
 // CLAUDE.md: "After signup, redirect directly to the calculator"
 // CLAUDE.md: "SPLIT LAYOUT (desktop): Left = brand visual/copy | Right = form"
+// CLAUDE.md §5: "Регистрирай се с Google if OAuth is ever added should be the FIRST option"
+
+const SAFE_ORIGIN = import.meta.env.VITE_APP_URL || window.location.origin;
 
 const BENEFITS = [
     { icon: BookmarkCheck, title: "Запази резултатите", desc: "Балсовете и специалностите, които изчислиш, се пазят автоматично." },
@@ -28,6 +31,23 @@ const SignUp = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Bug fix (същият като в Login.jsx): без fallback тук `pathname` е undefined
+    // при директно посещение на /register → navigate("undefined") → 404.
+    // Certainty principle: връщаме потребителя точно там, откъдето е дошъл
+    // (напр. заключената специалност в калкулатора), не винаги на /calculator.
+    const fromPath = location.state?.from?.pathname;
+    const fromSearch = location.state?.from?.search || "";
+    const from = fromPath ? `${fromPath}${fromSearch}` : "/calculator";
+
+    const handleGoogleSignup = async () => {
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: "google",
+            options: { redirectTo: `${SAFE_ORIGIN}${from}` },
+        });
+        if (error) setError("Възникна грешка. Опитайте отново.");
+    };
 
     const handleSignUp = async e => {
         e.preventDefault();
@@ -55,8 +75,10 @@ const SignUp = () => {
             }
             setLoading(false);
         } else {
-            // CLAUDE.md: "After signup, redirect directly to the calculator"
-            navigate("/calculator");
+            // CLAUDE.md: "After signup, redirect directly to the calculator" —
+            // но ако е дошъл от конкретна страница (напр. gated специалност),
+            // го връщаме именно там.
+            navigate(from);
         }
     };
 
@@ -206,6 +228,34 @@ const SignUp = () => {
                         </div>
                     )}
 
+                    {/* CLAUDE.md §5: Google е ПЪРВАТА опция — най-евтиният път до акаунт
+                        за 17-годишен на телефон (нула парола за помнене). */}
+                    <button
+                        type="button"
+                        onClick={handleGoogleSignup}
+                        style={{
+                            width: "100%", height: "3rem",
+                            display: "flex", alignItems: "center", justifyContent: "center", gap: "0.75rem",
+                            background: "var(--brand-input-bg)", border: "1px solid var(--brand-input-border)",
+                            borderRadius: "0.75rem", color: "var(--brand-text)", fontSize: "14px",
+                            fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                            transition: "border-color 0.2s, background 0.2s",
+                            marginBottom: "0.25rem",
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(6,182,212,0.35)"; e.currentTarget.style.background = "var(--brand-surface)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--brand-input-border)"; e.currentTarget.style.background = "var(--brand-input-bg)"; }}
+                    >
+                        <svg width="18" height="18" viewBox="0 0 24 24">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+                        </svg>
+                        Регистрирай се с Google
+                    </button>
+
+                    <Divider label="Или с имейл" />
+
                     <form onSubmit={handleSignUp} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                         {/* CLAUDE.md: email + password only — no username on signup */}
                         <Field label="Имейл" icon={Mail} type="email" placeholder="ivan@mail.com" value={email} onChange={e => setEmail(e.target.value)} />
@@ -282,9 +332,7 @@ const SignUp = () => {
                         Никакъв спам. Само резултатите ти.
                     </p>
 
-                    <Divider label="Или" />
-
-                    <p style={{ margin: 0, textAlign: "center", fontSize: "13px", color: "var(--brand-muted)" }}>
+                    <p style={{ margin: "1.25rem 0 0", textAlign: "center", fontSize: "13px", color: "var(--brand-muted)" }}>
                         Вече имаш профил?{" "}
                         <Link to="/login" style={{ color: "var(--brand-cyan)", fontWeight: 700, textDecoration: "none" }}>
                             Влез тук
