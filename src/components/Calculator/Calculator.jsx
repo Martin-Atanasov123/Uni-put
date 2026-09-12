@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 // eslint-disable-next-line no-unused-vars
 import { m, AnimatePresence } from "motion/react";
 import { supabase } from "@/lib/supabase";
@@ -49,9 +49,11 @@ import {
     UserPlus,
     Compass,
     Lock,
+    Users,
 } from "lucide-react";
 import GradeInputSection from "./GradeInputSection";
 import DeadlineReminder from "@/components/common/DeadlineReminder";
+import { calcStatsService } from "@/services/calcStatsService";
 import ReportButton from "./ReportButton";
 import { FIELD_LABELS, SLOT_GROUPS } from "@/lib/coefficients_config";
 import { UNIVERSITIES, SPECIALTIES, ADMISSION_YEAR, ADMISSION_YEAR_SHORT } from "@/lib/siteStats";
@@ -64,6 +66,7 @@ const SAFE_ORIGIN = import.meta.env.VITE_APP_URL || window.location.origin;
 // прага искаме акаунт, за да не губи прогреса си (loss aversion, честна
 // версия): балът се пази само на този браузър.
 const GATE_LIMIT = 3;
+const STATS_DEBOUNCE_MS = 2500;
 const historyKey = (h) => `${h.faculty}||${h.specialty}`;
 
 const S = {
@@ -797,6 +800,33 @@ export default function CalculatorPage() {
         }
     }, [isSpecialtyLocked, currentSpecialtyKey]);
 
+    // Анонимна статистика: след пауза във въвеждането записваме баловете и
+    // питаме за процентилен ранг. Под 20 браузъра сървърът не връща нищо.
+    // Пазим бала, за който е ранкът — при нови оценки старият не се показва.
+    const [cohortStats, setCohortStats] = useState({});
+    const lastStatsPayload = useRef("");
+    useEffect(() => {
+        if (isSpecialtyLocked) return;
+        const items = calcResults
+            .filter(r => r.hasStarted && !r.hasMissing && r.score > 0)
+            .map(r => ({ program_id: r.item.id, score: Number(r.formatted) }));
+        if (!items.length) return;
+        const payload = JSON.stringify(items);
+        if (payload === lastStatsPayload.current) return;
+        const timer = setTimeout(async () => {
+            lastStatsPayload.current = payload;
+            await calcStatsService.record(items);
+            const stats = await calcStatsService.percentiles(items);
+            const scoreById = Object.fromEntries(items.map(i => [i.program_id, i.score]));
+            setCohortStats(prev => {
+                const next = { ...prev };
+                for (const [id, s] of Object.entries(stats)) next[id] = { ...s, score: scoreById[id] };
+                return next;
+            });
+        }, STATS_DEBOUNCE_MS);
+        return () => clearTimeout(timer);
+    }, [calcResults, isSpecialtyLocked]);
+
     const clearFaculty = () => {
         setFacultySearch("");
         setSelectedFaculty("");
@@ -1466,6 +1496,19 @@ export default function CalculatorPage() {
                                                     {item.university_name} не публикува минимални балове за прием, затова не можем да кажем дали влизаш.
                                                 </div>
                                             </>
+                                        )}
+
+                                        {hasStarted && !hasMissing && cohortStats[item.id]?.score === Number(formatted) && (
+                                            <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+                                                <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "12px", fontWeight: 700, color: "var(--brand-text)" }}>
+                                                    <Users size={13} strokeWidth={1.5} style={{ color: "var(--brand-violet)", flexShrink: 0 }} />
+                                                    <span>Балът ти е по-висок от <span style={{ fontFamily: "monospace" }}>{cohortStats[item.id].pctBelow}%</span> от изчисленията в УниПът</span>
+                                                </div>
+                                                <p style={{ margin: 0, fontSize: "11px", color: "var(--brand-muted)", lineHeight: 1.5 }}>
+                                                    Сред {cohortStats[item.id].n} анонимни изчисления за тази програма. Включва и пробни оценки — не е прогноза за прием.{" "}
+                                                    <Link to="/privacy#anonimna-statistika" style={{ color: "var(--brand-cyan)" }}>Как работи</Link>
+                                                </p>
+                                            </div>
                                         )}
 
                                         {hasStarted && !hasMissing && (

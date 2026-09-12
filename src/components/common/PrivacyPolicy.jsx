@@ -1,5 +1,6 @@
 import { ShieldCheck } from "lucide-react";
 import Seo from "@/components/common/Seo";
+import CalcStatsOptOut from "@/components/common/CalcStatsOptOut";
 
 const SECTIONS = [
     {
@@ -11,6 +12,7 @@ const SECTIONS = [
                     <li>Име и имейл адрес при регистрация.</li>
                     <li>История на отговорите в кариерния съветник и бал калкулатора.</li>
                     <li>IP адрес и технически данни при посещение на Платформата.</li>
+                    <li>Анонимен бал от калкулатора, без връзка с акаунт или IP адрес (виж т. 7).</li>
                 </ul>
             </>
         ),
@@ -43,6 +45,25 @@ const SECTIONS = [
     {
         title: "6. Вашите права по GDPR",
         body: <p style={{ margin: 0 }}>Имате право на достъп, коригиране, изтриване и преносимост на вашите данни. За упражняване на тези права можете да се свържете с нас на посочения в Платформата контакт.</p>,
+    },
+    {
+        id: "anonimna-statistika",
+        title: "7. Анонимна статистика на баловете",
+        body: (
+            <>
+                <p style={{ margin: "0 0 0.5rem" }}>
+                    Когато изчислиш пълен бал, записваме само самия бал, програмата и академичната година —
+                    без акаунт, имейл или IP адрес. Браузърът ти пази случаен код, за да се брои веднъж
+                    (новият бал заменя стария) и за да можем да изтрием записите при отказ.
+                </p>
+                <p style={{ margin: "0 0 0.75rem" }}>
+                    Когато поне 20 различни браузъра са изчислили бал за една програма, калкулаторът показва
+                    на какво място е твоят бал сред тях. Под 20 не показваме нищо. Това не е прогноза за прием —
+                    включва и пробни оценки.
+                </p>
+                <CalcStatsOptOut />
+            </>
+        ),
     },
 ];
 
@@ -99,7 +120,7 @@ const PrivacyPolicy = () => {
 
                     <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem", color: "var(--brand-muted)", fontSize: "14px", lineHeight: 1.7 }}>
                         {SECTIONS.map(s => (
-                            <section key={s.title}>
+                            <section key={s.title} id={s.id} style={{ scrollMarginTop: "6rem" }}>
                                 <h2 style={{ margin: 0, fontSize: "1.125rem", fontWeight: 700, color: "var(--brand-text)", marginBottom: "0.5rem" }}>
                                     {s.title}
                                 </h2>
@@ -109,7 +130,7 @@ const PrivacyPolicy = () => {
 
                         <div style={{ height: "1px", background: "rgba(148,163,184,0.1)", margin: "0.5rem 0" }} />
                         <p style={{ margin: 0, fontSize: "12px", fontStyle: "italic", opacity: 0.7 }}>
-                            Последна актуализация: 26 март 2026 г.
+                            Последна актуализация: 12 септември 2026 г.
                         </p>
                     </div>
                 </div>

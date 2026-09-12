@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { sessionService } from "@/services/sessionService";
 import { useAuth } from "@/hooks/useAuth";
 import { universityService } from "@/services/universityService";
+import CalcStatsOptOut from "@/components/common/CalcStatsOptOut";
 import {
     User,
     Mail,
@@ -723,6 +724,7 @@ const Profile = () => {
                                     Запази настройките
                                 </button>
                             </div>
+                            <CalcStatsOptOut />
                         </div>
                     )}
                 </div>
