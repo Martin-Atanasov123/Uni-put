@@ -317,7 +317,10 @@ const Calendar = () => {
     const [activeTypes, setActiveTypes] = useState(new Set(TYPE_ORDER));
     const isDesktop = useIsDesktop();
     const [viewMode, setViewMode] = useState("agenda"); // 'agenda' | 'grid'
-    const [monthDate, setMonthDate] = useState(new Date(2026, 6, 1)); // юли 2026
+    const [monthDate, setMonthDate] = useState(() => {
+        const t = new Date();
+        return new Date(t.getFullYear(), t.getMonth(), 1);
+    });
 
     const today = useMemo(() => {
         const t = new Date();
