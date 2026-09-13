@@ -356,21 +356,32 @@ const Calendar = () => {
         activeTypes.has(e.event_type)
     ), [events, uniFilter, cityFilter, activeTypes]);
 
-    // Групиране по "месец година" за agenda
-    const grouped = useMemo(() => {
+    // Групиране по "месец година" за agenda. Започва от текущия месец като
+    // решетката; по-ранните са зад бутон. Текущо събитие, започнало по-рано,
+    // отива в групата на текущия месец.
+    const [showPast, setShowPast] = useState(false);
+    const currentMonthStart = useMemo(() => new Date(today.getFullYear(), today.getMonth(), 1), [today]);
+    const { grouped, pastCount } = useMemo(() => {
         const groups = [];
         const idx = {};
+        let past = 0;
         for (const ev of filtered) {
             const s = parseDate(ev.start_date);
-            const key = `${s.getFullYear()}-${s.getMonth()}`;
-            if (idx[key] === undefined) {
-                idx[key] = groups.length;
-                groups.push({ key, label: `${MONTHS_BG_CAP[s.getMonth()]} ${s.getFullYear()}`, items: [] });
+            const e = ev.end_date ? parseDate(ev.end_date) : s;
+            const isPast = e < currentMonthStart;
+            if (isPast) past++;
+            if (isPast && !showPast) continue;
+            const anchor = !isPast && s < currentMonthStart ? currentMonthStart : s;
+            const order = anchor.getFullYear() * 12 + anchor.getMonth();
+            if (idx[order] === undefined) {
+                idx[order] = groups.length;
+                groups.push({ key: order, label: `${MONTHS_BG_CAP[anchor.getMonth()]} ${anchor.getFullYear()}`, items: [] });
             }
-            groups[idx[key]].items.push(ev);
+            groups[idx[order]].items.push(ev);
         }
-        return groups;
-    }, [filtered]);
+        groups.sort((a, b) => a.key - b.key);
+        return { grouped: groups, pastCount: past };
+    }, [filtered, showPast, currentMonthStart]);
 
     // Събития за текущия месец (списък под решетката)
     const monthEvents = useMemo(() => filtered.filter((ev) => {
@@ -564,6 +575,21 @@ const Calendar = () => {
                         )}
                     </div>
                 ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                    {pastCount > 0 && (
+                        <button
+                            type="button"
+                            onClick={() => setShowPast((v) => !v)}
+                            style={{ alignSelf: "center", minHeight: "44px", padding: "0 1.25rem", background: "transparent", border: "1px solid var(--brand-border)", borderRadius: "0.75rem", color: "var(--brand-text)", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+                        >
+                            {showPast ? "Скрий по-ранните събития" : `Покажи по-ранните събития (${pastCount})`}
+                        </button>
+                    )}
+                    {grouped.length === 0 && (
+                        <p style={{ margin: 0, textAlign: "center", color: "var(--brand-muted)", fontSize: "13px", padding: "1rem" }}>
+                            Няма събития от {MONTHS_BG[today.getMonth()]} {today.getFullYear()} нататък. Все още нямаме дати за следващия прием.
+                        </p>
+                    )}
                     <m.div
                         initial="hidden"
                         animate="visible"
@@ -589,6 +615,7 @@ const Calendar = () => {
                             </div>
                         ))}
                     </m.div>
+                    </div>
                 )}
             </div>
         </div>
