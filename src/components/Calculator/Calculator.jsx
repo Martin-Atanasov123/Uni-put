@@ -54,6 +54,7 @@ import {
 import GradeInputSection from "./GradeInputSection";
 import DeadlineReminder from "@/components/common/DeadlineReminder";
 import { calcStatsService } from "@/services/calcStatsService";
+import { copyText, wrapText, roundRect, shareOrCopyLink, shareOrDownloadCanvas } from "@/lib/shareCard";
 import ReportButton from "./ReportButton";
 import { FIELD_LABELS, SLOT_GROUPS } from "@/lib/coefficients_config";
 import { UNIVERSITIES, SPECIALTIES, ADMISSION_YEAR, ADMISSION_YEAR_SHORT } from "@/lib/siteStats";
@@ -162,24 +163,6 @@ function admissionChanceBand(score, minBall, maxBall) {
 // за споделяне. Дава се (1) линк, който отваря калкулатора със същата
 // специалност — приятелят въвежда СВОИ оценки (нула PII в URL-а), и (2) канава
 // картинка за screenshot в Viber/WhatsApp/Instagram.
-
-function copyText(text) {
-    if (window.isSecureContext && navigator.clipboard) {
-        return navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
-    }
-    fallbackCopy(text);
-    return Promise.resolve();
-}
-function fallbackCopy(text) {
-    const el = document.createElement("textarea");
-    el.value = text;
-    el.style.position = "fixed";
-    el.style.opacity = "0";
-    document.body.appendChild(el);
-    el.select();
-    try { document.execCommand("copy"); } catch { /* без clipboard — нищо не можем да направим */ }
-    document.body.removeChild(el);
-}
 
 function buildShareUrl(specialty, university) {
     const p = new URLSearchParams({ specialty });
@@ -309,32 +292,6 @@ function drawCalcResultCard({ university, specialty, score, maxBall, chance, mar
     return canvas;
 }
 
-function wrapText(ctx, text, maxWidth) {
-    const words = String(text).split(/\s+/);
-    const lines = [];
-    let cur = "";
-    for (const w of words) {
-        const test = cur ? cur + " " + w : w;
-        if (ctx.measureText(test).width > maxWidth && cur) {
-            lines.push(cur); cur = w;
-        } else {
-            cur = test;
-        }
-    }
-    if (cur) lines.push(cur);
-    return lines;
-}
-
-function roundRect(ctx, x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.arcTo(x + w, y, x + w, y + h, r);
-    ctx.arcTo(x + w, y + h, x, y + h, r);
-    ctx.arcTo(x, y + h, x, y, r);
-    ctx.arcTo(x, y, x + w, y, r);
-    ctx.closePath();
-}
-
 // ── Formula legend ───────────────────────────────────────────────────────────
 const FORMULA_LEGEND = [
     { symbol: "Изпит(X)",  desc: "Конкурсен изпит по предмет X, организиран от университета" },
@@ -447,16 +404,8 @@ export default function CalculatorPage() {
         const url = buildShareUrl(item.specialty, item.university_name);
         const verdict = chance ? ` — ${chance.label.toLowerCase()}` : "";
         const text = `Моят приемен бал за ${item.specialty} (${item.university_name}): ${score.toFixed(2)}${verdict}. Изчисли своя:`;
-        try {
-            if (navigator.share) {
-                await navigator.share({ title: "УниПът — приемен бал", text, url });
-                return;
-            }
-        } catch (err) {
-            if (err?.name === "AbortError") return; // потребителят отказа
-        }
-        await copyText(`${text} ${url}`);
-        flashShare(item.id, "link");
+        const outcome = await shareOrCopyLink({ title: "УниПът — приемен бал", text, url });
+        if (outcome === "copied") flashShare(item.id, "link");
     };
 
     const saveResultImage = async (res) => {
@@ -471,27 +420,9 @@ export default function CalculatorPage() {
             minBall: minScore?.minBall ?? null,
             minYear: minScore?.year ?? null,
         });
-        const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
-        if (!blob) return;
         const fileName = `uniput-bal-${item.specialty}.png`.replace(/\s+/g, "-");
-        const file = new File([blob], fileName, { type: "image/png" });
-        try {
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                await navigator.share({ files: [file], title: "УниПът — приемен бал" });
-                return;
-            }
-        } catch (err) {
-            if (err?.name === "AbortError") return;
-        }
-        const objUrl = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = objUrl;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(objUrl), 10000);
-        flashShare(item.id, "image");
+        const outcome = await shareOrDownloadCanvas(canvas, fileName, "УниПът — приемен бал");
+        if (outcome === "downloaded") flashShare(item.id, "image");
     };
 
     const cities = useMemo(

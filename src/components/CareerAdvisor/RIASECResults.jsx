@@ -12,8 +12,12 @@ import {
     BookOpen,
     Calculator,
     ArrowRight,
+    Share2,
+    Download,
+    Check,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { wrapText, roundRect, shareOrCopyLink, shareOrDownloadCanvas } from "@/lib/shareCard";
 import SignupPrompt from "@/components/common/SignupPrompt";
 
 // След регистрация — обратно на СЪЩИЯ резултат (CareerAdvisor го възстановява
@@ -39,6 +43,114 @@ const S = {
     },
 };
 
+// 1080×1350 (4:5) картинка за Stories/Viber — кодът в цветовете на типовете,
+// водещият тип, трите ленти и топ 3 специалности. Само собственият резултат.
+function drawRiasecCard({ code, scores, topSpecialties }) {
+    const W = 1080;
+    const H = 1350;
+    const PAD = 88;
+    const INNER = W - PAD * 2;
+    const canvas = document.createElement("canvas");
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext("2d");
+    const font = (size, weight = 400) =>
+        `${weight} ${size}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif`;
+    const mono = (size, weight = 400) =>
+        `${weight} ${size}px ui-monospace, "SF Mono", Menlo, Consolas, monospace`;
+    const letters = code.split("");
+    const primary = RIASEC_LABELS[letters[0]] || { name: "", desc: "", color: "#06B6D4" };
+
+    ctx.fillStyle = "#0F172A";
+    ctx.fillRect(0, 0, W, H);
+    const glow = ctx.createRadialGradient(W * 0.8, H * 0.18, 0, W * 0.8, H * 0.18, W * 0.9);
+    glow.addColorStop(0, primary.color + "33");
+    glow.addColorStop(1, primary.color + "00");
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+    ctx.textBaseline = "alphabetic";
+
+    ctx.fillStyle = "#06B6D4";
+    ctx.fillRect(PAD, PAD, 8, 40);
+    ctx.fillStyle = "#F1F5F9";
+    ctx.font = font(38, 800);
+    ctx.fillText("УниПът", PAD + 24, PAD + 32);
+
+    let y = PAD + 150;
+    ctx.fillStyle = "#94A3B8";
+    ctx.font = font(26, 700);
+    ctx.fillText("МОЯТ КАРИЕРЕН ПРОФИЛ", PAD, y);
+
+    y += 210;
+    ctx.font = mono(200, 900);
+    let x = PAD;
+    for (const ch of letters) {
+        ctx.fillStyle = (RIASEC_LABELS[ch] || primary).color;
+        ctx.fillText(ch, x, y);
+        x += ctx.measureText(ch).width + 28;
+    }
+
+    y += 100;
+    ctx.fillStyle = primary.color;
+    ctx.font = font(56, 800);
+    ctx.fillText(`${primary.name} тип`, PAD, y);
+    y += 56;
+    ctx.fillStyle = "#CBD5E1";
+    ctx.font = font(32, 500);
+    for (const line of wrapText(ctx, primary.desc, INNER).slice(0, 2)) { ctx.fillText(line, PAD, y); y += 44; }
+
+    y += 40;
+    for (const ch of letters) {
+        const info = RIASEC_LABELS[ch];
+        if (!info) continue;
+        const pct = Math.max(0, Math.min(100, Number(scores?.[ch]) || 0));
+        ctx.fillStyle = "#F1F5F9";
+        ctx.font = font(30, 700);
+        ctx.fillText(`${ch} · ${info.name}`, PAD, y);
+        ctx.fillStyle = "#94A3B8";
+        ctx.font = mono(30, 700);
+        ctx.textAlign = "right";
+        ctx.fillText(`${Math.round(pct)}%`, W - PAD, y);
+        ctx.textAlign = "left";
+        y += 22;
+        roundRect(ctx, PAD, y, INNER, 14, 7);
+        ctx.fillStyle = "rgba(148,163,184,0.18)";
+        ctx.fill();
+        if (pct > 0) {
+            roundRect(ctx, PAD, y, Math.max(14, (INNER * pct) / 100), 14, 7);
+            ctx.fillStyle = info.color;
+            ctx.fill();
+        }
+        y += 64;
+    }
+
+    if (topSpecialties.length) {
+        y += 10;
+        ctx.fillStyle = "#94A3B8";
+        ctx.font = font(24, 700);
+        ctx.fillText("ПОДХОДЯЩИ СПЕЦИАЛНОСТИ", PAD, y);
+        y += 50;
+        ctx.fillStyle = "#F1F5F9";
+        ctx.font = font(32, 600);
+        for (const name of topSpecialties.slice(0, 3)) {
+            const lines = wrapText(ctx, name, INNER - 40);
+            ctx.fillText(`• ${lines[0]}${lines.length > 1 ? "…" : ""}`, PAD, y);
+            y += 46;
+        }
+    }
+
+    ctx.fillStyle = "#64748B";
+    ctx.font = font(28, 700);
+    ctx.fillText("uniput.eu", PAD, H - PAD);
+    ctx.fillStyle = "#94A3B8";
+    ctx.font = font(26, 500);
+    ctx.textAlign = "right";
+    ctx.fillText("Открий своя тип безплатно", W - PAD, H - PAD);
+    ctx.textAlign = "left";
+
+    return canvas;
+}
+
 const RIASECResults = ({ results, onRestart }) => {
     const navigate = useNavigate();
     const { user } = useAuth();
@@ -49,6 +161,34 @@ const RIASECResults = ({ results, onRestart }) => {
     const { scores, riasecCode, specialties, careers, error } = results;
     const visibleSpecialties = showAllSpecialties ? specialties : specialties.slice(0, 5);
     const visibleCareers = showAllCareers ? careers : careers.slice(0, 5);
+
+    // Споделяне: линкът води към теста (не към чуждия резултат), картинката
+    // е само собственият профил. Обратна връзка само когато няма системно меню.
+    const [shareFeedback, setShareFeedback] = useState(null); // "link" | "image"
+    const primaryName = RIASEC_LABELS[riasecCode[0]]?.name;
+    const flashShare = (kind) => {
+        setShareFeedback(kind);
+        setTimeout(() => setShareFeedback((k) => (k === kind ? null : k)), 2400);
+    };
+    const handleShareLink = async () => {
+        window.gtag?.("event", "share", { method: "link", content_type: "riasec_result" });
+        const outcome = await shareOrCopyLink({
+            title: "УниПът — кариерен профил",
+            text: `Моят кариерен профил е ${riasecCode}${primaryName ? ` (${primaryName.toLowerCase()} тип)` : ""}. Открий своя с безплатния тест:`,
+            url: `${window.location.origin}/career-advisor/?utm_source=riasec_share&utm_medium=share`,
+        });
+        if (outcome === "copied") flashShare("link");
+    };
+    const handleShareImage = async () => {
+        window.gtag?.("event", "share", { method: "image", content_type: "riasec_result" });
+        const canvas = drawRiasecCard({
+            code: riasecCode,
+            scores,
+            topSpecialties: [...new Set(specialties.map((s) => s.name).filter(Boolean))].slice(0, 3),
+        });
+        const outcome = await shareOrDownloadCanvas(canvas, `uniput-riasec-${riasecCode}.png`, "УниПът — кариерен профил");
+        if (outcome === "downloaded") flashShare("image");
+    };
 
     const viewModes = [
         { id: "all", label: "Всички" },
@@ -140,6 +280,27 @@ const RIASECResults = ({ results, onRestart }) => {
                             <span style={{ width: "3rem", textAlign: "right", fontSize: "12px", fontWeight: 700, color: "var(--brand-muted)", fontFamily: "monospace" }}>{score}%</span>
                         </div>
                     ))}
+                </div>
+
+                <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "0.625rem", marginTop: "0.5rem" }}>
+                    <button
+                        type="button"
+                        onClick={handleShareLink}
+                        style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "0.4rem", minHeight: "44px", padding: "0 1.25rem", borderRadius: "0.75rem", border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: "14px", fontWeight: 700, color: "#fff", background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))" }}
+                    >
+                        {shareFeedback === "link"
+                            ? <><Check size={16} /> Копирано</>
+                            : <><Share2 size={16} strokeWidth={2} /> Сподели профила</>}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleShareImage}
+                        style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "0.4rem", minHeight: "44px", padding: "0 1.25rem", borderRadius: "0.75rem", border: "1px solid var(--brand-border)", background: "transparent", cursor: "pointer", fontFamily: "inherit", fontSize: "14px", fontWeight: 600, color: "var(--brand-text)" }}
+                    >
+                        {shareFeedback === "image"
+                            ? <><Check size={16} /> Запазено</>
+                            : <><Download size={16} strokeWidth={2} /> Картинка</>}
+                    </button>
                 </div>
             </m.div>
 
