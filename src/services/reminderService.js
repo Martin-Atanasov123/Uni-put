@@ -2,12 +2,15 @@
 // Описание: Клиентски слой за имейл напомнянията за срокове за кандидатстване.
 //   Записването минава през Edge Function `deadline-reminders` (service role —
 //   таблицата `reminder_subscriptions` няма публично писане). Потвърждаване и
-//   отписване са security-definer RPC-та по неотгатваем uuid токен.
-// Експорти: subscribe, confirm, unsubscribe
+//   отписване са security-definer RPC-та по неотгатваем uuid токен. `getMine`
+//   чете директно (RLS: `reminder_sub_owner_read` — виждаш само своите).
+// Експорти: subscribe, confirm, unsubscribe, getMine
 // Бележки: Без RESEND_API_KEY на функцията всичко се записва, но имейли не се
 //   пращат — subscribe връща { emailPending: true }. UI слоят го комуникира.
 
 import { supabase } from '@/lib/supabase';
+
+const MINE_COLS = 'id,university_name,confirmed_at,unsubscribed_at,unsubscribe_token,created_at';
 
 export const reminderService = {
     /**
@@ -52,5 +55,19 @@ export const reminderService = {
             return false;
         }
         return !!data;
+    },
+
+    /** Активните (непотвърдени + потвърдени) записвания на текущия потребител. */
+    async getMine() {
+        const { data, error } = await supabase
+            .from('reminder_subscriptions')
+            .select(MINE_COLS)
+            .is('unsubscribed_at', null)
+            .order('created_at', { ascending: false });
+        if (error) {
+            console.error('[reminderService.getMine]', error.message);
+            return [];
+        }
+        return data || [];
     },
 };

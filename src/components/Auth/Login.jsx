@@ -6,6 +6,7 @@ import {
     Lock,
     LogIn,
     AlertCircle,
+    CheckCircle2,
     Loader2,
     Eye,
     EyeOff,
@@ -42,6 +43,7 @@ const Login = () => {
     const fromPath = location.state?.from?.pathname;
     const fromSearch = location.state?.from?.search || "";
     const from = fromPath ? `${fromPath}${fromSearch}` : "/calculator";
+    const accountDeleted = new URLSearchParams(location.search).get("deleted") === "1";
 
     const handleGoogleLogin = async () => {
         const { error } = await supabase.auth.signInWithOAuth({
@@ -123,6 +125,27 @@ const Login = () => {
                         </p>
                     </div>
                 </div>
+
+                {accountDeleted && !error && (
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.5rem",
+                            padding: "0.75rem 0.875rem",
+                            background: "rgba(34,197,94,0.08)",
+                            border: "1px solid rgba(34,197,94,0.3)",
+                            borderRadius: "0.625rem",
+                            color: "#86efac",
+                            fontSize: "13px",
+                            fontWeight: 500,
+                            marginBottom: "1.25rem",
+                        }}
+                    >
+                        <CheckCircle2 size={16} style={{ flexShrink: 0 }} />
+                        <span>Акаунтът и данните ти бяха изтрити.</span>
+                    </div>
+                )}
 
                 {error && (
                     <div

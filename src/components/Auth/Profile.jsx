@@ -1,9 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
 import { useNavigate, Link } from "react-router-dom";
 import { sessionService } from "@/services/sessionService";
 import { useAuth } from "@/hooks/useAuth";
 import { universityService } from "@/services/universityService";
+import { reminderService } from "@/services/reminderService";
+import { useUpcomingDeadlines } from "@/hooks/useNextDeadline";
+import { loadGrades, ALL_CATEGORY_KEYS } from "@/lib/gradeStore";
 import CalcStatsOptOut from "@/components/common/CalcStatsOptOut";
 import { historyPoints, mergeCalculatorHistory, readLocalHistory } from "@/lib/calcHistory";
 import {
@@ -15,7 +18,6 @@ import {
     AlertCircle,
     Shield,
     Lock,
-    Globe,
     Activity,
     Heart,
     Calculator,
@@ -28,6 +30,9 @@ import {
     Check,
     Target,
     Clock,
+    CalendarClock,
+    Bell,
+    BellOff,
 } from "lucide-react";
 
 const RIASEC_TYPES = {
@@ -58,18 +63,28 @@ const Profile = () => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [deleteConfirmEmail, setDeleteConfirmEmail] = useState("");
     const [deletingAccount, setDeletingAccount] = useState(false);
-    const [updatingPrivacy, setUpdatingPrivacy] = useState(false);
 
     const [user, setUser] = useState(null);
     const [favoriteDetails, setFavoriteDetails] = useState([]);
     const [calculatorHistory, setCalculatorHistory] = useState([]);
     const [showAllHistory, setShowAllHistory] = useState(false);
+    const [myGradesFilled, setMyGradesFilled] = useState(0);
+    const [reminders, setReminders] = useState([]);
+    const [subscribingAll, setSubscribingAll] = useState(false);
+    const [unsubscribingId, setUnsubscribingId] = useState(null);
     const [formData, setFormData] = useState({
         username: "",
         bio: "",
         email: "",
-        privacy: { isPublic: false, showActivity: true },
     });
+
+    // Университетите зад любимите (за да покажем сроковете им) — извежда се
+    // от пълния favoriteDetails, не само последните 3.
+    const favoriteUniversityNames = useMemo(
+        () => [...new Set(favoriteDetails.map(f => f.university_name).filter(Boolean))],
+        [favoriteDetails]
+    );
+    const upcomingDeadlines = useUpcomingDeadlines(favoriteUniversityNames);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -86,10 +101,6 @@ const Profile = () => {
                         username: metadata.username || "",
                         bio: metadata.bio || "",
                         email: user.email || "",
-                        privacy: {
-                            isPublic: metadata.privacy?.isPublic ?? false,
-                            showActivity: metadata.privacy?.showActivity ?? true,
-                        },
                     }));
                     setRiasecType(
                         metadata.riasec_type ||
@@ -98,9 +109,12 @@ const Profile = () => {
                     );
 
                     if (favorites.length > 0) {
-                        // Server-side: дърпаме само първите 3 favorite-а (вместо цялата таблица)
-                        const details = await universityService.getByIds(favorites.slice(0, 3));
+                        // Пълният списък (не само последните 3) — трябва ни за
+                        // сроковете на ВСИЧКИ любими университети по-долу.
+                        const details = await universityService.getByIds(favorites);
                         setFavoriteDetails(details);
+                    } else {
+                        setFavoriteDetails([]);
                     }
 
                     // Акаунт + браузър: калкулаторът пише в localStorage, а акаунтът се
@@ -108,6 +122,12 @@ const Profile = () => {
                     // вижда тук, докато страницата не се презареди.
                     const accountHistory = Array.isArray(metadata.calculator_history) ? metadata.calculator_history : [];
                     setCalculatorHistory(mergeCalculatorHistory(accountHistory, readLocalHistory()));
+
+                    // Merge като в MyGrades.jsx: облакът има приоритет пред локалните.
+                    const mergedGrades = { ...loadGrades(), ...(metadata.my_grades || {}) };
+                    setMyGradesFilled([...ALL_CATEGORY_KEYS].filter(k => mergedGrades[k] && mergedGrades[k] !== "").length);
+
+                    setReminders(await reminderService.getMine());
                 }
             } catch {
                 navigate("/login");
@@ -154,33 +174,54 @@ const Profile = () => {
         return (source[0] || "У").toUpperCase();
     };
 
-    const updatePrivacy = async () => {
-        setUpdatingPrivacy(true);
-        try {
-            const { error } = await supabase.auth.updateUser({
-                data: { privacy: formData.privacy },
-            });
-            if (error) throw error;
-            showMessage("success", "Настройките за поверителност са запазени!");
-        } catch (err) {
-            showMessage("error", err.message);
-        } finally {
-            setUpdatingPrivacy(false);
-        }
-    };
-
+    // Истинско изтриване през Edge Function delete-account (service role —
+    // само signOut() не трие нищо от auth.users, а бутонът обещаваше точно това).
     const handleDeleteAccount = async () => {
         if (deleteConfirmEmail !== user?.email) return;
         setDeletingAccount(true);
         try {
-            // Sign out immediately — actual deletion requires server-side admin API.
-            // Contact support or implement via Edge Function.
+            const { data, error } = await supabase.functions.invoke("delete-account");
+            if (error || !data?.ok) {
+                let msg = "Изтриването не мина. Опитай пак или ни пиши.";
+                try {
+                    const body = await error?.context?.json?.();
+                    if (body?.message) msg = body.message;
+                } catch { /* тялото не е JSON — пазим генеричното съобщение */ }
+                throw new Error(msg);
+            }
+            // Навигация ПРЕДИ logout: /profile е зад ProtectedRoute, което
+            // рендерира собствен `<Navigate to="/login" replace>` в мига щом
+            // signOut() изпразни user-а — и той печели надпреварата с ?deleted=1.
+            navigate("/login?deleted=1", { replace: true });
             await sessionService.logout();
-            navigate("/login?deleted=1");
         } catch (err) {
             showMessage("error", err.message);
             setDeletingAccount(false);
         }
+    };
+
+    // Абонира текущия имейл за напомняния за ВСИЧКИ срокове (не само любимите
+    // университети — субкрипцията е по имейл+университет=null, не по програма).
+    const handleSubscribeAll = async () => {
+        if (!user?.email) return;
+        setSubscribingAll(true);
+        const res = await reminderService.subscribe({ email: user.email, universityName: null, userId: user.id });
+        if (res?.ok) {
+            showMessage("success", res.emailPending
+                ? "Записахме те. Имейлите тръгват, щом активираме услугата."
+                : "Записахме те. Провери имейла си, за да потвърдиш.");
+            setReminders(await reminderService.getMine());
+        } else {
+            showMessage("error", "Нещо се обърка. Опитай пак.");
+        }
+        setSubscribingAll(false);
+    };
+
+    const handleUnsubscribeReminder = async (row) => {
+        setUnsubscribingId(row.id);
+        const ok = await reminderService.unsubscribe(row.unsubscribe_token);
+        if (ok) setReminders(prev => prev.filter(r => r.id !== row.id));
+        setUnsubscribingId(null);
     };
 
     if (loading) {
@@ -387,6 +428,7 @@ const Profile = () => {
                         const progressSteps = [
                             { label: "Кариерен тест", done: !!riasecType, link: "/career-advisor", sub: riasecType ? `Тип ${RIASEC_TYPES[riasecType]?.label || riasecType}` : "30 въпроса" },
                             { label: "Изчисли бал", done: calculatorHistory.length > 0, link: "/calculator", sub: calculatorHistory.length > 0 ? `${calculatorHistory.length} ${calculatorHistory.length === 1 ? "специалност" : "специалности"}` : "Пробвай калкулатора" },
+                            { label: "Въведи оценките си", done: myGradesFilled > 0, link: "/my-grades", sub: myGradesFilled > 0 ? `${myGradesFilled} попълнени` : "Автоматично в калкулатора" },
                             { label: "Запази 3 специалности", done: favorites.length >= 3, link: "/universities", sub: `${Math.min(favorites.length, 3)}/3 запазени` },
                             { label: "Сравни университети", done: favorites.length >= 2, link: "/favorites", sub: favorites.length >= 2 ? "Готов за сравнение" : "Запази поне 2" },
                         ];
@@ -487,6 +529,74 @@ const Profile = () => {
                                         </div>
                                     </div>
                                 </div>
+
+                                {/* Deadlines за любимите + управление на имейл напомнянията */}
+                                {favorites.length > 0 && (
+                                    <div style={{ padding: "1.25rem 1.5rem", background: "var(--brand-input-bg)", border: "1px solid var(--brand-border)", borderRadius: "1.25rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
+                                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                                            <CalendarClock size={15} style={{ color: "var(--brand-cyan)" }} />
+                                            <span style={{ fontSize: "11px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--brand-cyan)" }}>Наближаващи срокове</span>
+                                        </div>
+
+                                        {upcomingDeadlines.length > 0 ? (
+                                            <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}>
+                                                {upcomingDeadlines.slice(0, 4).map(d => (
+                                                    <div key={`${d.universityName}-${d.deadline}`} style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "0.5rem", padding: "0.75rem", background: "var(--brand-surface)", border: "1px solid var(--brand-border)", borderRadius: "0.75rem" }}>
+                                                        <div style={{ minWidth: 0 }}>
+                                                            <p style={{ margin: 0, fontSize: "13px", fontWeight: 700, color: "var(--brand-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{d.universityName}</p>
+                                                            <p style={{ margin: "0.15rem 0 0", fontSize: "11px", color: "var(--brand-muted)" }}>
+                                                                {d.type === "application" ? "Срок за кандидатстване" : "Приемен изпит"} · {new Date(d.deadline).toLocaleDateString("bg-BG", { day: "numeric", month: "long" })}
+                                                            </p>
+                                                        </div>
+                                                        <span style={{ flexShrink: 0, padding: "0.25rem 0.625rem", borderRadius: "999px", fontSize: "11px", fontWeight: 700, background: d.daysLeft <= 7 ? "rgba(248,113,113,0.12)" : "rgba(6,182,212,0.1)", color: d.daysLeft <= 7 ? "#fca5a5" : "var(--brand-cyan)" }}>
+                                                            {d.daysLeft === 0 ? "днес" : d.daysLeft === 1 ? "утре" : `след ${d.daysLeft} дни`}
+                                                        </span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <p style={{ margin: 0, fontSize: "12px", color: "var(--brand-muted)", fontStyle: "italic" }}>
+                                                Няма предстоящи срокове за любимите ти университети в момента.
+                                            </p>
+                                        )}
+
+                                        <div style={{ paddingTop: "0.875rem", borderTop: "1px solid var(--brand-border)" }}>
+                                            {reminders.length > 0 ? (
+                                                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                                                    <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--brand-muted)" }}>
+                                                        <Bell size={11} style={{ verticalAlign: "-1px", marginRight: "0.3rem" }} />
+                                                        Имейл напомняния
+                                                    </span>
+                                                    {reminders.map(r => (
+                                                        <div key={r.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem", fontSize: "12px" }}>
+                                                            <span style={{ color: "var(--brand-text)" }}>
+                                                                {r.university_name || "Всички университети"}
+                                                                <span style={{ color: "var(--brand-muted)", fontWeight: 500 }}> · {r.confirmed_at ? "активно" : "чака потвърждение"}</span>
+                                                            </span>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleUnsubscribeReminder(r)}
+                                                                disabled={unsubscribingId === r.id}
+                                                                style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", background: "none", border: "none", cursor: unsubscribingId === r.id ? "wait" : "pointer", color: "var(--brand-muted)", fontSize: "11px", fontWeight: 600, padding: 0, fontFamily: "inherit" }}
+                                                            >
+                                                                <BellOff size={12} /> Спри
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    onClick={handleSubscribeAll}
+                                                    disabled={subscribingAll}
+                                                    style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", background: "none", border: "none", cursor: subscribingAll ? "wait" : "pointer", color: "var(--brand-cyan)", fontSize: "12px", fontWeight: 700, padding: 0, fontFamily: "inherit" }}
+                                                >
+                                                    <Bell size={13} strokeWidth={2} /> Получавай напомняния по имейл <ArrowRight size={11} />
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
 
                                 {/* Calculator history */}
                                 {calculatorHistory.length > 0 && (
@@ -629,7 +739,7 @@ const Profile = () => {
                                 <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>
                                     <div>
                                         <p style={{ margin: 0, fontSize: "14px", fontWeight: 700, color: "var(--brand-text)" }}>Парола</p>
-                                        <p style={{ margin: "0.2rem 0 0", fontSize: "12px", color: "var(--brand-muted)" }}>Последна промяна: преди 2 месеца</p>
+                                        <p style={{ margin: "0.2rem 0 0", fontSize: "12px", color: "var(--brand-muted)" }}>Изпращаме линк за смяна на паролата на {user?.email}.</p>
                                     </div>
                                     <button
                                         onClick={() => navigate("/forgot-password")}
@@ -707,45 +817,11 @@ const Profile = () => {
                     {/* PRIVACY */}
                     {activeTab === "privacy" && (
                         <div style={{ maxWidth: "640px", display: "flex", flexDirection: "column", gap: "1rem" }}>
-                            <ToggleRow
-                                icon={Globe}
-                                title="Публичен профил"
-                                subtitle="Позволете на другите да виждат вашите любими университети."
-                                checked={formData.privacy.isPublic}
-                                onChange={e => setFormData({ ...formData, privacy: { ...formData.privacy, isPublic: e.target.checked } })}
-                            />
-                            <ToggleRow
-                                icon={Activity}
-                                title="Статус на активност"
-                                subtitle="Показвай кога последно сте влизали в платформата."
-                                checked={formData.privacy.showActivity}
-                                onChange={e => setFormData({ ...formData, privacy: { ...formData.privacy, showActivity: e.target.checked } })}
-                                color="violet"
-                            />
-                            <div style={{ display: "flex", justifyContent: "flex-end", paddingTop: "0.5rem" }}>
-                                <button
-                                    onClick={updatePrivacy}
-                                    disabled={updatingPrivacy}
-                                    style={{
-                                        padding: "0.75rem 2rem",
-                                        background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
-                                        border: "none",
-                                        borderRadius: "0.75rem",
-                                        color: "#fff",
-                                        fontSize: "13px",
-                                        fontWeight: 800,
-                                        cursor: updatingPrivacy ? "not-allowed" : "pointer",
-                                        fontFamily: "inherit",
-                                        boxShadow: "0 12px 30px rgba(6,182,212,0.3)",
-                                        display: "inline-flex",
-                                        alignItems: "center",
-                                        gap: "0.5rem",
-                                    }}
-                                >
-                                    {updatingPrivacy && <Loader2 size={14} style={{ animation: "spin 1s linear infinite" }} />}
-                                    Запази настройките
-                                </button>
-                            </div>
+                            <p style={{ margin: 0, fontSize: "13px", color: "var(--brand-muted)", lineHeight: 1.6 }}>
+                                Данните ти не се показват на други потребители и не се продават на трети страни.
+                                Виж пълните подробности в{" "}
+                                <Link to="/privacy" style={{ color: "var(--brand-cyan)" }}>Политиката за поверителност</Link>.
+                            </p>
                             <CalcStatsOptOut />
                         </div>
                     )}
@@ -870,81 +946,6 @@ function Section({ icon: Icon, iconColor, title, subtitle, danger, children }) {
             </div>
             {children}
         </div>
-    );
-}
-
-function ToggleRow({ icon: Icon, title, subtitle, checked, onChange, color = "cyan" }) {
-    const palette = color === "cyan"
-        ? { bg: "rgba(6,182,212,0.1)", border: "rgba(6,182,212,0.3)", color: "var(--brand-cyan)" }
-        : { bg: "rgba(139,92,246,0.1)", border: "rgba(139,92,246,0.3)", color: "var(--brand-violet)" };
-    return (
-        <label
-            style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: "1rem",
-                padding: "1rem 1.25rem",
-                background: "var(--brand-input-bg)",
-                border: "1px solid var(--brand-border)",
-                borderRadius: "1rem",
-                cursor: "pointer",
-            }}
-        >
-            <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                <div
-                    style={{
-                        width: "2.75rem",
-                        height: "2.75rem",
-                        borderRadius: "0.75rem",
-                        background: palette.bg,
-                        border: `1px solid ${palette.border}`,
-                        color: palette.color,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
-                    }}
-                >
-                    <Icon size={22} strokeWidth={1.5} />
-                </div>
-                <div>
-                    <span style={{ display: "block", fontSize: "14px", fontWeight: 700, color: "var(--brand-text)" }}>{title}</span>
-                    <span style={{ display: "block", fontSize: "12px", color: "var(--brand-muted)", marginTop: "0.2rem" }}>{subtitle}</span>
-                </div>
-            </div>
-            <span
-                style={{
-                    position: "relative",
-                    width: "2.5rem",
-                    height: "1.375rem",
-                    flexShrink: 0,
-                    background: checked ? "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))" : "rgba(148,163,184,0.2)",
-                    borderRadius: "999px",
-                    transition: "background 0.2s",
-                }}
-            >
-                <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={onChange}
-                    style={{ position: "absolute", opacity: 0, width: 0, height: 0 }}
-                />
-                <span
-                    style={{
-                        position: "absolute",
-                        top: "2px",
-                        left: checked ? "calc(100% - 1.25rem)" : "2px",
-                        width: "1.125rem",
-                        height: "1.125rem",
-                        borderRadius: "50%",
-                        background: "#fff",
-                        boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-                        transition: "left 0.2s",
-                    }}
-                />
-            </span>
-        </label>
     );
 }
 
