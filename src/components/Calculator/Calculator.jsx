@@ -542,8 +542,8 @@ export default function CalculatorPage() {
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
-        const sp = params.get("specialty")?.slice(0, 100).replace(/[%_\\]/g, "");
-        const uni = params.get("university")?.slice(0, 200).replace(/[%_\\]/g, "");
+        const sp = params.get("specialty")?.slice(0, 200).replace(/[%_\\]/g, "");
+        const uni = params.get("university")?.slice(0, 300).replace(/[%_\\]/g, "");
         if (!sp) return;
         (async () => {
             // Ако имаме и university — exact match (избягваме грешен hit от ilike при близки имена).

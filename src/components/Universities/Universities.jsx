@@ -498,7 +498,7 @@ function SpecialtyCard({ uni, isFav, onToggleFav, showUser }) {
             {/* Actions */}
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", paddingTop: "0.875rem", borderTop: "1px solid var(--brand-border)" }}>
                 <Link
-                    to={`/calculator/?specialty=${encodeURIComponent(uni.specialty)}`}
+                    to={`/calculator/?specialty=${encodeURIComponent(uni.specialty)}&university=${encodeURIComponent(uni.university_name)}`}
                     style={{ display: "flex", alignItems: "center", gap: "0.35rem", padding: "0.5rem 0.875rem", background: "linear-gradient(135deg,var(--brand-cyan),#0891b2)", border: "none", borderRadius: "0.625rem", color: "#fff", fontWeight: 700, fontSize: "12px", textDecoration: "none", fontFamily: "inherit", flexShrink: 0 }}
                 >
                     <Calculator size={13} /> Изчисли бал
@@ -591,7 +591,7 @@ export default function UniversitiesPage() {
                 });
                 setUniversities(results);
                 if (searchTerm.trim().length > 1) {
-                    setSuggestions(results.slice(0, 5));
+                    setSuggestions([...new Map(results.map((r) => [r.specialty, r])).values()].slice(0, 5));
                     setShowSuggestions(true);
                 } else {
                     setSuggestions([]);

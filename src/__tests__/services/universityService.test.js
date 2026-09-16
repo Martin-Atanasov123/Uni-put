@@ -73,10 +73,55 @@ describe('universityService.searchUniversities (server-side)', () => {
 
         expect(calls.or.length).toBe(1);
         const orStr = calls.or[0];
-        // Query се нормализира до lowercase преди да се вгради в pattern (ilike е case-insensitive)
-        expect(orStr).toContain('specialty.ilike.%технически%');
-        expect(orStr).toContain('university_name.ilike.%технически%');
-        expect(orStr).toContain('faculty.ilike.%технически%');
+        // Lowercase + дълги думи без последните 2 букви, за да хващат и други форми
+        expect(orStr).toContain('specialty.ilike.%техничес%');
+        expect(orStr).toContain('university_name.ilike.%техничес%');
+        expect(orStr).toContain('faculty.ilike.%техничес%');
+        expect(orStr).toContain('city.ilike.%техничес%');
+    });
+
+    it('всяка дума е отделно .or() условие (AND между думите)', async () => {
+        const { builder, calls } = makeQueryMock({ resolveData: [] });
+        supabase.from.mockReturnValue(builder);
+
+        await universityService.searchUniversities({ query: 'информатика в София' });
+
+        expect(calls.or.length).toBe(2);
+        expect(calls.or[0]).toContain('specialty.ilike.%информати%');
+        expect(calls.or[1]).toContain('city.ilike.%софия%');
+    });
+
+    it('разпознава съкращение на университет като цяла дума', async () => {
+        const { builder, calls } = makeQueryMock({ resolveData: [] });
+        supabase.from.mockReturnValue(builder);
+
+        await universityService.searchUniversities({ query: 'УНСС' });
+
+        expect(calls.or).toEqual(['university_name.ilike.Университет за национално и световно стопанство%']);
+    });
+
+    it('търси латиница и като кирилица, и синоними', async () => {
+        const { builder, calls } = makeQueryMock({ resolveData: [] });
+        supabase.from.mockReturnValue(builder);
+
+        await universityService.searchUniversities({ query: 'informatika стоматология' });
+
+        expect(calls.or[0]).toContain('%информати%');
+        expect(calls.or[1]).toContain('%дентална медицина%');
+    });
+
+    it('подрежда първо програмите със съвпадение в името на специалността', async () => {
+        const data = [
+            { id: 'a', specialty: 'Химия', university_name: 'Софийски университет', faculty: 'Информатика' },
+            { id: 'b', specialty: 'Бизнес информатика', university_name: 'УНСС', faculty: 'Икономика' },
+            { id: 'c', specialty: 'Информатика', university_name: 'ПУ', faculty: 'Математика' },
+        ];
+        const { builder } = makeQueryMock({ resolveData: data });
+        supabase.from.mockReturnValue(builder);
+
+        const result = await universityService.searchUniversities({ query: 'информатика' });
+
+        expect(result.map((r) => r.id)).toEqual(['c', 'b', 'a']);
     });
 
     it('разширява "право" със синонимите ("юридически науки", "правни науки")', async () => {
@@ -149,8 +194,8 @@ describe('universityService.searchUniversities (server-side)', () => {
         expect(orStr).not.toContain('(');
         expect(orStr).not.toContain('\\');
         // Никакви вътрешни % или _ от user input — само нашите wrapper-и
-        // (3 wrapper-а × 2 % = 6 общо в string-а, нито един друг)
-        expect((orStr.match(/%/g) || []).length).toBe(6);
+        // (2 варианта „test"/„тест" × 4 колони × 2 % = 16, нито един друг)
+        expect((orStr.match(/%/g) || []).length).toBe(16);
     });
 
     it('хвърля грешка нагоре (за UI error handling)', async () => {

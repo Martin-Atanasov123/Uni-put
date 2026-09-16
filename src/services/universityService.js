@@ -16,12 +16,104 @@ const CITIES_CACHE_TTL = 1000 * 60 * 60 * 24; // 24h
 const UNI_NAMES_CACHE_KEY = 'uniput_uni_names_cache_v1';
 const SPEC_NAMES_CACHE_KEY = 'uniput_spec_names_cache_v1';
 
-// Синоними — когато потребителят пише "право" искаме да хване и "юридически науки" и т.н.
+// Синоними на дума от заявката — търсят се като алтернативи на самата дума.
 const SPECIALTY_SYNONYMS = {
-    'право': ['право', 'юридически науки', 'правни науки'],
+    'право': ['юридически науки', 'правни науки'],
+    'стоматология': ['дентална медицина'],
+    'стоматолог': ['дентална медицина'],
+    'айти': ['информати', 'компютър', 'софтуер', 'информационни технологии'],
+    'ит': ['информати', 'компютър', 'софтуер', 'информационни технологии'],
+    'it': ['информати', 'компютър', 'софтуер', 'информационни технологии'],
+    'програмиране': ['софтуер', 'информати', 'компютър'],
+    'лекар': ['медицина'],
+    'учител': ['педагог'],
 };
 
+// Съкращение (цялата дума) → началото на официалното име в базата (търси се
+// като префикс, иначе „ТУ" хваща и „Лесотехнически университет").
+// Откъсите са без запетаи — запетаята разделя условията в PostgREST .or().
+const UNIVERSITY_ABBREVIATIONS = {
+    'су': 'Софийски университет',
+    'пу': 'Пловдивски университет',
+    'унсс': 'Университет за национално и световно стопанство',
+    'ту': 'Технически университет',
+    'нбу': 'Нов български университет',
+    'вту': 'Великотърновски университет',
+    'юзу': 'Югозападен университет',
+    'шу': 'Шуменски университет',
+    'ру': 'Русенски университет',
+    'тру': 'Тракийски университет',
+    'лту': 'Лесотехнически университет',
+    'хтму': 'Химикотехнологичен и металургичен университет',
+    'уасг': 'Университет по архитектура',
+    'мгу': 'Минно-геоложки университет',
+    'ухт': 'Университет по хранителни технологии',
+    'ау': 'Аграрен университет',
+    'иу': 'Икономически университет',
+    'му': 'Медицински университет',
+    'бсу': 'Бургаски свободен университет',
+    'всу': 'Варненски свободен университет',
+    'бду': 'Бургаски държавен университет',
+    'ауб': 'Американски университет',
+    'аубг': 'Американски университет',
+    'нса': 'Национална спортна академия',
+    'натфиз': 'Национална академия за театрално',
+    'нма': 'Национална музикална академия',
+    'нха': 'Национална художествена академия',
+    'нву': 'Национален военен университет',
+    'амтии': 'Академия за музикално',
+    'унибит': 'Университет по библиотекознание',
+    'узф': 'Университет по застраховане',
+    'ввму': 'Висше военноморско училище',
+    'мвр': 'Академия на Министерството на вътрешните работи',
+};
+
+const STOPWORDS = new Set(['в', 'и', 'на', 'по', 'за', 'от', 'с', 'със', 'към', 'the', 'and']);
+
+const LATIN_TO_CYRILLIC = [
+    ['sht', 'щ'], ['zh', 'ж'], ['ch', 'ч'], ['sh', 'ш'], ['yu', 'ю'], ['ya', 'я'], ['ts', 'ц'], ['ia', 'ия'],
+    ['a', 'а'], ['b', 'б'], ['v', 'в'], ['g', 'г'], ['d', 'д'], ['e', 'е'], ['z', 'з'], ['i', 'и'],
+    ['y', 'й'], ['k', 'к'], ['l', 'л'], ['m', 'м'], ['n', 'н'], ['o', 'о'], ['p', 'п'], ['r', 'р'],
+    ['s', 'с'], ['t', 'т'], ['u', 'у'], ['f', 'ф'], ['h', 'х'], ['c', 'ц'], ['w', 'в'], ['x', 'кс'],
+    ['q', 'к'], ['j', 'й'],
+];
+const transliterate = (word) =>
+    LATIN_TO_CYRILLIC.reduce((acc, [lat, cyr]) => acc.split(lat).join(cyr), word);
+
+// Дълги думи се търсят без последните 2 букви, за да хванат и други форми
+// („психологии" → „психолог"). Къси думи (градове, „право") остават цели.
+const stem = (word) => (word.length >= 7 ? word.slice(0, -2) : word);
+
 const normalize = (s) => (s || '').toLowerCase().trim();
+
+// Разбива заявката на думи; всяка дума става списък алтернативи (стебло,
+// синоними, кирилица от латиница) или съкращение на университет.
+const parseQuery = (query) =>
+    normalize(query)
+        .split(/[\s,.;:–—-]+/)
+        .map((w) => sanitizeForIlike(w))
+        .filter((w) => w.length >= 2 && !STOPWORDS.has(w))
+        .slice(0, 6)
+        .map((word) => {
+            if (UNIVERSITY_ABBREVIATIONS[word]) return { word, university: UNIVERSITY_ABBREVIATIONS[word] };
+            const variants = new Set([stem(word), ...(SPECIALTY_SYNONYMS[word] || [])]);
+            if (/^[a-z]+$/.test(word)) variants.add(stem(transliterate(word)));
+            return { word, variants: [...variants].map(sanitizeForIlike).filter(Boolean) };
+        });
+
+const SEARCH_COLUMNS = ['specialty', 'university_name', 'faculty', 'city'];
+
+// Първо програмите, чието име на специалност съдържа думите от заявката.
+const relevance = (row, terms) => {
+    const specialty = normalize(row.specialty);
+    let score = 0;
+    for (const t of terms) {
+        if (t.university) continue;
+        if (t.variants.some((v) => specialty.startsWith(normalize(v)))) score += 2;
+        else if (t.variants.some((v) => specialty.includes(normalize(v)))) score += 1;
+    }
+    return score;
+};
 
 // Премахва PostgREST мета-символи от user input преди да се вгради в .ilike() pattern.
 // Това НЕ замества параметризация — Supabase прави proper escaping на стойностите —
@@ -48,21 +140,18 @@ export const universityService = {
         limit = PAGE_SIZE_DEFAULT,
         offset = 0,
     } = {}) {
-        const normalizedQuery = normalize(query);
+        const terms = parseQuery(query);
         let q = supabase.from('universities').select(SLIM_COLS)
             .eq('academic_year', ADMISSION_YEAR);
 
-        if (normalizedQuery) {
-            const synonyms = SPECIALTY_SYNONYMS[normalizedQuery] || [normalizedQuery];
-            // Изграждаме .or() условие — всеки synonym се търси в specialty/university_name/faculty
-            const orParts = [];
-            synonyms.forEach((term) => {
-                const safe = sanitizeForIlike(term);
-                if (!safe) return;
-                orParts.push(`specialty.ilike.%${safe}%`);
-                orParts.push(`university_name.ilike.%${safe}%`);
-                orParts.push(`faculty.ilike.%${safe}%`);
-            });
+        // Всяка дума е отделно .or() (PostgREST ги свързва с AND): „информатика
+        // софия" намира програми, които съдържат и двете думи в някоя колона.
+        for (const t of terms) {
+            if (t.university) {
+                q = q.or(`university_name.ilike.${t.university}%`);
+                continue;
+            }
+            const orParts = t.variants.flatMap((v) => SEARCH_COLUMNS.map((col) => `${col}.ilike.%${v}%`));
             if (orParts.length) q = q.or(orParts.join(','));
         }
 
@@ -74,7 +163,12 @@ export const universityService = {
 
         const { data, error } = await q;
         if (error) throw error;
-        return data || [];
+        const rows = data || [];
+        if (!terms.length) return rows;
+        return rows
+            .map((row, i) => ({ row, i, score: relevance(row, terms) }))
+            .sort((a, b) => b.score - a.score || a.i - b.i)
+            .map((x) => x.row);
     },
 
     /**
