@@ -5,6 +5,7 @@ import { sessionService } from "@/services/sessionService";
 import { useAuth } from "@/hooks/useAuth";
 import { universityService } from "@/services/universityService";
 import CalcStatsOptOut from "@/components/common/CalcStatsOptOut";
+import { historyPoints, mergeCalculatorHistory, readLocalHistory } from "@/lib/calcHistory";
 import {
     User,
     Mail,
@@ -62,6 +63,7 @@ const Profile = () => {
     const [user, setUser] = useState(null);
     const [favoriteDetails, setFavoriteDetails] = useState([]);
     const [calculatorHistory, setCalculatorHistory] = useState([]);
+    const [showAllHistory, setShowAllHistory] = useState(false);
     const [formData, setFormData] = useState({
         username: "",
         bio: "",
@@ -101,12 +103,11 @@ const Profile = () => {
                         setFavoriteDetails(details);
                     }
 
-                    // Акаунтът е source of truth след AuthContext миграцията (мерджва
-                    // localStorage в metadata при вход); localStorage е само fallback
-                    // за старите сесии, при които миграцията още не е минала.
-                    const accountHistory = Array.isArray(metadata.calculator_history) ? metadata.calculator_history : null;
-                    const history = accountHistory || JSON.parse(localStorage.getItem("calculator_history") || "[]");
-                    setCalculatorHistory(history.slice(0, 3));
+                    // Акаунт + браузър: калкулаторът пише в localStorage, а акаунтът се
+                    // синхронизира при зареждане — без сливане ново изчисление не се
+                    // вижда тук, докато страницата не се презареди.
+                    const accountHistory = Array.isArray(metadata.calculator_history) ? metadata.calculator_history : [];
+                    setCalculatorHistory(mergeCalculatorHistory(accountHistory, readLocalHistory()));
                 }
             } catch {
                 navigate("/login");
@@ -385,7 +386,7 @@ const Profile = () => {
                     {activeTab === "overview" && (() => {
                         const progressSteps = [
                             { label: "Кариерен тест", done: !!riasecType, link: "/career-advisor", sub: riasecType ? `Тип ${RIASEC_TYPES[riasecType]?.label || riasecType}` : "30 въпроса" },
-                            { label: "Изчисли бал", done: calculatorHistory.length > 0, link: "/calculator", sub: calculatorHistory.length > 0 ? `${calculatorHistory.length} изчисления` : "Пробвай калкулатора" },
+                            { label: "Изчисли бал", done: calculatorHistory.length > 0, link: "/calculator", sub: calculatorHistory.length > 0 ? `${calculatorHistory.length} ${calculatorHistory.length === 1 ? "специалност" : "специалности"}` : "Пробвай калкулатора" },
                             { label: "Запази 3 специалности", done: favorites.length >= 3, link: "/universities", sub: `${Math.min(favorites.length, 3)}/3 запазени` },
                             { label: "Сравни университети", done: favorites.length >= 2, link: "/favorites", sub: favorites.length >= 2 ? "Готов за сравнение" : "Запази поне 2" },
                         ];
@@ -490,14 +491,20 @@ const Profile = () => {
                                 {/* Calculator history */}
                                 {calculatorHistory.length > 0 && (
                                     <div style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
-                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                            <h3 style={{ margin: 0, fontSize: "1rem", fontWeight: 800, letterSpacing: "-0.01em" }}>История на изчисленията</h3>
+                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>
+                                            <div>
+                                                <h3 style={{ margin: 0, fontSize: "1rem", fontWeight: 800, letterSpacing: "-0.01em" }}>Моят прогрес по специалности</h3>
+                                                <p style={{ margin: "0.2rem 0 0", fontSize: "12px", color: "var(--brand-muted)" }}>Изчисли пак със същия университет, когато оценките ти се променят — тук виждаш разликата.</p>
+                                            </div>
                                             <Link to="/calculator/" style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", fontSize: "11px", fontWeight: 700, color: "var(--brand-cyan)", textDecoration: "none", textTransform: "uppercase", letterSpacing: "0.08em" }}>
                                                 Изчисли пак <ArrowRight size={11} />
                                             </Link>
                                         </div>
                                         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "0.75rem" }}>
-                                            {calculatorHistory.map((h, i) => {
+                                            {(showAllHistory ? calculatorHistory : calculatorHistory.slice(0, 6)).map((h, i) => {
+                                                const points = historyPoints(h);
+                                                const prev = points.length > 1 ? points[points.length - 2] : null;
+                                                const delta = prev ? Number(h.score) - Number(prev.score) : null;
                                                 // Сравнение само срещу реален минимален бал; стари записи (без minBall) са неутрални.
                                                 const hasMin = h.minBall != null;
                                                 const above = hasMin && h.isAbove === true;
@@ -510,6 +517,12 @@ const Profile = () => {
                                                         </div>
                                                         <span style={{ fontFamily: "monospace", fontSize: "1.25rem", fontWeight: 800, color: above ? "#34d399" : "var(--brand-text)", flexShrink: 0 }}>{h.score?.toFixed ? h.score.toFixed(2) : h.score}</span>
                                                     </div>
+                                                    {points.length > 1 && <ScoreSparkline points={points} />}
+                                                    {delta !== null && (
+                                                        <span style={{ fontSize: "11px", fontWeight: 700, color: delta > 0 ? "#34d399" : delta < 0 ? "#fca5a5" : "var(--brand-muted)" }}>
+                                                            {delta > 0 ? "▲ +" : delta < 0 ? "▼ −" : ""}{delta === 0 ? "Без промяна" : Math.abs(delta).toFixed(2) + " т."} спрямо {new Date(prev.date).toLocaleDateString("bg-BG", { day: "numeric", month: "short" })}
+                                                        </span>
+                                                    )}
                                                     {h.maxBall > 0 && (
                                                         <div style={{ height: "3px", background: "var(--brand-border)", borderRadius: "2px" }}>
                                                             <div style={{ height: "3px", borderRadius: "2px", background: hasMin ? (above ? "#34d399" : "rgba(248,113,113,0.6)") : "var(--brand-cyan)", width: `${Math.min((h.score / h.maxBall) * 100, 100)}%` }} />
@@ -529,6 +542,15 @@ const Profile = () => {
                                                 );
                                             })}
                                         </div>
+                                        {calculatorHistory.length > 6 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowAllHistory(v => !v)}
+                                                style={{ alignSelf: "center", minHeight: "44px", padding: "0 1.25rem", background: "transparent", border: "1px solid var(--brand-border)", borderRadius: "0.75rem", color: "var(--brand-text)", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+                                            >
+                                                {showAllHistory ? "Покажи по-малко" : `Покажи всички (${calculatorHistory.length})`}
+                                            </button>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -732,6 +754,20 @@ const Profile = () => {
         </div>
     );
 };
+
+function ScoreSparkline({ points }) {
+    const scores = points.map(p => Number(p.score));
+    const min = Math.min(...scores);
+    const max = Math.max(...scores);
+    const y = (s) => (max === min ? 12 : 21 - ((s - min) / (max - min)) * 18);
+    const x = (i) => (i / (points.length - 1)) * 100;
+    const coords = scores.map((s, i) => `${x(i).toFixed(1)},${y(s).toFixed(1)}`).join(" ");
+    return (
+        <svg viewBox="0 0 100 24" preserveAspectRatio="none" role="img" aria-label={`Бал през времето: ${scores.map(s => s.toFixed(2)).join(", ")}`} style={{ width: "100%", height: "28px", overflow: "visible" }}>
+            <polyline points={coords} fill="none" stroke="var(--brand-cyan)" strokeWidth="2" vectorEffect="non-scaling-stroke" strokeLinejoin="round" strokeLinecap="round" />
+        </svg>
+    );
+}
 
 function StatCard({ icon: Icon, label, value, color }) {
     const palette = color === "cyan"

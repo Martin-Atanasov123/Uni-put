@@ -54,6 +54,7 @@ import {
 import GradeInputSection from "./GradeInputSection";
 import DeadlineReminder from "@/components/common/DeadlineReminder";
 import { calcStatsService } from "@/services/calcStatsService";
+import { CALC_HISTORY_KEY, historyKey, nextHistoryPoints, readLocalHistory } from "@/lib/calcHistory";
 import { copyText, wrapText, roundRect, shareOrCopyLink, shareOrDownloadCanvas } from "@/lib/shareCard";
 import ReportButton from "./ReportButton";
 import { FIELD_LABELS, SLOT_GROUPS } from "@/lib/coefficients_config";
@@ -68,7 +69,6 @@ const SAFE_ORIGIN = import.meta.env.VITE_APP_URL || window.location.origin;
 // версия): балът се пази само на този браузър.
 const GATE_LIMIT = 3;
 const STATS_DEBOUNCE_MS = 2500;
-const historyKey = (h) => `${h.faculty}||${h.specialty}`;
 
 const S = {
     surface: "var(--brand-surface-2)",
@@ -348,12 +348,7 @@ export default function CalculatorPage() {
     // „отключил" (получил е пълен резултат за тях). Пазим пълните записи (не
     // само ключове), за да можем да покажем имената им в gate картата —
     // инициализира се от localStorage, за да оцелее презареждане на страницата.
-    const [unlockedHistory, setUnlockedHistory] = useState(() => {
-        try {
-            const arr = JSON.parse(localStorage.getItem("calculator_history") || "[]");
-            return Array.isArray(arr) ? arr : [];
-        } catch { return []; }
-    });
+    const [unlockedHistory, setUnlockedHistory] = useState(readLocalHistory);
     const unlockedSpecialtyKeys = useMemo(() => new Set(unlockedHistory.map(historyKey)), [unlockedHistory]);
 
     // OAuth директно от gate картата — връща потребителя на СЪЩАТА заключена
@@ -687,11 +682,15 @@ export default function CalculatorPage() {
         if (!user && !alreadyUnlocked && unlockedHistory.length >= GATE_LIMIT) return;
 
         const best = complete.reduce((a, b) => a.score > b.score ? a : b);
+        const score = parseFloat(best.formatted);
+        const university = best.item.university_name;
+        const existing = unlockedHistory.find(h => historyKey(h) === currentKey);
         const entry = {
             faculty: selectedFaculty,
             specialty: selectedSpecialtyName,
-            score: parseFloat(best.formatted),
-            university: best.item.university_name,
+            score,
+            university,
+            points: nextHistoryPoints(existing, score, university),
             maxBall: best.maxBall,
             minBall: best.minScore?.minBall ?? null,
             minBallYear: best.minScore?.year ?? null,
@@ -712,7 +711,7 @@ export default function CalculatorPage() {
         const stripDate = (arr) => arr.map((h) => { const clone = { ...h }; delete clone.date; return clone; });
         if (JSON.stringify(stripDate(next)) === JSON.stringify(stripDate(unlockedHistory))) return;
 
-        localStorage.setItem("calculator_history", JSON.stringify(next));
+        localStorage.setItem(CALC_HISTORY_KEY, JSON.stringify(next));
         setUnlockedHistory(next);
     }, [calcResults, selectedSpecialtyName, hasAnyValidGrade, selectedFaculty, user, unlockedHistory]);
 

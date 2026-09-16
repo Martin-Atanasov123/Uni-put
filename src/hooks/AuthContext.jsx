@@ -16,13 +16,12 @@
 //   покана за акаунт (само при анонимно ДОБАВЯНЕ).
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { CALC_HISTORY_KEY, readLocalHistory, mergeCalculatorHistory } from "@/lib/calcHistory";
 
 export const AuthContext = createContext({});
 
 const ANON_FAVORITES_KEY = "uniput_anon_favorites";
-const CALC_HISTORY_KEY = "calculator_history";
 const RIASEC_RESULT_KEY = "riasec_result";
-const HISTORY_CAP = 10;
 
 // Bug fix: университи IDs в Supabase са UUID (string) / legacy bigint (number).
 // Приемаме и двете (non-empty string или positive finite number).
@@ -46,31 +45,6 @@ const writeLocalFavorites = (arr) => {
     } catch {
         /* localStorage недостъпен / пълен — игнорираме */
     }
-};
-
-const readLocalHistory = () => {
-    try {
-        const arr = JSON.parse(localStorage.getItem(CALC_HISTORY_KEY) || "[]");
-        return Array.isArray(arr) ? arr : [];
-    } catch {
-        return [];
-    }
-};
-
-// Слива история от акаунта с локалната по (faculty+specialty), пази по-новия
-// запис (по date) при конфликт, най-новите HISTORY_CAP отгоре. Огледало на
-// dedup логиката в Calculator.jsx, за да не се разминават на две места.
-const mergeCalculatorHistory = (accountHistory, localHistory) => {
-    const byKey = new Map();
-    for (const h of [...(accountHistory || []), ...(localHistory || [])]) {
-        if (!h?.faculty || !h?.specialty) continue;
-        const key = `${h.faculty}||${h.specialty}`;
-        const existing = byKey.get(key);
-        if (!existing || (h.date || 0) > (existing.date || 0)) byKey.set(key, h);
-    }
-    return [...byKey.values()]
-        .sort((a, b) => (b.date || 0) - (a.date || 0))
-        .slice(0, HISTORY_CAP);
 };
 
 export const AuthProvider = ({ children }) => {
