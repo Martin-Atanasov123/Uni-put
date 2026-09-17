@@ -2,9 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { m } from "motion/react";
 import { useAuth } from "@/hooks/useAuth";
 import { universityService } from "@/services/universityService";
-import { Search, MapPin, School, Heart, Calculator } from "lucide-react";
+import { Search, MapPin, School, Heart, Calculator, Scale, X, TrendingUp, TrendingDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import SignupPrompt from "@/components/common/SignupPrompt";
+import { mergeCalculatorHistory, readLocalHistory, CHANCE_BAND_META, CHANCE_TONES } from "@/lib/calcHistory";
+
+const MAX_COMPARE = 3;
 
 const FavoritesPage = () => {
     const { user, favorites, isFavorite, toggleFavorite } = useAuth();
@@ -12,6 +15,35 @@ const FavoritesPage = () => {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [cityFilter, setCityFilter] = useState("Всички");
+    const [calcHistory, setCalcHistory] = useState([]);
+    const [compareIds, setCompareIds] = useState(() => new Set());
+
+    // `user` от AuthContext е самата Supabase сесия — вече носи user_metadata,
+    // не е нужна отделна заявка (същият merge принцип като в Profile.jsx).
+    useEffect(() => {
+        const accountHistory = Array.isArray(user?.user_metadata?.calculator_history) ? user.user_metadata.calculator_history : [];
+        setCalcHistory(mergeCalculatorHistory(accountHistory, readLocalHistory()));
+    }, [user]);
+
+    const toggleCompare = (id) => {
+        setCompareIds(prev => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else if (next.size < MAX_COMPARE) next.add(id);
+            return next;
+        });
+    };
+
+    // Точно съвпадение по факултет+специалност+университет — калкулаторът може
+    // да е показал „най-добрия" резултат за друг университет със същото име
+    // на специалността; тук показваме само бала за ТОЗИ конкретен ред.
+    const findHistoryFor = (uni) =>
+        calcHistory.find(h => h.faculty === uni.faculty && h.specialty === uni.specialty && h.university === uni.university_name) || null;
+
+    const compareItems = useMemo(
+        () => allFavoritesData.filter(u => compareIds.has(String(u.id))),
+        [allFavoritesData, compareIds]
+    );
 
     useEffect(() => {
         const load = async () => {
@@ -142,6 +174,36 @@ const FavoritesPage = () => {
                     </select>
                 </div>
 
+                {compareIds.size >= 2 && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                                <Scale size={15} style={{ color: "var(--brand-violet)" }} />
+                                <span style={{ fontSize: "11px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--brand-violet)" }}>
+                                    Сравнение ({compareItems.length})
+                                </span>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setCompareIds(new Set())}
+                                style={{ background: "none", border: "none", cursor: "pointer", color: "var(--brand-muted)", fontSize: "11px", fontWeight: 600, padding: 0, fontFamily: "inherit" }}
+                            >
+                                Изчисти сравнението
+                            </button>
+                        </div>
+                        <div style={{ display: "flex", gap: "0.875rem", overflowX: "auto", paddingBottom: "0.375rem" }}>
+                            {compareItems.map(uni => (
+                                <ComparisonCard
+                                    key={uni.id}
+                                    uni={uni}
+                                    entry={findHistoryFor(uni)}
+                                    onRemove={() => toggleCompare(String(uni.id))}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 {loading ? (
                     <div style={{ display: "flex", justifyContent: "center", padding: "5rem 0" }}>
                         <div style={{ width: "3rem", height: "3rem", borderRadius: "50%", border: "3px solid rgba(6,182,212,0.2)", borderTopColor: "var(--brand-cyan)", animation: "spin 1s linear infinite" }} />
@@ -254,24 +316,49 @@ const FavoritesPage = () => {
                                         <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
                                             <MapPin size={10} style={{ color: "var(--brand-cyan)" }} /> {uni.city}
                                         </span>
-                                        <button
-                                            type="button"
-                                            onClick={() => toggleFavorite(String(uni.id))}
-                                            style={{
-                                                padding: "0.3rem",
-                                                background: favorite ? "rgba(248,113,113,0.1)" : "var(--brand-border)",
-                                                border: `1px solid ${favorite ? "rgba(248,113,113,0.3)" : "rgba(148,163,184,0.15)"}`,
-                                                borderRadius: "999px",
-                                                color: favorite ? "#f87171" : "var(--brand-muted)",
-                                                cursor: "pointer",
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                            }}
-                                            aria-label="Премахни от любими"
-                                        >
-                                            <Heart size={14} fill={favorite ? "#f87171" : "none"} />
-                                        </button>
+                                        <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                                            <button
+                                                type="button"
+                                                onClick={() => toggleCompare(String(uni.id))}
+                                                disabled={!compareIds.has(String(uni.id)) && compareIds.size >= MAX_COMPARE}
+                                                title={!compareIds.has(String(uni.id)) && compareIds.size >= MAX_COMPARE ? `Може да сравняваш до ${MAX_COMPARE} наведнъж` : undefined}
+                                                style={{
+                                                    display: "inline-flex",
+                                                    alignItems: "center",
+                                                    gap: "0.3rem",
+                                                    padding: "0.3rem 0.55rem",
+                                                    background: compareIds.has(String(uni.id)) ? "rgba(139,92,246,0.12)" : "var(--brand-border)",
+                                                    border: `1px solid ${compareIds.has(String(uni.id)) ? "rgba(139,92,246,0.35)" : "rgba(148,163,184,0.15)"}`,
+                                                    borderRadius: "999px",
+                                                    color: compareIds.has(String(uni.id)) ? "var(--brand-violet)" : "var(--brand-muted)",
+                                                    fontSize: "10px",
+                                                    fontWeight: 700,
+                                                    cursor: (!compareIds.has(String(uni.id)) && compareIds.size >= MAX_COMPARE) ? "not-allowed" : "pointer",
+                                                    opacity: (!compareIds.has(String(uni.id)) && compareIds.size >= MAX_COMPARE) ? 0.5 : 1,
+                                                    fontFamily: "inherit",
+                                                }}
+                                            >
+                                                <Scale size={11} /> {compareIds.has(String(uni.id)) ? "В сравнението" : "Сравни"}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => toggleFavorite(String(uni.id))}
+                                                style={{
+                                                    padding: "0.3rem",
+                                                    background: favorite ? "rgba(248,113,113,0.1)" : "var(--brand-border)",
+                                                    border: `1px solid ${favorite ? "rgba(248,113,113,0.3)" : "rgba(148,163,184,0.15)"}`,
+                                                    borderRadius: "999px",
+                                                    color: favorite ? "#f87171" : "var(--brand-muted)",
+                                                    cursor: "pointer",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                }}
+                                                aria-label="Премахни от любими"
+                                            >
+                                                <Heart size={14} fill={favorite ? "#f87171" : "none"} />
+                                            </button>
+                                        </div>
                                     </div>
 
                                     <div style={{ position: "relative" }}>
@@ -285,7 +372,7 @@ const FavoritesPage = () => {
 
                                     <div style={{ marginTop: "auto", paddingTop: "0.875rem", borderTop: "1px solid var(--brand-border)", position: "relative" }}>
                                         <Link
-                                            to={`/calculator/?specialty=${encodeURIComponent(uni.specialty)}`}
+                                            to={`/calculator/?specialty=${encodeURIComponent(uni.specialty)}&university=${encodeURIComponent(uni.university_name)}`}
                                             style={{
                                                 display: "inline-flex",
                                                 alignItems: "center",
@@ -312,5 +399,87 @@ const FavoritesPage = () => {
         </div>
     );
 };
+
+function ComparisonRow({ label, value, mono, color, icon }) {
+    return (
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.5rem", fontSize: "12px" }}>
+            <span style={{ color: "var(--brand-muted)" }}>{label}</span>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", fontFamily: mono ? "monospace" : "inherit", fontWeight: 700, color: color || "var(--brand-text)" }}>
+                {icon}{value}
+            </span>
+        </div>
+    );
+}
+
+function ComparisonCard({ uni, entry, onRemove }) {
+    const chance = entry?.chanceBand ? CHANCE_BAND_META[entry.chanceBand] : null;
+    const tone = chance ? CHANCE_TONES[chance.tone] : null;
+    return (
+        <div
+            style={{
+                minWidth: "240px",
+                maxWidth: "240px",
+                flexShrink: 0,
+                background: "var(--brand-surface)",
+                border: "1px solid var(--brand-border)",
+                borderRadius: "1rem",
+                padding: "1.25rem",
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.75rem",
+            }}
+        >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "0.5rem" }}>
+                <div style={{ minWidth: 0 }}>
+                    <h4 style={{ margin: 0, fontSize: "0.9375rem", fontWeight: 800, lineHeight: 1.3, color: "var(--brand-text)" }}>{uni.specialty}</h4>
+                    <p style={{ margin: "0.25rem 0 0", fontSize: "11px", color: "var(--brand-muted)", fontWeight: 600 }}>{uni.university_name}</p>
+                </div>
+                <button
+                    type="button"
+                    onClick={onRemove}
+                    aria-label="Премахни от сравнението"
+                    style={{ flexShrink: 0, width: "1.5rem", height: "1.5rem", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--brand-border)", border: "none", borderRadius: "999px", color: "var(--brand-muted)", cursor: "pointer" }}
+                >
+                    <X size={11} />
+                </button>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", paddingTop: "0.625rem", borderTop: "1px solid var(--brand-border)" }}>
+                <ComparisonRow label="Град" value={uni.city} />
+                <ComparisonRow label="Максимален бал" value={uni.max_ball ? Number(uni.max_ball).toFixed(0) : "—"} mono />
+                {entry ? (
+                    <>
+                        <ComparisonRow
+                            label="Твоят бал"
+                            value={Number(entry.score).toFixed(2)}
+                            mono
+                            color={entry.isAbove === true ? "#10b981" : entry.isAbove === false ? "#f87171" : undefined}
+                            icon={entry.isAbove === true ? <TrendingUp size={11} /> : entry.isAbove === false ? <TrendingDown size={11} /> : null}
+                        />
+                        {entry.minBall != null && (
+                            <ComparisonRow label={`Мин. бал ${entry.minBallYear || ""}`.trim()} value={Number(entry.minBall).toFixed(2)} mono />
+                        )}
+                        {chance && (
+                            <span style={{ alignSelf: "flex-start", padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "11px", fontWeight: 700, background: tone.bg, color: tone.text, border: `1px solid ${tone.border}` }}>
+                                {chance.label}
+                            </span>
+                        )}
+                    </>
+                ) : (
+                    <p style={{ margin: 0, fontSize: "11.5px", color: "var(--brand-muted)", fontStyle: "italic", lineHeight: 1.5 }}>
+                        Все още не си изчислил бал тук.
+                    </p>
+                )}
+            </div>
+
+            <Link
+                to={`/calculator/?specialty=${encodeURIComponent(uni.specialty)}&university=${encodeURIComponent(uni.university_name)}`}
+                style={{ marginTop: "auto", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "0.35rem", padding: "0.5rem 0.75rem", background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.3)", borderRadius: "0.5rem", color: "var(--brand-cyan)", fontSize: "12px", fontWeight: 700, textDecoration: "none" }}
+            >
+                <Calculator size={12} /> {entry ? "Изчисли пак" : "Изчисли бал"}
+            </Link>
+        </div>
+    );
+}
 
 export default FavoritesPage;

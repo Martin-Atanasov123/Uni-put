@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { useNavigate, Link } from "react-router-dom";
 import { sessionService } from "@/services/sessionService";
@@ -33,6 +33,7 @@ import {
     CalendarClock,
     Bell,
     BellOff,
+    Compass,
 } from "lucide-react";
 
 const RIASEC_TYPES = {
@@ -202,7 +203,7 @@ const Profile = () => {
 
     // Абонира текущия имейл за напомняния за ВСИЧКИ срокове (не само любимите
     // университети — субкрипцията е по имейл+университет=null, не по програма).
-    const handleSubscribeAll = async () => {
+    const handleSubscribeAll = useCallback(async () => {
         if (!user?.email) return;
         setSubscribingAll(true);
         const res = await reminderService.subscribe({ email: user.email, universityName: null, userId: user.id });
@@ -215,7 +216,7 @@ const Profile = () => {
             showMessage("error", "Нещо се обърка. Опитай пак.");
         }
         setSubscribingAll(false);
-    };
+    }, [user]);
 
     const handleUnsubscribeReminder = async (row) => {
         setUnsubscribingId(row.id);
@@ -223,6 +224,34 @@ const Profile = () => {
         if (ok) setReminders(prev => prev.filter(r => r.id !== row.id));
         setUnsubscribingId(null);
     };
+
+    // Едно конкретно следващо действие вместо статичен списък — приоритет по
+    // реалния ефект (CLAUDE.md §17 „5-Question Feature Filter": растеж/задържане).
+    // Проверките са в реда, в който всяка следваща има смисъл само ако
+    // предишната вече е свършена (тестът преди бала, балът преди сроковете).
+    const nextAction = useMemo(() => {
+        if (!riasecType) {
+            return { title: "Направи кариерния тест", text: "30 въпроса разкриват кои специалности пасват на теб — калкулаторът е по-полезен, когато знаеш какво търсиш.", cta: "Направи теста", link: "/career-advisor" };
+        }
+        if (calculatorHistory.length === 0) {
+            const typeLabel = RIASEC_TYPES[riasecType]?.label || riasecType;
+            return { title: "Изчисли своя бал", text: `Типът ти е ${typeLabel} — сега провери реалните си шансове за специалностите, които те интересуват.`, cta: "Към калкулатора", link: "/calculator" };
+        }
+        if (favorites.length === 0) {
+            return { title: "Запази специалност в любими", text: "За да сравняваш университети и да следиш сроковете им, запази поне една.", cta: "Разгледай университети", link: "/universities" };
+        }
+        if (myGradesFilled === 0) {
+            return { title: "Въведи оценките си веднъж", text: "Калкулаторът ще ги попълва автоматично на всяко устройство — без да ги пишеш пак.", cta: "Моите оценки", link: "/my-grades" };
+        }
+        const urgent = upcomingDeadlines[0];
+        if (urgent && reminders.length === 0) {
+            return { title: `Наближава срок: ${urgent.universityName}`, text: `Остават ${urgent.daysLeft === 0 ? "по-малко от ден" : urgent.daysLeft === 1 ? "1 ден" : `${urgent.daysLeft} дни`}. Включи имейл напомняния, за да не го изпуснеш.`, cta: "Получавай напомняния", onClick: handleSubscribeAll };
+        }
+        if (favorites.length < 2) {
+            return { title: "Запази още една специалност", text: "От две любими нататък можеш да ги сравняваш една до друга — бал, шанс, минимум.", cta: "Разгледай университети", link: "/universities" };
+        }
+        return { title: "Сравни любимите си", text: `Имаш ${favorites.length} запазени специалности — виж коя има по-добри шансове и по-нисък минимален бал.`, cta: "Към любимите", link: "/favorites" };
+    }, [riasecType, calculatorHistory.length, favorites.length, myGradesFilled, upcomingDeadlines, reminders.length, handleSubscribeAll]);
 
     if (loading) {
         return (
@@ -437,6 +466,32 @@ const Profile = () => {
 
                         return (
                             <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                                {/* Следваща стъпка — едно конкретно действие вместо статичен списък */}
+                                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1rem", padding: "1.25rem 1.5rem", background: "linear-gradient(135deg, rgba(6,182,212,0.08), rgba(139,92,246,0.08))", border: "1px solid rgba(6,182,212,0.25)", borderRadius: "1.25rem" }}>
+                                    <div style={{ width: "2.75rem", height: "2.75rem", borderRadius: "0.75rem", background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                        <Compass size={20} color="#fff" strokeWidth={1.5} />
+                                    </div>
+                                    <div style={{ flex: 1, minWidth: "200px" }}>
+                                        <p style={{ margin: 0, fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--brand-cyan)" }}>Следваща стъпка</p>
+                                        <h3 style={{ margin: "0.25rem 0 0", fontSize: "1rem", fontWeight: 800, color: "var(--brand-text)" }}>{nextAction.title}</h3>
+                                        <p style={{ margin: "0.3rem 0 0", fontSize: "12.5px", color: "var(--brand-muted)", lineHeight: 1.5, maxWidth: "52ch" }}>{nextAction.text}</p>
+                                    </div>
+                                    {nextAction.link ? (
+                                        <Link to={nextAction.link} style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.65rem 1.1rem", background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))", borderRadius: "0.75rem", color: "#fff", fontSize: "13px", fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
+                                            {nextAction.cta} <ArrowRight size={13} />
+                                        </Link>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            onClick={nextAction.onClick}
+                                            disabled={subscribingAll}
+                                            style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.65rem 1.1rem", background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))", border: "none", borderRadius: "0.75rem", color: "#fff", fontSize: "13px", fontWeight: 700, cursor: subscribingAll ? "wait" : "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}
+                                        >
+                                            {nextAction.cta} <ArrowRight size={13} />
+                                        </button>
+                                    )}
+                                </div>
+
                                 {/* Progress steps */}
                                 <div style={{ padding: "1.25rem 1.5rem", background: "var(--brand-input-bg)", border: "1px solid var(--brand-border)", borderRadius: "1.25rem" }}>
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>

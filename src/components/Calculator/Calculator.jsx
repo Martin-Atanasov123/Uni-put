@@ -54,7 +54,7 @@ import {
 import GradeInputSection from "./GradeInputSection";
 import DeadlineReminder from "@/components/common/DeadlineReminder";
 import { calcStatsService } from "@/services/calcStatsService";
-import { CALC_HISTORY_KEY, historyKey, nextHistoryPoints, readLocalHistory } from "@/lib/calcHistory";
+import { CALC_HISTORY_KEY, historyKey, nextHistoryPoints, readLocalHistory, CHANCE_BAND_META, CHANCE_TONES } from "@/lib/calcHistory";
 import { copyText, wrapText, roundRect, shareOrCopyLink, shareOrDownloadCanvas } from "@/lib/shareCard";
 import ReportButton from "./ReportButton";
 import { FIELD_LABELS, SLOT_GROUPS } from "@/lib/coefficients_config";
@@ -136,26 +136,26 @@ function dziToGrade(pts) {
 // (иначе „+5 т." значи различно на скала /42 и на /500).
 // Годишните колебания на минималния бал са около 15–20% от max_ball, затова
 // „на границата" е широка лента, а не точка.
-const CHANCE_TONES = {
-    green: { text: "#10b981", bg: "rgba(16,185,129,0.1)",  border: "rgba(16,185,129,0.25)" },
-    amber: { text: "#FBBF24", bg: "rgba(251,191,36,0.1)",  border: "rgba(251,191,36,0.25)" },
-    red:   { text: "#f87171", bg: "rgba(248,113,113,0.1)", border: "rgba(248,113,113,0.25)" },
+// Блърбовете остават тук (само калкулаторът ги показва); етикет+цвят идват
+// от CHANCE_BAND_META, за да не се разминат с картата в Любими.
+const CHANCE_BLURBS = {
+    high: "Балът ти е доста над миналогодишния праг — с голяма преднина.",
+    good: "Балът ти е над миналогодишния праг с удобна разлика.",
+    realistic: "Балът ти е на границата на миналогодишния праг — може да падне и в двете посоки.",
+    borderline: "Балът ти е под миналогодишния праг, но в рамките на обичайните годишни колебания.",
+    low: "Балът ти е доста под миналогодишния праг. Подготви и резервни варианти.",
 };
 
 function admissionChanceBand(score, minBall, maxBall) {
     if (!(score > 0) || minBall == null || !(maxBall > 0)) return null;
     const marginPts = score - minBall;
     const marginPct = (marginPts / maxBall) * 100;
-    if (marginPct >= 12) return { key: "high", label: "Много добър шанс", tone: "green",
-        blurb: "Балът ти е доста над миналогодишния праг — с голяма преднина." };
-    if (marginPct >= 4) return { key: "good", label: "Добър шанс", tone: "green",
-        blurb: "Балът ти е над миналогодишния праг с удобна разлика." };
-    if (marginPct >= -2) return { key: "realistic", label: "Реалистичен шанс", tone: "amber",
-        blurb: "Балът ти е на границата на миналогодишния праг — може да падне и в двете посоки." };
-    if (marginPct >= -10) return { key: "borderline", label: "Граничен шанс", tone: "amber",
-        blurb: "Балът ти е под миналогодишния праг, но в рамките на обичайните годишни колебания." };
-    return { key: "low", label: "Малък шанс", tone: "red",
-        blurb: "Балът ти е доста под миналогодишния праг. Подготви и резервни варианти." };
+    const key = marginPct >= 12 ? "high"
+        : marginPct >= 4 ? "good"
+        : marginPct >= -2 ? "realistic"
+        : marginPct >= -10 ? "borderline"
+        : "low";
+    return { key, ...CHANCE_BAND_META[key], blurb: CHANCE_BLURBS[key] };
 }
 
 // ── Споделяне на резултат ────────────────────────────────────────────────────

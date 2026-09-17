@@ -11,6 +11,22 @@ const SAME_SESSION_MS = 30 * 60 * 1000;
 
 export const historyKey = (h) => `${h.faculty}||${h.specialty}`;
 
+// Общи етикети за „шанс за прием" (виж admissionChanceBand в Calculator.jsx) —
+// историята пази само ключа (`high`/`good`/...), затова етикет+цвят живеят тук,
+// на едно място, за да не се разминат Калкулаторът и сравнението в Любими.
+export const CHANCE_BAND_META = {
+    high:       { label: "Много добър шанс", tone: "green" },
+    good:       { label: "Добър шанс", tone: "green" },
+    realistic:  { label: "Реалистичен шанс", tone: "amber" },
+    borderline: { label: "Граничен шанс", tone: "amber" },
+    low:        { label: "Малък шанс", tone: "red" },
+};
+export const CHANCE_TONES = {
+    green: { text: "#10b981", bg: "rgba(16,185,129,0.1)",  border: "rgba(16,185,129,0.25)" },
+    amber: { text: "#FBBF24", bg: "rgba(251,191,36,0.1)",  border: "rgba(251,191,36,0.25)" },
+    red:   { text: "#f87171", bg: "rgba(248,113,113,0.1)", border: "rgba(248,113,113,0.25)" },
+};
+
 export const historyPoints = (h) => {
     if (Array.isArray(h?.points) && h.points.length) return h.points;
     return h?.score != null ? [{ score: h.score, date: h.date || 0, university: h.university }] : [];
