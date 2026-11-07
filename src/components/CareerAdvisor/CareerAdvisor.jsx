@@ -5,6 +5,7 @@ import { getRiasecMatches } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import riasecData from "@/data/riasec_questions.json";
 import Seo from "@/components/common/Seo";
+import ErrorState from "@/components/common/ErrorState";
 import JsonLd from "@/components/common/JsonLd";
 
 // Quiz schema — Google rich result за интерактивни тестове.
@@ -104,6 +105,7 @@ const CareerAdvisor = () => {
         return saved ? JSON.parse(saved) : {};
     });
     const [results, setResults] = useState(restoredResults);
+    const [resultsError, setResultsError] = useState(false);
     const [quizVersion, setQuizVersion] = useState(null);
     const [scaleLabels, setScaleLabels] = useState({});
     const [isTransitioning, setIsTransitioning] = useState(false);
@@ -212,15 +214,17 @@ const CareerAdvisor = () => {
         calculateFinalResultsRef.current = calculateFinalResults;
     });
 
-    const calculateFinalResults = async () => {
-        if (step === "results") return; // вече се изпълнява — избягвай дубликат
+    const calculateFinalResults = async (force = false) => {
+        if (step === "results" && force !== true) return; // вече се изпълнява — избягвай дубликат
         setLoading(true);
+        setResultsError(false);
         setStep("results");
         try {
             const scores = calculateScores(answers, filteredQuestions);
             const riasecCode = calculateRiasecCode(scores);
             const { specialties, careers, error } = await getRiasecMatches(scores);
             setResults({ scores, riasecCode, specialties, careers, error });
+            if (error) setResultsError(true);
             if (!error) {
                 try {
                     localStorage.setItem(LAST_RESULTS_KEY, JSON.stringify({ scores, riasecCode, specialties, careers }));
@@ -236,7 +240,9 @@ const CareerAdvisor = () => {
                     if (user) await supabase.auth.updateUser({ data: { riasec_type: primaryType } });
                 } catch { /* not logged in — that's fine */ }
             }
-        } catch { /* empty */ } finally { setLoading(false); }
+        } catch {
+            setResultsError(true);
+        } finally { setLoading(false); }
     };
 
     const renderVersionSelection = () => (
@@ -475,7 +481,14 @@ const CareerAdvisor = () => {
                 </div>
             );
         }
-        if (!results) return null;
+        if (resultsError || !results) {
+            return (
+                <ErrorState
+                    message="Не успяхме да подберем специалности за твоя профил. Отговорите ти са запазени — провери връзката и опитай пак."
+                    onRetry={() => calculateFinalResults(true)}
+                />
+            );
+        }
         return (
             <RIASECResults
                 results={results}

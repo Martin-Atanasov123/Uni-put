@@ -15,9 +15,10 @@ const EVENT_COLS =
 export const calendarService = {
     /**
      * Всички събития от календара, подредени по начална дата (възходящо).
-     * @returns {Promise<Array>} масив от събития (или [] при грешка)
+     * @param {{throwOnError?: boolean}} [opts] при true хвърля грешката (за UI със състояние за грешка)
+     * @returns {Promise<Array>} масив от събития (или [] при грешка, ако throwOnError е false)
      */
-    async getAdmissionEvents() {
+    async getAdmissionEvents({ throwOnError = false } = {}) {
         const { data, error } = await supabase
             .from('admission_events')
             .select(EVENT_COLS)
@@ -28,6 +29,7 @@ export const calendarService = {
             // Не поглъщай мълчаливо — ако таблицата липсва (миграцията не е пусната)
             // или колоните се разминат, искаме следа в конзолата, не безмълвно [].
             console.error('[getAdmissionEvents] Supabase error:', error.message);
+            if (throwOnError) throw error;
             return [];
         }
         return data || [];

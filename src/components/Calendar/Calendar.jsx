@@ -4,6 +4,7 @@ import { m } from "motion/react";
 import { calendarService } from "@/services/calendarService";
 import { slugify } from "@/lib/slugify";
 import Seo from "@/components/common/Seo";
+import ErrorState from "@/components/common/ErrorState";
 import JsonLd from "@/components/common/JsonLd";
 import {
     CalendarDays, ChevronLeft, ChevronRight, MapPin, ExternalLink,
@@ -332,14 +333,21 @@ const Calendar = () => {
         setViewMode(isDesktop ? "grid" : "agenda");
     }, [isDesktop]);
 
-    useEffect(() => {
-        (async () => {
-            setLoading(true);
-            const data = await calendarService.getAdmissionEvents();
-            setEvents(data);
+    const [loadError, setLoadError] = useState(false);
+
+    const loadEvents = useCallback(async () => {
+        setLoading(true);
+        setLoadError(false);
+        try {
+            setEvents(await calendarService.getAdmissionEvents({ throwOnError: true }));
+        } catch {
+            setLoadError(true);
+        } finally {
             setLoading(false);
-        })();
+        }
     }, []);
+
+    useEffect(() => { loadEvents(); }, [loadEvents]);
 
     const universities = useMemo(
         () => [...new Set(events.map((e) => e.university_name).filter(Boolean))].sort((a, b) => a.localeCompare(b, "bg")),
@@ -507,7 +515,7 @@ const Calendar = () => {
                     <Legend />
                     <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
                         <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--brand-muted)" }}>
-                            {loading ? "..." : `${filtered.length} събити${filtered.length === 1 ? "е" : "я"}`}
+                            {loading ? "..." : loadError ? "" : `${filtered.length} събити${filtered.length === 1 ? "е" : "я"}`}
                         </span>
                         {isDesktop && (
                             <div style={{ display: "flex", background: "var(--brand-surface-2)", border: "1px solid var(--brand-border)", borderRadius: "0.625rem", padding: "0.2rem" }}>
@@ -532,6 +540,11 @@ const Calendar = () => {
                     <div style={{ ...S.surface, padding: "4rem 2rem", textAlign: "center", color: "var(--brand-muted)" }}>
                         Зареждане на датите…
                     </div>
+                ) : loadError ? (
+                    <ErrorState
+                        message="Не успяхме да заредим датите за прием. Провери връзката и опитай пак."
+                        onRetry={loadEvents}
+                    />
                 ) : filtered.length === 0 ? (
                     <div style={{ ...S.surface, padding: "4rem 2rem", textAlign: "center" }}>
                         <div style={{ width: "4rem", height: "4rem", margin: "0 auto 1rem", borderRadius: "1rem", background: "rgba(6,182,212,0.08)", border: "1px solid rgba(6,182,212,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>

@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { m, AnimatePresence } from "motion/react";
 import { supabase } from "@/lib/supabase";
 import { fetchDistinct } from "@/services/universityService";
+import { calculateScore, findSeparateDiplomaKeys } from "@/lib/scoring";
 import { useLocation, Link } from "react-router-dom";
 import Seo from "@/components/common/Seo";
 import JsonLd from "@/components/common/JsonLd";
@@ -606,31 +607,7 @@ export default function CalculatorPage() {
         return merged;
     }, [rowsForSelectedSpecialty]);
 
-    // Дипломна оценка, която формулата смята като ОТДЕЛЕН член (напр. „3.25×ДЗИ(Мат) + Мат(д)“),
-    // не бива да се слива с изпитните алтернативи — иначе няма поле, в което да се въведе.
-    const separateDiplomaKeys = useMemo(() => {
-        const out = new Set();
-        const isDip = k => /^Диплома:/.test(FIELD_LABELS[k] || "");
-        const groupOf = k => {
-            for (const [master, members] of Object.entries(SLOT_GROUPS)) if (members.includes(k)) return master;
-            return k;
-        };
-        rowsForSelectedSpecialty.forEach(row => {
-            const slots = Array.isArray(row?.coefficients) ? row.coefficients : [];
-            const examGroups = new Set();
-            slots.forEach(slot => {
-                const keys = (slot.alternatives || []).map(a => a?.key).filter(Boolean);
-                if (keys.length && !keys.every(isDip)) keys.forEach(k => examGroups.add(groupOf(k)));
-            });
-            slots.forEach(slot => {
-                const keys = (slot.alternatives || []).map(a => a?.key).filter(Boolean);
-                if (keys.length && keys.every(isDip)) {
-                    keys.forEach(k => { if (examGroups.has(groupOf(k))) out.add(k); });
-                }
-            });
-        });
-        return out;
-    }, [rowsForSelectedSpecialty]);
+    const separateDiplomaKeys = useMemo(() => findSeparateDiplomaKeys(rowsForSelectedSpecialty), [rowsForSelectedSpecialty]);
 
     const describeGroup = groupId => {
         if (FIELD_LABELS[groupId]) return FIELD_LABELS[groupId];
@@ -656,29 +633,6 @@ export default function CalculatorPage() {
             if (!seen.has(label)) { seen.add(label); labels.push(label); }
         });
         return labels.join(" / ");
-    };
-
-    const calculateScore = (coefficients, gradeSource) => {
-        if (!Array.isArray(coefficients) || !coefficients.length) return { score: 0, missingSlots: [] };
-        let total = 0;
-        const missingSlots = [];
-        coefficients.forEach(slot => {
-            const alts = slot.alternatives || [];
-            let best = null;
-            const keys = [];
-            alts.forEach(alt => {
-                if (!alt?.key) return;
-                keys.push(alt.key);
-                const val = parseFloat(gradeSource[alt.key]);
-                if (!Number.isNaN(val) && val >= 2 && val <= 6) {
-                    const product = val * Number(alt.coef);
-                    if (best === null || product > best) best = product;
-                }
-            });
-            if (best === null) missingSlots.push(keys);
-            else total += best;
-        });
-        return { score: total, missingSlots };
     };
 
     const hasAnyValidGrade = useMemo(() =>

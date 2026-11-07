@@ -156,6 +156,7 @@ export default function DziStrategist() {
     const [query, setQuery] = useState("");
     const [lookupSubjects, setLookupSubjects] = useState(null);
     const [lookupLoading, setLookupLoading] = useState(false);
+    const [lookupError, setLookupError] = useState(false);
 
     useEffect(() => {
         let alive = true;
@@ -175,11 +176,13 @@ export default function DziStrategist() {
         const exact = specialties.find(s => s.toLowerCase() === name.trim().toLowerCase());
         if (!exact) { setLookupSubjects([]); return; }
         setLookupLoading(true);
+        setLookupError(false);
         try {
             const subs = await dziService.getDziForSpecialty(exact);
             setLookupSubjects(subs);
         } catch {
-            setLookupSubjects([]);
+            setLookupSubjects(null);
+            setLookupError(true);
         } finally {
             setLookupLoading(false);
         }
@@ -303,6 +306,12 @@ export default function DziStrategist() {
 
                     {lookupLoading && (
                         <p style={{ fontSize: "13px", color: "var(--brand-muted)", marginTop: "1rem" }}>Зареждане…</p>
+                    )}
+
+                    {lookupError && !lookupLoading && (
+                        <p role="alert" style={{ fontSize: "13px", color: "#f87171", marginTop: "1rem" }}>
+                            Не успяхме да заредим данните за тази специалност. Провери връзката и опитай пак.
+                        </p>
                     )}
 
                     {lookupSubjects && !lookupLoading && (

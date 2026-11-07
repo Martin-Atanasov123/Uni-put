@@ -84,7 +84,8 @@ const AdminDashboard = () => {
             };
             setAuditLog(prev => [entry, ...prev].slice(0, 50));
         } catch {
-            // audit write failed silently
+            // Записът в одитния журнал не бива да е тих — админът трябва да знае.
+            setStatus({ type: "error", msg: "Действието е изпълнено, но не успя да се запише в одитния журнал." });
         }
     };
 

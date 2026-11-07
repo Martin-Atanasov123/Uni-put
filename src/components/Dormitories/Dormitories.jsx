@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { m } from "motion/react";
 import { getAllDormitories } from "@/lib/api";
 import Seo from "@/components/common/Seo";
+import ErrorState from "@/components/common/ErrorState";
 import { DORMITORIES, DORMITORY_CITIES, ADMISSION_YEAR_SHORT } from "@/lib/siteStats";
 import {
     Building2,
@@ -283,16 +284,24 @@ const Dormitories = () => {
     const [selectedUniversity, setSelectedUniversity] = useState("");
     const [universities, setUniversities] = useState([]);
 
-    useEffect(() => {
-        (async () => {
-            setLoading(true);
-            const data = await getAllDormitories();
+    const [loadError, setLoadError] = useState(false);
+
+    const loadDormitories = useCallback(async () => {
+        setLoading(true);
+        setLoadError(false);
+        try {
+            const data = await getAllDormitories({ throwOnError: true });
             setDormitories(data);
             const unis = [...new Set(data.map(d => d.university_id))].filter(Boolean).sort();
             setUniversities(unis);
+        } catch {
+            setLoadError(true);
+        } finally {
             setLoading(false);
-        })();
+        }
     }, []);
+
+    useEffect(() => { loadDormitories(); }, [loadDormitories]);
 
     const filteredDorms = selectedUniversity
         ? dormitories.filter(d => d.university_id === selectedUniversity)
@@ -394,7 +403,7 @@ const Dormitories = () => {
                         </button>
                     )}
                     <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--brand-muted)", marginLeft: "auto" }}>
-                        {loading ? "..." : `${filteredDorms.length} резултат${filteredDorms.length === 1 ? "" : "а"}`}
+                        {loading ? "..." : loadError ? "" : `${filteredDorms.length} резултат${filteredDorms.length === 1 ? "" : "а"}`}
                     </span>
                 </div>
 
@@ -403,6 +412,11 @@ const Dormitories = () => {
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "1.25rem" }}>
                         {[1, 2, 3, 4, 5, 6].map(i => <Skeleton key={i} />)}
                     </div>
+                ) : loadError ? (
+                    <ErrorState
+                        message="Не успяхме да заредим общежитията. Провери връзката и опитай пак."
+                        onRetry={loadDormitories}
+                    />
                 ) : filteredDorms.length === 0 ? (
                     <div
                         style={{

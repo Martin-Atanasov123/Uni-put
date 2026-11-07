@@ -196,7 +196,7 @@ export async function getAllRiasecCodes() {
  * Извлича всички общежития.
  * @returns {Promise<Array>}
  */
-export async function getAllDormitories() {
+export async function getAllDormitories({ throwOnError = false } = {}) {
     const { data, error } = await supabase
         .from('dormitories')
         .select(DORMITORIES_COLS)
@@ -206,6 +206,7 @@ export async function getAllDormitories() {
         // Не поглъщай мълчаливо — в миналото DORMITORIES_COLS се разминаваше
         // със схемата и страницата показваше „0 резултата" без следа за причината.
         console.error('[getAllDormitories] Supabase error:', error.message);
+        if (throwOnError) throw error;
         return [];
     }
     return data;
