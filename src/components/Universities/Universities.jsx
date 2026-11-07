@@ -548,12 +548,18 @@ export default function UniversitiesPage() {
         setLoading(true);
         setError(null);
         try {
-            const [batch1, batch2, cityList] = await Promise.all([
-                universityService.searchUniversities({ limit: 1000, offset: 0 }),
-                universityService.searchUniversities({ limit: 1000, offset: 1000 }),
-                universityService.getCities(),
-            ]);
-            const unis = [...batch1, ...batch2];
+            // Сървърът връща най-много 1000 реда на заявка — тегли се на страници,
+            // докато свършат (не фиксирани 2 партиди, които биха отрязали >2000 реда).
+            const loadAll = async () => {
+                const all = [];
+                for (let offset = 0; ; offset += 1000) {
+                    const batch = await universityService.searchUniversities({ limit: 1000, offset });
+                    all.push(...batch);
+                    if (batch.length < 1000) break;
+                }
+                return all;
+            };
+            const [unis, cityList] = await Promise.all([loadAll(), universityService.getCities()]);
             setUniversities(unis);
             setCities(cityList);
         } catch (err) {

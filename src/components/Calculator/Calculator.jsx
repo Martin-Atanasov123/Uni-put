@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 // eslint-disable-next-line no-unused-vars
 import { m, AnimatePresence } from "motion/react";
 import { supabase } from "@/lib/supabase";
+import { fetchDistinct } from "@/services/universityService";
 import { useLocation, Link } from "react-router-dom";
 import Seo from "@/components/common/Seo";
 import JsonLd from "@/components/common/JsonLd";
@@ -313,6 +314,9 @@ const TIPS = [
     "Пазете своя RIASEC профил — той ще ти помогне да намериш специалности, подходящи за теб.",
 ];
 
+// Кеш в паметта: данни за факултет + минимални балове (живее до презареждане на страницата).
+const FACULTY_DATA_CACHE = new Map();
+
 export default function CalculatorPage() {
     const currentYear = new Date().getFullYear();
     const [allData, setAllData] = useState([]);
@@ -449,7 +453,7 @@ export default function CalculatorPage() {
     useEffect(() => {
         (async () => {
             try {
-                const cached = localStorage.getItem("uniput_faculties_cache");
+                const cached = localStorage.getItem("uniput_faculties_cache_v2");
                 if (cached) {
                     const parsed = JSON.parse(cached);
                     if (Array.isArray(parsed) && parsed.length > 0) setFaculties(parsed);
@@ -457,8 +461,9 @@ export default function CalculatorPage() {
             } catch {
                 // corrupt cache — игнорираме, ще се презапише
             }
-            const { data, error } = await supabase.from("universities")
-                .select("faculty").eq("academic_year", ADMISSION_YEAR).limit(2000);
+            let list;
+            let error = null;
+            try { list = await fetchDistinct("faculty"); } catch (e) { error = e; }
             if (error) {
                 // Ако вече имаме факултети от cache-а — продължаваме да работим без да тревожим UI.
                 // Ако нямаме — показваме грешка.
@@ -468,10 +473,9 @@ export default function CalculatorPage() {
                 });
                 return;
             }
-            const list = [...new Set(data.map(i => i.faculty).filter(Boolean))];
             setFaculties(list);
             setLoadError(null);
-            try { localStorage.setItem("uniput_faculties_cache", JSON.stringify(list)); } catch {
+            try { localStorage.setItem("uniput_faculties_cache_v2", JSON.stringify(list)); } catch {
                 // localStorage недостъпен / пълен
             }
         })();
@@ -479,6 +483,14 @@ export default function CalculatorPage() {
 
     useEffect(() => {
         if (!selectedFaculty) return;
+        // Повторен избор на същия факултет не прави нови заявки.
+        const hit = FACULTY_DATA_CACHE.get(selectedFaculty);
+        if (hit) {
+            setAllData(hit.rows);
+            setMinScores(hit.minScores);
+            setLoadError(null);
+            return;
+        }
         (async () => {
             const { data, error } = await supabase
                 .from("universities")
@@ -493,6 +505,7 @@ export default function CalculatorPage() {
             }
             setAllData(data || []);
             setLoadError(null);
+            let resolvedMin = {};
 
             // Официални минимални балове от класиране (где са публикувани).
             // Отделна slim заявка — не пипаме основната, кешираме по запис.
@@ -525,13 +538,11 @@ export default function CalculatorPage() {
                             round: finalRows[0].round,
                         };
                     });
-                    setMinScores(resolved);
-                } else {
-                    setMinScores({});
+                    resolvedMin = resolved;
                 }
-            } else {
-                setMinScores({});
             }
+            setMinScores(resolvedMin);
+            FACULTY_DATA_CACHE.set(selectedFaculty, { rows: data || [], minScores: resolvedMin });
         })();
     }, [selectedFaculty]);
 

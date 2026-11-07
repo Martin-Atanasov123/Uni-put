@@ -11,10 +11,27 @@ import { ADMISSION_YEAR } from '@/lib/siteStats';
 const SLIM_COLS = 'id,university_name,specialty,faculty,city,education_level,max_ball,accreditation_status';
 const PAGE_SIZE_DEFAULT = 200;
 
-const CITIES_CACHE_KEY = 'uniput_cities_cache_v1';
+const CITIES_CACHE_KEY = 'uniput_cities_cache_v2';
 const CITIES_CACHE_TTL = 1000 * 60 * 60 * 24; // 24h
-const UNI_NAMES_CACHE_KEY = 'uniput_uni_names_cache_v1';
-const SPEC_NAMES_CACHE_KEY = 'uniput_spec_names_cache_v1';
+const UNI_NAMES_CACHE_KEY = 'uniput_uni_names_cache_v2';
+const SPEC_NAMES_CACHE_KEY = 'uniput_spec_names_cache_v2';
+
+/**
+ * Уникални стойности на колона (faculty/city/university_name/specialty) за текущата
+ * академична година — DISTINCT на сървъра (RPC universities_distinct).
+ * Преди това се теглеше цялата колона и се махаха дубликатите в браузъра, а
+ * PostgREST отрязва отговора на 1000 реда (губеха се факултети, градове, университети).
+ * @param {'faculty'|'city'|'university_name'|'specialty'} column
+ * @returns {Promise<string[]>} подредени по българска азбука
+ */
+export async function fetchDistinct(column) {
+    const { data, error } = await supabase.rpc('universities_distinct', {
+        p_column: column,
+        p_year: ADMISSION_YEAR,
+    });
+    if (error) throw error;
+    return (data || []).filter(Boolean).sort((a, b) => a.localeCompare(b, 'bg'));
+}
 
 // Синоними на дума от заявката — търсят се като алтернативи на самата дума.
 const SPECIALTY_SYNONYMS = {
@@ -219,14 +236,7 @@ export const universityService = {
             }
         } catch { /* corrupt cache */ }
 
-        const { data, error } = await supabase
-            .from('universities')
-            .select('university_name')
-            .eq('academic_year', ADMISSION_YEAR);
-        if (error) throw error;
-
-        const unique = [...new Set((data || []).map((d) => d.university_name).filter(Boolean))]
-            .sort((a, b) => a.localeCompare(b, 'bg'));
+        const unique = await fetchDistinct('university_name');
 
         try {
             localStorage.setItem(UNI_NAMES_CACHE_KEY,
@@ -268,21 +278,7 @@ export const universityService = {
             }
         } catch { /* corrupt cache */ }
 
-        // PostgREST капва на ~1000 реда; специалностите са >1200, затова пагинираме.
-        const PAGE = 1000;
-        const all = [];
-        for (let from = 0; ; from += PAGE) {
-            const { data, error } = await supabase
-                .from('universities')
-                .select('specialty')
-                .eq('academic_year', ADMISSION_YEAR)
-                .range(from, from + PAGE - 1);
-            if (error) throw error;
-            all.push(...data);
-            if (data.length < PAGE) break;
-        }
-        const unique = [...new Set(all.map((d) => d.specialty).filter(Boolean))]
-            .sort((a, b) => a.localeCompare(b, 'bg'));
+        const unique = await fetchDistinct('specialty');
 
         try {
             localStorage.setItem(SPEC_NAMES_CACHE_KEY,
@@ -357,15 +353,8 @@ export const universityService = {
             // corrupt cache — игнорираме
         }
 
-        // 2. Fetch — само колоната `city`, малък payload
-        const { data, error } = await supabase
-            .from('universities')
-            .select('city')
-            .eq('academic_year', ADMISSION_YEAR);
-        if (error) throw error;
-
-        const unique = [...new Set((data || []).map((d) => d.city).filter(Boolean))]
-            .sort((a, b) => a.localeCompare(b, 'bg'));
+        // 2. Уникалните градове — DISTINCT на сървъра
+        const unique = await fetchDistinct('city');
         const result = ['Всички', ...unique];
 
         try {

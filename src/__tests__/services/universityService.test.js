@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { ADMISSION_YEAR } from '@/lib/siteStats';
 
 vi.mock('@/lib/supabase', () => ({
-    supabase: { from: vi.fn() }
+    supabase: { from: vi.fn(), rpc: vi.fn() }
 }));
 
 // Mock LocalStorage
@@ -237,27 +237,23 @@ describe('universityService.getCities', () => {
         localStorage.clear();
     });
 
-    it('дърпа само колоната "city" и кешира', async () => {
-        const data = [
-            { city: 'София' }, { city: 'Пловдив' }, { city: 'София' }, { city: null }
-        ];
-        const { builder, calls } = makeQueryMock({ resolveData: data });
-        supabase.from.mockReturnValue(builder);
+    it('взима уникалните градове от сървъра (RPC) и кешира', async () => {
+        supabase.rpc.mockResolvedValue({ data: ['София', 'Пловдив', 'Шумен'], error: null });
 
         const result = await universityService.getCities();
 
-        expect(calls.select).toContain('city');
+        expect(supabase.rpc).toHaveBeenCalledWith('universities_distinct', {
+            p_column: 'city',
+            p_year: ADMISSION_YEAR,
+        });
+        expect(supabase.from).not.toHaveBeenCalled();
         expect(result[0]).toBe('Всички');
-        expect(result).toContain('София');
-        expect(result).toContain('Пловдив');
-        // Без дубликати, без null
-        expect(result.filter(c => c === 'София').length).toBe(1);
-        // Запазено в localStorage
-        expect(localStorage.getItem('uniput_cities_cache_v1')).toBeTruthy();
+        expect(result).toContain('Шумен');
+        expect(localStorage.getItem('uniput_cities_cache_v2')).toBeTruthy();
     });
 
     it('връща кеширания списък без втора заявка', async () => {
-        localStorage.setItem('uniput_cities_cache_v1', JSON.stringify({
+        localStorage.setItem('uniput_cities_cache_v2', JSON.stringify({
             ts: Date.now(),
             data: ['Всички', 'Бургас']
         }));

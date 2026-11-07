@@ -54,7 +54,9 @@ vi.mock("@/lib/supabase", () => {
   const from = vi.fn(() => ({ select }));
   return {
     supabase: {
-      from
+      from,
+      // Уникалните факултети идват от сървъра (RPC universities_distinct).
+      rpc: vi.fn(() => Promise.resolve({ data: ["Факултет A", "Факултет B"], error: null })),
     }
   };
 });

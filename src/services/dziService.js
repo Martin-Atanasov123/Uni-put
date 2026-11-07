@@ -7,11 +7,12 @@
 
 import { supabase } from '@/lib/supabase';
 import { ADMISSION_YEAR } from '@/lib/siteStats';
+import { fetchDistinct } from '@/services/universityService';
 
 // Ранкирането се мени само при промяна на коефициентите в базата → кешираме за 24h.
 const STRATEGY_CACHE_KEY = 'uniput_dzi_strategy_v1';
 const STRATEGY_CACHE_TTL = 1000 * 60 * 60 * 24; // 24h
-const SPECIALTIES_CACHE_KEY = 'uniput_specialty_names_v1';
+const SPECIALTIES_CACHE_KEY = 'uniput_specialty_names_v2';
 const SPECIALTIES_CACHE_TTL = 1000 * 60 * 60 * 24; // 24h
 
 export const dziService = {
@@ -75,11 +76,7 @@ export const dziService = {
             // счупен кеш — игнорираме
         }
 
-        const { data, error } = await supabase.from('universities')
-            .select('specialty').eq('academic_year', ADMISSION_YEAR).limit(3000);
-        if (error) throw error;
-        const names = [...new Set((data || []).map(r => r.specialty).filter(Boolean))]
-            .sort((a, b) => a.localeCompare(b, 'bg'));
+        const names = await fetchDistinct('specialty');
 
         try {
             localStorage.setItem(SPECIALTIES_CACHE_KEY, JSON.stringify({ ts: Date.now(), data: names }));
