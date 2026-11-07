@@ -595,6 +595,32 @@ export default function CalculatorPage() {
         return merged;
     }, [rowsForSelectedSpecialty]);
 
+    // Дипломна оценка, която формулата смята като ОТДЕЛЕН член (напр. „3.25×ДЗИ(Мат) + Мат(д)“),
+    // не бива да се слива с изпитните алтернативи — иначе няма поле, в което да се въведе.
+    const separateDiplomaKeys = useMemo(() => {
+        const out = new Set();
+        const isDip = k => /^Диплома:/.test(FIELD_LABELS[k] || "");
+        const groupOf = k => {
+            for (const [master, members] of Object.entries(SLOT_GROUPS)) if (members.includes(k)) return master;
+            return k;
+        };
+        rowsForSelectedSpecialty.forEach(row => {
+            const slots = Array.isArray(row?.coefficients) ? row.coefficients : [];
+            const examGroups = new Set();
+            slots.forEach(slot => {
+                const keys = (slot.alternatives || []).map(a => a?.key).filter(Boolean);
+                if (keys.length && !keys.every(isDip)) keys.forEach(k => examGroups.add(groupOf(k)));
+            });
+            slots.forEach(slot => {
+                const keys = (slot.alternatives || []).map(a => a?.key).filter(Boolean);
+                if (keys.length && keys.every(isDip)) {
+                    keys.forEach(k => { if (examGroups.has(groupOf(k))) out.add(k); });
+                }
+            });
+        });
+        return out;
+    }, [rowsForSelectedSpecialty]);
+
     const describeGroup = groupId => {
         if (FIELD_LABELS[groupId]) return FIELD_LABELS[groupId];
         if (SLOT_GROUPS[groupId]) {
@@ -1232,6 +1258,7 @@ export default function CalculatorPage() {
                         >
                             <GradeInputSection
                                 coefficients={coefficientsForInputs}
+                                separateKeys={separateDiplomaKeys}
                                 faculty={selectedFaculty}
                                 specialty={selectedSpecialtyName}
                                 onGradesChange={setGrades}

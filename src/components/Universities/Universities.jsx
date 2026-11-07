@@ -669,6 +669,10 @@ export default function UniversitiesPage() {
         () => new Set(universities.map((u) => u.university_name)).size,
         [universities]
     );
+    const distinctSpecialties = useMemo(
+        () => new Set(universities.map((u) => u.specialty)).size,
+        [universities]
+    );
     const totalCities = useMemo(
         () => new Set(universities.map((u) => u.city).filter(Boolean)).size,
         [universities]
@@ -747,7 +751,7 @@ export default function UniversitiesPage() {
                     </h1>
                     {!loading && (
                         <p style={{ color: "var(--brand-muted)", fontSize: "14px", fontWeight: 500, margin: 0 }}>
-                            {universities.length.toLocaleString("bg-BG")} специалности в {totalUniversities} университета в {totalCities} града
+                            {distinctSpecialties.toLocaleString("bg-BG")} {distinctSpecialties === 1 ? "специалност" : "специалности"} в {totalUniversities} {totalUniversities === 1 ? "университет" : "университета"} в {totalCities} {totalCities === 1 ? "град" : "града"}
                         </p>
                     )}
                 </m.div>
@@ -761,9 +765,9 @@ export default function UniversitiesPage() {
                         className="uni-stat-strip"
                     >
                         {[
-                            { value: universities.length, label: "Специалности" },
-                            { value: totalUniversities, label: "Университета" },
-                            { value: totalCities, label: "Града" },
+                            { value: distinctSpecialties, label: distinctSpecialties === 1 ? "Специалност" : "Специалности" },
+                            { value: totalUniversities, label: totalUniversities === 1 ? "Университет" : "Университета" },
+                            { value: totalCities, label: totalCities === 1 ? "Град" : "Града" },
                             { value: activeGroupsCount, label: "Направления" },
                         ].map(({ value, label }) => (
                             <div key={label} className="uni-stat-card">

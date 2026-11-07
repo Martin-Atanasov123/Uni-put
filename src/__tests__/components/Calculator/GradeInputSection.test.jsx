@@ -43,6 +43,21 @@ describe("GradeInputSection", () => {
         expect(inputs.length).toBeGreaterThan(0);
     });
 
+    it("дипломната оценка, която е отделен член във формулата, получава собствено поле", () => {
+        const withDiploma = { exam_mat: 3.25, dzi1_mat: 3.25, mat: 1 };
+        const { rerender } = render(
+            <GradeInputSection coefficients={withDiploma} faculty="Ф" specialty="С" onGradesChange={mockOnChange} />
+        );
+        // без отделяне: ДЗИ и диплома са алтернативи в едно поле
+        expect(screen.getAllByPlaceholderText("0.00")).toHaveLength(1);
+
+        rerender(
+            <GradeInputSection coefficients={withDiploma} separateKeys={new Set(["mat"])} faculty="Ф" specialty="С" onGradesChange={mockOnChange} />
+        );
+        expect(screen.getAllByPlaceholderText("0.00")).toHaveLength(2);
+        expect(screen.getByText(/Диплома: Математика/i)).toBeTruthy();
+    });
+
     it("валидира и показва грешка извън 2.00–6.00", () => {
         render(
             <GradeInputSection

@@ -38,7 +38,7 @@ function compareAlternatives(a, b) {
     return diff !== 0 ? diff : a.label.length - b.label.length;
 }
 
-function buildSlots(coefficients) {
+function buildSlots(coefficients, separateKeys) {
     const map = {};
     Object.keys(coefficients || {}).forEach(key => {
         const label = FIELD_LABELS[key] || key;
@@ -46,6 +46,8 @@ function buildSlots(coefficients) {
         for (const [group, members] of Object.entries(SLOT_GROUPS)) {
             if (members.includes(key)) { slotId = group; break; }
         }
+        // Отделен член във формулата (напр. диплома по Математика до изпита) — собствено поле.
+        if (separateKeys?.has(key)) slotId = `separate:${slotId}`;
         if (!map[slotId]) map[slotId] = { id: slotId, alternatives: [] };
         map[slotId].alternatives.push({ key, label });
     });
@@ -55,14 +57,14 @@ function buildSlots(coefficients) {
     });
 }
 
-export default function GradeInputSection({ coefficients = {}, faculty, specialty, onGradesChange }) {
+export default function GradeInputSection({ coefficients = {}, separateKeys, faculty, specialty, onGradesChange }) {
     const { user } = useAuth();
     const [valuesByKey, setValuesByKey] = useState({});
     const [activeAltBySlot, setActiveAltBySlot] = useState({});
     const [saving, setSaving] = useState(false);
     const [openDropdown, setOpenDropdown] = useState(null);
 
-    const slots = useMemo(() => buildSlots(coefficients), [coefficients]);
+    const slots = useMemo(() => buildSlots(coefficients, separateKeys), [coefficients, separateKeys]);
 
     useEffect(() => {
         // 1. Зареди централните оценки ("Моите оценки") като base

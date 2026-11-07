@@ -346,13 +346,15 @@ const Dormitories = () => {
                         <Filter size={14} />
                         <h2 style={{ fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Филтриране по университет</h2>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flex: 1, minWidth: "240px" }}>
-                        <School size={14} style={{ color: "var(--brand-muted)" }} />
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flex: 1, minWidth: "min(240px, 100%)" }}>
+                        <School size={14} style={{ color: "var(--brand-muted)", flexShrink: 0 }} />
                         <select
                             value={selectedUniversity}
                             onChange={e => setSelectedUniversity(e.target.value)}
                             style={{
                                 flex: 1,
+                                minWidth: 0,
+                                maxWidth: "100%",
                                 padding: "0.55rem 0.75rem",
                                 background: "var(--brand-input-bg)",
                                 border: "1px solid var(--brand-input-border)",
