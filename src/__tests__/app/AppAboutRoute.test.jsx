@@ -15,7 +15,7 @@ describe("Routing to About page", () => {
         );
 
         expect(
-            screen.getByRole("heading", { name: /за нас/i, level: 1 })
+            screen.getByRole("heading", { name: /Хората зад УниПът/i, level: 1 })
         ).toBeTruthy();
     });
 });

@@ -3,6 +3,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { adminService } from "@/services/adminService";
 import { supabase } from "@/lib/supabase";
 
+vi.mock("@/components/admin/adminConfig", () => ({
+  ADMIN_TABLES: [{ table: "test_table" }]
+}));
+
 vi.mock("@/lib/supabase", () => ({
   supabase: {
     from: vi.fn().mockReturnThis(),
@@ -44,7 +48,7 @@ describe("adminService", () => {
       { id: 1, name: "Row 1" },
       { id: 2, name: "Row 2" }
     ];
-    supabase.select.mockResolvedValue({ data: rows, error: null });
+    supabase.select.mockReturnValue({ limit: vi.fn().mockResolvedValue({ data: rows, error: null }) });
 
     const page = await adminService.list("test_table", {
       page: 0,
@@ -60,7 +64,7 @@ describe("adminService", () => {
 
   it("list applies pagination correctly", async () => {
     const rows = Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `Row ${i + 1}` }));
-    supabase.select.mockResolvedValue({ data: rows, error: null });
+    supabase.select.mockReturnValue({ limit: vi.fn().mockResolvedValue({ data: rows, error: null }) });
 
     // Page 0 should have 10 items (default PAGE_SIZE)
     const page0 = await adminService.list("test_table", { page: 0 });

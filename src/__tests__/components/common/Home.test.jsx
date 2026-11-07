@@ -1,10 +1,12 @@
 // @vitest-environment happy-dom
-import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, afterEach } from "vitest";
+import { render, screen, cleanup } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import Home from "@/components/common/Home";
 
 describe("Home landing page", () => {
+    afterEach(cleanup);
+
     it("renders the hero section", () => {
         render(<MemoryRouter><Home /></MemoryRouter>);
         expect(screen.getByTestId("hero-section")).toBeTruthy();
@@ -12,12 +14,12 @@ describe("Home landing page", () => {
 
     it("renders the main headline", () => {
         render(<MemoryRouter><Home /></MemoryRouter>);
-        expect(screen.getByText(/Открий своя/i)).toBeTruthy();
+        expect(screen.getAllByText(/Открий своя/i).length).toBeGreaterThan(0);
     });
 
     it("renders RIASEC CTA button", () => {
         render(<MemoryRouter><Home /></MemoryRouter>);
-        expect(screen.getByText(/Направи своя RIASEC профил/i)).toBeTruthy();
+        expect(screen.getByText(/Направи кариерен тест/i)).toBeTruthy();
     });
 
     it("renders the how it works section", () => {

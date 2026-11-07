@@ -215,16 +215,18 @@ describe('universityService.getByIds', () => {
         expect(supabase.from).not.toHaveBeenCalled();
     });
 
-    it('прилага .in() с числови ID-та', async () => {
-        const data = [{ id: 5, university_name: 'X' }];
+    it('прилага .in() само с валидни UUID-та', async () => {
+        const A = '11111111-1111-4111-8111-111111111111';
+        const B = '22222222-2222-4222-8222-222222222222';
+        const data = [{ id: A, university_name: 'X' }];
         const { builder, calls } = makeQueryMock({ resolveData: data });
         supabase.from.mockReturnValue(builder);
 
-        const result = await universityService.getByIds(['5', '7', 'invalid']);
+        const result = await universityService.getByIds([A, B, 'invalid', '5']);
 
         expect(calls.in.length).toBe(1);
         expect(calls.in[0][0]).toBe('id');
-        expect(calls.in[0][1]).toEqual([5, 7]);
+        expect(calls.in[0][1]).toEqual([A, B]);
         expect(result).toEqual(data);
     });
 });

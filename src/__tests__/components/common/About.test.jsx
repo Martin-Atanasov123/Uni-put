@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
-import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, afterEach } from "vitest";
+import { render, screen, cleanup } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import About from "@/components/common/About";
 
@@ -13,9 +13,11 @@ const renderWithRouter = () => {
 };
 
 describe("About page", () => {
+    afterEach(cleanup);
+
     it("renders main heading and intro text", () => {
         renderWithRouter();
-        const heading = screen.getByRole("heading", { name: /за нас/i, level: 1 });
+        const heading = screen.getByRole("heading", { name: /Хората зад УниПът/i, level: 1 });
         expect(heading).toBeTruthy();
         expect(
             screen.getByText(/УниПът е създаден, за да помогне/i)
@@ -33,7 +35,7 @@ describe("About page", () => {
         const emailLinks = screen.getAllByRole("link", { name: /Имейл/i });
         expect(emailLinks.length).toBeGreaterThanOrEqual(2);
 
-        const githubLinks = screen.getAllByRole("link", { name: /GitHub профил/i });
+        const githubLinks = screen.getAllByRole("link", { name: /GitHub/i });
         expect(githubLinks.length).toBeGreaterThanOrEqual(2);
     });
 

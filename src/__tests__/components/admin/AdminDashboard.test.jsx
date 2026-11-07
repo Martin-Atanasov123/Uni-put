@@ -5,6 +5,15 @@ import { MemoryRouter } from "react-router-dom";
 import AdminDashboard from "@/components/admin/AdminDashboard";
 import { adminService } from "@/services/adminService";
 
+vi.mock("@/lib/supabaseAdmin", () => {
+  const channel = { on: vi.fn(function () { return this; }), subscribe: vi.fn(function () { return this; }) };
+  return { supabaseAdmin: { channel: vi.fn(() => channel), removeChannel: vi.fn() } };
+});
+
+vi.mock("@/lib/supabase", () => ({
+  supabase: { auth: { getUser: vi.fn().mockResolvedValue({ data: { user: null } }) }, from: vi.fn() }
+}));
+
 vi.mock("@/services/adminService", () => ({
   adminService: {
     list: vi.fn()
