@@ -1,0 +1,32 @@
+{
+  "confirm-sign-up": {
+    "subject": "Потвърди имейла си — УниПът"
+  },
+  "invite-user": {
+    "subject": "Покана за УниПът"
+  },
+  "magic-link-or-otp": {
+    "subject": "Влез в УниПът с един клик"
+  },
+  "change-email-address": {
+    "subject": "Потвърди новия си имейл — УниПът"
+  },
+  "reset-password": {
+    "subject": "Смени паролата си — УниПът"
+  },
+  "reauthentication": {
+    "subject": "Код за потвърждение — УниПът"
+  },
+  "password-changed": {
+    "subject": "Паролата ти в УниПът беше сменена"
+  },
+  "email-address-changed": {
+    "subject": "Имейлът на акаунта ти в УниПът беше сменен"
+  },
+  "sign-in-method-linked": {
+    "subject": "Нов начин за вход в акаунта ти — УниПът"
+  },
+  "sign-in-method-removed": {
+    "subject": "Премахнат е начин за вход в акаунта ти — УниПът"
+  }
+}

@@ -18,6 +18,7 @@
 //   3. Приложи migrations/20260911000100_reminder_cron.sql (планира дневния cron)
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
+import { layout, esc } from "./emailLayout.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -40,12 +41,12 @@ const admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 // ── Изпращане през Resend (no-op без ключ) ──────────────────────────────────
-async function sendEmail(to: string, subject: string, text: string): Promise<boolean> {
+async function sendEmail(to: string, subject: string, text: string, html?: string): Promise<boolean> {
     if (!RESEND_API_KEY) return false;
     const res = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ from: MAIL_FROM, to, subject, text }),
+        body: JSON.stringify({ from: MAIL_FROM, to, subject, text, ...(html ? { html } : {}) }),
     });
     if (!res.ok) {
         console.error("resend error", res.status, await res.text());
@@ -69,6 +70,45 @@ function confirmEmailBody(token: string, uni: string | null): string {
         "",
         "— УниПът · uniput.eu",
     ].join("\n");
+}
+
+function confirmEmailHtml(token: string, uni: string | null): string {
+    const link = `${SITE_URL}/reminders/confirm?token=${token}`;
+    const scope = uni ? `за срокове в <strong style="color:#F1F5F9;">${esc(uni)}</strong>` : "за всички срокове за кандидатстване";
+    return layout({
+        preheader: "Потвърди с един клик и ще ти напомним преди всеки срок.",
+        eyebrow: "Напомняния за срокове",
+        title: "Потвърди напомнянията си",
+        paragraphs: [
+            `Заяви напомняния по имейл ${scope} от УниПът. Ще ти пишем само когато срокът наближава — 7 дни и 1 ден преди края.`,
+        ],
+        button: { label: "Потвърди напомнянията", url: link },
+        note: { title: "Не си ти?", text: "Просто игнорирай този имейл — няма да получиш нищо повече." },
+        footerReason: "Получаваш този имейл, защото адресът ти беше използван за напомняния в УниПът.",
+    });
+}
+
+function reminderEmailHtml(
+    uni: string, title: string, dateStr: string, daysLeft: number, sourceUrl: string | null, unsubToken: string,
+): string {
+    const unsub = `${SITE_URL}/reminders/unsubscribe?token=${unsubToken}`;
+    const when = daysLeft <= 1 ? "утре" : `след ${daysLeft} дни`;
+    const source = sourceUrl && /^https?:\/\//.test(sourceUrl)
+        ? `Официален източник: <a href="${esc(sourceUrl)}" target="_blank" style="color:#22D3EE;text-decoration:none;">${esc(sourceUrl)}</a>`
+        : undefined;
+    return layout({
+        preheader: `${esc(title)} в ${esc(uni)} — ${esc(dateStr)}.`,
+        eyebrow: "Срок за кандидатстване",
+        title: `${esc(title)} изтича ${when}`,
+        paragraphs: [
+            `Срокът <strong style="color:#F1F5F9;">„${esc(title)}“</strong> в <strong style="color:#F1F5F9;">${esc(uni)}</strong> изтича <strong style="color:#F1F5F9;">${when}</strong> — ${esc(dateStr)}.`,
+            "Провери какво още ти трябва и не изпускай класирането.",
+        ],
+        button: { label: "Виж бала си в калкулатора", url: `${SITE_URL}/calculator/` },
+        secondary: source,
+        footerReason: "Получаваш това напомняне, защото си го заявил в УниПът.",
+        unsubscribeUrl: unsub,
+    });
 }
 
 function reminderEmailBody(
@@ -139,7 +179,7 @@ async function handleSubscribe(body: Record<string, unknown>) {
 
     let emailed = false;
     if (RESEND_API_KEY && row) {
-        emailed = await sendEmail(email, "Потвърди напомнянията от УниПът", confirmEmailBody(row.confirm_token, universityName));
+        emailed = await sendEmail(email, "Потвърди напомнянията от УниПът", confirmEmailBody(row.confirm_token, universityName), confirmEmailHtml(row.confirm_token, universityName));
         if (emailed) {
             await admin.from("reminder_subscriptions").update({ confirm_sent_at: new Date().toISOString() }).eq("id", row.id);
         }
@@ -163,7 +203,7 @@ async function handleSend() {
         .limit(200);
     for (const s of pending ?? []) {
         if (s.confirm_sent_at && s.confirm_sent_at > resendCut) continue;
-        if (await sendEmail(s.email, "Потвърди напомнянията от УниПът", confirmEmailBody(s.confirm_token, s.university_name))) {
+        if (await sendEmail(s.email, "Потвърди напомнянията от УниПът", confirmEmailBody(s.confirm_token, s.university_name), confirmEmailHtml(s.confirm_token, s.university_name))) {
             await admin.from("reminder_subscriptions").update({ confirm_sent_at: new Date().toISOString() }).eq("id", s.id);
             confirmSent++;
         }
@@ -197,6 +237,7 @@ async function handleSend() {
                 s.email,
                 `⏰ ${e.days <= 1 ? "Утре" : `След ${e.days} дни`}: ${e.title} — ${e.university_name}`,
                 reminderEmailBody(e.university_name, e.title, fmtDate(e.deadline), e.days, e.source_url, s.unsubscribe_token),
+                reminderEmailHtml(e.university_name, e.title, fmtDate(e.deadline), e.days, e.source_url, s.unsubscribe_token),
             );
             if (ok) {
                 notified.add(e.id);
