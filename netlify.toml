@@ -116,6 +116,24 @@
 # затова НЯМА client-route правило тук — иначе /dzi-strateg (без наклонена черта)
 # щеше да получи 200 с shell-а на НАЧАЛНАТА страница вместо 301 към /dzi-strateg/.
 # Статичният файл се сервира пръв, точно както за /about, /calculator и т.н.
+# Линковете от имейлите за напомняния (потвърждение / отписване) — client-only.
+# Без тези правила стигаха до истинския 404 и отписването не работеше.
+[[redirects]]
+  from = "/reminders/confirm"
+  to = "/index.html"
+  status = 200
+[[redirects]]
+  from = "/reminders/confirm/*"
+  to = "/index.html"
+  status = 200
+[[redirects]]
+  from = "/reminders/unsubscribe"
+  to = "/index.html"
+  status = 200
+[[redirects]]
+  from = "/reminders/unsubscribe/*"
+  to = "/index.html"
+  status = 200
 [[redirects]]
   from = "/admin"
   to = "/index.html"

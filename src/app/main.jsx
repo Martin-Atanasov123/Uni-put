@@ -5,6 +5,9 @@ import { BrowserRouter } from 'react-router-dom'
 import "@fontsource-variable/inter/wght.css"
 
 import App from './App.jsx'
+import { installBulgarianValidation } from '@/lib/bgValidation'
+
+installBulgarianValidation()
 
 // Auto-recover от stale chunk references след deploy.
 // Когато Netlify пуска нов build, старите chunk hashes изчезват от сървъра.
