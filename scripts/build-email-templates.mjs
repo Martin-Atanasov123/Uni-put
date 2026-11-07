@@ -17,6 +17,8 @@ import { layout } from "../supabase/functions/deadline-reminders/emailLayout.ts"
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = resolve(ROOT, "supabase/templates");
+// Копие, достъпно по https://uniput.eu/email/templates/<slug>.html — от там се зарежда в таблото на Supabase.
+const PUBLIC_OUT = resolve(ROOT, "public/email/templates");
 
 const reason = (what) =>
     `Получаваш този имейл, защото ${what} <strong style="color:#CBD5E1;">{{ .Email }}</strong>.`;
@@ -172,9 +174,11 @@ const templates = {
 };
 
 await mkdir(OUT, { recursive: true });
+await mkdir(PUBLIC_OUT, { recursive: true });
 const manifest = {};
 for (const [slug, t] of Object.entries(templates)) {
     await writeFile(resolve(OUT, `${slug}.html`), t.html, "utf8");
+    await writeFile(resolve(PUBLIC_OUT, `${slug}.html`), t.html, "utf8");
     manifest[slug] = { subject: t.subject };
 }
 await writeFile(resolve(OUT, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n", "utf8");
