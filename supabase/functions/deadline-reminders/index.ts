@@ -13,7 +13,7 @@
 // ДОРМАНТНО без RESEND_API_KEY: записва редовете, но не праща имейли и връща
 // { emailPending: true }. Активира се само с добавяне на секрета — нула промени
 // по кода. За да заработи:
-//   1. Направи безплатен акаунт в Resend (resend.com), верифицирай домейн uniput.eu
+//   1. Resend: домейнът mail.uniput.eu е създаден (eu-west-1); DNS записите са в Netlify DNS
 //   2. supabase secrets set RESEND_API_KEY=re_xxx  (и по избор CRON_SECRET, SITE_URL, MAIL_FROM)
 //   3. Приложи migrations/20260911000100_reminder_cron.sql (планира дневния cron)
 
@@ -25,7 +25,8 @@ const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") ?? "";
 const CRON_SECRET = Deno.env.get("CRON_SECRET") ?? "";
 const SITE_URL = (Deno.env.get("SITE_URL") ?? "https://uniput.eu").replace(/\/+$/, "");
-const MAIL_FROM = Deno.env.get("MAIL_FROM") ?? "УниПът <напомняния@uniput.eu>";
+// Само ASCII в адреса: кирилица преди „@" не е валиден имейл. Домейнът е потвърден в Resend (eu-west-1).
+const MAIL_FROM = Deno.env.get("MAIL_FROM") ?? "УниПът <reminders@mail.uniput.eu>";
 
 const CORS = {
     "Access-Control-Allow-Origin": "*",
