@@ -11,6 +11,15 @@ const REPORT_TYPES = [
     { value: "other", label: "Друго" },
 ];
 
+function dataUrlToBlob(dataUrl) {
+    const [meta, b64] = dataUrl.split(",");
+    const mime = /data:([^;]+)/.exec(meta)?.[1] || "image/jpeg";
+    const bin = atob(b64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new Blob([bytes], { type: mime });
+}
+
 export default function ReportButton({ universityName, specialty }) {
     const [isOpen, setIsOpen] = useState(false);
     const [reportType, setReportType] = useState("formula_error");
@@ -65,7 +74,8 @@ export default function ReportButton({ universityName, specialty }) {
     const uploadScreenshot = async (dataUrl, userId) => {
         if (!dataUrl) return null;
         try {
-            const blob = await (await fetch(dataUrl)).blob();
+            // fetch(dataUrl) е забранен от CSP (connect-src не позволява data:) — декодираме ръчно.
+            const blob = dataUrlToBlob(dataUrl);
             const fileName = `${userId}/report_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
             const { data, error: uploadError } = await supabase.storage
                 .from("reports-screenshots")
