@@ -28,9 +28,19 @@ export default function ReportButton({ universityName, specialty }) {
                 scale: 1,
                 useCORS: true,
                 logging: false,
-                backgroundColor: null,
+                backgroundColor: "#0B1220",
             });
-            setScreenshotData(canvas.toDataURL("image/png", 0.8));
+            // Цялата страница като PNG надхвърля лимита на хранилището (5 MB) и качването
+            // мълчаливо пропадаше — смаляваме до 1200px и пазим като JPEG.
+            const MAX_W = 1200;
+            let out = canvas;
+            if (canvas.width > MAX_W) {
+                out = document.createElement("canvas");
+                out.width = MAX_W;
+                out.height = Math.round((canvas.height * MAX_W) / canvas.width);
+                out.getContext("2d").drawImage(canvas, 0, 0, out.width, out.height);
+            }
+            setScreenshotData(out.toDataURL("image/jpeg", 0.72));
         } catch {
             setScreenshotData(null);
         }
@@ -52,14 +62,14 @@ export default function ReportButton({ universityName, specialty }) {
         setError("");
     };
 
-    const uploadScreenshot = async dataUrl => {
+    const uploadScreenshot = async (dataUrl, userId) => {
         if (!dataUrl) return null;
         try {
             const blob = await (await fetch(dataUrl)).blob();
-            const fileName = `report_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.png`;
+            const fileName = `${userId}/report_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
             const { data, error: uploadError } = await supabase.storage
                 .from("reports-screenshots")
-                .upload(fileName, blob, { contentType: "image/png" });
+                .upload(fileName, blob, { contentType: "image/jpeg" });
             if (uploadError) return null;
             const { data: urlData } = supabase.storage.from("reports-screenshots").getPublicUrl(data.path);
             return urlData?.publicUrl || null;
@@ -69,13 +79,13 @@ export default function ReportButton({ universityName, specialty }) {
     };
 
     const handleSubmit = async () => {
-        if (!description.trim()) { setError("Моля, опишете проблема."); return; }
+        if (!description.trim()) { setError("Опиши проблема, за да можем да го поправим."); return; }
         setSending(true);
         setError("");
         try {
             const { data: { user } } = await supabase.auth.getUser();
-            if (!user) { setError("Трябва да сте влезли в профила си."); setSending(false); return; }
-            const screenshotUrl = await uploadScreenshot(screenshotData);
+            if (!user) { setError("Влез в профила си, за да изпратиш доклад."); setSending(false); return; }
+            const screenshotUrl = await uploadScreenshot(screenshotData, user.id);
             const { error: insertError } = await supabase.from("reports").insert({
                 user_id: user.id,
                 university_name: universityName || null,
