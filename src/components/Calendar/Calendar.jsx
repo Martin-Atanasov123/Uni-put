@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { m } from "motion/react";
 import { calendarService } from "@/services/calendarService";
 import { slugify } from "@/lib/slugify";
 import Seo from "@/components/common/Seo";
 import ErrorState from "@/components/common/ErrorState";
+import CalendarReminder from "@/components/Calendar/CalendarReminder";
 import JsonLd from "@/components/common/JsonLd";
 import {
     CalendarDays, ChevronLeft, ChevronRight, MapPin, ExternalLink,
@@ -313,7 +314,9 @@ function Legend() {
 const Calendar = () => {
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [uniFilter, setUniFilter] = useState("");
+    const location = useLocation();
+    // ?university=… — връщане от входа с вече избран университет
+    const [uniFilter, setUniFilter] = useState(() => new URLSearchParams(location.search).get("university") || "");
     const [cityFilter, setCityFilter] = useState("");
     const [activeTypes, setActiveTypes] = useState(new Set(TYPE_ORDER));
     const isDesktop = useIsDesktop();
@@ -509,6 +512,8 @@ const Calendar = () => {
                         })}
                     </div>
                 </div>
+
+                <CalendarReminder universityName={uniFilter || null} />
 
                 {/* View toggle (desktop only) + count */}
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>

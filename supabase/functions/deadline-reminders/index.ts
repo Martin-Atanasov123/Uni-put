@@ -89,8 +89,15 @@ function confirmEmailHtml(token: string, uni: string | null): string {
     });
 }
 
+const TYPE_LABEL: Record<string, string> = {
+    application: "Срок за кандидатстване",
+    exam: "Приемен изпит",
+    ranking: "Класиране",
+    enrollment: "Записване",
+};
+
 function reminderEmailHtml(
-    uni: string, title: string, dateStr: string, daysLeft: number, sourceUrl: string | null, unsubToken: string,
+    uni: string, title: string, dateStr: string, daysLeft: number, sourceUrl: string | null, unsubToken: string, eventType = "application",
 ): string {
     const unsub = `${SITE_URL}/reminders/unsubscribe?token=${unsubToken}`;
     const when = daysLeft <= 1 ? "утре" : `след ${daysLeft} дни`;
@@ -99,7 +106,7 @@ function reminderEmailHtml(
         : undefined;
     return layout({
         preheader: `${esc(title)} в ${esc(uni)} — ${esc(dateStr)}.`,
-        eyebrow: "Срок за кандидатстване",
+        eyebrow: TYPE_LABEL[eventType] ?? "Дата от календара",
         title: `${esc(title)} изтича ${when}`,
         paragraphs: [
             `Срокът <strong style="color:#F1F5F9;">„${esc(title)}“</strong> в <strong style="color:#F1F5F9;">${esc(uni)}</strong> изтича <strong style="color:#F1F5F9;">${when}</strong> — ${esc(dateStr)}.`,
@@ -214,7 +221,7 @@ async function handleSend() {
     const { data: events } = await admin
         .from("admission_events")
         .select("id, university_name, event_type, title, start_date, end_date, source_url")
-        .in("event_type", ["application", "exam"])
+        .in("event_type", ["application", "exam", "ranking", "enrollment"])
         .eq("is_confirmed", true);
     const dueEvents = (events ?? [])
         .map((e) => ({ ...e, deadline: e.end_date ?? e.start_date }))
@@ -238,7 +245,7 @@ async function handleSend() {
                 s.email,
                 `⏰ ${e.days <= 1 ? "Утре" : `След ${e.days} дни`}: ${e.title} — ${e.university_name}`,
                 reminderEmailBody(e.university_name, e.title, fmtDate(e.deadline), e.days, e.source_url, s.unsubscribe_token),
-                reminderEmailHtml(e.university_name, e.title, fmtDate(e.deadline), e.days, e.source_url, s.unsubscribe_token),
+                reminderEmailHtml(e.university_name, e.title, fmtDate(e.deadline), e.days, e.source_url, s.unsubscribe_token, e.event_type),
             );
             if (ok) {
                 notified.add(e.id);
