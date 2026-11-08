@@ -5,12 +5,13 @@ import { calendarService } from "@/services/calendarService";
 import { slugify } from "@/lib/slugify";
 import Seo from "@/components/common/Seo";
 import ErrorState from "@/components/common/ErrorState";
-import CalendarReminder from "@/components/Calendar/CalendarReminder";
+import CalendarReminder, { EventReminderAction } from "@/components/Calendar/CalendarReminder";
+import CalendarModal from "@/components/Calendar/CalendarModal";
 import JsonLd from "@/components/common/JsonLd";
 import {
     CalendarDays, ChevronLeft, ChevronRight, MapPin, ExternalLink,
     Filter, X, School, GraduationCap, FileText, Trophy, UserCheck,
-    LayoutGrid, List, AlertCircle, Info,
+    LayoutGrid, List, Info, BellRing,
 } from "lucide-react";
 
 // ── Тип събитие → цвят/етикет/икона (сигнатурни цветове, стабилни навсякъде) ──
@@ -90,7 +91,7 @@ const S = {
 };
 
 // ── Единична карта на събитие (за agenda и за списъка под решетката) ──────────
-function EventCard({ event, today }) {
+function EventCard({ event, today, onOpen }) {
     const type = EVENT_TYPES[event.event_type] || EVENT_TYPES.application;
     const { Icon } = type;
     const end = event.end_date ? parseDate(event.end_date) : parseDate(event.start_date);
@@ -177,13 +178,23 @@ function EventCard({ event, today }) {
                         </a>
                     )}
                 </div>
+                {onOpen && (
+                    <button type="button" onClick={() => onOpen(event)} style={{
+                        display: "inline-flex", alignItems: "center", gap: "0.4rem", marginTop: "0.625rem", minHeight: "44px",
+                        padding: "0.4rem 0.875rem", background: "transparent", border: "1px solid var(--brand-border)",
+                        borderRadius: "0.75rem", color: "var(--brand-cyan)", fontSize: "12.5px", fontWeight: 600,
+                        fontFamily: "inherit", cursor: "pointer",
+                    }}>
+                        <BellRing size={14} strokeWidth={1.5} aria-hidden="true" /> Напомняй ми за този университет
+                    </button>
+                )}
             </div>
         </div>
     );
 }
 
 // ── Месечна решетка (десктоп) ────────────────────────────────────────────────
-function MonthGrid({ monthDate, events, today, onPrev, onNext }) {
+function MonthGrid({ monthDate, events, today, onPrev, onNext, onOpenEvent, onOpenDay }) {
     const year = monthDate.getFullYear();
     const month = monthDate.getMonth();
     const firstOfMonth = new Date(year, month, 1);
@@ -215,7 +226,7 @@ function MonthGrid({ monthDate, events, today, onPrev, onNext }) {
         d && today.getFullYear() === year && today.getMonth() === month && today.getDate() === d;
 
     return (
-        <div style={{ ...S.surface, padding: "1.25rem" }}>
+        <div style={{ ...S.surface, padding: "1.25rem", minWidth: 0, overflow: "hidden" }}>
             {/* Навигация по месеци */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
                 <button type="button" onClick={onPrev} aria-label="Предишен месец" style={navBtn}>
@@ -230,7 +241,7 @@ function MonthGrid({ monthDate, events, today, onPrev, onNext }) {
             </div>
 
             {/* Заглавия на дните */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "0.375rem", marginBottom: "0.375rem" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(7, minmax(0, 1fr))", gap: "0.375rem", marginBottom: "0.375rem" }}>
                 {WEEKDAYS_BG.map((w) => (
                     <div key={w} style={{ textAlign: "center", fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--brand-muted)", padding: "0.25rem 0" }}>
                         {w}
@@ -239,12 +250,12 @@ function MonthGrid({ monthDate, events, today, onPrev, onNext }) {
             </div>
 
             {/* Дни */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "0.375rem" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(7, minmax(0, 1fr))", gap: "0.375rem" }}>
                 {cells.map((d, i) => {
                     const dayEvents = d ? (byDay[d] || []) : [];
                     return (
                         <div key={i} style={{
-                            minHeight: 84,
+                            minHeight: 84, minWidth: 0, overflow: "hidden",
                             borderRadius: "0.625rem",
                             border: isToday(d) ? "1px solid var(--brand-cyan)" : "1px solid var(--brand-border)",
                             background: d ? "var(--brand-input-bg)" : "transparent",
@@ -262,22 +273,32 @@ function MonthGrid({ monthDate, events, today, onPrev, onNext }) {
                             {dayEvents.slice(0, 3).map((ev, j) => {
                                 const t = EVENT_TYPES[ev.event_type] || EVENT_TYPES.application;
                                 return (
-                                    <div key={j} title={`${ev.title} — ${ev.university_name}`} style={{
-                                        display: "flex", alignItems: "center", gap: "0.25rem",
-                                        background: `${t.color}1a`, borderLeft: `2px solid ${t.color}`,
-                                        borderRadius: "0.25rem", padding: "0.1rem 0.25rem", overflow: "hidden",
-                                    }}>
+                                    <button key={j} type="button" onClick={() => onOpenEvent(ev, d)}
+                                        title={`${t.label}: ${ev.university_name}`}
+                                        aria-label={`${t.label} — ${ev.university_name}. Отвори`}
+                                        style={{
+                                            display: "flex", alignItems: "center", gap: "0.25rem", width: "100%", minWidth: 0,
+                                            background: `${t.color}1a`, border: "none", borderLeft: `2px solid ${t.color}`,
+                                            borderRadius: "0.25rem", padding: "0.15rem 0.25rem", overflow: "hidden",
+                                            cursor: "pointer", fontFamily: "inherit", textAlign: "left",
+                                        }}>
                                         <span style={{ width: 5, height: 5, borderRadius: "50%", background: t.color, flexShrink: 0 }} />
-                                        <span style={{ fontSize: "9px", fontWeight: 600, color: "var(--brand-text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                        <span style={{ fontSize: "9px", fontWeight: 600, color: "var(--brand-text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", minWidth: 0 }}>
                                             {ev.university_name.replace(/\s*[„"].*/, "").replace(/–.*/, "").trim().split(" ").slice(0, 2).join(" ")}
                                         </span>
-                                    </div>
+                                    </button>
                                 );
                             })}
                             {dayEvents.length > 3 && (
-                                <span style={{ fontSize: "9px", fontWeight: 700, color: "var(--brand-muted)" }}>
-                                    +{dayEvents.length - 3}
-                                </span>
+                                <button type="button" onClick={() => onOpenDay(d, dayEvents)}
+                                    aria-label={`Покажи всички ${dayEvents.length} събития за ${d} ${MONTHS_BG[month]}`}
+                                    style={{
+                                        width: "100%", padding: "0.2rem 0.25rem", background: "var(--brand-surface-2)",
+                                        border: "1px solid var(--brand-border)", borderRadius: "0.25rem", cursor: "pointer",
+                                        fontFamily: "inherit", fontSize: "10px", fontWeight: 700, color: "var(--brand-cyan)",
+                                    }}>
+                                    +{dayEvents.length - 3} още
+                                </button>
                             )}
                         </div>
                     );
@@ -337,6 +358,10 @@ const Calendar = () => {
     }, [isDesktop]);
 
     const [loadError, setLoadError] = useState(false);
+    // dialog: null | { day: { d, events } } | { event, day? }
+    const [dialog, setDialog] = useState(null);
+    const closeDialog = useCallback(() => setDialog(null), []);
+    const openEvent = useCallback((event, day) => setDialog({ event, day: day && day.events ? day : null }), []);
 
     const loadEvents = useCallback(async () => {
         setLoading(true);
@@ -577,6 +602,8 @@ const Calendar = () => {
                             today={today}
                             onPrev={() => setMonthDate((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1))}
                             onNext={() => setMonthDate((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1))}
+                            onOpenEvent={(ev) => openEvent(ev)}
+                            onOpenDay={(d, evs) => setDialog({ day: { d, events: evs } })}
                         />
                         {/* Списък на събитията за месеца под решетката */}
                         {monthEvents.length > 0 ? (
@@ -584,7 +611,7 @@ const Calendar = () => {
                                 <h3 style={{ margin: 0, fontSize: "13px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--brand-muted)" }}>
                                     Събития през {MONTHS_BG[monthDate.getMonth()]} {monthDate.getFullYear()}
                                 </h3>
-                                {monthEvents.map((ev) => <EventCard key={ev.id} event={ev} today={today} />)}
+                                {monthEvents.map((ev) => <EventCard key={ev.id} event={ev} today={today} onOpen={openEvent} />)}
                             </div>
                         ) : (
                             <p style={{ margin: 0, textAlign: "center", color: "var(--brand-muted)", fontSize: "13px", padding: "1rem" }}>
@@ -627,7 +654,7 @@ const Calendar = () => {
                                 </div>
                                 {group.items.map((ev) => (
                                     <m.div key={ev.id} variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] } } }}>
-                                        <EventCard event={ev} today={today} />
+                                        <EventCard event={ev} today={today} onOpen={openEvent} />
                                     </m.div>
                                 ))}
                             </div>
@@ -636,6 +663,46 @@ const Calendar = () => {
                     </div>
                 )}
             </div>
+
+            <CalendarModal
+                open={!!dialog}
+                onClose={closeDialog}
+                title={dialog?.event ? dialog.event.university_name : dialog?.day ? `${dialog.day.d} ${MONTHS_BG[monthDate.getMonth()]} ${monthDate.getFullYear()}` : ""}
+                subtitle={dialog?.event ? "Избери дали да ти напомняме само за този университет." : dialog?.day ? `${dialog.day.events?.length || 0} събития — избери едно` : ""}
+            >
+                {dialog?.event ? (
+                    <>
+                        {dialog.day && (
+                            <button type="button" onClick={() => setDialog({ day: dialog.day })} style={{
+                                alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: "0.3rem", minHeight: "44px",
+                                background: "transparent", border: "none", color: "var(--brand-cyan)", fontSize: "13px", fontWeight: 600,
+                                fontFamily: "inherit", cursor: "pointer", padding: 0,
+                            }}>
+                                <ChevronLeft size={16} strokeWidth={1.5} aria-hidden="true" /> Всички събития от деня
+                            </button>
+                        )}
+                        <EventCard event={dialog.event} today={today} />
+                        <EventReminderAction universityName={dialog.event.university_name} />
+                    </>
+                ) : dialog?.day ? (
+                    dialog.day.events.map((ev) => {
+                        const t = EVENT_TYPES[ev.event_type] || EVENT_TYPES.application;
+                        return (
+                            <button key={ev.id} type="button" onClick={() => setDialog({ event: ev, day: dialog.day })} style={{
+                                ...S.surface, display: "flex", alignItems: "center", gap: "0.75rem", width: "100%", minHeight: "56px",
+                                padding: "0.75rem 1rem", textAlign: "left", cursor: "pointer", fontFamily: "inherit",
+                                borderLeft: `3px solid ${t.color}`, color: "var(--brand-text)",
+                            }}>
+                                <span style={{ flex: 1, minWidth: 0 }}>
+                                    <span style={{ display: "block", fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: t.color }}>{t.label}</span>
+                                    <span style={{ display: "block", fontSize: "13.5px", fontWeight: 700 }}>{ev.university_name}</span>
+                                </span>
+                                <ChevronRight size={16} strokeWidth={1.5} style={{ color: "var(--brand-muted)", flexShrink: 0 }} aria-hidden="true" />
+                            </button>
+                        );
+                    })
+                ) : null}
+            </CalendarModal>
         </div>
     );
 };
