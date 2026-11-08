@@ -7,6 +7,7 @@ import {
     GraduationCap,
     Heart,
     Database,
+    Mail,
 } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 import { m } from "motion/react";
@@ -26,6 +27,7 @@ const LINK_COLUMNS = [
         links: [
             { label: "За нас", icon: Info, href: "/about/" },
             { label: "Лиценз GNU", icon: ShieldCheck, href: "https://www.gnu.org/licenses/gpl-3.0.html", external: true },
+            { label: "uniput1000@gmail.com", icon: Mail, href: "mailto:uniput1000@gmail.com", mail: true },
         ],
     },
     {
@@ -58,6 +60,13 @@ function FooterLink({ link }) {
     const onEnter = e => { e.currentTarget.style.color = "var(--brand-cyan)"; };
     const onLeave = e => { e.currentTarget.style.color = "var(--brand-muted)"; };
 
+    if (link.mail) {
+        return (
+            <a href={link.href} style={style} onMouseEnter={onEnter} onMouseLeave={onLeave}>
+                {content}
+            </a>
+        );
+    }
     if (link.external) {
         return (
             <a href={link.href} target="_blank" rel="noreferrer" style={style} onMouseEnter={onEnter} onMouseLeave={onLeave}>

@@ -10,6 +10,7 @@
 // Само "erasable" TypeScript — файлът се зарежда и от Deno, и от Node (type stripping).
 
 export const SITE = "https://uniput.eu";
+export const SUPPORT_EMAIL = "uniput1000@gmail.com";
 const FONT = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif";
 const MONO = "'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace";
 
@@ -153,6 +154,7 @@ export function layout(o: EmailOptions): string {
           <td align="center" style="padding:26px 12px 0;font-family:${FONT};font-size:12px;line-height:1.7;color:${C.muted};">
             <strong style="color:${C.body};">УниПът</strong> &middot; безплатният пътеводител за кандидат-студенти<br>
             ${o.footerReason}${unsub}<br>
+            Въпроси? <a href="mailto:${SUPPORT_EMAIL}" style="color:${C.cyan};text-decoration:none;">${SUPPORT_EMAIL}</a><br>
             <a href="${SITE}/privacy/" target="_blank" style="color:${C.muted};text-decoration:underline;">Поверителност</a> &nbsp;&middot;&nbsp;
             <a href="${SITE}/terms/" target="_blank" style="color:${C.muted};text-decoration:underline;">Условия</a> &nbsp;&middot;&nbsp;
             <a href="${SITE}" target="_blank" style="color:${C.muted};text-decoration:underline;">uniput.eu</a>
