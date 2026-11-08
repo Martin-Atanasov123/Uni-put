@@ -58,7 +58,7 @@ async function sendEmail(to: string, subject: string, text: string, html?: strin
 
 function confirmEmailBody(token: string, uni: string | null): string {
     const link = `${SITE_URL}/reminders/confirm?token=${token}`;
-    const scope = uni ? `за срокове в „${uni}"` : "за всички срокове за кандидатстване";
+    const scope = uni ? `за срокове в „${uni}"` : "за всички дати за прием (кандидатстване, изпит, класиране, записване)";
     return [
         "Здравей,",
         "",
@@ -75,7 +75,7 @@ function confirmEmailBody(token: string, uni: string | null): string {
 
 function confirmEmailHtml(token: string, uni: string | null): string {
     const link = `${SITE_URL}/reminders/confirm?token=${token}`;
-    const scope = uni ? `за срокове в <strong style="color:#F1F5F9;">${esc(uni)}</strong>` : "за всички срокове за кандидатстване";
+    const scope = uni ? `за срокове в <strong style="color:#F1F5F9;">${esc(uni)}</strong>` : "за всички дати за прием (кандидатстване, изпит, класиране, записване)";
     return layout({
         preheader: "Потвърди с един клик и ще ти напомним преди всеки срок.",
         eyebrow: "Напомняния за срокове",
