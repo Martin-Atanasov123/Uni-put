@@ -462,7 +462,11 @@ const Profile = () => {
                             { label: "Сравни университети", done: favorites.length >= 2, link: "/favorites", sub: favorites.length >= 2 ? "Готов за сравнение" : "Запази поне 2" },
                         ];
                         const doneCount = progressSteps.filter(s => s.done).length;
-                        const riasecInfo = riasecType ? RIASEC_TYPES[riasecType] : null;
+                        // Пълните резултати са само в този браузър (в акаунта се пази типът) — без тях няма какво да се покаже.
+    const hasSavedRiasecResults = (() => {
+        try { return !!JSON.parse(localStorage.getItem("riasec_last_results") || "null")?.scores; } catch { return false; }
+    })();
+    const riasecInfo = riasecType ? RIASEC_TYPES[riasecType] : null;
 
                         return (
                             <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
@@ -538,8 +542,8 @@ const Profile = () => {
                                                 {riasecInfo.label} ({riasecType})
                                             </p>
                                         </div>
-                                        <Link to="/career-advisor/" style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", fontSize: "11px", fontWeight: 700, color: riasecInfo.color, textDecoration: "none", opacity: 0.8, whiteSpace: "nowrap" }}>
-                                            Виж резултата <ArrowRight size={11} />
+                                        <Link to={hasSavedRiasecResults ? "/career-advisor/?view=results" : "/career-advisor/"} style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", fontSize: "11px", fontWeight: 700, color: riasecInfo.color, textDecoration: "none", opacity: 0.8, whiteSpace: "nowrap" }}>
+                                            {hasSavedRiasecResults ? "Виж резултата" : "Направи теста пак"} <ArrowRight size={11} />
                                         </Link>
                                     </div>
                                 )}
@@ -575,7 +579,7 @@ const Profile = () => {
                                             )) : (
                                                 <div style={{ padding: "2rem", textAlign: "center", background: "var(--brand-input-bg)", border: "1px dashed var(--brand-input-border)", borderRadius: "1rem" }}>
                                                     <Heart size={28} style={{ color: "var(--brand-muted)", opacity: 0.3, margin: "0 auto 0.625rem" }} />
-                                                    <p style={{ margin: "0 0 0.75rem", fontSize: "12px", color: "var(--brand-muted)", fontStyle: "italic" }}>Нямате добавени любими университети</p>
+                                                    <p style={{ margin: "0 0 0.75rem", fontSize: "12px", color: "var(--brand-muted)", fontStyle: "italic" }}>Нямаш добавени любими специалности</p>
                                                     <Link to="/universities/" style={{ display: "inline-flex", padding: "0.4rem 0.875rem", background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.3)", borderRadius: "0.5rem", color: "var(--brand-cyan)", fontSize: "11px", fontWeight: 700, textDecoration: "none" }}>
                                                         Търсене
                                                     </Link>
@@ -740,7 +744,7 @@ const Profile = () => {
                                     Биография
                                 </label>
                                 <textarea
-                                    placeholder="Разкажете ни малко за вашите цели..."
+                                    placeholder="Разкажи ни малко за целите си..."
                                     value={formData.bio}
                                     onChange={e => setFormData({ ...formData, bio: e.target.value })}
                                     style={{

@@ -25,7 +25,7 @@ const ForgotPassword = () => {
             if (error) throw error;
             setSuccess(true);
         } catch {
-            setError("Възникна грешка. Опитайте отново.");
+            setError("Нещо се обърка. Опитай пак.");
         } finally {
             setLoading(false);
         }

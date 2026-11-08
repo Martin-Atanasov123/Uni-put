@@ -47,7 +47,7 @@ const UpdatePassword = () => {
             setSuccess(true);
             setTimeout(() => navigate("/login"), 3000);
         } catch {
-            setError("Възникна грешка при смяна на паролата. Опитайте отново.");
+            setError("Нещо се обърка при смяната на паролата. Опитай пак.");
         } finally {
             setLoading(false);
         }

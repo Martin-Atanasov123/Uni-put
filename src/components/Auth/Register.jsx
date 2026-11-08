@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { m } from "motion/react";
 import { supabase } from "@/lib/supabase";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, Navigate, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import Seo from "@/components/common/Seo";
 import {
     UserPlus, Mail, Lock, Eye, EyeOff, AlertCircle, Loader2,
@@ -32,6 +33,7 @@ const SignUp = () => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
     const location = useLocation();
+    const { user } = useAuth();
 
     // Bug fix (същият като в Login.jsx): без fallback тук `pathname` е undefined
     // при директно посещение на /register → navigate("undefined") → 404.
@@ -46,7 +48,7 @@ const SignUp = () => {
             provider: "google",
             options: { redirectTo: `${SAFE_ORIGIN}${from}` },
         });
-        if (error) setError("Възникна грешка. Опитайте отново.");
+        if (error) setError("Нещо се обърка. Опитай пак.");
     };
 
     const handleSignUp = async e => {
@@ -65,13 +67,13 @@ const SignUp = () => {
             return;
         }
 
-        const { error: signUpError } = await supabase.auth.signUp({ email, password });
+        const { error: signUpError } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${SAFE_ORIGIN}${from}` } });
 
         if (signUpError) {
             if (signUpError.message.includes("already registered")) {
                 setError("Този имейл вече е зает. Пробвай да влезеш.");
             } else {
-                setError("Възникна грешка при регистрацията. Опитайте отново.");
+                setError("Нещо се обърка при регистрацията. Опитай пак.");
             }
             setLoading(false);
         } else {
@@ -87,6 +89,9 @@ const SignUp = () => {
         { ok: /[A-Z]/.test(password), label: "Главна буква" },
         { ok: /[0-9]/.test(password), label: "Цифра" },
     ];
+
+    // Вече влязъл потребител няма какво да прави на страницата за регистрация.
+    if (user) return <Navigate to={fromPath ? from : "/profile"} replace />;
 
     return (
         <div

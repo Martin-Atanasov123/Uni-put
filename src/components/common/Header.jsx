@@ -181,6 +181,9 @@ export default function Header() {
                             <div ref={userMenuRef} style={{ position: "relative" }}>
                                 <button
                                     onClick={() => setIsUserMenuOpen((o) => !o)}
+                                    aria-label="Меню на профила"
+                                    aria-haspopup="menu"
+                                    aria-expanded={isUserMenuOpen}
                                     style={{
                                         display: "flex", alignItems: "center", gap: "0.375rem",
                                         padding: "0.375rem 0.5rem 0.375rem 0.375rem",

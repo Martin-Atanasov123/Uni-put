@@ -238,10 +238,36 @@ const FavoritesPage = () => {
                         >
                             <Heart size={28} style={{ color: "#fca5a5" }} />
                         </div>
-                        <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700, textWrap: "balance" }}>Все още нямаш запазени специалности.</h3>
+                        <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700, textWrap: "balance" }}>
+                            {allFavoritesData.length > 0 ? "Нищо не съвпада с този избор." : "Все още нямаш запазени специалности."}
+                        </h3>
                         <p style={{ margin: "0.5rem auto 1.25rem", color: "var(--brand-muted)", fontSize: "14px", maxWidth: "400px", lineHeight: 1.6 }}>
-                            Намери специалност, която те интересува, и я добави тук с натискане на сърцето.
+                            {allFavoritesData.length > 0
+                                ? "Любимите ти са наред — опитай с друга дума или махни филтъра по град."
+                                : "Намери специалност, която те интересува, и я добави тук с натискане на сърцето."}
                         </p>
+                        {allFavoritesData.length > 0 ? (
+                            <button
+                                type="button"
+                                onClick={() => { setSearch(""); setCityFilter("Всички"); }}
+                                style={{
+                                    display: "inline-flex",
+                                    minHeight: "44px",
+                                    alignItems: "center",
+                                    padding: "0.6rem 1.25rem",
+                                    background: "transparent",
+                                    border: "1px solid var(--brand-border)",
+                                    borderRadius: "0.625rem",
+                                    color: "var(--brand-text)",
+                                    fontSize: "13px",
+                                    fontWeight: 700,
+                                    fontFamily: "inherit",
+                                    cursor: "pointer",
+                                }}
+                            >
+                                Изчисти филтрите
+                            </button>
+                        ) : (
                         <Link
                             to="/universities/"
                             style={{
@@ -257,6 +283,7 @@ const FavoritesPage = () => {
                         >
                             Към университетите
                         </Link>
+                        )}
                     </m.div>
                 ) : (
                     <m.div

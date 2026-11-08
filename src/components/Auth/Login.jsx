@@ -12,7 +12,8 @@ import {
     EyeOff,
     GraduationCap,
 } from "lucide-react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, Navigate, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import Seo from "@/components/common/Seo";
 
 const SAFE_ORIGIN = import.meta.env.VITE_APP_URL || window.location.origin;
@@ -20,10 +21,10 @@ const SAFE_ORIGIN = import.meta.env.VITE_APP_URL || window.location.origin;
 const safeAuthError = msg => {
     const map = {
         "Invalid login credentials": "Невалиден имейл или парола.",
-        "Email not confirmed": "Моля потвърдете имейла си.",
-        "Too many requests": "Твърде много опити. Опитайте по-късно.",
+        "Email not confirmed": "Потвърди имейла си — изпратихме ти линк.",
+        "Too many requests": "Твърде много опити. Опитай пак след малко.",
     };
-    return map[msg] || "Възникна грешка. Опитайте отново.";
+    return map[msg] || "Нещо се обърка. Опитай пак.";
 };
 
 const Login = () => {
@@ -35,6 +36,7 @@ const Login = () => {
 
     const navigate = useNavigate();
     const location = useLocation();
+    const { user } = useAuth();
     // Bug fix: преди беше `?.pathname + (?.search || "") || "/calculator"`.
     // Когато няма state.from (потребител отива директно на /login), pathname
     // връща undefined, конкатенацията дава "undefined" (string!), което
@@ -62,6 +64,9 @@ const Login = () => {
         else { navigate(from); }
         setLoading(false);
     };
+
+    // Вече влязъл потребител няма какво да прави на страницата за вход.
+    if (user) return <Navigate to={fromPath ? from : "/profile"} replace />;
 
     return (
         <div
