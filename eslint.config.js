@@ -23,7 +23,8 @@ export default [
     rules: {
       ...js.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      // ^m$ — `m` от motion/react се ползва като <m.div>; без eslint-plugin-react линтът не го вижда
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]|^m$' }],
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },

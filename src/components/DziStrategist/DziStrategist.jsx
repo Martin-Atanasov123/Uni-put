@@ -13,6 +13,7 @@ import {
 import { dziService } from "@/services/dziService";
 import Seo from "@/components/common/Seo";
 import JsonLd from "@/components/common/JsonLd";
+import DziPlanner from "@/components/DziStrategist/DziPlanner";
 
 const HOWTO_SCHEMA = {
     "@context": "https://schema.org",
@@ -223,6 +224,12 @@ export default function DziStrategist() {
                         Българският език и литература е задължителен. Вторият ДЗИ е твоят избор — и той решава колко специалности ще можеш да караш. Ето подредбата по официалните формули за балообразуване.
                     </p>
                 </m.div>
+
+                <DziPlanner specialties={specialties} />
+
+                <h2 style={{ margin: "0 0 1rem", fontSize: "1.25rem", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--brand-text)" }}>
+                    Общата класация
+                </h2>
 
                 {/* Ranking */}
                 {loading && (

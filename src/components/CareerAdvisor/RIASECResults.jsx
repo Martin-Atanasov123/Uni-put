@@ -696,7 +696,7 @@ const RIASECResults = ({ results, onRestart }) => {
                     <Calculator size={18} /> Изчисли бал за тези специалности <ArrowRight size={16} />
                 </Link>
                 <Link
-                    to="/dzi-strateg"
+                    to={`/dzi-strateg?s=${encodeURIComponent([...new Set(specialties.map((s) => s.name).filter(Boolean))].slice(0, 8).join("|"))}`}
                     style={{
                         display: "inline-flex", alignItems: "center", gap: "0.4rem",
                         fontSize: "13px", fontWeight: 700, color: "var(--brand-cyan)", textDecoration: "none",

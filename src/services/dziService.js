@@ -60,6 +60,26 @@ export const dziService = {
     },
 
     /**
+     * Програми (специалност × университет) с коефициентите им за избрани специалности —
+     * вход за обратния калкулатор (src/lib/dziPlan.js).
+     * @param {string[]} specialties  точни имена (до 12)
+     * @returns {Promise<Array<{university_name:string, specialty:string, city:string|null, coefficients:Array}>>}
+     */
+    async getPlanRows(specialties) {
+        const names = [...new Set((specialties || []).map(s => String(s).trim()).filter(Boolean))].slice(0, 12);
+        if (!names.length) return [];
+        const { data, error } = await supabase
+            .from('universities')
+            .select('university_name, specialty, city, coefficients')
+            .in('specialty', names)
+            .eq('academic_year', ADMISSION_YEAR)
+            .order('specialty')
+            .order('university_name');
+        if (error) throw error;
+        return data || [];
+    },
+
+    /**
      * Сортиран списък с уникални имена на специалности (за autocomplete).
      * @returns {Promise<string[]>}
      */

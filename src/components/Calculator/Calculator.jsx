@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-// eslint-disable-next-line no-unused-vars
 import { m, AnimatePresence } from "motion/react";
 import { supabase } from "@/lib/supabase";
 import { fetchDistinct } from "@/services/universityService";
