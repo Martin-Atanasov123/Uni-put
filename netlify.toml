@@ -54,6 +54,16 @@
 # и с наклонена черта (/login и /login/*) — за нула съмнение при trailing slash.
 # Всичко останало (несъществуващи адреси) → истински 404 + noindex.
 
+# Второ име за същия sitemap. Search Console пази статус „Couldn't fetch" за
+# /sitemap.xml от първото (неуспешно) подаване и не го нулира при повторно
+# подаване на същия адрес, въпреки че Googlebot го тегли без проблем (URL
+# Inspection → Live test: „URL is available to Google", 12.11.2026). Подаването
+# под нов адрес кара Google да го изтегли на чисто. Съдържанието е едно и също.
+[[redirects]]
+  from = "/sitemap-pages.xml"
+  to = "/sitemap.xml"
+  status = 200
+
 [[redirects]]
   from = "/login"
   to = "/index.html"

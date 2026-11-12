@@ -149,8 +149,8 @@ export default function SpecialtyPage() {
         "@type": "BreadcrumbList",
         itemListElement: [
             { "@type": "ListItem", position: 1, name: "Начало", item: "https://uniput.eu/" },
-            { "@type": "ListItem", position: 2, name: "Специалности", item: "https://uniput.eu/universities" },
-            { "@type": "ListItem", position: 3, name, item: `https://uniput.eu/specialnosti/${specSlug}` },
+            { "@type": "ListItem", position: 2, name: "Специалности", item: "https://uniput.eu/specialnosti/" },
+            { "@type": "ListItem", position: 3, name, item: `https://uniput.eu/specialnosti/${specSlug}/` },
         ],
     };
 
@@ -166,11 +166,11 @@ export default function SpecialtyPage() {
             <JsonLd data={breadcrumbSchema} />
 
             <div style={{ maxWidth: "72rem", margin: "0 auto" }}>
-                <Link to="/universities/" style={{
+                <Link to="/specialnosti/" style={{
                     display: "inline-flex", alignItems: "center", gap: "0.375rem",
                     fontSize: "0.8125rem", color: "var(--brand-muted)", textDecoration: "none", marginBottom: "1.25rem",
                 }}>
-                    <ArrowLeft size={14} /> Всички университети
+                    <ArrowLeft size={14} /> Всички специалности
                 </Link>
 
                 <div style={{

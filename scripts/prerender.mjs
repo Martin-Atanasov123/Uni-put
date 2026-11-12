@@ -79,6 +79,21 @@ const STATIC_ROUTES = [
         image: `${SITE_URL}/og/universities.png`,
     },
     {
+        // Keep in sync с <Seo> props в SpecialtiesIndex.jsx.
+        path: "/specialnosti",
+        title: `Специалности в България — къде се изучават, прием ${ADMISSION_YEAR_SHORT}`,
+        description: "Азбучен списък на специалностите, които се изучават в поне два български университета. Виж къде се предлага всяка, по каква формула се образува балът и изчисли своя — безплатно.",
+        image: DEFAULT_IMAGE,
+        schemas: [{
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+                { "@type": "ListItem", position: 1, name: "Начало", item: `${SITE_URL}/` },
+                { "@type": "ListItem", position: 2, name: "Специалности", item: `${SITE_URL}/specialnosti/` },
+            ],
+        }],
+    },
+    {
         path: "/dormitories",
         title: `${DORMITORIES} студентски общежития в България за ${ADMISSION_YEAR_SHORT}`,
         description: `Сравни ${DORMITORIES} студентски общежития в ${DORMITORY_CITIES} града. Месечен наем, депозит, разстояние до университета и транспортни линии — на едно място. Данни към ${ADMISSION_YEAR_SHORT} г.`,
@@ -178,6 +193,7 @@ const PAGE_H1 = {
     "/calculator": "Калкулатор за приемен бал 2026",
     "/career-advisor": "Безплатен RIASEC кариерен тест",
     "/universities": "Висши училища в България за прием 2026",
+    "/specialnosti": `Специалности в България за прием ${ADMISSION_YEAR_SHORT}`,
     "/dormitories": "Студентски общежития в България",
     "/dzi-strateg": "Кой втори ДЗИ да избера",
     "/calendar": "Календар за прием 2026",
@@ -191,6 +207,7 @@ const SEO_LINKS = [
     { href: "/calculator/", text: "Калкулатор за приемен бал" },
     { href: "/career-advisor/", text: "Кариерен тест" },
     { href: "/universities/", text: "Университети" },
+    { href: "/specialnosti/", text: "Специалности" },
     { href: "/calendar/", text: "Календар за прием" },
     { href: "/dormitories/", text: "Студентски общежития" },
 ];
@@ -235,6 +252,26 @@ function buildUniversitiesIndexBody(route, uniIndex) {
         `<h2>Всички висши училища</h2>` +
         `<ul>${items}</ul>` +
         `<nav aria-label="Основни секции">${navLinks("/universities/")}</nav>` +
+        `</div>`
+    );
+}
+
+// Хъб страницата /specialnosti/ — огледало на SpecialtiesIndex.jsx. Единственото
+// място, което линква ВСИЧКИ per-специалност страници с истински <a>; без него
+// те са orphan-и (Search Console, ноември 2026: Google знаеше 11 URL-а от 234).
+function buildSpecialtiesIndexBody(route, specIndex) {
+    const items = specIndex
+        .map((s) => `<li><a href="/specialnosti/${esc(s.slug)}/">${esc(s.name)}</a> — ${s.unis} университета</li>`)
+        .join("");
+    return (
+        WRAP_OPEN +
+        `<h1 style="font-size:1.75rem;font-weight:800;letter-spacing:-0.02em">${esc(PAGE_H1[route.path])}</h1>` +
+        `<p>Тук са специалностите, които се изучават в поне два университета. Избери една и ще видиш ` +
+        `къде се предлага, по каква формула се образува балът и какъв е бил минималният бал за ` +
+        `прием, където има официални данни.</p>` +
+        `<ul>${items}</ul>` +
+        `<p><a href="/calculator/">Изчисли моя бал</a> · <a href="/universities/">Виж всички университети</a></p>` +
+        `<nav aria-label="Основни секции">${navLinks("/specialnosti/")}</nav>` +
         `</div>`
     );
 }
@@ -347,7 +384,7 @@ function buildSpecialtyBody(route) {
 
     return (
         WRAP_OPEN +
-        `<p><a href="/universities/">Всички университети</a></p>` +
+        `<p><a href="/specialnosti/">Всички специалности</a></p>` +
         `<h1 style="font-size:1.75rem;font-weight:800;letter-spacing:-0.02em">${esc(name)} — прием ${ADMISSION_YEAR_SHORT}</h1>` +
         `<p>${esc(route.description)}</p>` +
         intro +
@@ -357,9 +394,10 @@ function buildSpecialtyBody(route) {
     );
 }
 
-function buildBody(route, uniIndex) {
+function buildBody(route, uniIndex, specIndex) {
     if (route.uni) return buildUniversityBody(route);
     if (route.spec) return buildSpecialtyBody(route);
+    if (route.path === "/specialnosti") return buildSpecialtiesIndexBody(route, specIndex);
     if (route.path === "/universities" && uniIndex.length) {
         return buildUniversitiesIndexBody(route, uniIndex);
     }
@@ -491,7 +529,7 @@ async function fetchUniversityRoutes() {
                 "@context": "https://schema.org",
                 "@type": "EducationalOrganization",
                 name,
-                url: `${SITE_URL}/universities/${slug}`,
+                url: `${SITE_URL}/universities/${slug}/`,
                 ...(primaryCity && {
                     address: { "@type": "PostalAddress", addressLocality: primaryCity, addressCountry: "BG" },
                 }),
@@ -503,8 +541,8 @@ async function fetchUniversityRoutes() {
                 "@type": "BreadcrumbList",
                 itemListElement: [
                     { "@type": "ListItem", position: 1, name: "Начало", item: `${SITE_URL}/` },
-                    { "@type": "ListItem", position: 2, name: "Университети", item: `${SITE_URL}/universities` },
-                    { "@type": "ListItem", position: 3, name, item: `${SITE_URL}/universities/${slug}` },
+                    { "@type": "ListItem", position: 2, name: "Университети", item: `${SITE_URL}/universities/` },
+                    { "@type": "ListItem", position: 3, name, item: `${SITE_URL}/universities/${slug}/` },
                 ],
             },
         ];
@@ -622,8 +660,8 @@ async function fetchSpecialtyRoutes() {
             "@type": "BreadcrumbList",
             itemListElement: [
                 { "@type": "ListItem", position: 1, name: "Начало", item: `${SITE_URL}/` },
-                { "@type": "ListItem", position: 2, name: "Специалности", item: `${SITE_URL}/universities` },
-                { "@type": "ListItem", position: 3, name: sp, item: `${SITE_URL}/specialnosti/${slug}` },
+                { "@type": "ListItem", position: 2, name: "Специалности", item: `${SITE_URL}/specialnosti/` },
+                { "@type": "ListItem", position: 3, name: sp, item: `${SITE_URL}/specialnosti/${slug}/` },
             ],
         }];
 
@@ -662,6 +700,7 @@ async function main() {
     let routes = [...STATIC_ROUTES];
     // Индекс за хъб страницата /universities/ — сортиран по име, както в UI-я.
     let uniIndex = [];
+    let specIndex = [];
     if (INCLUDE_DYNAMIC) {
         console.log("📡 Дърпам per-uni метаданни от Supabase…");
         const uniRoutes = await fetchUniversityRoutes();
@@ -673,6 +712,13 @@ async function main() {
 
         const specRoutes = await fetchSpecialtyRoutes();
         routes.push(...specRoutes);
+        specIndex = specRoutes
+            .map((r) => ({
+                name: r.spec.name,
+                slug: r.spec.slug,
+                unis: new Set(r.spec.programs.map((p) => p.university_name)).size,
+            }))
+            .sort((a, b) => a.name.localeCompare(b.name, "bg"));
         console.log(`   + ${specRoutes.length} per-specialty routes`);
     } else {
         console.log("ℹ Per-uni prerender изключен (SITEMAP_DYNAMIC≠1).");
@@ -684,7 +730,10 @@ async function main() {
         // "/" вече е dist/index.html — презаписваме го с правилния head също.
         const outDir = route.path === "/" ? DIST : resolve(DIST, `.${route.path}`);
         await mkdir(outDir, { recursive: true });
-        const body = buildBody(route, uniIndex);
+        // Хъбът без данни би бил празен списък → thin страница. Без dynamic режим
+        // не го пишем изобщо (в Netlify режимът е включен).
+        if (route.path === "/specialnosti" && !specIndex.length) continue;
+        const body = buildBody(route, uniIndex, specIndex);
         let html = injectHead(shell, buildHead(route));
         html = injectBody(html, body);
         await writeFile(resolve(outDir, "index.html"), html, "utf8");

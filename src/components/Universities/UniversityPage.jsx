@@ -138,7 +138,7 @@ export default function UniversityPage() {
         "@context": "https://schema.org",
         "@type": "EducationalOrganization",
         name: uniName,
-        url: `https://uniput.eu/universities/${uniSlug}`,
+        url: `https://uniput.eu/universities/${uniSlug}/`,
         ...(primaryCity && {
             address: { "@type": "PostalAddress", addressLocality: primaryCity, addressCountry: "BG" },
         }),
@@ -152,8 +152,8 @@ export default function UniversityPage() {
         "@type": "BreadcrumbList",
         itemListElement: [
             { "@type": "ListItem", position: 1, name: "Начало", item: "https://uniput.eu/" },
-            { "@type": "ListItem", position: 2, name: "Университети", item: "https://uniput.eu/universities" },
-            { "@type": "ListItem", position: 3, name: uniName, item: `https://uniput.eu/universities/${uniSlug}` },
+            { "@type": "ListItem", position: 2, name: "Университети", item: "https://uniput.eu/universities/" },
+            { "@type": "ListItem", position: 3, name: uniName, item: `https://uniput.eu/universities/${uniSlug}/` },
         ],
     };
 

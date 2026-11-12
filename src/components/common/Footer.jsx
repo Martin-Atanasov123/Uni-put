@@ -26,6 +26,8 @@ const LINK_COLUMNS = [
         title: "Проектът",
         links: [
             { label: "За нас", icon: Info, href: "/about/" },
+            { label: "Всички специалности", icon: BookOpen, href: "/specialnosti/" },
+            { label: "Всички университети", icon: Database, href: "/universities/" },
             { label: "Лиценз GNU", icon: ShieldCheck, href: "https://www.gnu.org/licenses/gpl-3.0.html", external: true },
             { label: "uniput1000@gmail.com", icon: Mail, href: "mailto:uniput1000@gmail.com", mail: true },
         ],

@@ -48,6 +48,7 @@ const STATIC_ROUTES = [
     { path: "/calculator",     changefreq: "weekly",  priority: "0.9" },
     { path: "/career-advisor", changefreq: "monthly", priority: "0.9" },
     { path: "/universities",   changefreq: "weekly",  priority: "0.8" },
+    { path: "/specialnosti",   changefreq: "weekly",  priority: "0.8", dynamicOnly: true },
     { path: "/calendar",       changefreq: "weekly",  priority: "0.8" },
     { path: "/dormitories",    changefreq: "monthly", priority: "0.7" },
     { path: "/dzi-strateg",    changefreq: "monthly", priority: "0.7" },
@@ -56,12 +57,18 @@ const STATIC_ROUTES = [
     { path: "/privacy",        changefreq: "yearly",  priority: "0.3" },
 ];
 
+// <lastmod> = датата на билда. Данните и prerender-натият HTML се регенерират от
+// базата при всеки deploy, така че датата е вярна; Google ползва lastmod (а
+// игнорира changefreq/priority), за да реши кога да обходи страницата отново.
+const LASTMOD = new Date().toISOString().slice(0, 10);
+
 function urlEntry({ path, changefreq, priority }) {
     // Trailing slash — Netlify 301-redirect-ва no-slash → slash, затова sitemap-ът
     // трябва да изброява реалните 200 URL-и (slash-версиите), не redirect-ите.
     const slashed = path === "/" ? "/" : "/" + path.replace(/^\/|\/$/g, "") + "/";
     return `  <url>
     <loc>${SITE_URL}${slashed}</loc>
+    <lastmod>${LASTMOD}</lastmod>
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
   </url>`;
@@ -147,7 +154,8 @@ async function fetchDynamicRoutes() {
 async function main() {
     await loadDotEnvIfPresent(resolve(__dirname, "..", ".env"));
 
-    const routes = [...STATIC_ROUTES];
+    // /specialnosti/ хъбът се prerender-ва само в dynamic режим (иска данни от базата).
+    const routes = STATIC_ROUTES.filter((r) => INCLUDE_DYNAMIC_ROUTES || !r.dynamicOnly);
 
     if (INCLUDE_DYNAMIC_ROUTES) {
         console.log("📡 Извличам университети и специалности от Supabase…");

@@ -15,6 +15,7 @@ const CITIES_CACHE_KEY = 'uniput_cities_cache_v2';
 const CITIES_CACHE_TTL = 1000 * 60 * 60 * 24; // 24h
 const UNI_NAMES_CACHE_KEY = 'uniput_uni_names_cache_v2';
 const SPEC_NAMES_CACHE_KEY = 'uniput_spec_names_cache_v2';
+const SPEC_INDEX_CACHE_KEY = 'uniput_spec_index_cache_v1';
 
 /**
  * Уникални стойности на колона (faculty/city/university_name/specialty) за текущата
@@ -337,6 +338,55 @@ export const universityService = {
             }
         }
         return { programs, riasec, minScores };
+    },
+
+    /**
+     * Индекс за хъб страницата /specialnosti/: всяка специалност, предлагана в
+     * поне 2 университета (същият праг като prerender.mjs и sitemap-а — под него
+     * няма агрегатна страница), с броя университети. Кешира се 24h.
+     * @returns {Promise<Array<{ name: string, unis: number }>>}
+     */
+    async getSpecialtyIndex() {
+        try {
+            const raw = localStorage.getItem(SPEC_INDEX_CACHE_KEY);
+            if (raw) {
+                const { ts, data } = JSON.parse(raw);
+                if (Date.now() - ts < CITIES_CACHE_TTL && Array.isArray(data) && data.length) {
+                    return data;
+                }
+            }
+        } catch { /* corrupt cache */ }
+
+        // PostgREST реже на 1000 реда → странираме, иначе специалности изпадат.
+        const PAGE = 1000;
+        const bySpec = new Map();
+        for (let from = 0; ; from += PAGE) {
+            const { data, error } = await supabase
+                .from('universities')
+                .select('university_name,specialty')
+                .eq('academic_year', ADMISSION_YEAR)
+                .order('id', { ascending: true })
+                .range(from, from + PAGE - 1);
+            if (error) throw error;
+            if (!data || !data.length) break;
+            for (const row of data) {
+                if (!row.specialty) continue;
+                if (!bySpec.has(row.specialty)) bySpec.set(row.specialty, new Set());
+                bySpec.get(row.specialty).add(row.university_name);
+            }
+            if (data.length < PAGE) break;
+        }
+
+        const index = [...bySpec.entries()]
+            .filter(([, unis]) => unis.size >= 2)
+            .map(([name, unis]) => ({ name, unis: unis.size }))
+            .sort((a, b) => a.name.localeCompare(b.name, 'bg'));
+
+        try {
+            localStorage.setItem(SPEC_INDEX_CACHE_KEY,
+                JSON.stringify({ ts: Date.now(), data: index }));
+        } catch { /* localStorage full */ }
+        return index;
     },
 
     async getCities() {
