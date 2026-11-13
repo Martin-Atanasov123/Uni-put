@@ -124,6 +124,12 @@ def load_minmax(path):
     row = [str(x).strip() for x in raw.iloc[h]]
     ci = [i for i, c in enumerate(row) if c == "Код"]  # [училище, паралелка]
     sc, cc = ci[0], ci[1]
+    # Колоните с балове се намират по „Общо“ (мин., макс.) — в някои справки (2023, етапи 2–4)
+    # между името на паралелката и бала има допълнителна колона „Брой паралелки“.
+    ob = [i for i, c in enumerate(row) if c == "Общо"]
+    if len(ob) < 2:
+        raise ValueError(f"{path}: не намирам двете колони „Общо“ в реда със заглавията")
+    mn, mx = ob[0], ob[1]
     out = []
     for i in range(h + 1, len(raw)):
         r = raw.iloc[i]
@@ -133,8 +139,8 @@ def load_minmax(path):
         out.append({
             "school_code": norm_code(r[sc]), "school_name": re.sub(r"\s+", " ", str(r[sc + 1]).strip()),
             "class_code": norm_code(r[cc]), "class_name": re.sub(r"\s+", " ", str(r[cc + 1]).strip()),
-            "min_total": num(cc + 2), "min_m": num(cc + 3), "min_f": num(cc + 4),
-            "max_total": num(cc + 5), "max_m": num(cc + 6), "max_f": num(cc + 7),
+            "min_total": num(mn), "min_m": num(mn + 1), "min_f": num(mn + 2),
+            "max_total": num(mx), "max_m": num(mx + 1), "max_f": num(mx + 2),
         })
     return out
 

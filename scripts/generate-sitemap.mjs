@@ -52,6 +52,7 @@ const STATIC_ROUTES = [
     { path: "/calendar",       changefreq: "weekly",  priority: "0.8" },
     { path: "/dormitories",    changefreq: "monthly", priority: "0.7" },
     { path: "/dzi-strateg",    changefreq: "monthly", priority: "0.7" },
+    { path: "/priem-7-klas",   changefreq: "weekly",  priority: "0.8" },
     { path: "/about",          changefreq: "monthly", priority: "0.5" },
     { path: "/terms",          changefreq: "yearly",  priority: "0.3" },
     { path: "/privacy",        changefreq: "yearly",  priority: "0.3" },
