@@ -1,6 +1,7 @@
 import { Mail, Github, Code2, Briefcase, Users, Lightbulb, Database, BookOpen, Calculator, Brain } from "lucide-react";
 import { m } from "motion/react";
 import Seo from "@/components/common/Seo";
+import { RULES_YEAR } from "@/lib/siteStats";
 
 const TEAM = [
     {
@@ -164,7 +165,6 @@ function MemberCard({ member, reverse }) {
 }
 
 const About = () => {
-    const currentYear = new Date().getFullYear();
     return (
         <main
             style={{ minHeight: "100vh", background: "var(--brand-bg)", color: "var(--brand-text)", padding: "7rem 1.5rem 4rem", position: "relative", overflow: "hidden" }}
@@ -290,7 +290,7 @@ const About = () => {
                     </div>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "1.25rem" }}>
                         {[
-                            { label: "Приемни балове и коефициенти", source: `Наредби на МОН, актуализирани за ${currentYear} г.`, href: "https://www.mon.bg" },
+                            { label: "Приемни балове и коефициенти", source: `Правилници за прием ${RULES_YEAR} г. — последните публикувани`, href: "https://www.mon.bg" },
                             { label: "Кариерни профили (RIASEC)", source: "O*NET Career Database (база данни за кариери от O*NET)", href: "https://www.onetonline.org" },
                             { label: "Информация за университети", source: "Официални сайтове на университетите + МОН регистър", href: "https://www.mon.bg" },
                             { label: "Общежития", source: "Информация от публично достъпни университетски справочници", href: null },

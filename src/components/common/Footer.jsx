@@ -10,6 +10,7 @@ import {
     Mail,
 } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
+import { DATA_FRESHNESS_NOTE } from "@/lib/siteStats";
 import { m } from "motion/react";
 
 const LINK_COLUMNS = [
@@ -173,7 +174,7 @@ const Footer = () => {
                             </span>
                         </div>
                         <p style={{ fontSize: "13px", color: "var(--brand-muted)", lineHeight: 1.6, margin: 0 }}>
-                            Твоят дигитален пътеводител към висшето образование в България. Данните са от официалните наредби на МОН, актуализирани за {currentYear} г.
+                            Твоят дигитален пътеводител към висшето образование в България. {DATA_FRESHNESS_NOTE}
                         </p>
                         {/* <span
                             style={{

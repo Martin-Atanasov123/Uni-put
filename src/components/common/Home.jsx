@@ -4,7 +4,7 @@ import { m, useInView } from "motion/react";
 import { useAuth } from "@/hooks/useAuth";
 import Seo from "@/components/common/Seo";
 import JsonLd from "@/components/common/JsonLd";
-import { UNIVERSITIES, SPECIALTIES, CAREERS, RIASEC_SPECIALTIES, ADMISSION_YEAR_SHORT } from "@/lib/siteStats";
+import { UNIVERSITIES, SPECIALTIES, CAREERS, RIASEC_SPECIALTIES, ADMISSION_YEAR_SHORT, DATA_FRESHNESS_NOTE } from "@/lib/siteStats";
 
 // Schema.org structured data — описание на УниПът като организация и сайт.
 // Помага на Google + AI Overview да разберат scope-а на платформата.
@@ -229,7 +229,7 @@ function HeroSection() {
                         }}
                     >
                         <Zap size={11} />
-                        Изцяло обновени данни за 2026 г.
+                        Готови за прием {ADMISSION_YEAR_SHORT} г.
                     </div>
 
                     {/* Headline */}
@@ -565,7 +565,7 @@ const FEATURES = [
     {
         icon: Shield,
         title: "Официална Интеграция",
-        desc: "Всички данни са от публичните регистри на Министерство на Образованието, актуализирани за 2026 г.",
+        desc: DATA_FRESHNESS_NOTE,
     },
     {
         icon: Calculator,

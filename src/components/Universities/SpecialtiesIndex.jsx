@@ -17,7 +17,7 @@ import { universityService } from "@/services/universityService";
 import { slugify } from "@/lib/slugify";
 import Seo from "@/components/common/Seo";
 import JsonLd from "@/components/common/JsonLd";
-import { ADMISSION_YEAR_SHORT } from "@/lib/siteStats";
+import { ADMISSION_YEAR_SHORT, DATA_FRESHNESS_NOTE } from "@/lib/siteStats";
 
 const CARD_BORDER = "1px solid var(--brand-card-border)";
 
@@ -188,7 +188,7 @@ export default function SpecialtiesIndex() {
                 </m.div>
 
                 <p style={{ marginTop: "2rem", fontSize: "12px", color: "var(--brand-muted)", lineHeight: 1.6, maxWidth: "65ch" }}>
-                    Данните са от официалните правилници за прием {ADMISSION_YEAR_SHORT} г. Специалности, които се
+                    {DATA_FRESHNESS_NOTE} Специалности, които се
                     предлагат само в един университет, са на страницата на съответния университет.
                 </p>
             </div>

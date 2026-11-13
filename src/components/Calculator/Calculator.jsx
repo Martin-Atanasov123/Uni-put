@@ -59,7 +59,7 @@ import { CALC_HISTORY_KEY, historyKey, nextHistoryPoints, readLocalHistory, CHAN
 import { copyText, wrapText, roundRect, shareOrCopyLink, shareOrDownloadCanvas } from "@/lib/shareCard";
 import ReportButton from "./ReportButton";
 import { FIELD_LABELS, SLOT_GROUPS } from "@/lib/coefficients_config";
-import { UNIVERSITIES, SPECIALTIES, ADMISSION_YEAR, ADMISSION_YEAR_SHORT } from "@/lib/siteStats";
+import { UNIVERSITIES, SPECIALTIES, ADMISSION_YEAR, ADMISSION_YEAR_SHORT, DATA_FRESHNESS_NOTE } from "@/lib/siteStats";
 
 const SAFE_ORIGIN = import.meta.env.VITE_APP_URL || window.location.origin;
 
@@ -318,7 +318,6 @@ const TIPS = [
 const FACULTY_DATA_CACHE = new Map();
 
 export default function CalculatorPage() {
-    const currentYear = new Date().getFullYear();
     const [allData, setAllData] = useState([]);
     const [minScores, setMinScores] = useState({}); // university_id → {minBall, minBallMax, year, round}
     const [faculties, setFaculties] = useState([]);
@@ -1626,7 +1625,7 @@ export default function CalculatorPage() {
             {/* CLAUDE.md: data source trust signal */}
             {calcResults.length > 0 && (
                 <p style={{ marginTop: "1.5rem", fontSize: "11px", color: "var(--brand-muted)", opacity: 0.6, textAlign: "center", letterSpacing: "0.04em" }}>
-                    Данните са от официалните наредби на МОН, актуализирани за {currentYear} г. Средният бал е изчислен от историческия максимален бал.
+                    {DATA_FRESHNESS_NOTE} Средният бал е изчислен от историческия максимален бал.
                 </p>
             )}
 

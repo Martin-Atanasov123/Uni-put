@@ -11,7 +11,7 @@ import { slugify } from "@/lib/slugify";
 import Seo from "@/components/common/Seo";
 import JsonLd from "@/components/common/JsonLd";
 import AccreditationWarning from "@/components/common/AccreditationWarning";
-import { UNIVERSITIES, RIASEC_SPECIALTIES, ADMISSION_YEAR_SHORT } from "@/lib/siteStats";
+import { UNIVERSITIES, RIASEC_SPECIALTIES, ADMISSION_YEAR_SHORT, DATA_FRESHNESS_NOTE } from "@/lib/siteStats";
 
 const CARD_BORDER = "1px solid var(--brand-card-border)";
 
@@ -128,8 +128,8 @@ export default function UniversityPage() {
     const primaryCity = cities[0] || "";
     // Статус на акредитация (един за целия университет) — за warning банер.
     const accreditationStatus = rows[0]?.accreditation_status;
-    // SEO copy от SEO-AUDIT-REPORT.md §3.2 — enriched за прием 2026
-    const seoTitle = `${uniName} — прием и балообразуване 2026`;
+    // SEO copy от SEO-AUDIT-REPORT.md §3.2 — enriched за предстоящата кампания
+    const seoTitle = `${uniName} — прием и балообразуване ${ADMISSION_YEAR_SHORT}`;
     const seoDesc = `${uniName} — балообразуване ${ADMISSION_YEAR_SHORT}: точните коефициенти за ${totalSpecialties} специалности в ${faculties.length} факултета. Изчисли приемния си бал безплатно.`;
 
     // Schema.org EducationalOrganization — описва университета като субект.
@@ -200,7 +200,7 @@ export default function UniversityPage() {
                     background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
                     WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
                 }}>
-                    Прием в {uniName} 2026
+                    Прием в {uniName} {ADMISSION_YEAR_SHORT}
                 </h1>
 
                 {/* Stat chips */}
@@ -247,7 +247,7 @@ export default function UniversityPage() {
                     background: "var(--brand-surface-2)", border: CARD_BORDER,
                     borderRadius: "0.625rem", fontSize: "0.75rem", color: "var(--brand-muted)",
                 }}>
-                    <Database size={12} /> Данни от наредбите на МОН, актуализирани за 2026 г.
+                    <Database size={12} /> {DATA_FRESHNESS_NOTE}
                 </div>
 
                 {/* Trust warning — показва се само за университети с проблемна акредитация */}
@@ -272,15 +272,15 @@ export default function UniversityPage() {
                         margin: 0, fontSize: "1.125rem", fontWeight: 700,
                         letterSpacing: "-0.01em", color: "var(--brand-text)",
                     }}>
-                        За приема в {uniName} през 2026 г.
+                        За приема в {uniName} през {ADMISSION_YEAR_SHORT} г.
                     </h2>
                     <p style={{
                         margin: "1rem 0 0", fontSize: "0.9375rem",
                         lineHeight: 1.7, color: "var(--brand-muted)", maxWidth: "65ch",
                     }}>
                         {uniName} е сред {UNIVERSITIES} висши училища с публикувани условия
-                        за прием в УниПът. През
-                        академичната 2026 г. приема кандидати за {totalSpecialties}{" "}
+                        за прием в УниПът. По действащия правилник приема кандидати
+                        за {totalSpecialties}{" "}
                         {totalSpecialties === 1 ? "специалност" : "специалности"},
                         разпределени в {faculties.length}{" "}
                         {faculties.length === 1 ? "факултет" : "факултета"}.
