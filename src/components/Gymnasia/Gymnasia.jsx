@@ -71,6 +71,61 @@ function useIsDesktop() {
     return d;
 }
 
+// Ключови дати за прием 2027/2028 — заповеди на МОН от 31.08.2026:
+// РД09-3339 (НВО) и РД09-3340 (прием в VIII клас). Сменят се веднъж годишно.
+const KEY_DATES = [
+    { from: "2027-06-18", label: "НВО по български език и литература", note: "начало 09:00" },
+    { from: "2027-06-21", label: "НВО по математика", note: "начало 09:00" },
+    { from: "2027-07-02", label: "Резултати от НВО", note: "до тази дата вкл." },
+    { from: "2027-07-09", to: "2027-07-12", label: "Подаване на заявленията с желанията", note: "1. етап" },
+    { from: "2027-07-14", label: "Първо класиране" },
+    { from: "2027-07-15", to: "2027-07-19", label: "Записване или заявление за 2. етап" },
+    { from: "2027-07-21", label: "Второ класиране" },
+    { from: "2027-07-22", to: "2027-07-23", label: "Записване след 2. етап" },
+];
+const KEY_DATES_SOURCES = [
+    { href: "https://www.mon.bg/nfs/2026/08/zapoved-org-prov-nvo-iv-vii-x-klas-2026-2027-31082026.pdf", label: "Заповед РД09-3339 (НВО)" },
+    { href: "https://www.mon.bg/nfs/2026/08/zapoved-grafik2027-2028-31082026.pdf", label: "Заповед РД09-3340 (прием)" },
+];
+const MONTHS_GEN = ["януари", "февруари", "март", "април", "май", "юни", "юли", "август", "септември", "октомври", "ноември", "декември"];
+const dayMonth = (iso) => { const [, mo, d] = iso.split("-").map(Number); return `${d} ${MONTHS_GEN[mo - 1]}`; };
+
+function KeyDates() {
+    const today = new Date().toISOString().slice(0, 10);
+    const upcoming = KEY_DATES.filter((k) => (k.to || k.from) >= today);
+    if (!upcoming.length) return null;
+    const next = upcoming[0];
+    const days = Math.ceil((new Date(next.from) - new Date(today)) / 86400000);
+    return (
+        <section aria-labelledby="g7-dates" style={{ ...card, padding: "1.25rem" }}>
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", justifyContent: "space-between", gap: "0.5rem", marginBottom: "0.875rem" }}>
+                <h2 id="g7-dates" style={{ margin: 0, fontSize: "1.125rem", fontWeight: 800, letterSpacing: "-0.02em" }}>Ключови дати 2027</h2>
+                {days > 0 && <span style={{ fontSize: "12.5px", color: "var(--brand-muted)" }}>до {next.label.replace(/^НВО по /, "НВО ")}: <strong style={{ ...mono, color: "var(--brand-cyan)" }}>{days}</strong> дни</span>}
+            </div>
+            <ol style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "0.5rem" }}>
+                {upcoming.map((k) => (
+                    <li key={k.from + k.label} style={{ display: "flex", gap: "0.75rem", alignItems: "baseline", padding: "0.5rem 0.75rem", background: "var(--brand-surface-2)", borderRadius: "0.625rem" }}>
+                        <span style={{ ...mono, fontSize: "12.5px", fontWeight: 800, color: "var(--brand-cyan)", whiteSpace: "nowrap" }}>
+                            {k.to ? `${dayMonth(k.from).split(" ")[0]}–${dayMonth(k.to)}` : dayMonth(k.from)}
+                        </span>
+                        <span style={{ fontSize: "12.5px", lineHeight: 1.4 }}>
+                            {k.label}{k.note && <span style={{ color: "var(--brand-muted)" }}> · {k.note}</span>}
+                        </span>
+                    </li>
+                ))}
+            </ol>
+            <p style={{ margin: "0.75rem 0 0", fontSize: "11px", color: "var(--brand-muted)", display: "flex", flexWrap: "wrap", gap: "0.25rem 0.75rem" }}>
+                Източник:
+                {KEY_DATES_SOURCES.map((s) => (
+                    <a key={s.href} href={s.href} target="_blank" rel="noopener noreferrer" style={{ color: "var(--brand-muted)", display: "inline-flex", alignItems: "center", gap: "0.2rem" }}>
+                        {s.label} <ExternalLink size={10} strokeWidth={1.5} aria-hidden="true" />
+                    </a>
+                ))}
+            </p>
+        </section>
+    );
+}
+
 // ── Детайли на паралелка: всички етапи × години ──────────────────────────────
 function HistoryTable({ cls, stage1 }) {
     const [rows, setRows] = useState(null);
@@ -383,6 +438,8 @@ export default function Gymnasia() {
                         Минималният бал е този на последния приет на съответния етап — той се формира всяка година наново. Миналите балове са ориентир, не гаранция.
                     </p>
                 </div>
+
+                <KeyDates />
 
                 {/* Входове */}
                 <section aria-labelledby="g7-inputs" style={{ ...card, padding: "1.25rem" }}>

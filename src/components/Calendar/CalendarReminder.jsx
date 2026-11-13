@@ -147,7 +147,7 @@ export default function CalendarReminder({ universityName = null }) {
 }
 
 // ── Компактно действие под конкретно събитие ─────────────────────────────────
-export function EventReminderAction({ universityName }) {
+export function EventReminderAction({ universityName, national = false }) {
     const { user, subs, mine, coveredByAll, busy, notice, subscribe, stop } = useReminderScope(universityName);
 
     return (
@@ -170,7 +170,7 @@ export function EventReminderAction({ universityName }) {
                 ) : (
                     <button type="button" onClick={subscribe} disabled={busy || (user && subs === null)} style={{ ...primaryBtn, opacity: busy ? 0.7 : 1 }}>
                         {busy ? <Loader2 size={15} strokeWidth={1.5} className="animate-spin" aria-hidden="true" /> : <BellRing size={15} strokeWidth={1.5} aria-hidden="true" />}
-                        {user ? "Напомняй ми само за този университет" : "Влез и ми напомняй за него"}
+                        {national ? (user ? "Напомняй ми за тези дати" : "Влез и ми напомняй") : (user ? "Напомняй ми само за този университет" : "Влез и ми напомняй за него")}
                     </button>
                 )}
             </div>

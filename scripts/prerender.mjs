@@ -18,7 +18,7 @@
 
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { UNIVERSITIES, SPECIALTIES, RIASEC_SPECIALTIES, DORMITORIES, DORMITORY_CITIES, ADMISSION_YEAR_SHORT } from "../src/lib/siteStats.js";
+import { UNIVERSITIES, SPECIALTIES, RIASEC_SPECIALTIES, DORMITORIES, DORMITORY_CITIES, ADMISSION_YEAR_SHORT, ADMISSION_YEAR, DATA_FRESHNESS_NOTE } from "../src/lib/siteStats.js";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import { slugify } from "../src/lib/slugify.js";
@@ -115,8 +115,9 @@ const STATIC_ROUTES = [
     },
     {
         path: "/calendar",
-        title: "Календар за прием 2026 — изпити и срокове",
-        description: "Всички дати за прием 2026: изпити, срокове за кандидатстване, класирания и записвания по университети. Данни от официалните източници.",
+        // Keep in sync с <Seo> props в Calendar.jsx.
+        title: `Календар за прием ${ADMISSION_YEAR_SHORT} — ДЗИ, изпити и срокове`,
+        description: `Датите за прием ${ADMISSION_YEAR_SHORT}: ДЗИ, приемни изпити, срокове за кандидатстване, класирания и записвания по университети. От заповедите на МОН и сайтовете на университетите.`,
         image: DEFAULT_IMAGE,
     },
     {
@@ -197,14 +198,14 @@ function injectHead(shell, headTags) {
 // H1 текст per route (по-подходящ като заглавие от <title>). Fallback: route.title.
 const PAGE_H1 = {
     "/": "УниПът — калкулатор за приемен бал и кариерен тест",
-    "/calculator": "Калкулатор за приемен бал 2026",
+    "/calculator": `Калкулатор за приемен бал ${ADMISSION_YEAR_SHORT}`,
     "/career-advisor": "Безплатен RIASEC кариерен тест",
-    "/universities": "Висши училища в България за прием 2026",
+    "/universities": `Висши училища в България за прием ${ADMISSION_YEAR_SHORT}`,
     "/specialnosti": `Специалности в България за прием ${ADMISSION_YEAR_SHORT}`,
     "/dormitories": "Студентски общежития в България",
     "/dzi-strateg": "Кой втори ДЗИ да избера",
     "/priem-7-klas": "Прием след 7. клас в София",
-    "/calendar": "Календар за прием 2026",
+    "/calendar": `Календар за прием ${ADMISSION_YEAR_SHORT}`,
     "/about": "За УниПът",
     "/terms": "Условия за ползване",
     "/privacy": "Политика за поверителност",
@@ -343,9 +344,9 @@ function buildUniversityBody(route) {
     return (
         WRAP_OPEN +
         `<p><a href="/universities/">Всички университети</a></p>` +
-        `<h1 style="font-size:1.75rem;font-weight:800;letter-spacing:-0.02em">Прием в ${esc(name)} 2026</h1>` +
+        `<h1 style="font-size:1.75rem;font-weight:800;letter-spacing:-0.02em">Прием в ${esc(name)} ${ADMISSION_YEAR_SHORT}</h1>` +
         `<p>${esc(statBits)}</p>` +
-        `<p>Данни от наредбите на МОН, актуализирани за 2026 г.</p>` +
+        `<p>${esc(DATA_FRESHNESS_NOTE)}</p>` +
         intro +
         facSections +
         siblingBlock +
@@ -529,7 +530,7 @@ async function fetchUniversityRoutes() {
         const cities = [...u.cities.entries()].sort((a, b) => b[1] - a[1]).map(([c]) => c);
         const primaryCity = cities[0] || "";
         // Шаблоните трябва да съвпадат с UniversityPage.jsx seoTitle / seoDesc.
-        const title = `${name} — прием и балообразуване 2026`;
+        const title = `${name} — прием и балообразуване ${ADMISSION_YEAR_SHORT}`;
         const description = `${name} — балообразуване ${ADMISSION_YEAR_SHORT}: точните коефициенти за ${total} специалности в ${facCount} факултета. Изчисли приемния си бал безплатно.`;
 
         // Schema.org — идентично на uniSchema / breadcrumbSchema в UniversityPage.jsx.
@@ -601,7 +602,7 @@ async function fetchSpecialtyRoutes() {
         const { data, error } = await supabase
             .from("universities")
             .select("id, university_name, specialty, city, education_level, formula_description")
-            .eq("academic_year", "2026/2027")
+            .eq("academic_year", ADMISSION_YEAR)
             .range(from, from + PAGE - 1);
         if (error) { console.warn(`⚠ Supabase грешка (спец.): ${error.message}`); return []; }
         if (!data || !data.length) break;

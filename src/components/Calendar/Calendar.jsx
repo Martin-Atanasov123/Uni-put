@@ -8,6 +8,10 @@ import ErrorState from "@/components/common/ErrorState";
 import CalendarReminder, { EventReminderAction } from "@/components/Calendar/CalendarReminder";
 import CalendarModal from "@/components/Calendar/CalendarModal";
 import JsonLd from "@/components/common/JsonLd";
+import { ADMISSION_YEAR_SHORT } from "@/lib/siteStats";
+
+// Национални дати (ДЗИ, НВО) са с „university_name“ = „МОН — …“ — не са университет, без линк към /universities/.
+const isNational = (name) => String(name || "").startsWith("МОН");
 import {
     CalendarDays, ChevronLeft, ChevronRight, MapPin, ExternalLink,
     Filter, X, School, GraduationCap, FileText, Trophy, UserCheck,
@@ -158,12 +162,18 @@ function EventCard({ event, today, onOpen }) {
                 )}
 
                 <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.75rem", marginTop: "0.5rem" }}>
-                    <Link to={`/universities/${slug}/`} style={{
-                        display: "inline-flex", alignItems: "center", gap: "0.3rem",
-                        fontSize: "12px", fontWeight: 600, color: "var(--brand-cyan)", textDecoration: "none",
-                    }}>
-                        <School size={12} strokeWidth={1.5} /> {event.university_name}
-                    </Link>
+                    {isNational(event.university_name) ? (
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", fontSize: "12px", fontWeight: 600, color: "var(--brand-text)" }}>
+                            <School size={12} strokeWidth={1.5} /> {event.university_name}
+                        </span>
+                    ) : (
+                        <Link to={`/universities/${slug}/`} style={{
+                            display: "inline-flex", alignItems: "center", gap: "0.3rem",
+                            fontSize: "12px", fontWeight: 600, color: "var(--brand-cyan)", textDecoration: "none",
+                        }}>
+                            <School size={12} strokeWidth={1.5} /> {event.university_name}
+                        </Link>
+                    )}
                     {event.city && (
                         <span style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", fontSize: "11px", color: "var(--brand-muted)" }}>
                             <MapPin size={11} strokeWidth={1.5} /> {event.city}
@@ -185,7 +195,7 @@ function EventCard({ event, today, onOpen }) {
                         borderRadius: "0.75rem", color: "var(--brand-cyan)", fontSize: "12.5px", fontWeight: 600,
                         fontFamily: "inherit", cursor: "pointer",
                     }}>
-                        <BellRing size={14} strokeWidth={1.5} aria-hidden="true" /> Напомняй ми за този университет
+                        <BellRing size={14} strokeWidth={1.5} aria-hidden="true" /> {isNational(event.university_name) ? "Напомняй ми за тези дати" : "Напомняй ми за този университет"}
                     </button>
                 )}
             </div>
@@ -443,14 +453,14 @@ const Calendar = () => {
     return (
         <div style={{ minHeight: "100vh", background: "var(--brand-bg)", padding: "7rem 1.5rem 3rem", color: "var(--brand-text)" }}>
             <Seo
-                title="Календар за прием 2026 — изпити и срокове"
-                description="Всички дати за прием 2026: изпити, срокове за кандидатстване, класирания и записвания по университети. Данни от официалните източници."
+                title={`Календар за прием ${ADMISSION_YEAR_SHORT} — ДЗИ, изпити и срокове`}
+                description={`Датите за прием ${ADMISSION_YEAR_SHORT}: ДЗИ, приемни изпити, срокове за кандидатстване, класирания и записвания по университети. От заповедите на МОН и сайтовете на университетите.`}
                 path="/calendar"
             />
             <JsonLd data={{
                 "@context": "https://schema.org",
                 "@type": "CollectionPage",
-                name: "Календар за прием 2026 — УниПът",
+                name: `Календар за прием ${ADMISSION_YEAR_SHORT} — УниПът`,
                 description: "Ключови дати от кандидатстудентските кампании на българските университети: изпити, срокове, класирания и записвания.",
                 url: "https://uniput.eu/calendar/",
                 inLanguage: "bg-BG",
@@ -472,7 +482,7 @@ const Calendar = () => {
                     </div>
                     <h1 style={{ margin: 0, fontSize: "clamp(2rem, 4vw, 2.75rem)", fontWeight: 800, letterSpacing: "-0.02em", display: "flex", alignItems: "center", gap: "0.75rem", textWrap: "balance" }}>
                         <CalendarDays size={32} style={{ color: "var(--brand-cyan)" }} strokeWidth={1.5} />
-                        Всички дати за прием 2026
+                        Всички дати за прием {ADMISSION_YEAR_SHORT}
                     </h1>
                     <p style={{ margin: 0, color: "var(--brand-muted)", fontSize: "1rem", maxWidth: "640px", lineHeight: 1.6 }}>
                         Изпити, срокове за кандидатстване, класирания и записвания — събрани по университети,
@@ -484,7 +494,7 @@ const Calendar = () => {
                 <div style={{ display: "flex", gap: "0.625rem", alignItems: "flex-start", padding: "0.75rem 1rem", background: "rgba(6,182,212,0.06)", border: "1px solid rgba(6,182,212,0.2)", borderRadius: "0.875rem" }}>
                     <Info size={16} style={{ color: "var(--brand-cyan)", flexShrink: 0, marginTop: 1 }} strokeWidth={1.5} />
                     <p style={{ margin: 0, fontSize: "12.5px", color: "var(--brand-muted)", lineHeight: 1.55 }}>
-                        Датите са от официалните сайтове на университетите за кампания 2026/2027.
+                        Датите са от заповедите на МОН (ДЗИ) и от официалните сайтове на университетите. Университетите обявяват графиците си за {ADMISSION_YEAR_SHORT} г. през пролетта — добавяме ги веднага.
                         Винаги проверявай в източника до събитието — графиците понякога се променят.
                     </p>
                 </div>
@@ -668,7 +678,7 @@ const Calendar = () => {
                 open={!!dialog}
                 onClose={closeDialog}
                 title={dialog?.event ? dialog.event.university_name : dialog?.day ? `${dialog.day.d} ${MONTHS_BG[monthDate.getMonth()]} ${monthDate.getFullYear()}` : ""}
-                subtitle={dialog?.event ? "Избери дали да ти напомняме само за този университет." : dialog?.day ? `${dialog.day.events?.length || 0} събития — избери едно` : ""}
+                subtitle={dialog?.event ? (isNational(dialog.event.university_name) ? "Национален график на МОН — важи за всички." : "Избери дали да ти напомняме само за този университет.") : dialog?.day ? `${dialog.day.events?.length || 0} събития — избери едно` : ""}
             >
                 {dialog?.event ? (
                     <>
@@ -682,7 +692,7 @@ const Calendar = () => {
                             </button>
                         )}
                         <EventCard event={dialog.event} today={today} />
-                        <EventReminderAction universityName={dialog.event.university_name} />
+                        <EventReminderAction universityName={dialog.event.university_name} national={isNational(dialog.event.university_name)} />
                     </>
                 ) : dialog?.day ? (
                     dialog.day.events.map((ev) => {
