@@ -49,6 +49,8 @@ import {
     Smartphone,
     Zap,
     CheckCircle,
+    School,
+    Compass,
 } from "lucide-react";
 
 // GlobeScene for CTASection — lazy loaded
@@ -549,6 +551,101 @@ function HowItWorksSection() {
     );
 }
 
+// ── PATH (образователният път: 7. клас → ДЗИ → университет) ────────────────
+
+const PATH_STAGES = [
+    {
+        icon: School,
+        grade: "7. клас",
+        title: "Избери гимназия",
+        desc: "Балът ти за всяка паралелка в София, минималните балове от 4 години и помощник за подреждане на желанията.",
+        to: "/priem-7-klas/",
+        cta: "Прием след 7. клас",
+    },
+    {
+        icon: Compass,
+        grade: "10.–11. клас",
+        title: "Избери втори ДЗИ",
+        desc: "Добави специалностите, които те привличат, и виж коя матура ги държи отворени без изпит.",
+        to: "/dzi-strateg/",
+        cta: "Кой ДЗИ да избера",
+    },
+    {
+        icon: GraduationCap,
+        grade: "12. клас",
+        title: "Влез в университет",
+        desc: "Точният приемен бал по формулата на всяка специалност и сравнение с минимумите.",
+        to: "/calculator/",
+        cta: "Изчисли бала си",
+    },
+];
+
+function PathSection() {
+    return (
+        <section className="py-24 px-6 relative" style={{ background: "var(--brand-bg)" }}>
+            <div className="max-w-6xl mx-auto">
+                <Reveal className="text-center mb-12">
+                    <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{ color: "var(--brand-cyan)" }}>
+                        Целият път
+                    </p>
+                    <h2 className="text-3xl md:text-5xl font-bold" style={{ color: "var(--brand-text)", letterSpacing: "-0.02em", textWrap: "balance" }}>
+                        От седми клас до студентската скамейка
+                    </h2>
+                    <p className="mt-4 text-lg max-w-xl mx-auto" style={{ color: "var(--brand-muted)" }}>
+                        Три решения, които определят образованието ти. УниПът помага за всяко от тях.
+                    </p>
+                </Reveal>
+                <m.ol
+                    className="grid md:grid-cols-3 gap-5"
+                    style={{ listStyle: "none", margin: 0, padding: 0 }}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-60px" }}
+                    variants={stagger}
+                >
+                    {PATH_STAGES.map((s, i) => {
+                        const Icon = s.icon;
+                        return (
+                            <m.li key={s.to} variants={fadeUp} transition={{ duration: 0.5, ease: EASE }}>
+                                <Link
+                                    to={s.to}
+                                   
+                                    style={{
+                                        display: "flex", flexDirection: "column", height: "100%", padding: "1.5rem",
+                                        background: "var(--brand-surface)", border: "1px solid var(--brand-card-border)",
+                                        borderRadius: "1.25rem", textDecoration: "none", color: "inherit",
+                                        transition: "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease",
+                                    }}
+                                    onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.borderColor = "rgba(6,182,212,0.4)"; }}
+                                    onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.borderColor = "var(--brand-card-border)"; }}
+                                >
+                                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
+                                        <div className="inline-flex p-3 rounded-xl" style={{ background: "linear-gradient(135deg, rgba(6,182,212,0.12), rgba(139,92,246,0.12))" }}>
+                                            <Icon size={20} strokeWidth={1.5} style={{ color: "var(--brand-cyan)" }} aria-hidden="true" />
+                                        </div>
+                                        <span style={{ fontFamily: "monospace", fontSize: "12px", fontWeight: 800, color: "var(--brand-muted)" }}>
+                                            {String(i + 1).padStart(2, "0")} · {s.grade}
+                                        </span>
+                                    </div>
+                                    <h3 style={{ margin: "0 0 0.5rem", fontSize: "1.125rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--brand-text)", textWrap: "balance" }}>
+                                        {s.title}
+                                    </h3>
+                                    <p style={{ margin: "0 0 1.25rem", fontSize: "14px", lineHeight: 1.65, color: "var(--brand-muted)", flex: 1 }}>
+                                        {s.desc}
+                                    </p>
+                                    <span style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", fontSize: "14px", fontWeight: 700, color: "var(--brand-cyan)" }}>
+                                        {s.cta} <ArrowRight size={15} strokeWidth={1.5} aria-hidden="true" />
+                                    </span>
+                                </Link>
+                            </m.li>
+                        );
+                    })}
+                </m.ol>
+            </div>
+        </section>
+    );
+}
+
 // ── FEATURES ────────────────────────────────────────────────────────────────
 
 const FEATURES = [
@@ -1024,6 +1121,7 @@ export default function Home() {
             <HeroSection />
             <StatStripSection />
             <HowItWorksSection />
+            <PathSection />
             <FeaturesSection />
             <TrustSection />
             <CTASection />
