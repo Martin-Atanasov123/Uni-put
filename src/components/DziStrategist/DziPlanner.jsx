@@ -4,6 +4,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { m, AnimatePresence } from "motion/react";
 import { Search, X, ChevronDown, Share2, Check, AlertCircle, Sparkles, Calculator as CalcIcon, ArrowRight } from "lucide-react";
+import SignupPrompt from "@/components/common/SignupPrompt";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/lib/supabase";
 import { dziService } from "@/services/dziService";
 import { rankSecondDzi } from "@/lib/dziPlan";
 
@@ -63,6 +66,34 @@ export default function DziPlanner({ specialties }) {
     const [showAll, setShowAll] = useState(false);
     const [copied, setCopied] = useState(false);
     const hydrated = useRef(false);
+    const [ready, setReady] = useState(false); // URL-хидратацията е минала (избраното от линка е в `chosen`)
+
+    // Синхронизация с акаунта (user_metadata.dzi_plan): специалности + ЗДИППК. Акаунтът печели само ако
+    // нищо не е избрано (нито от линк, нито локално); после всяка промяна се записва (debounce).
+    const { user } = useAuth();
+    const accountHydrated = useRef(null);
+    const lastSaved = useRef("");
+    useEffect(() => {
+        if (!user || !ready || accountHydrated.current === user.id) return;
+        accountHydrated.current = user.id;
+        const saved = user.user_metadata?.dzi_plan;
+        lastSaved.current = JSON.stringify(saved || {});
+        if (!chosen.length && Array.isArray(saved?.chosen) && saved.chosen.length) {
+            setChosen(saved.chosen.filter((x) => specialties.includes(x)).slice(0, MAX_CHOSEN));
+            if (saved.zdippk) setZdippk(true);
+        }
+    }, [user, ready, specialties, chosen.length]);
+    useEffect(() => {
+        if (!user || accountHydrated.current !== user.id) return undefined;
+        const t = setTimeout(() => {
+            const next = { chosen, zdippk };
+            const sig = JSON.stringify(next);
+            if (sig === lastSaved.current) return;
+            lastSaved.current = sig;
+            supabase.auth.updateUser({ data: { dzi_plan: next } }).catch(() => { lastSaved.current = ""; });
+        }, 1500);
+        return () => clearTimeout(t);
+    }, [user, chosen, zdippk]);
 
     // Хидратация от ?s=A|B — само имена, които реално съществуват.
     useEffect(() => {
@@ -72,6 +103,7 @@ export default function DziPlanner({ specialties }) {
         const lower = new Map(specialties.map((s) => [s.toLowerCase(), s]));
         const valid = [...new Set(raw.map((r) => lower.get(r.toLowerCase())).filter(Boolean))];
         if (valid.length) setChosen(valid);
+        setReady(true);
     }, [specialties, params]);
 
     // Обратна посока: състояние → URL (споделяем линк).
@@ -279,6 +311,14 @@ export default function DziPlanner({ specialties }) {
                     <Link to={`/calculator/?specialty=${encodeURIComponent(chosen[0])}`} style={{ alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: "0.5rem", minHeight: 44, padding: "0 1.25rem", background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))", borderRadius: "0.75rem", color: "#fff", fontSize: "13.5px", fontWeight: 700, textDecoration: "none" }}>
                         Изчисли бала си за {chosen[0]} <ArrowRight size={15} strokeWidth={1.5} aria-hidden="true" />
                     </Link>
+
+                    {user ? (
+                        <p style={{ margin: 0, display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "12px", color: "#10b981", fontWeight: 600 }}>
+                            <Check size={13} strokeWidth={1.5} aria-hidden="true" /> Изборът ти се пази в акаунта
+                        </p>
+                    ) : (
+                        <SignupPrompt variant="dzi" from={{ pathname: "/dzi-strateg/", search: params.toString() ? `?${params.toString()}` : "" }} />
+                    )}
                 </m.div>
             )}
         </section>

@@ -14,6 +14,8 @@ import { dziService } from "@/services/dziService";
 import Seo from "@/components/common/Seo";
 import JsonLd from "@/components/common/JsonLd";
 import DziPlanner from "@/components/DziStrategist/DziPlanner";
+import SignupPrompt from "@/components/common/SignupPrompt";
+import { useAuth } from "@/hooks/useAuth";
 
 const HOWTO_SCHEMA = {
     "@context": "https://schema.org",
@@ -148,6 +150,7 @@ function SubjectRow({ rank, row, max, animate }) {
 }
 
 export default function DziStrategist() {
+    const { user } = useAuth();
     const [rows, setRows] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -342,6 +345,12 @@ export default function DziStrategist() {
                         )
                     )}
                 </m.div>
+
+                {!user && (
+                    <div style={{ marginTop: "2.5rem" }}>
+                        <SignupPrompt variant="dzi-page" from={{ pathname: "/dzi-strateg/" }} />
+                    </div>
+                )}
 
                 {/* CTA */}
                 <div style={{ marginTop: "2.5rem", textAlign: "center" }}>
