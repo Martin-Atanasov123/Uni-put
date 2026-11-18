@@ -1,6 +1,6 @@
 // Прием след VII клас (София, Варна): бал по формулата на всяка паралелка, минимални балове
 // от 1-ви етап за 4 години и помощник за подреждане на желанията.
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { m, AnimatePresence } from "motion/react";
 import {
@@ -11,6 +11,9 @@ import Seo from "@/components/common/Seo";
 import JsonLd from "@/components/common/JsonLd";
 import ErrorState from "@/components/common/ErrorState";
 import CalendarModal from "@/components/Calendar/CalendarModal";
+import SignupPrompt from "@/components/common/SignupPrompt";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/lib/supabase";
 import { gymnasiaService } from "@/services/gymnasiaService";
 import {
     DIPLOMA_SUBJECTS, ABILITY_EXAMS, computeBal, verdict, wishStatus, wishesAdvice, labelForKey, historyForClass, MAX_BAL,
@@ -281,7 +284,7 @@ function ClassRow({ row, year, inWish, onToggleWish, expanded, onExpand, stage1,
 }
 
 // ── Желания ──────────────────────────────────────────────────────────────────
-function WishesList({ wishes, rowsByCode, onMove, onRemove, onCopy, copied }) {
+function WishesList({ wishes, rowsByCode, onMove, onRemove, onCopy, copied, user, returnTo }) {
     const statuses = wishes.map((c) => rowsByCode[c]?.status || "unknown");
     const advice = wishesAdvice(statuses);
     if (!wishes.length) {
@@ -325,6 +328,13 @@ function WishesList({ wishes, rowsByCode, onMove, onRemove, onCopy, copied }) {
             <button type="button" onClick={onCopy} style={{ ...ghostBtn, alignSelf: "flex-start", color: copied ? "#10b981" : "var(--brand-text)" }}>
                 {copied ? <Check size={14} strokeWidth={1.5} aria-hidden="true" /> : <Share2 size={14} strokeWidth={1.5} aria-hidden="true" />} {copied ? "Копирано" : "Копирай линк към списъка"}
             </button>
+            {user ? (
+                <p style={{ margin: 0, display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "12px", color: "#10b981", fontWeight: 600 }}>
+                    <Check size={13} strokeWidth={1.5} aria-hidden="true" /> Списъкът се пази в акаунта ти
+                </p>
+            ) : (
+                <SignupPrompt variant="gymnasia-wishes" from={returnTo} />
+            )}
         </div>
     );
 }
@@ -391,6 +401,49 @@ export default function Gymnasia() {
         if (next.toString() !== params.toString()) setParams(next, { replace: true });
     }, [wishes, wishState.rid, region.id, params, setParams]);
 
+    // ── Синхронизация с акаунта (user_metadata.g7): оценки + желания по област ──
+    // Акаунтът печели при хидратация само ако локалното е празно; после всяка промяна се записва (debounce).
+    const { user } = useAuth();
+    const accRef = useRef({ inputs: {}, wishes: {} });
+    const lastSaved = useRef("");
+    const regionHydrated = useRef({});
+    const [hydratedFor, setHydratedFor] = useState(null);
+    const latest = useRef({});
+    latest.current = { inputs, wishes, wishState, region };
+
+    useEffect(() => {
+        if (!user || hydratedFor === user.id) return;
+        const g = user.user_metadata?.g7 || {};
+        accRef.current = { inputs: g.inputs || {}, wishes: g.wishes || {} };
+        lastSaved.current = JSON.stringify(accRef.current);
+        const { inputs: li } = latest.current;
+        const localEmpty = !Object.values(li).some((v) => v !== "" && v !== undefined && v !== null);
+        if (localEmpty && Object.keys(accRef.current.inputs).length) setInputs(accRef.current.inputs);
+        setHydratedFor(user.id);
+    }, [user, hydratedFor]);
+
+    useEffect(() => {
+        if (!user || hydratedFor !== user.id || wishState.rid !== region.id || regionHydrated.current[region.id]) return;
+        regionHydrated.current[region.id] = true;
+        const fromAcc = accRef.current.wishes[region.id];
+        if (!wishState.list.length && Array.isArray(fromAcc) && fromAcc.length) setWishes(fromAcc);
+    }, [user, hydratedFor, wishState, region.id, setWishes]);
+
+    useEffect(() => {
+        if (!user || hydratedFor !== user.id || wishState.rid !== region.id || !regionHydrated.current[region.id]) return undefined;
+        const t = setTimeout(() => {
+            const next = { inputs, wishes: { ...accRef.current.wishes, [region.id]: wishes } };
+            const sig = JSON.stringify(next);
+            if (sig === lastSaved.current) return;
+            lastSaved.current = sig;
+            accRef.current = next;
+            supabase.auth.updateUser({ data: { g7: next } }).catch(() => { lastSaved.current = ""; });
+        }, 1500);
+        return () => clearTimeout(t);
+    }, [user, hydratedFor, inputs, wishes, wishState.rid, region.id]);
+
+    const returnTo = useMemo(() => ({ pathname: "/priem-7-klas/", search: params.toString() ? `?${params.toString()}` : "" }), [params]);
+
     const switchRegion = (id) => {
         if (id === region.id) return;
         setExpanded(null); setShown(PAGE); setQ(""); setKind(""); setOnlyIn(false);
@@ -450,7 +503,7 @@ export default function Gymnasia() {
         else done(false);
     };
 
-    const wishesPanel = <WishesList wishes={wishes} rowsByCode={rowsByCode} onMove={moveWish} onRemove={(c) => toggleWish(c)} onCopy={copyLink} copied={copied} />;
+    const wishesPanel = <WishesList wishes={wishes} rowsByCode={rowsByCode} onMove={moveWish} onRemove={(c) => toggleWish(c)} onCopy={copyLink} copied={copied} user={user} returnTo={returnTo} />;
 
     return (
         <div style={{ minHeight: "100vh", background: "var(--brand-bg)", padding: "7rem 1rem 6rem", color: "var(--brand-text)" }}>
@@ -554,6 +607,9 @@ export default function Gymnasia() {
                             Балът ти е между <strong style={mono}>{fmt(stats.lo)}</strong> и <strong style={mono}>{fmt(stats.hi)}</strong> според паралелката.
                             По минимумите от 1-ви етап {year} г. влизаш в <strong style={mono}>{stats.inCount}</strong> от {stats.withMin} паралелки с данни.
                         </p>
+                    )}
+                    {!user && hasNvo && stats.withBal > 0 && (
+                        <div style={{ marginTop: "1rem" }}><SignupPrompt variant="gymnasia-result" from={returnTo} /></div>
                     )}
                     {!hasNvo && <p style={{ margin: "1rem 0 0", fontSize: "13px", color: "var(--brand-muted)" }}>Въведи точките от двете НВО, за да видиш бала си. Без тях списъкът показва само минималните балове.</p>}
                 </section>
