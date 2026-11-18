@@ -224,7 +224,7 @@ function ClassRow({ row, year, inWish, onToggleWish, expanded, onExpand, stage1,
                         </>
                     ) : noFormula ? (
                         <span style={{ fontSize: "11px", color: "var(--brand-muted)", fontWeight: 600, maxWidth: 140, display: "inline-block", lineHeight: 1.3 }}>
-                            формулата не е публикувана
+                            {region.noFormulas ? "формулата не е публикувана" : "формулата ѝ още не е в данните ни"}
                         </span>
                     ) : (
                         <span title={missing.map(labelForKey).join(", ")} style={{ fontSize: "11px", color: "#FBBF24", fontWeight: 600, maxWidth: 140, display: "inline-block", lineHeight: 1.3 }}>
@@ -250,7 +250,10 @@ function ClassRow({ row, year, inWish, onToggleWish, expanded, onExpand, stage1,
                         <div style={{ padding: "0 1rem 1rem", display: "flex", flexDirection: "column", gap: "0.75rem", borderTop: "1px solid var(--brand-border)" }}>
                             {noFormula ? (
                                 <p style={{ margin: "0.75rem 0 0", fontSize: "12px", color: "var(--brand-muted)", lineHeight: 1.5 }}>
-                                    {region.ruo} не е публикувало формулата за тази паралелка, затова не смятаме личен бал. Минималните балове по-долу са официални. Формулата можеш да питаш в самото училище.
+                                    {region.noFormulas
+                                        ? `${region.ruo} не е публикувало формулата за тази паралелка, затова не смятаме личен бал.`
+                                        : "Не успяхме да свържем официалната формула с тази паралелка (имената в справките се разминават), затова не смятаме личен бал."}
+                                    {" "}Минималните балове по-долу са официални. Формулата можеш да питаш в самото училище.
                                 </p>
                             ) : (
                             <div style={{ paddingTop: "0.75rem" }}>
