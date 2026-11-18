@@ -19,6 +19,7 @@ import {
 // Региони с данни. `db` е стойността в колоната region; `rn` е името за заглавия и текст.
 const REGIONS = [
     { id: "sofia", db: "София-град", name: "София", in: "в София", ruo: "РУО – София-град", url: "https://ruo.mon.bg/sofia-grad/ucheniczi/priem-na-ucheniczi/priem-v-8-klas/" },
+    { id: "burgas", db: "Бургас", name: "Бургас", in: "в Бургас", noFormulas: true, ruo: "РУО – Бургас", url: "https://ruo.mon.bg/burgas/ucheniczi/priem-na-ucheniczi/priem-v-8-klas/" },
     { id: "varna", db: "Варна", name: "Варна", in: "във Варна", ruo: "РУО – Варна", url: "https://ruo.mon.bg/varna/ucheniczi/priem-na-ucheniczi/priem-v-8-klas/" },
 ];
 const regionById = (id) => REGIONS.find((r) => r.id === id) || REGIONS[0];
@@ -188,7 +189,7 @@ function HistoryTable({ cls, stage1, region }) {
 
 // ── Ред за паралелка ─────────────────────────────────────────────────────────
 function ClassRow({ row, year, inWish, onToggleWish, expanded, onExpand, stage1, region }) {
-    const { cls, bal, missing, hist, v } = row;
+    const { cls, bal, missing, noFormula, hist, v } = row;
     const prev = hist.slice(1, 4).filter((h) => h.min !== null);
     return (
         <li style={{ ...card, overflow: "hidden", borderLeft: `3px solid ${v ? (v.above ? "#10b981" : "#f87171") : "var(--brand-border)"}` }}>
@@ -220,6 +221,10 @@ function ClassRow({ row, year, inWish, onToggleWish, expanded, onExpand, stage1,
                                 </span>
                             ) : <span style={{ display: "block", marginTop: "0.25rem", fontSize: "11px", color: "var(--brand-muted)" }}>без ориентир</span>}
                         </>
+                    ) : noFormula ? (
+                        <span style={{ fontSize: "11px", color: "var(--brand-muted)", fontWeight: 600, maxWidth: 140, display: "inline-block", lineHeight: 1.3 }}>
+                            формулата не е публикувана
+                        </span>
                     ) : (
                         <span title={missing.map(labelForKey).join(", ")} style={{ fontSize: "11px", color: "#FBBF24", fontWeight: 600, maxWidth: 140, display: "inline-block", lineHeight: 1.3 }}>
                             {missing[0]?.startsWith("olimp_") ? "иска резултат от олимпиада" : `въведи ${missing.map((k) => labelForKey(k).replace(/ \(свидетелство\)| \(.*\)/, "")).slice(0, 2).join(", ")}`}
@@ -242,6 +247,11 @@ function ClassRow({ row, year, inWish, onToggleWish, expanded, onExpand, stage1,
                 {expanded && (
                     <m.div initial={reduced ? false : { opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }} style={{ overflow: "hidden" }}>
                         <div style={{ padding: "0 1rem 1rem", display: "flex", flexDirection: "column", gap: "0.75rem", borderTop: "1px solid var(--brand-border)" }}>
+                            {noFormula ? (
+                                <p style={{ margin: "0.75rem 0 0", fontSize: "12px", color: "var(--brand-muted)", lineHeight: 1.5 }}>
+                                    {region.ruo} не е публикувало формулата за тази паралелка, затова не смятаме личен бал. Минималните балове по-долу са официални. Формулата можеш да питаш в самото училище.
+                                </p>
+                            ) : (
                             <div style={{ paddingTop: "0.75rem" }}>
                                 <span style={label}>Балообразуване</span>
                                 <code style={{ fontSize: "12.5px", color: "var(--brand-text)", background: "var(--brand-surface-2)", padding: "0.25rem 0.5rem", borderRadius: "0.375rem", display: "inline-block" }}>{cls.formula_raw}</code>
@@ -250,6 +260,7 @@ function ClassRow({ row, year, inWish, onToggleWish, expanded, onExpand, stage1,
                                     {cls.first_language && <> Първи чужд език: {cls.first_language}{cls.language_mode ? ` (${cls.language_mode})` : ""}.</>}
                                 </p>
                             </div>
+                            )}
                             <div>
                                 <span style={label}>Минимален бал по етапи</span>
                                 <HistoryTable cls={cls} stage1={stage1} region={region} />
@@ -389,11 +400,11 @@ export default function Gymnasia() {
     const hasNvo = inputs.nvo_bel !== undefined && inputs.nvo_bel !== "" && inputs.nvo_mat !== undefined && inputs.nvo_mat !== "";
 
     const rows = useMemo(() => classes.map((cls) => {
-        const { bal, missing } = hasNvo ? computeBal(cls, inputs) : { bal: null, missing: [] };
+        const { bal, missing, noFormula } = hasNvo ? computeBal(cls, inputs) : { bal: null, missing: [], noFormula: !cls.coefficients?.length };
         const hist = historyForClass(cls, stage1);
         const min = hist[0]?.min ?? null;
         const v = verdict(bal, min);
-        return { cls, bal, missing, hist, min, v, status: wishStatus(bal, min) };
+        return { cls, bal, missing, noFormula, hist, min, v, status: wishStatus(bal, min) };
     }), [classes, inputs, hasNvo, stage1]);
     const rowsByCode = useMemo(() => Object.fromEntries(rows.map((r) => [r.cls.class_code, r])), [rows]);
 
@@ -479,7 +490,8 @@ export default function Gymnasia() {
                 <div style={{ display: "flex", gap: "0.625rem", alignItems: "flex-start", padding: "0.75rem 1rem", background: "rgba(6,182,212,0.06)", border: "1px solid rgba(6,182,212,0.2)", borderRadius: "0.875rem" }}>
                     <Info size={16} strokeWidth={1.5} style={{ color: "var(--brand-cyan)", flexShrink: 0, marginTop: 1 }} aria-hidden="true" />
                     <p style={{ margin: 0, fontSize: "12.5px", lineHeight: 1.55, color: "var(--brand-muted)" }}>
-                        Данните са от справките на {region.ruo}: паралелки и балообразуване за прием {year ? `${year}/${year + 1}` : ""}, класирания {histRange} г.
+                        Данните са от справките на {region.ruo}: {region.noFormulas ? "паралелки" : "паралелки и балообразуване"} за прием {year ? `${year}/${year + 1}` : ""}, класирания {histRange} г.
+                        {region.noFormulas && <> <strong style={{ color: "var(--brand-text)" }}>{region.ruo} не публикува формулите за балообразуване</strong>, затова тук виждаш само минималните балове — личен бал не смятаме.</>}
                         Минималният бал е този на последния приет на съответния етап — той се формира всяка година наново. Миналите балове са ориентир, не гаранция.
                     </p>
                 </div>
@@ -540,7 +552,7 @@ export default function Gymnasia() {
                                 <input value={q} onChange={(e) => { setQ(e.target.value); setShown(PAGE); }} placeholder="Училище, профил, език…" aria-label="Търси паралелка" style={{ ...input, paddingLeft: "2.5rem" }} />
                             </div>
                             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", alignItems: "center" }}>
-                                {[["", "Всички"], ["профилирана", "Профилирани"], ["професионална", "Професионални"]].map(([k, l]) => (
+                                {(classes.some((c) => c.kind) ? [["", "Всички"], ["профилирана", "Профилирани"], ["професионална", "Професионални"]] : []).map(([k, l]) => (
                                     <button key={k} type="button" onClick={() => { setKind(k); setShown(PAGE); }} style={chip(kind === k)}>{l}</button>
                                 ))}
                                 <button type="button" onClick={() => { setOnlyIn((v) => !v); setShown(PAGE); }} disabled={!hasNvo} style={{ ...chip(onlyIn, "#10b981"), opacity: hasNvo ? 1 : 0.5 }}>

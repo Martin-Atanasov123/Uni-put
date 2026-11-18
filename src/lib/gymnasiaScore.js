@@ -76,9 +76,11 @@ function evaluateSlots(slots, inputs) {
 
 /**
  * Бал за паралелка. При алтернативни формули („… или …“) взима най-високия пълен вариант.
- * @returns {{bal:number|null, missing:string[]}} missing = липсващи входове на основната формула
+ * @returns {{bal:number|null, missing:string[], noFormula?:boolean}} missing = липсващи входове на основната формула
  */
 export function computeBal(cls, inputs) {
+    // РУО не е публикувало формулата → няма личен бал (само минималните балове).
+    if (!Array.isArray(cls.coefficients) || cls.coefficients.length === 0) return { bal: null, missing: [], noFormula: true };
     const variants = [cls.coefficients, ...(Array.isArray(cls.alt_formulas) ? cls.alt_formulas : [])];
     const results = variants.map((v) => evaluateSlots(v, inputs));
     const complete = results.filter((r) => r.missing.length === 0);

@@ -36,6 +36,9 @@ describe("computeBal", () => {
     it("оценка 2 от свидетелството не носи точки → липса", () => {
         expect(computeBal(SU1, { nvo_bel: 85, nvo_mat: 60, dipl_bel: 2, dipl_chez: 4 }).bal).toBeNull();
     });
+    it("паралелка без публикувана формула → без бал и с флаг noFormula", () => {
+        expect(computeBal({ coefficients: [] }, { nvo_bel: 90, nvo_mat: 90 })).toEqual({ bal: null, missing: [], noFormula: true });
+    });
     it("НВО над 100 се ограничава до 100", () => {
         expect(computeBal(SMG, { nvo_bel: 120, nvo_mat: 100, dipl_bel: 6, dipl_m: 6 }).bal).toBe(500);
     });
