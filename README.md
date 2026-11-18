@@ -1,5 +1,7 @@
 # УниПът — Платформа за Кандидат-Студенти
 
+[![Проверка](https://github.com/Martin-Atanasov123/Uni-put/actions/workflows/ci.yml/badge.svg)](https://github.com/Martin-Atanasov123/Uni-put/actions/workflows/ci.yml)
+
 Безплатна платформа, която помага на български ученици да изчислят приемния си бал, да открият подходяща кариера и да сравнят университети — всичко на едно място.
 
 ---

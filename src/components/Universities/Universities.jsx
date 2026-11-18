@@ -521,7 +521,7 @@ function SpecialtyCard({ uni, isFav, onToggleFav, showUser }) {
 
 // ─── Main Component ────────────────────────────────────────────────────────
 export default function UniversitiesPage() {
-    const { user, isFavorite, toggleFavorite } = useAuth();
+    const { isFavorite, toggleFavorite } = useAuth();
     const [universities, setUniversities] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -701,13 +701,6 @@ export default function UniversitiesPage() {
     const handleGroupSelect = (group) => {
         setSelectedGroup(group.id);
         setSelectedFaculty(null);
-        setViewMode("search");
-        setTimeout(() => gridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
-    };
-
-    const handleFacultyClick = (facultyName) => {
-        setSelectedFaculty(facultyName);
-        setSelectedGroup(null);
         setViewMode("search");
         setTimeout(() => gridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
     };

@@ -27,7 +27,7 @@ const AdminDashboard = () => {
     const [auditLog, setAuditLog] = useState([]);
     const [loading, setLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
-    const [currentPage, setCurrentPage] = useState(0);
+    const [, setCurrentPage] = useState(0);
     const currentPageRef = useRef(0);
     const [showOnboarding, setShowOnboarding] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);

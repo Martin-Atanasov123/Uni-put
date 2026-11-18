@@ -2,7 +2,7 @@
 // Описание: Показва всички доклади за грешки, позволява филтриране по статус,
 //   преглед на скрийншоти, добавяне на бележки и маркиране като решени.
 //   Линк към AdminDashboard за бърза редакция на записа.
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
     Flag, CheckCircle2, Clock, Eye, MessageSquare, ExternalLink,
     Filter, RefreshCw, ChevronDown, ChevronUp, AlertTriangle,
@@ -33,7 +33,7 @@ export default function AdminReports() {
     const [saving, setSaving] = useState({});
     const [searchQuery, setSearchQuery] = useState("");
 
-    const fetchReports = async () => {
+    const fetchReports = useCallback(async () => {
         setLoading(true);
         let query = supabase
             .from("reports")
@@ -51,9 +51,9 @@ export default function AdminReports() {
         const { data, error } = await query;
         if (!error) setReports(data || []);
         setLoading(false);
-    };
+    }, [filterStatus]);
 
-    useEffect(() => { fetchReports(); }, [filterStatus]);
+    useEffect(() => { fetchReports(); }, [fetchReports]);
 
     const updateStatus = async (id, newStatus) => {
         setSaving((p) => ({ ...p, [id]: true }));

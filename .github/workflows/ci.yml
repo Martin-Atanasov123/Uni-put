@@ -1,0 +1,38 @@
+# Автоматична проверка при всеки push и pull request:
+# ESLint (стандарти на кода) → Vitest (автоматични тестове) → production build.
+name: Проверка
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Инсталиране на зависимостите
+        run: npm ci
+
+      - name: Lint (ESLint)
+        run: npm run lint
+
+      - name: Тестове (Vitest)
+        run: npm test
+
+      - name: Build
+        run: npm run build
+        env:
+          # Build-ът не се свързва с базата (SITEMAP_DYNAMIC не е включен),
+          # затова стигат фиктивни стойности — истинските са само в Netlify.
+          VITE_SUPABASE_URL: https://placeholder.supabase.co
+          VITE_SUPABASE_ANON_KEY: placeholder-anon-key

@@ -79,14 +79,14 @@ export default function GradeInputSection({ coefficients = {}, separateKeys, fac
                 if (parsed.valuesByKey) perSpecialty = parsed.valuesByKey;
                 if (parsed.activeAltBySlot) setActiveAltBySlot(parsed.activeAltBySlot);
             }
-        } catch {}
+        } catch { /* повреден или липсващ запис в localStorage — започваме на чисто */ }
 
         // 3. Merge: per-specialty override взима приоритет над глобалните
         setValuesByKey({ ...globalGrades, ...perSpecialty });
     }, [faculty, specialty]);
 
     useEffect(() => {
-        try { localStorage.setItem(getStorageKey(faculty, specialty), JSON.stringify({ valuesByKey, activeAltBySlot })); } catch {}
+        try { localStorage.setItem(getStorageKey(faculty, specialty), JSON.stringify({ valuesByKey, activeAltBySlot })); } catch { /* localStorage недостъпен (частен режим) — оценките просто не се пазят */ }
     }, [valuesByKey, activeAltBySlot, faculty, specialty]);
 
     const userRef = useRef(user);
