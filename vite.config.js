@@ -38,11 +38,10 @@ export default defineConfig({
       output: {
         manualChunks: {
           'vendor-react':  ['react', 'react-dom', 'react-router-dom'],
-          // Three.js split into three chunks so each can be cached independently.
+          // Three.js split into two chunks so each can be cached independently.
           // No modulepreload hint (filtered above) — loads lazily after first paint.
           'vendor-three-core':  ['three'],
           'vendor-three-fiber': ['@react-three/fiber'],
-          'vendor-three-drei':  ['@react-three/drei'],
           'vendor-motion': ['motion'],
           'vendor-ui':     ['lucide-react'],
           'vendor-supa':   ['@supabase/supabase-js'],

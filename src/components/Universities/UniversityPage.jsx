@@ -128,7 +128,7 @@ export default function UniversityPage() {
     const primaryCity = cities[0] || "";
     // Статус на акредитация (един за целия университет) — за warning банер.
     const accreditationStatus = rows[0]?.accreditation_status;
-    // SEO copy от SEO-AUDIT-REPORT.md §3.2 — enriched за предстоящата кампания
+    // SEO текст за предстоящата кампания
     const seoTitle = `${uniName} — прием и балообразуване ${ADMISSION_YEAR_SHORT}`;
     const seoDesc = `${uniName} — балообразуване ${ADMISSION_YEAR_SHORT}: точните коефициенти за ${totalSpecialties} специалности в ${faculties.length} факултета. Изчисли приемния си бал безплатно.`;
 

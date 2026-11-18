@@ -35,3 +35,9 @@ uniput-local.db
 # Claude Code local config
 .claude/
 
+# Генерирани локално
+__pycache__/
+supabase/.temp/
+graphify-out/
+.playwright-mcp/
+

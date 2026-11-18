@@ -26,7 +26,7 @@
 | Routing | React Router 7 (всички маршрути lazy-loaded) |
 | Styling | Tailwind CSS 4 + DaisyUI (dark / nord теми) |
 | Animations | Framer Motion (`motion/react`) — `LazyMotion + domAnimation` |
-| 3D | Three.js via `@react-three/fiber` + `@react-three/drei` |
+| 3D | Three.js via `@react-three/fiber` |
 | Icons | Lucide React |
 | Backend | Supabase (PostgreSQL + Auth + Storage) |
 | Tests | Vitest + @testing-library/react |
