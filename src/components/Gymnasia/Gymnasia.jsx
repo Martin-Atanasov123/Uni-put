@@ -55,7 +55,7 @@ const ghostBtn = {
     border: "1px solid var(--brand-border)", borderRadius: "0.75rem", color: "var(--brand-text)", fontSize: "13px", fontWeight: 600, fontFamily: "inherit", cursor: "pointer",
 };
 const iconBtn = {
-    display: "flex", alignItems: "center", justifyContent: "center", width: 40, height: 40, background: "var(--brand-surface-2)",
+    display: "flex", alignItems: "center", justifyContent: "center", width: 44, height: 44, background: "var(--brand-surface-2)",
     border: "1px solid var(--brand-border)", borderRadius: "0.625rem", color: "var(--brand-text)", cursor: "pointer",
 };
 
@@ -124,7 +124,7 @@ function KeyDates() {
             <p style={{ margin: "0.75rem 0 0", fontSize: "11px", color: "var(--brand-muted)", display: "flex", flexWrap: "wrap", gap: "0.25rem 0.75rem" }}>
                 Източник:
                 {KEY_DATES_SOURCES.map((s) => (
-                    <a key={s.href} href={s.href} target="_blank" rel="noopener noreferrer" style={{ color: "var(--brand-muted)", display: "inline-flex", alignItems: "center", gap: "0.2rem" }}>
+                    <a key={s.href} href={s.href} target="_blank" rel="noopener noreferrer" style={{ color: "var(--brand-muted)", display: "inline-flex", alignItems: "center", minHeight: 44, gap: "0.2rem" }}>
                         {s.label} <ExternalLink size={10} strokeWidth={1.5} aria-hidden="true" />
                     </a>
                 ))}
@@ -269,7 +269,7 @@ function ClassRow({ row, year, inWish, onToggleWish, expanded, onExpand, stage1,
                                 <span style={label}>Минимален бал по етапи</span>
                                 <HistoryTable cls={cls} stage1={stage1} region={region} />
                             </div>
-                            <a href={region.url} target="_blank" rel="noopener noreferrer" style={{ alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: "0.3rem", fontSize: "12px", fontWeight: 600, color: "var(--brand-muted)", textDecoration: "none" }}>
+                            <a href={region.url} target="_blank" rel="noopener noreferrer" style={{ alignSelf: "flex-start", display: "inline-flex", alignItems: "center", minHeight: 44, gap: "0.3rem", fontSize: "12px", fontWeight: 600, color: "var(--brand-muted)", textDecoration: "none" }}>
                                 Източник: {region.ruo} <ExternalLink size={11} strokeWidth={1.5} aria-hidden="true" />
                             </a>
                         </div>
@@ -298,14 +298,14 @@ function WishesList({ wishes, rowsByCode, onMove, onRemove, onCopy, copied }) {
                     const r = rowsByCode[code]; if (!r) return null;
                     const st = STATUS[r.status];
                     return (
-                        <li key={code} style={{ display: "grid", gridTemplateColumns: "1.5rem 1fr auto", gap: "0.5rem", alignItems: "center", padding: "0.5rem 0.625rem", background: "var(--brand-surface-2)", borderRadius: "0.75rem", borderLeft: `3px solid ${st.color}` }}>
+                        <li key={code} style={{ display: "grid", gridTemplateColumns: "1.25rem minmax(0, 1fr)", gap: "0.375rem 0.5rem", alignItems: "start", padding: "0.5rem 0.625rem", background: "var(--brand-surface-2)", borderRadius: "0.75rem", borderLeft: `3px solid ${st.color}` }}>
                             <span style={{ ...mono, fontSize: "12px", fontWeight: 800, color: "var(--brand-muted)" }}>{i + 1}</span>
                             <span style={{ minWidth: 0 }}>
-                                <span style={{ display: "block", fontSize: "12.5px", fontWeight: 700, color: "var(--brand-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.cls.class_name}</span>
-                                <span style={{ display: "block", fontSize: "11px", color: "var(--brand-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{shortSchool(r.cls.school_name)}</span>
+                                <span style={{ display: "block", fontSize: "12.5px", fontWeight: 700, color: "var(--brand-text)", lineHeight: 1.35, overflowWrap: "anywhere" }}>{r.cls.class_name}</span>
+                                <span style={{ display: "block", fontSize: "11px", color: "var(--brand-muted)", lineHeight: 1.35, overflowWrap: "anywhere" }}>{shortSchool(r.cls.school_name)}</span>
                                 <span style={{ fontSize: "11px", fontWeight: 700, color: st.color }}>{st.label}{r.v ? ` · ${r.v.above ? "+" : "−"}${fmt(Math.abs(r.v.diff))}` : ""}</span>
                             </span>
-                            <span style={{ display: "flex", gap: "0.25rem" }}>
+                            <span style={{ gridColumn: "2", display: "flex", gap: "0.25rem" }}>
                                 <button type="button" onClick={() => onMove(i, -1)} disabled={i === 0} aria-label="Премести нагоре" style={{ ...iconBtn, opacity: i === 0 ? 0.4 : 1 }}><ArrowUp size={14} strokeWidth={1.5} aria-hidden="true" /></button>
                                 <button type="button" onClick={() => onMove(i, 1)} disabled={i === wishes.length - 1} aria-label="Премести надолу" style={{ ...iconBtn, opacity: i === wishes.length - 1 ? 0.4 : 1 }}><ArrowDown size={14} strokeWidth={1.5} aria-hidden="true" /></button>
                                 <button type="button" onClick={() => onRemove(code)} aria-label="Премахни" style={iconBtn}><X size={14} strokeWidth={1.5} aria-hidden="true" /></button>
@@ -513,12 +513,23 @@ export default function Gymnasia() {
                             </div>
                         ))}
                     </div>
-                    <span style={label}>Оценки от свидетелството (7. клас)</span>
+                    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.5rem 0.75rem", marginBottom: "0.5rem" }}>
+                        <span style={{ ...label, margin: 0 }}>Оценки от свидетелството (7. клас)</span>
+                        <label style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", fontSize: "12.5px", color: "var(--brand-muted)" }}>
+                            Бързо — една и съща оценка за всички:
+                            <select defaultValue="" aria-label="Една и съща оценка за всички предмети" key={Object.keys(inputs).length}
+                                onChange={(e) => { const v = e.target.value; if (v) setInputs((prev) => ({ ...prev, ...Object.fromEntries(DIPLOMA_SUBJECTS.map((x) => [x.key, v])) })); }}
+                                style={{ ...input, ...mono, width: 72, height: 44, padding: "0 0.25rem", textAlign: "center" }}>
+                                <option value="">—</option>
+                                {[6, 5, 4, 3].map((g) => <option key={g} value={g}>{g}</option>)}
+                            </select>
+                        </label>
+                    </div>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: "0.5rem" }}>
                         {DIPLOMA_SUBJECTS.map((s) => (
                             <label key={s.key} title={s.label} style={{ display: "flex", alignItems: "center", gap: "0.5rem", minHeight: 44, padding: "0 0.625rem", background: "var(--brand-surface-2)", border: "1px solid var(--brand-border)", borderRadius: "0.625rem", fontSize: "12.5px", fontWeight: 600 }}>
                                 <span style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.abbr} <span style={{ fontWeight: 400, color: "var(--brand-muted)" }}>· {s.label}</span></span>
-                                <select value={inputs[s.key] ?? ""} onChange={(e) => setInput(s.key, e.target.value)} aria-label={s.label} style={{ ...input, ...mono, width: 64, height: 36, padding: "0 0.25rem", textAlign: "center" }}>
+                                <select value={inputs[s.key] ?? ""} onChange={(e) => setInput(s.key, e.target.value)} aria-label={s.label} style={{ ...input, ...mono, width: 72, height: 44, padding: "0 0.25rem", textAlign: "center" }}>
                                     <option value="">—</option>
                                     {[6, 5, 4, 3].map((g) => <option key={g} value={g}>{g}</option>)}
                                 </select>
@@ -607,7 +618,7 @@ export default function Gymnasia() {
                 </div>
 
                 <p style={{ margin: 0, fontSize: "12px", color: "var(--brand-muted)", lineHeight: 1.6, maxWidth: "70ch" }}>
-                    Следваща стъпка след гимназията: <Link to="/dzi-strateg" style={{ color: "var(--brand-cyan)" }}>кой втори ДЗИ да избереш</Link> и <Link to="/calculator/" style={{ color: "var(--brand-cyan)" }}>балът за университет</Link> — УниПът е с теб по целия път.
+                    Следваща стъпка след гимназията: <Link to="/dzi-strateg" style={{ color: "var(--brand-cyan)", display: "inline-flex", alignItems: "center", minHeight: 44 }}>кой втори ДЗИ да избереш</Link> и <Link to="/calculator/" style={{ color: "var(--brand-cyan)", display: "inline-flex", alignItems: "center", minHeight: 44 }}>балът за университет</Link> — УниПът е с теб по целия път.
                 </p>
             </div>
 
