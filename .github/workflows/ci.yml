@@ -12,6 +12,12 @@ jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      # Тестовете и build-ът не се свързват с базата (заявките са mock-нати, SITEMAP_DYNAMIC
+      # не е включен), но Supabase клиентът изисква URL при създаване — стигат фиктивни
+      # стойности. Истинските ключове са само в Netlify.
+      VITE_SUPABASE_URL: https://placeholder.supabase.co
+      VITE_SUPABASE_ANON_KEY: placeholder-anon-key
     steps:
       - uses: actions/checkout@v4
 
@@ -31,8 +37,3 @@ jobs:
 
       - name: Build
         run: npm run build
-        env:
-          # Build-ът не се свързва с базата (SITEMAP_DYNAMIC не е включен),
-          # затова стигат фиктивни стойности — истинските са само в Netlify.
-          VITE_SUPABASE_URL: https://placeholder.supabase.co
-          VITE_SUPABASE_ANON_KEY: placeholder-anon-key
