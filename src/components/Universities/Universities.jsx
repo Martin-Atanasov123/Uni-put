@@ -1171,7 +1171,7 @@ export default function UniversitiesPage() {
             <AnimatePresence>
                 {showFavNudge && (
                     <div style={{ position: "fixed", left: "1rem", right: "1rem", bottom: "1rem", zIndex: 90, display: "flex", justifyContent: "center", pointerEvents: "none" }}>
-                        <div style={{ width: "100%", maxWidth: "34rem", pointerEvents: "auto" }}>
+                        <div style={{ width: "100%", maxWidth: "34rem", pointerEvents: "auto", borderRadius: "1.25rem", boxShadow: "0 16px 40px var(--brand-shadow)" }}>
                             <SignupPrompt variant="favorite" onDismiss={() => setShowFavNudge(false)} />
                         </div>
                     </div>

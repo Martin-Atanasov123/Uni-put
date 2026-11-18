@@ -75,7 +75,7 @@ export default function SignupPrompt({ variant = "favorite", onDismiss, register
                 gap: "1rem",
                 alignItems: "flex-start",
                 padding: "1.25rem 1.5rem",
-                background: "linear-gradient(135deg, rgba(6,182,212,0.08), rgba(139,92,246,0.08))",
+                background: "linear-gradient(135deg, rgba(6,182,212,0.08), rgba(139,92,246,0.08)), var(--brand-surface)", // плътна основа — иначе е прозрачна, когато се носи над съдържание
                 border: "1px solid rgba(6,182,212,0.25)",
                 borderRadius: "1.25rem",
             }}
