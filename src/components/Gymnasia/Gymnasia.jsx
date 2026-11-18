@@ -19,6 +19,7 @@ import {
 // Региони с данни. `db` е стойността в колоната region; `rn` е името за заглавия и текст.
 const REGIONS = [
     { id: "sofia", db: "София-град", name: "София", in: "в София", ruo: "РУО – София-град", url: "https://ruo.mon.bg/sofia-grad/ucheniczi/priem-na-ucheniczi/priem-v-8-klas/" },
+    { id: "ruse", db: "Русе", name: "Русе", in: "в Русе", ruo: "РУО – Русе", url: "https://ruo.mon.bg/ruse/ucheniczi/priem-na-ucheniczi/priem-v-8-klas/" },
     { id: "burgas", db: "Бургас", name: "Бургас", in: "в Бургас", noFormulas: true, ruo: "РУО – Бургас", url: "https://ruo.mon.bg/burgas/ucheniczi/priem-na-ucheniczi/priem-v-8-klas/" },
     { id: "varna", db: "Варна", name: "Варна", in: "във Варна", ruo: "РУО – Варна", url: "https://ruo.mon.bg/varna/ucheniczi/priem-na-ucheniczi/priem-v-8-klas/" },
 ];
