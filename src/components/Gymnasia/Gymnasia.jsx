@@ -1,4 +1,4 @@
-// Прием след VII клас (София): бал по формулата на всяка паралелка, минимални балове
+// Прием след VII клас (София, Варна): бал по формулата на всяка паралелка, минимални балове
 // от 1-ви етап за 4 години и помощник за подреждане на желанията.
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -16,11 +16,16 @@ import {
     DIPLOMA_SUBJECTS, ABILITY_EXAMS, computeBal, verdict, wishStatus, wishesAdvice, labelForKey, historyForClass, MAX_BAL,
 } from "@/lib/gymnasiaScore";
 
-const REGION = "София-град";
-const RUO_URL = "https://ruo.mon.bg/sofia-grad/ucheniczi/priem-na-ucheniczi/priem-v-8-klas/";
+// Региони с данни. `db` е стойността в колоната region; `rn` е името за заглавия и текст.
+const REGIONS = [
+    { id: "sofia", db: "София-град", name: "София", in: "в София", ruo: "РУО – София-град", url: "https://ruo.mon.bg/sofia-grad/ucheniczi/priem-na-ucheniczi/priem-v-8-klas/" },
+    { id: "varna", db: "Варна", name: "Варна", in: "във Варна", ruo: "РУО – Варна", url: "https://ruo.mon.bg/varna/ucheniczi/priem-na-ucheniczi/priem-v-8-klas/" },
+];
+const regionById = (id) => REGIONS.find((r) => r.id === id) || REGIONS[0];
 const LS_INPUTS = "uniput_g7_inputs_v1";
 const LS_WISHES = "uniput_g7_wishes_v1";
 const PAGE = 60;
+const NO_WISHES = [];
 const reduced = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
 const STATUS = {
@@ -127,16 +132,16 @@ function KeyDates() {
 }
 
 // ── Детайли на паралелка: всички етапи × години ──────────────────────────────
-function HistoryTable({ cls, stage1 }) {
+function HistoryTable({ cls, stage1, region }) {
     const [rows, setRows] = useState(null);
     const [err, setErr] = useState(false);
     useEffect(() => {
         let alive = true;
-        gymnasiaService.getSchoolRankings(cls.school_code)
+        gymnasiaService.getSchoolRankings(cls.school_code, region.db)
             .then((r) => { if (alive) setRows(r); })
             .catch(() => { if (alive) setErr(true); });
         return () => { alive = false; };
-    }, [cls.school_code]);
+    }, [cls.school_code, region.db]);
     const hist = historyForClass(cls, stage1);
     const codesByYear = Object.fromEntries(hist.map((h) => [h.year, h]));
     const mine = (rows || []).filter((r) => {
@@ -182,7 +187,7 @@ function HistoryTable({ cls, stage1 }) {
 }
 
 // ── Ред за паралелка ─────────────────────────────────────────────────────────
-function ClassRow({ row, year, inWish, onToggleWish, expanded, onExpand, stage1 }) {
+function ClassRow({ row, year, inWish, onToggleWish, expanded, onExpand, stage1, region }) {
     const { cls, bal, missing, hist, v } = row;
     const prev = hist.slice(1, 4).filter((h) => h.min !== null);
     return (
@@ -247,10 +252,10 @@ function ClassRow({ row, year, inWish, onToggleWish, expanded, onExpand, stage1 
                             </div>
                             <div>
                                 <span style={label}>Минимален бал по етапи</span>
-                                <HistoryTable cls={cls} stage1={stage1} />
+                                <HistoryTable cls={cls} stage1={stage1} region={region} />
                             </div>
-                            <a href={RUO_URL} target="_blank" rel="noopener noreferrer" style={{ alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: "0.3rem", fontSize: "12px", fontWeight: 600, color: "var(--brand-muted)", textDecoration: "none" }}>
-                                Източник: РУО – София-град <ExternalLink size={11} strokeWidth={1.5} aria-hidden="true" />
+                            <a href={region.url} target="_blank" rel="noopener noreferrer" style={{ alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: "0.3rem", fontSize: "12px", fontWeight: 600, color: "var(--brand-muted)", textDecoration: "none" }}>
+                                Източник: {region.ruo} <ExternalLink size={11} strokeWidth={1.5} aria-hidden="true" />
                             </a>
                         </div>
                     </m.div>
@@ -313,16 +318,30 @@ function WishesList({ wishes, rowsByCode, onMove, onRemove, onCopy, copied }) {
 export default function Gymnasia() {
     const isDesktop = useIsDesktop();
     const [params, setParams] = useSearchParams();
+    const region = useMemo(() => regionById(params.get("r")), [params]);
     const [year, setYear] = useState(null);
     const [classes, setClasses] = useState([]);
     const [stage1, setStage1] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [inputs, setInputs] = useState(() => readLS(LS_INPUTS, {}));
-    const [wishes, setWishes] = useState(() => {
-        const fromUrl = (new URLSearchParams(window.location.search).get("w") || "").split(",").map((s) => s.trim()).filter(Boolean);
-        return fromUrl.length ? fromUrl.slice(0, 40) : readLS(LS_WISHES, []);
+    // Желанията са по област. `wishState.rid` казва за коя област е списъкът; при смяна на областта
+    // (URL-ът се сменя със закъснение — React Router го прави в transition) се чете нов списък,
+    // а старият никога не се записва под ключа на новата област.
+    const [wishState, setWishState] = useState(() => {
+        const sp = new URLSearchParams(window.location.search);
+        const rid = regionById(sp.get("r")).id;
+        const fromUrl = (sp.get("w") || "").split(",").map((x) => x.trim()).filter(Boolean);
+        return { rid, list: fromUrl.length ? fromUrl.slice(0, 40) : readLS(`${LS_WISHES}_${rid}`, []) };
     });
+    const wishes = wishState.rid === region.id ? wishState.list : NO_WISHES;
+    const setWishes = useCallback((fn) => setWishState((st) => {
+        const cur = st.rid === region.id ? st.list : NO_WISHES;
+        return { rid: region.id, list: typeof fn === "function" ? fn(cur) : fn };
+    }), [region.id]);
+    useEffect(() => {
+        setWishState((st) => (st.rid === region.id ? st : { rid: region.id, list: readLS(`${LS_WISHES}_${region.id}`, []) }));
+    }, [region.id]);
     const [q, setQ] = useState("");
     const [kind, setKind] = useState("");
     const [onlyIn, setOnlyIn] = useState(false);
@@ -336,24 +355,35 @@ export default function Gymnasia() {
     const load = useCallback(async () => {
         setLoading(true); setError(false);
         try {
-            const y = await gymnasiaService.getLatestYear(REGION);
+            const y = await gymnasiaService.getLatestYear(region.db);
             if (!y) { setClasses([]); setStage1([]); setYear(null); return; }
             const [cls, s1] = await Promise.all([
-                gymnasiaService.getClasses(y, REGION),
-                gymnasiaService.getStage1([y, y - 1, y - 2, y - 3], REGION),
+                gymnasiaService.getClasses(y, region.db),
+                gymnasiaService.getStage1([y, y - 1, y - 2, y - 3], region.db),
             ]);
             setYear(y); setClasses(cls); setStage1(s1);
         } catch { setError(true); } finally { setLoading(false); }
-    }, []);
+    }, [region.db]);
     useEffect(() => { load(); }, [load]);
 
     useEffect(() => { writeLS(LS_INPUTS, inputs); }, [inputs]);
     useEffect(() => {
-        writeLS(LS_WISHES, wishes);
+        if (wishState.rid !== region.id) return;
+        writeLS(`${LS_WISHES}_${region.id}`, wishes);
         const next = new URLSearchParams(params);
         if (wishes.length) next.set("w", wishes.join(",")); else next.delete("w");
+        if (region.id === "sofia") next.delete("r"); else next.set("r", region.id);
         if (next.toString() !== params.toString()) setParams(next, { replace: true });
-    }, [wishes, params, setParams]);
+    }, [wishes, wishState.rid, region.id, params, setParams]);
+
+    const switchRegion = (id) => {
+        if (id === region.id) return;
+        setExpanded(null); setShown(PAGE); setQ(""); setKind(""); setOnlyIn(false);
+        const next = new URLSearchParams(params);
+        next.delete("w");
+        if (id === "sofia") next.delete("r"); else next.set("r", id);
+        setParams(next, { replace: true });
+    };
 
     const setInput = (key, value) => setInputs((p) => ({ ...p, [key]: value }));
     const hasNvo = inputs.nvo_bel !== undefined && inputs.nvo_bel !== "" && inputs.nvo_mat !== undefined && inputs.nvo_mat !== "";
@@ -389,6 +419,13 @@ export default function Gymnasia() {
         return { withBal: withBal.length, inCount, withMin, lo: bals.length ? Math.min(...bals) : null, hi: bals.length ? Math.max(...bals) : null };
     }, [rows]);
 
+    const histRange = useMemo(() => {
+        const ys = [...new Set(stage1.map((r) => r.campaign_year))];
+        if (!ys.length) return "";
+        const lo = Math.min(...ys), hi = Math.max(...ys);
+        return lo === hi ? String(lo) : `${lo}–${hi}`;
+    }, [stage1]);
+
     const toggleWish = (code) => setWishes((w) => (w.includes(code) ? w.filter((c) => c !== code) : [...w, code]));
     const moveWish = (i, d) => setWishes((w) => { const n = [...w]; const j = i + d; if (j < 0 || j >= n.length) return w; [n[i], n[j]] = [n[j], n[i]]; return n; });
     const copyLink = () => {
@@ -403,8 +440,8 @@ export default function Gymnasia() {
     return (
         <div style={{ minHeight: "100vh", background: "var(--brand-bg)", padding: "7rem 1rem 6rem", color: "var(--brand-text)" }}>
             <Seo
-                title={`Прием след 7. клас в София ${year ? year + 1 : ""} — бал, минимални балове и желания`}
-                description="Изчисли бала си за всяка паралелка в София по формулата от РУО, сравни с минималните балове от последните 4 години и подреди желанията си разумно. Безплатно."
+                title={`Прием след 7. клас ${region.in} ${year ? year + 1 : ""} — бал, минимални балове и желания`}
+                description={`Изчисли бала си за всяка паралелка в ${region.name} по формулата от ${region.ruo.replace("РУО – ", "РУО ")}, сравни с минималните балове от последните кампании и подреди желанията си разумно. Безплатно.`}
                 path="/priem-7-klas"
             />
             <JsonLd data={{
@@ -421,7 +458,7 @@ export default function Gymnasia() {
                 <m.header initial={reduced ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}>
                     <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.375rem 0.875rem", background: "rgba(6,182,212,0.08)", border: "1px solid rgba(6,182,212,0.2)", borderRadius: "999px", marginBottom: "1rem" }}>
                         <School size={14} strokeWidth={1.5} style={{ color: "var(--brand-cyan)" }} aria-hidden="true" />
-                        <span style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--brand-cyan)" }}>Прием след 7. клас · {REGION}</span>
+                        <span style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--brand-cyan)" }}>Прием след 7. клас · {region.name}</span>
                     </div>
                     <h1 style={{ margin: "0 0 0.75rem", fontSize: "clamp(2rem, 5vw, 3.25rem)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.05, textWrap: "balance" }}>
                         Виж в кои гимназии влизаш — <span style={{ background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>преди да подадеш желанията</span>
@@ -431,10 +468,18 @@ export default function Gymnasia() {
                     </p>
                 </m.header>
 
+                <div role="group" aria-label="Област" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.5rem" }}>
+                    <span style={{ ...label, margin: 0 }}>Област</span>
+                    {REGIONS.map((r) => (
+                        <button key={r.id} type="button" onClick={() => switchRegion(r.id)} aria-pressed={r.id === region.id} style={chip(r.id === region.id)}>{r.name}</button>
+                    ))}
+                    <span style={{ fontSize: "12px", color: "var(--brand-muted)" }}>Добавяме още области — започваме с най-големите.</span>
+                </div>
+
                 <div style={{ display: "flex", gap: "0.625rem", alignItems: "flex-start", padding: "0.75rem 1rem", background: "rgba(6,182,212,0.06)", border: "1px solid rgba(6,182,212,0.2)", borderRadius: "0.875rem" }}>
                     <Info size={16} strokeWidth={1.5} style={{ color: "var(--brand-cyan)", flexShrink: 0, marginTop: 1 }} aria-hidden="true" />
                     <p style={{ margin: 0, fontSize: "12.5px", lineHeight: 1.55, color: "var(--brand-muted)" }}>
-                        Данните са от справките на РУО – София-град: паралелки и балообразуване за прием {year ? `${year}/${year + 1}` : ""}, класирания {year ? `${year - 3}–${year}` : ""} г.
+                        Данните са от справките на {region.ruo}: паралелки и балообразуване за прием {year ? `${year}/${year + 1}` : ""}, класирания {histRange} г.
                         Минималният бал е този на последния приет на съответния етап — той се формира всяка година наново. Миналите балове са ориентир, не гаранция.
                     </p>
                 </div>
@@ -525,7 +570,7 @@ export default function Gymnasia() {
                                 <p style={{ margin: 0, fontSize: "12.5px", color: "var(--brand-muted)" }}>{filtered.length} паралелки</p>
                                 <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "0.625rem" }}>
                                     {filtered.slice(0, shown).map((r) => (
-                                        <ClassRow key={r.cls.class_code} row={r} year={year} stage1={stage1} inWish={wishes.includes(r.cls.class_code)} onToggleWish={toggleWish} expanded={expanded === r.cls.class_code} onExpand={setExpanded} />
+                                        <ClassRow key={r.cls.class_code} row={r} year={year} stage1={stage1} inWish={wishes.includes(r.cls.class_code)} onToggleWish={toggleWish} expanded={expanded === r.cls.class_code} onExpand={setExpanded} region={region} />
                                     ))}
                                 </ul>
                                 {filtered.length > shown && (
