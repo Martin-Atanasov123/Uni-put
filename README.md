@@ -89,23 +89,28 @@
 
 ## Инсталация
 
-Изисквания: Node.js 18+
+Не е нужна инсталация, за да ползваш платформата: тя работи в браузъра на **https://uniput.eu**.
+
+Локално стартиране (изисквания: Node.js 18+, git):
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/Martin-Atanasov123/Uni-put.git
 cd Uni-put
 npm install
 ```
 
-Създай `.env` в корена:
+Създай файл `.env` в корена. Ключът по-долу е **публичният** анонимен ключ — същият, който сайтът
+изпраща на всеки браузър. Достъпът до данните се контролира от RLS политиките в базата, затова
+с него се чете само публичното съдържание.
 
 ```env
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_SUPABASE_URL=https://vryaoxncvtnpsngkqteq.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZyeWFveG5jdnRucHNuZ2txdGVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NTA4MzksImV4cCI6MjA3ODUyNjgzOX0.n0nKdy9HuREIhS5oP1XzyBAa1CMKJhdRWwYZ2694ZM0
 ```
 
 ```bash
 npm run dev        # http://localhost:5173
+npm run lint       # проверка на кода (ESLint)
 npm run build      # продукционен build
 npx vitest run     # тестове
 ```

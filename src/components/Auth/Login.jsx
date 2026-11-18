@@ -122,9 +122,9 @@ const Login = () => {
                         <GraduationCap size={28} color="#fff" />
                     </div>
                     <div style={{ textAlign: "center" }}>
-                        <h2 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--brand-text)" }}>
+                        <h1 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--brand-text)", textWrap: "balance" }}>
                             Добре дошъл отново
-                        </h2>
+                        </h1>
                         <p style={{ margin: "0.4rem 0 0", fontSize: "13px", color: "var(--brand-muted)" }}>
                             Влез в УниПът, за да управляваш своите балове.
                         </p>
