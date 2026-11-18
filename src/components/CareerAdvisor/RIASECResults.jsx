@@ -171,7 +171,6 @@ const RIASECResults = ({ results, onRestart }) => {
         setTimeout(() => setShareFeedback((k) => (k === kind ? null : k)), 2400);
     };
     const handleShareLink = async () => {
-        window.gtag?.("event", "share", { method: "link", content_type: "riasec_result" });
         const outcome = await shareOrCopyLink({
             title: "УниПът — кариерен профил",
             text: `Моят кариерен профил е ${riasecCode}${primaryName ? ` (${primaryName.toLowerCase()} тип)` : ""}. Открий своя с безплатния тест:`,
@@ -180,7 +179,6 @@ const RIASECResults = ({ results, onRestart }) => {
         if (outcome === "copied") flashShare("link");
     };
     const handleShareImage = async () => {
-        window.gtag?.("event", "share", { method: "image", content_type: "riasec_result" });
         const canvas = drawRiasecCard({
             code: riasecCode,
             scores,

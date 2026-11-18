@@ -357,7 +357,6 @@ export default function CalculatorPage() {
     // OAuth директно от gate картата — връща потребителя на СЪЩАТА заключена
     // специалност (certainty: нищо не се губи), не на общ /calculator.
     const handleGateGoogleSignup = () => {
-        window.gtag?.("event", "signup_gate_cta_click", { gate: "calculator_specialty_limit", method: "google" });
         const dest = `${location.pathname}${location.search}`;
         supabase.auth.signInWithOAuth({
             provider: "google",
@@ -711,13 +710,6 @@ export default function CalculatorPage() {
         && hasCompleteResult
         && !unlockedSpecialtyKeys.has(currentSpecialtyKey)
         && unlockedSpecialtyKeys.size >= GATE_LIMIT;
-
-    // Аналитика: „показан gate" веднъж на специалност, не на всеки render.
-    useEffect(() => {
-        if (isSpecialtyLocked) {
-            window.gtag?.("event", "signup_gate_shown", { gate: "calculator_specialty_limit" });
-        }
-    }, [isSpecialtyLocked, currentSpecialtyKey]);
 
     // Анонимна статистика: след пауза във въвеждането записваме баловете и
     // питаме за процентилен ранг. Под 20 браузъра сървърът не връща нищо.
@@ -1293,7 +1285,6 @@ export default function CalculatorPage() {
                             <Link
                                 to="/register"
                                 state={{ from: { pathname: location.pathname, search: location.search } }}
-                                onClick={() => window.gtag?.("event", "signup_gate_cta_click", { gate: "calculator_specialty_limit", method: "email" })}
                                 style={{
                                     display: "inline-flex", alignItems: "center",
                                     height: "3rem", padding: "0 1.25rem",
@@ -1310,7 +1301,6 @@ export default function CalculatorPage() {
                         <div style={{ marginTop: "1.25rem" }}>
                             <Link
                                 to="/universities/"
-                                onClick={() => window.gtag?.("event", "signup_gate_dismiss", { gate: "calculator_specialty_limit" })}
                                 style={{ fontSize: "13px", fontWeight: 600, color: "var(--brand-cyan)", textDecoration: "none" }}
                             >
                                 Не сега — към университетите

@@ -8,7 +8,6 @@ import ProtectedRoute from "@/routes/ProtectedRoute";
 import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import GlobalErrorBoundary from "@/components/common/GlobalErrorBoundary";
-import CookieConsent from "@/components/common/CookieConsent";
 
 import AdminRoute from "@/routes/AdminRoute";
 import ScrollToTop from "@/components/common/ScrollToTop";
@@ -152,7 +151,6 @@ function App() {
                         </Suspense>
                     </main>
                     <Footer />
-                    <CookieConsent />
                 </AuthProvider>
             </LazyMotion>
         </GlobalErrorBoundary>
