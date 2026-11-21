@@ -307,6 +307,12 @@ const TIPS = [
 ];
 
 // Кеш в паметта: данни за факултет + минимални балове (живее до презареждане на страницата).
+const FIELD_LABEL = {
+    display: "block", marginBottom: "0.4rem",
+    fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em",
+    color: "var(--brand-muted)",
+};
+
 const FACULTY_DATA_CACHE = new Map();
 
 export default function CalculatorPage() {
@@ -750,27 +756,46 @@ export default function CalculatorPage() {
             />
             <JsonLd data={CALCULATOR_SCHEMA} />
             <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 1.5rem" }}>
+                <style>{`
+                    .calc-head { display: grid; gap: 1.25rem; margin-bottom: 2.5rem; }
+                    .calc-how { display: grid; grid-template-columns: 1fr; gap: 1.25rem; list-style: none; margin: 1rem 0 0; padding: 0; }
+                    .calc-lower { display: grid; grid-template-columns: minmax(0, 1fr); column-gap: 3rem; }
+                    .calc-result { display: grid; gap: 1.25rem; }
+                    .calc-result-status { padding-top: 1rem; border-top: 1px solid var(--brand-border); display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; }
+                    @media (min-width: 640px) { .calc-how { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem 2rem; } }
+                    @media (min-width: 900px) {
+                        .calc-head { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: end; gap: 3rem; }
+                        .calc-result { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); column-gap: 2.5rem; }
+                        .calc-result-name { grid-column: 1; grid-row: 1; }
+                        .calc-result-formula { grid-column: 1; grid-row: 2; align-self: start; }
+                        .calc-result-score { grid-column: 2; grid-row: 1; }
+                        .calc-result-status { grid-column: 2; grid-row: 2; padding-top: 0; border-top: none; }
+                    }
+                    @media (min-width: 1000px) {
+                        .calc-how { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+                        .calc-lower { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+                        .calc-conv { grid-column: 1; grid-row: 1 / span 2; }
+                        .calc-leg { grid-column: 2; grid-row: 1; }
+                        .calc-tip { grid-column: 2; grid-row: 2; }
+                    }
+                `}</style>
 
                 {/* Header */}
-                <m.div initial={{ opacity: 0, y: 20, }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} style={{ marginBottom: "2.5rem" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.625rem", marginBottom: "0.75rem" }}>
-                        <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "var(--brand-violet)", boxShadow: "0 0 10px var(--brand-violet)" }} />
-                        <span style={{ color: "var(--brand-violet)", fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em" }}>Калкулатор</span>
+                <m.div className="calc-head" initial={{ opacity: 0, y: 20, }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+                    <div>
+                        <p style={{ margin: "0 0 0.75rem", color: "var(--brand-accent-text)", fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em" }}>Калкулатор</p>
+                        <h1 style={{ fontSize: "clamp(2rem,5vw,3.25rem)", fontWeight: 800, color: "var(--brand-text)", lineHeight: 1.08, letterSpacing: "-0.03em", margin: 0, textWrap: "balance" }}>
+                            Изчисли своя{" "}
+                            <span style={{ color: "var(--brand-accent-text)" }}>
+                                приемен бал
+                            </span>
+                        </h1>
                     </div>
-                    <h1 style={{ fontSize: "clamp(2rem,5vw,3rem)", fontWeight: 900, color: "var(--brand-text)", lineHeight: 1.1, letterSpacing: "-0.03em", margin: "0 0 0.625rem", textWrap: "balance" }}>
-                        Изчисли своя{" "}
-                        <span style={{ color: "var(--brand-accent-text)" }}>
-                            приемен бал
-                        </span>
-                    </h1>
 
                     {/* Notice */}
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: "0.625rem", padding: "0.875rem 1rem", background: "rgba(245,181,68,0.08)", border: "1px solid rgba(245,181,68,0.2)", borderRadius: "0.875rem", maxWidth: "36rem" }}>
-                        <AlertCircle size={15} style={{ color: "var(--brand-violet)", flexShrink: 0, marginTop: "1px" }} />
-                        <p style={{ fontSize: "13px", color: "var(--brand-muted)", margin: 0, lineHeight: 1.5 }}>
-                            Калкулаторът има формулите на 51 университета. Ако не намираш своята специалност, пиши ни на uniput1000@gmail.com — ще я добавим.
-                        </p>
-                    </div>
+                    <p style={{ margin: 0, paddingLeft: "1rem", borderLeft: "2px solid var(--brand-accent)", fontSize: "14px", color: "var(--brand-muted)", lineHeight: 1.6, maxWidth: "30rem" }}>
+                        Калкулаторът има формулите на 51 университета. Ако не намираш своята специалност, пиши ни на uniput1000@gmail.com — ще я добавим.
+                    </p>
                 </m.div>
 
                 {/* Load error banner */}
@@ -824,14 +849,16 @@ export default function CalculatorPage() {
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.1 }}
-                    style={{ background: S.surface, backdropFilter: "blur(12px)", border: `1px solid ${S.border}`, borderRadius: "1.25rem", padding: "1.25rem", marginBottom: "1.5rem" }}
+                    style={{ background: S.surface, border: `1px solid ${S.border}`, borderRadius: "1.25rem", padding: "1.25rem", marginBottom: "1.5rem" }}
                 >
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
                         {/* Faculty searchable */}
                         <div style={{ position: "relative" }}>
+                            <label htmlFor="calc-faculty" style={FIELD_LABEL}>1 · Факултет</label>
                             <div style={{ position: "relative" }}>
                                 <input
                                     type="text"
+                                    id="calc-faculty"
                                     placeholder="Търси факултет..."
                                     value={facultySearch}
                                     onChange={e => { setFacultySearch(e.target.value); setDropdownShowAll(false); setIsFacultyDropdownOpen(true); }}
@@ -882,7 +909,9 @@ export default function CalculatorPage() {
                         </div>
 
                         {/* Specialty */}
-                        <select
+                        <div>
+                            <label htmlFor="calc-specialty" style={FIELD_LABEL}>2 · Специалност</label>
+                            <select id="calc-specialty"
                             value={selectedSpecialtyName}
                             onChange={e => setSelectedSpecialtyName(e.target.value)}
                             disabled={!selectedFaculty}
@@ -892,6 +921,7 @@ export default function CalculatorPage() {
                             <option value="" style={{ background: "var(--brand-dropdown-bg)" }}>Избери специалност</option>
                             {availableSpecialties.map((s, i) => <option key={i} value={s} style={{ background: "var(--brand-dropdown-bg)" }}>{s}</option>)}
                         </select>
+                        </div>
                     </div>
 
                     {/* Optional filters */}
@@ -930,30 +960,20 @@ export default function CalculatorPage() {
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.15 }}
-                        style={{ marginBottom: "2rem"  }}
+                        style={{ marginBottom: "2rem" }}
                     >
-                        <h2 style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--brand-cyan)", marginBottom: "1rem", margin: 0 }}>
-                            Как се изчислява баловия резултат
+                        <h2 style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--brand-accent-text)", margin: 0 }}>
+                            Как се изчислява баловият резултат
                         </h2>
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: "0.875rem" }}>
-                            {HOW_STEPS.map(step => {
-                                const Icon = step.icon;
-                                return (
-                                    <div key={step.num} style={{ background: S.surface, backdropFilter: "blur(12px)", border: `1px solid ${S.border}`, borderRadius: "1.25rem", padding: "1.25rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                                            <div style={{ padding: "0.5rem", borderRadius: "0.625rem", background: "rgba(245,181,68,0.12)", display: "inline-flex" }}>
-                                                <Icon size={18} style={{ color: "var(--brand-cyan)" }} />
-                                            </div>
-                                            <span style={{ fontSize: "2rem", fontWeight: 900, color: "var(--brand-border)", letterSpacing: "-0.04em" }}>{step.num}</span>
-                                        </div>
-                                        <div>
-                                            <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--brand-text)", margin: "0 0 0.3rem" }}>{step.title}</p>
-                                            <p style={{ fontSize: "12px", color: "var(--brand-muted)", margin: 0, lineHeight: 1.55 }}>{step.desc}</p>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                        <ol className="calc-how">
+                            {HOW_STEPS.map(step => (
+                                <li key={step.num} style={{ borderTop: "1px solid var(--brand-border)", paddingTop: "1rem" }}>
+                                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "13px", fontWeight: 600, color: "var(--brand-accent-text)" }}>{step.num}</span>
+                                    <p style={{ fontSize: "1rem", fontWeight: 700, color: "var(--brand-text)", margin: "0.4rem 0 0.35rem", fontFamily: "var(--font-display)" }}>{step.title}</p>
+                                    <p style={{ fontSize: "13px", color: "var(--brand-muted)", margin: 0, lineHeight: 1.6 }}>{step.desc}</p>
+                                </li>
+                            ))}
+                        </ol>
                     </m.div>
                 )}
 
@@ -963,42 +983,36 @@ export default function CalculatorPage() {
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.18 }}
-                        style={{ marginBottom: "2rem" }}
+                        style={{ marginBottom: "2.5rem" }}
                     >
                         <Link
                             to="/dzi-strateg"
                             style={{
                                 display: "flex", alignItems: "center", gap: "1rem",
-                                padding: "1.25rem 1.5rem",
-                                background: "rgba(245,181,68,0.08)",
-                                border: "1px solid var(--brand-card-border)",
-                                borderRadius: "1.25rem",
+                                padding: "1.125rem 0",
+                                borderTop: "1px solid var(--brand-border)",
+                                borderBottom: "1px solid var(--brand-border)",
                                 textDecoration: "none",
                             }}
                         >
-                            <div style={{ flexShrink: 0, padding: "0.625rem", borderRadius: "0.75rem", background: "var(--brand-accent)", display: "inline-flex" }}>
-                                <Compass size={20} color="#111827" strokeWidth={1.5} />
-                            </div>
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                                <p style={{ fontSize: "14px", fontWeight: 800, color: "var(--brand-text)", margin: "0 0 0.2rem", letterSpacing: "-0.01em" }}>
-                                    Още нямаш оценки? Виж кой втори ДЗИ ти отваря най-много специалности
-                                </p>
-                                <p style={{ fontSize: "12px", color: "var(--brand-muted)", margin: 0, lineHeight: 1.5 }}>
-                                    ДЗИ Стратег — за 11. клас и всеки, който планира матурите си.
-                                </p>
-                            </div>
-                            <ArrowRight size={18} style={{ flexShrink: 0, color: "var(--brand-cyan)" }} />
+                            <p style={{ flex: 1, minWidth: 0, margin: 0, fontSize: "14px", lineHeight: 1.55, color: "var(--brand-muted)" }}>
+                                <strong style={{ color: "var(--brand-text)" }}>Още нямаш оценки? Виж кой втори ДЗИ ти отваря най-много специалности.</strong>{" "}
+                                ДЗИ Стратег — за 11. клас и всеки, който планира матурите си.
+                            </p>
+                            <ArrowRight size={18} strokeWidth={1.5} style={{ flexShrink: 0, color: "var(--brand-accent-text)" }} />
                         </Link>
                     </m.div>
                 )}
 
+                <div className="calc-lower">
                 {/* DZI → Grade Converter — shown only when no faculty selected AND dropdown is closed */}
                 {!selectedFaculty && !isFacultyDropdownOpen && (
                     <m.div
+                        className="calc-conv"
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.22 }}
-                        style={{ background: S.surface, backdropFilter: "blur(12px)", border: `1px solid ${S.border}`, borderRadius: "1.25rem", padding: "1.5rem", marginBottom: "2rem" }}
+                        style={{ background: S.surface, border: `1px solid ${S.border}`, borderRadius: "1.25rem", padding: "1.5rem", marginBottom: "2rem" }}
                     >
                         {/* Header */}
                         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1.25rem" }}>
@@ -1148,15 +1162,13 @@ export default function CalculatorPage() {
                 {/* Formula legend — shown only when no faculty selected AND dropdown is closed */}
                 {!selectedFaculty && !isFacultyDropdownOpen && (
                     <m.div
+                        className="calc-leg"
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.26 }}
-                        style={{ background: S.surface, backdropFilter: "blur(12px)", border: `1px solid ${S.border}`, borderRadius: "1.25rem", padding: "1.25rem", marginBottom: "2rem" }}
+                        style={{ borderTop: "1px solid var(--brand-border)", paddingTop: "1.25rem", marginBottom: "2rem" }}
                     >
                         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.875rem" }}>
-                            <div style={{ padding: "0.375rem", borderRadius: "0.5rem", background: "rgba(245,181,68,0.12)", display: "inline-flex" }}>
-                                <Info size={15} style={{ color: "var(--brand-violet)" }} />
-                            </div>
                             <p style={{ fontSize: "13px", fontWeight: 700, color: "var(--brand-text)", margin: 0 }}>Легенда на формулите</p>
                         </div>
                         <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
@@ -1173,13 +1185,13 @@ export default function CalculatorPage() {
                 {/* Tips — shown only when no faculty selected AND dropdown is closed */}
                 {!selectedFaculty && !isFacultyDropdownOpen && (
                     <m.div
+                        className="calc-tip"
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.29 }}
-                        style={{ background: S.surface, backdropFilter: "blur(12px)", border: `1px solid ${S.border}`, borderRadius: "1.25rem", padding: "1.25rem", marginBottom: "2rem" }}
+                        style={{ borderTop: "1px solid var(--brand-border)", paddingTop: "1.25rem", marginBottom: "2rem" }}
                     >
                         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.875rem" }}>
-                            <Lightbulb size={15} style={{ color: "#FBBF24" }} />
                             <p style={{ fontSize: "13px", fontWeight: 700, color: "var(--brand-text)", margin: 0 }}>Съвети за по-добър резултат</p>
                         </div>
                         <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "0.5rem" }}>
@@ -1193,6 +1205,8 @@ export default function CalculatorPage() {
                     </m.div>
                 )}
 
+                </div>
+
                 {/* Grade inputs */}
                 <AnimatePresence>
                     {selectedSpecialtyName && rowsForSelectedSpecialty.length > 0 && (
@@ -1201,7 +1215,7 @@ export default function CalculatorPage() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.4 }}
-                            style={{ background: S.surface, backdropFilter: "blur(12px)", border: `1px solid ${S.border}`, borderRadius: "1.25rem", padding: "1.5rem", marginBottom: "1.5rem" }}
+                            style={{ background: S.surface, border: `1px solid ${S.border}`, borderRadius: "1.25rem", padding: "1.5rem", marginBottom: "1.5rem" }}
                         >
                             <GradeInputSection
                                 coefficients={coefficientsForInputs}
@@ -1307,32 +1321,33 @@ export default function CalculatorPage() {
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, delay: 0.1 }}
-                        style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(320px,1fr))", gap: "1rem" }}
+                        style={{ display: "grid", gridTemplateColumns: "1fr", gap: "1rem" }}
                     >
                         {calcResults.map(({ item, score, maxBall, formatted, minScore, isAbove, marginPts, chance, percentOfMax, hasStarted, hasMissing, missingSlots }) => (
-                                <div key={item.id} style={{ background: S.surface, backdropFilter: "blur(12px)", border: `1px solid ${S.border}`, borderRadius: "1.25rem", padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
+                                <div key={item.id} className="calc-result" style={{ background: S.surface, border: `1px solid ${S.border}`, borderRadius: "1.25rem", padding: "1.5rem" }}>
 
-                                    {/* Top: name + score */}
-                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "1rem" }}>
-                                        <div style={{ flex: 1, minWidth: 0 }}>
-                                            <div style={{ fontSize: "11px", color: "var(--brand-muted)", marginBottom: "0.25rem", fontWeight: 600 }}>{item.university_name}</div>
-                                            <h3 style={{ fontSize: "15px", fontWeight: 700, color: "var(--brand-text)", lineHeight: 1.4, margin: 0 }}>{item.specialty}</h3>
-                                        </div>
-                                        <div style={{ textAlign: "right", flexShrink: 0 }}>
-                                            <div style={{ fontSize: "2.5rem", fontWeight: 900, lineHeight: 1, letterSpacing: "-0.04em", color: hasMissing ? "var(--brand-muted)" : isAbove === true && hasStarted ? "#10b981" : "var(--brand-cyan)" }}>
-                                                {hasMissing && hasStarted ? "—" : !hasStarted ? "—" : formatted}
+                                    {/* Име на специалността */}
+                                    <div className="calc-result-name" style={{ minWidth: 0 }}>
+                                        <div style={{ fontSize: "12px", color: "var(--brand-muted)", marginBottom: "0.35rem", fontWeight: 600 }}>{item.university_name}</div>
+                                        <h3 style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--brand-text)", lineHeight: 1.3, margin: 0, letterSpacing: "-0.01em" }}>{item.specialty}</h3>
+                                        {/* Trust warning — преди да зарадваме ученика с „влизаш", го предупреждаваме за акредитацията */}
+                                        {item.accreditation_status && (
+                                            <div style={{ marginTop: "0.75rem" }}>
+                                                <AccreditationWarning status={item.accreditation_status} />
                                             </div>
-                                            <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>бал</div>
-                                        </div>
+                                        )}
                                     </div>
 
-                                    {/* Trust warning — преди да зарадваме ученика с „влизаш", го предупреждаваме за акредитацията */}
-                                    {item.accreditation_status && (
-                                        <AccreditationWarning status={item.accreditation_status} />
-                                    )}
+                                    {/* Бал */}
+                                    <div className="calc-result-score">
+                                        <div style={{ fontFamily: "var(--font-mono)", fontSize: "3.25rem", fontWeight: 600, lineHeight: 1, letterSpacing: "-0.04em", color: hasMissing ? "var(--brand-muted)" : isAbove === true && hasStarted ? "#10b981" : "var(--brand-text)" }}>
+                                            {hasMissing && hasStarted ? "—" : !hasStarted ? "—" : formatted}
+                                        </div>
+                                        <div style={{ marginTop: "0.35rem", fontSize: "11px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>бал{maxBall ? ` от ${maxBall}` : ""}</div>
+                                    </div>
 
                                     {/* Formula */}
-                                    <div style={{ display: "flex", gap: "0.5rem", padding: "0.75rem", background: "rgba(245,181,68,0.06)", border: "1px solid rgba(245,181,68,0.15)", borderRadius: "0.75rem", minWidth: 0 }}>
+                                    <div className="calc-result-formula" style={{ display: "flex", gap: "0.5rem", padding: "0.75rem", background: "rgba(245,181,68,0.06)", border: "1px solid rgba(245,181,68,0.15)", borderRadius: "0.75rem", minWidth: 0 }}>
                                         <Info size={14} style={{ color: "var(--brand-violet)", flexShrink: 0, marginTop: "1px" }} />
                                         <p style={{ fontSize: "12px", color: "var(--brand-muted)", margin: 0, lineHeight: 1.5, wordBreak: "break-word", overflowWrap: "anywhere", minWidth: 0 }}>
                                             <strong style={{ color: "var(--brand-text)" }}>Формула:</strong> {item.formula_description}
@@ -1340,7 +1355,7 @@ export default function CalculatorPage() {
                                     </div>
 
                                     {/* Status */}
-                                    <div style={{ paddingTop: "0.75rem", borderTop: "1px solid rgba(148,163,184,0.08)", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                                    <div className="calc-result-status">
                                         {minScore && (
                                             <div style={{ fontSize: "12px", color: "var(--brand-muted)" }}>
                                                 Минимален бал {minScore.year}{minScore.round ? ` (${minScore.round}-${minScore.round === 1 ? "во" : minScore.round === 2 ? "ро" : "то"} класиране)` : " (финално класиране)"}:{" "}
