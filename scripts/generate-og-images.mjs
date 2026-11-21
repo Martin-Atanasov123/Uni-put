@@ -1,180 +1,112 @@
-// Генерира социални preview изображения (Open Graph + Twitter Card).
+// Генерира социални preview изображения (Open Graph + Twitter Card), 1200×630.
 //
-// Защо: преди това всичките 60+ страници използваха един и същ /university.png.
-// Когато ученик сподели линк във Viber/Telegram/Facebook, всички preview-та
-// изглеждаха еднакво. Per-page branded OG = +30-50% CTR от social shares.
+// Дизайн (редизайн, ноември 2026): плътен тъмен фон, кехлибарен акцент, Source Serif 4 за
+// заглавието и Source Sans 3 за текста — същото като в сайта. Без градиенти и орбове.
 //
-// Стратегия: SVG шаблон на страница → rasterize до PNG чрез @resvg/resvg-js
-// (pure WASM, без native bindings). Output: public/og/[slug].png (1200×630 — official OG spec).
+// Шрифтовете са статични TTF в scripts/og-fonts/ (Resvg не чете woff2). Логото е
+// scripts/og-fonts/logo-amber.png (изрязана и намалена версия на public/logo-wordmark.png).
 //
-// Стартирай ръчно: `npm run generate:og`. Не е в prebuild — изображенията
-// се commit-ват веднъж и се регенерират само при дизайн промяна.
-//
-// ⚠️ ВНИМАНИЕ: комитнатите PNG-та в public/og/ НЕ идват от този скрипт. Те са
-// направени ръчно и са значително по-добри — носят логото на УниПът, Inter,
-// градиентното число в cyan→violet и илюстрацията. Този скрипт е само груб
-// fallback: Inter не е инсталиран в Node, затова Resvg рендерира със serif,
-// без лого и без илюстрация. Пускането му презаписваше брандираните файлове с
-// по-лоши. Затова сега по подразбиране НЕ пише върху съществуващ файл —
-// нужен е изричен --force.
+// Стартирай ръчно: `npm run generate:og`. Не е в prebuild — PNG-тата се commit-ват и се
+// регенерират само при промяна на дизайна или на числата в siteStats.
 
 import { UNIVERSITIES, SPECIALTIES, DORMITORIES, DORMITORY_CITIES, ADMISSION_YEAR_SHORT } from "../src/lib/siteStats.js";
 
 import { Resvg } from "@resvg/resvg-js";
-import { writeFile, mkdir } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { writeFile, mkdir, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = resolve(__dirname, "..", "public", "og");
+const FONT_DIR = resolve(__dirname, "og-fonts");
 
-// Шаблоните за всички страници. Headline + subtitle + accent цвят.
-// Брандиране: cyan→violet gradient (signature на УниПът), Inter font, dark bg.
+const BG = "#0E1525";
+const ACCENT = "#F5B544";
+const TEXT = "#EEF1F7";
+const MUTED = "#94A3B8";
+
 const PAGES = [
-    {
-        slug: "default",
-        eyebrow: "УНИПЪТ",
-        title: "Калкулатор за приемен бал",
-        subtitle: "и кариерен ориентир за кандидат-студенти",
-        accent: "#06B6D4",
-    },
-    {
-        slug: "calculator",
-        eyebrow: "КАЛКУЛАТОР",
-        title: "Кандидатстудентски бал",
-        subtitle: `Точните коефициенти за ${SPECIALTIES} специалности`,
-        accent: "#06B6D4",
-    },
-    {
-        slug: "career-advisor",
-        eyebrow: "RIASEC ТЕСТ",
-        title: "Открий своето призвание",
-        subtitle: "30 въпроса за 3 минути — безплатно",
-        accent: "#8B5CF6",
-    },
-    {
-        slug: "universities",
-        eyebrow: "ВИСШИ УЧИЛИЩА",
-        title: `${UNIVERSITIES} университета`,
-        subtitle: `${SPECIALTIES} специалности за прием ${ADMISSION_YEAR_SHORT}`,
-        accent: "#06B6D4",
-    },
-    {
-        slug: "dormitories",
-        eyebrow: "СТУДЕНТСКИ ЖИВОТ",
-        title: `${DORMITORIES} общежития`,
-        subtitle: `В ${DORMITORY_CITIES} града на България`,
-        accent: "#8B5CF6",
-    },
-    {
-        slug: "about",
-        eyebrow: "ЗА НАС",
-        title: "УниПът",
-        subtitle: "Твоят дигитален пътеводител към висшето образование",
-        accent: "#8B5CF6",
-    },
+    { slug: "default", eyebrow: "УНИПЪТ", title: "Калкулатор за приемен бал", subtitle: "и кариерен ориентир за кандидат-студенти" },
+    { slug: "calculator", eyebrow: "КАЛКУЛАТОР", title: "Кандидатстудентски бал", subtitle: `Точните коефициенти за ${SPECIALTIES} специалности` },
+    { slug: "career-advisor", eyebrow: "RIASEC ТЕСТ", title: "Открий своето призвание", subtitle: "30 въпроса за 3 минути — безплатно" },
+    { slug: "universities", eyebrow: "ВИСШИ УЧИЛИЩА", title: `${UNIVERSITIES} университета`, subtitle: `${SPECIALTIES} специалности за прием ${ADMISSION_YEAR_SHORT}` },
+    { slug: "dormitories", eyebrow: "СТУДЕНТСКИ ЖИВОТ", title: `${DORMITORIES} общежития`, subtitle: `В ${DORMITORY_CITIES} града на България` },
+    { slug: "about", eyebrow: "ЗА НАС", title: "УниПът", subtitle: "Твоят дигитален пътеводител към висшето образование" },
 ];
 
-function svgTemplate({ eyebrow, title, subtitle, accent }) {
-    // 1200×630 е официалното OG препоръчително съотношение.
-    // Layout: left-aligned brand mark + headline; right-side ambient gradient orb.
-    // Escape XML special chars в текстовете.
-    const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+// Балансиран пренос: до 2 реда, режем на думата най-близо до средата (без „сираче“ от една дума).
+function wrap(text, max = 22) {
+    if (text.length <= max) return [text];
+    const words = text.split(" ");
+    let best = null;
+    for (let i = 1; i < words.length; i++) {
+        const l1 = words.slice(0, i).join(" ");
+        const l2 = words.slice(i).join(" ");
+        const diff = Math.abs(l1.length - l2.length);
+        if (!best || diff < best.diff) best = { lines: [l1, l2], diff };
+    }
+    return best ? best.lines : [text];
+}
+
+function svgTemplate({ eyebrow, title, subtitle }, logoB64) {
+    const lines = wrap(title);
+    const titleY = 330;
+    const lh = 88;
+    const subY = titleY + (lines.length - 1) * lh + 70;
+    const logoW = 190;
+    const logoH = Math.round((logoW * 443) / 520);
     return `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0F172A"/>
-      <stop offset="100%" stop-color="#0B1120"/>
-    </linearGradient>
-    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#06B6D4"/>
-      <stop offset="100%" stop-color="#8B5CF6"/>
-    </linearGradient>
-    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0%" stop-color="${accent}" stop-opacity="0.35"/>
-      <stop offset="70%" stop-color="${accent}" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="${BG}"/>
 
-  <!-- Background -->
-  <rect width="1200" height="630" fill="url(#bg)"/>
-
-  <!-- Ambient glow (right) -->
-  <ellipse cx="950" cy="315" rx="400" ry="400" fill="url(#glow)"/>
-
-  <!-- Dot grid pattern -->
-  <g opacity="0.15">
-    ${Array.from({ length: 30 }, (_, y) =>
-        Array.from({ length: 60 }, (_, x) =>
-            `<circle cx="${20 + x * 20}" cy="${20 + y * 20}" r="1" fill="#94A3B8"/>`
-        ).join("")
+  <!-- Точкова решетка -->
+  <g opacity="0.12">
+    ${Array.from({ length: 32 }, (_, y) =>
+        Array.from({ length: 60 }, (_, x) => `<circle cx="${20 + x * 20}" cy="${20 + y * 20}" r="1" fill="${MUTED}"/>`).join("")
     ).join("")}
   </g>
 
-  <!-- Brand mark — gradient line + УниПът -->
-  <g transform="translate(80, 110)">
-    <rect x="0" y="-6" width="6" height="44" fill="url(#brand)" rx="3"/>
-    <text x="22" y="26" font-family="Inter, system-ui, sans-serif" font-size="30" font-weight="900" fill="#F1F5F9" letter-spacing="-0.02em">УниПът</text>
+  <!-- Път: две тънки линии в долния десен ъгъл -->
+  <g fill="none" stroke="${ACCENT}" stroke-linecap="round">
+    <path d="M520 700 C 700 560, 820 640, 960 470 S 1140 300, 1260 330" stroke-width="2" opacity="0.30"/>
+    <path d="M600 720 C 780 600, 900 680, 1040 520 S 1200 380, 1280 410" stroke-width="1.5" opacity="0.16"/>
   </g>
 
-  <!-- Eyebrow -->
-  <text x="80" y="260" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="700" fill="${accent}" letter-spacing="0.18em">${esc(eyebrow)}</text>
+  <!-- Лого -->
+  <image x="${1200 - 80 - logoW}" y="56" width="${logoW}" height="${logoH}" xlink:href="data:image/png;base64,${logoB64}"/>
 
-  <!-- Title (headline) -->
-  <text x="80" y="340" font-family="Inter, system-ui, sans-serif" font-size="72" font-weight="900" fill="#F1F5F9" letter-spacing="-0.03em">${esc(title)}</text>
+  <!-- Надпис над заглавието -->
+  <text x="80" y="238" font-family="UP Sans Bold" font-size="24" fill="${ACCENT}" letter-spacing="3.2">${esc(eyebrow)}</text>
 
-  <!-- Subtitle -->
-  <text x="80" y="400" font-family="Inter, system-ui, sans-serif" font-size="32" font-weight="500" fill="#94A3B8">${esc(subtitle)}</text>
+  <!-- Заглавие -->
+  ${lines.map((l, i) => `<text x="80" y="${titleY + i * lh}" font-family="UP Serif" font-size="80" fill="${TEXT}" letter-spacing="-1.4">${esc(l)}</text>`).join("\n  ")}
 
-  <!-- Footer URL -->
-  <text x="80" y="560" font-family="Inter, system-ui, sans-serif" font-size="20" font-weight="600" fill="#64748B" letter-spacing="0.05em">uniput.eu</text>
+  <!-- Подзаглавие -->
+  <text x="80" y="${subY}" font-family="UP Sans" font-size="34" fill="${MUTED}">${esc(subtitle)}</text>
 
-  <!-- Right-side decorative gradient bar -->
-  <rect x="1180" y="0" width="20" height="630" fill="url(#brand)"/>
+  <!-- Адрес -->
+  <text x="80" y="570" font-family="UP Sans Bold" font-size="22" fill="${MUTED}" letter-spacing="1.1">uniput.eu</text>
 </svg>`;
 }
 
-const FORCE = process.argv.includes("--force");
-
 async function main() {
-    let skipped = 0;
     await mkdir(OUT_DIR, { recursive: true });
+    const logoB64 = (await readFile(resolve(FONT_DIR, "logo-amber.png"))).toString("base64");
+    const fontFiles = ["SourceSerif4-ExtraBold.ttf", "SourceSans3-Bold.ttf", "SourceSans3-Regular.ttf"].map((f) => resolve(FONT_DIR, f));
     console.log(`📁 Output: ${OUT_DIR}\n`);
 
     for (const page of PAGES) {
-        const svg = svgTemplate(page);
-        // Resvg рендерира с висока резолюция (по default fitTo: { mode: 'width', value: 1200 } за нашите SVG-и).
-        const resvg = new Resvg(svg, {
-            background: "#0F172A",
+        const resvg = new Resvg(svgTemplate(page, logoB64), {
+            background: BG,
             fitTo: { mode: "width", value: 1200 },
-            font: {
-                // Системни fallback fontове — Inter не е инсталиран в Node env,
-                // но Resvg ще използва най-близкия sans-serif. Кирилицата ще се рендерира коректно.
-                loadSystemFonts: true,
-            },
+            font: { fontFiles, loadSystemFonts: false, defaultFontFamily: "UP Sans" },
         });
-        const outPath = resolve(OUT_DIR, `${page.slug}.png`);
-        if (existsSync(outPath) && !FORCE) {
-            console.log(`⏭  ${page.slug.padEnd(15)} вече съществува — пропуснат (--force за презапис)`);
-            skipped += 1;
-            continue;
-        }
-        const pngBuffer = resvg.render().asPng();
-        await writeFile(outPath, pngBuffer);
-        const sizeKB = (pngBuffer.length / 1024).toFixed(1);
-        console.log(`✅ ${page.slug.padEnd(15)} → ${sizeKB} KB`);
-    }
-    const written = PAGES.length - skipped;
-    console.log(`
-Записани ${written} OG изображения, пропуснати ${skipped}.`);
-    if (skipped > 0) {
-        console.log("   Комитнатите PNG-та са ръчно брандирани — не ги презаписвай без нужда.");
+        const png = resvg.render().asPng();
+        await writeFile(resolve(OUT_DIR, `${page.slug}.png`), png);
+        console.log(`✅ ${page.slug.padEnd(15)} → ${(png.length / 1024).toFixed(1)} KB`);
     }
 }
 
-main().catch((err) => {
-    console.error("❌", err.message);
-    process.exit(1);
-});
+main().catch((e) => { console.error(e); process.exit(1); });
