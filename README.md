@@ -132,7 +132,7 @@ src/
 │   ├── Universities/
 │   ├── admin/        # AdminDashboard, AdminReports
 │   ├── common/       # Header, Footer, Home, About, NotFound, ...
-│   └── landing/      # AnoAI, GlobeScene (3D)
+│   └── landing/      # GlobeScene (3D)
 ├── hooks/            # AuthContext.jsx, useTheme.js
 ├── lib/              # supabase.js, coefficients_config.js
 ├── routes/           # ProtectedRoute.jsx, AdminRoute.jsx

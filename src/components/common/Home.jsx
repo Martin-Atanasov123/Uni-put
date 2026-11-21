@@ -56,9 +56,6 @@ import {
 // GlobeScene for CTASection — lazy loaded
 const GlobeScene = lazy(() => import("@/components/landing/GlobeScene"));
 
-// AnoAI aurora shader — lazy loaded (Three.js chunk, shared with GlobeScene)
-const AnoAI = lazy(() => import("@/components/landing/AnoAI"));
-
 // ── Gradient dot grid background ────────────────────────────────────────────
 function DotsBg({ cyanOpacity = 0.1, violetOpacity = 0.07, size = 26 }) {
     return (
@@ -141,26 +138,6 @@ function useCountUp(end, duration = 1400, trigger) {
 // ── HERO ────────────────────────────────────────────────────────────────────
 
 function HeroSection() {
-    // Mobile + reduced-motion → пропускаме целия Three.js шейдър.
-    // На <768px устройство 3D ефектът е едва видим, а Three.js core (~730 KB raw)
-    // блокира main thread за 5-10s на по-слаби телефони. PageSpeed mobile тестът
-    // (Moto G Power + Slow 4G) спадаше до Performance 49 заради това.
-    const isMobile = useMediaQuery("(max-width: 768px)");
-    const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
-    const enableShader = !isMobile && !prefersReducedMotion;
-
-    // На desktop — отлагаме шейдъра до СЛЕД първото изрисуване, за да не блокира
-    // FCP. Double-rAF гарантира paint-а да премине през compositor.
-    const [anoaiReady, setAnoaiReady] = useState(false);
-    useEffect(() => {
-        if (!enableShader) return;
-        let r1, r2;
-        r1 = requestAnimationFrame(() => {
-            r2 = requestAnimationFrame(() => setAnoaiReady(true));
-        });
-        return () => { cancelAnimationFrame(r1); cancelAnimationFrame(r2); };
-    }, [enableShader]);
-
     return (
         <section
             data-testid="hero-section"
@@ -168,25 +145,6 @@ function HeroSection() {
             style={{ background: "var(--brand-bg)" }}
         >
             <DotsBg cyanOpacity={0.07} violetOpacity={0.05} size={32} />
-
-            {/* ── Layer 0b: AnoAI shader — desktop only, deferred until after first paint ── */}
-            {enableShader && anoaiReady && (
-                <Suspense fallback={null}>
-                    <div
-                        aria-hidden
-                        style={{
-                            position: "absolute",
-                            top: "0%", bottom: 0, left: 0, right: 0,
-                            zIndex: 1,
-                            pointerEvents: "none",
-                            filter: "blur(2.5px)",
-                            transform: "scale(1.02)",
-                        }}
-                    >
-                        <AnoAI style={{ position: "absolute", inset: 0 }} />
-                    </div>
-                </Suspense>
-            )}
 
             {/* ── Layer 2: centred hero text ── */}
             <div
