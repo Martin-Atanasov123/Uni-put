@@ -57,7 +57,7 @@ function NotFound({ slug }) {
                 </p>
                 <Link to="/universities/" style={{
                     display: "inline-flex", alignItems: "center", gap: "0.5rem", marginTop: "1.5rem",
-                    padding: "0.75rem 1.5rem", background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                    padding: "0.75rem 1.5rem", background: "var(--brand-accent)",
                     color: "#fff", borderRadius: "0.75rem", fontWeight: 700, textDecoration: "none",
                 }}>
                     Към университетите <ArrowRight size={16} />
@@ -182,8 +182,7 @@ export default function SpecialtyPage() {
                 <h1 style={{
                     margin: 0, fontSize: "clamp(2rem, 5vw, 3.25rem)", fontWeight: 900,
                     letterSpacing: "-0.035em", lineHeight: 1.1, textWrap: "balance",
-                    background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
-                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                    color: "var(--brand-accent-text)",
                 }}>
                     {name}
                 </h1>
@@ -282,7 +281,7 @@ export default function SpecialtyPage() {
                                     display: "inline-flex", alignItems: "center", gap: "0.375rem", marginTop: "0.875rem",
                                     minHeight: "40px", padding: "0 0.875rem", borderRadius: "0.625rem",
                                     fontSize: "13px", fontWeight: 700, color: "#fff", textDecoration: "none",
-                                    background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                    background: "var(--brand-accent)",
                                 }}>
                                     <Calculator size={14} strokeWidth={2} /> Изчисли бала си тук
                                 </Link>
@@ -295,7 +294,7 @@ export default function SpecialtyPage() {
                 <div style={{ marginTop: "2.5rem", display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
                     <Link to="/calculator/" style={{
                         display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.75rem 1.5rem",
-                        background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                        background: "var(--brand-accent)",
                         color: "#fff", borderRadius: "0.75rem", fontWeight: 700, textDecoration: "none", fontSize: "0.9375rem",
                     }}>
                         <Calculator size={16} /> Калкулатор за бал

@@ -453,7 +453,7 @@ const Dormitories = () => {
                                 style={{
                                     marginTop: "1.25rem",
                                     padding: "0.6rem 1.25rem",
-                                    background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                    background: "var(--brand-accent)",
                                     border: "none",
                                     borderRadius: "0.625rem",
                                     color: "#fff",

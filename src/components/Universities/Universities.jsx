@@ -299,12 +299,6 @@ function GroupCard({ group, total, specialties, univCount, cityCount, onSelect, 
                     minHeight: "84px",
                 }}
             >
-                {/* Ambient glow */}
-                <div style={{
-                    position: "absolute", inset: 0,
-                    background: `radial-gradient(ellipse at 80% 50%, ${group.accent}18 0%, transparent 70%)`,
-                    pointerEvents: "none",
-                }} />
 
                 {/* Icon "card" — white surface with icon (rsvu white-card-inside-green-rect pattern) */}
                 <div style={{
@@ -333,9 +327,7 @@ function GroupCard({ group, total, specialties, univCount, cityCount, onSelect, 
                     <div style={{
                         fontSize: "1.5rem", fontWeight: 900,
                         fontFamily: "monospace", lineHeight: 1,
-                        background: `linear-gradient(135deg, ${group.accent}, ${group.accent}bb)`,
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
+                        color: group.accent,
                     }}>
                         {total}
                     </div>
@@ -447,7 +439,6 @@ function SpecialtyCard({ uni, isFav, onToggleFav, showUser }) {
                 transition: "border-color 0.2s",
             }}
         >
-            <div style={{ position: "absolute", top: 0, right: 0, width: "100px", height: "100px", background: "radial-gradient(circle,rgba(6,182,212,0.07) 0%,transparent 70%)", transform: "translate(30%,-30%)", pointerEvents: "none" }} />
 
             {/* Badges */}
             <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", flexWrap: "wrap" }}>
@@ -499,7 +490,7 @@ function SpecialtyCard({ uni, isFav, onToggleFav, showUser }) {
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", paddingTop: "0.875rem", borderTop: "1px solid var(--brand-border)" }}>
                 <Link
                     to={`/calculator/?specialty=${encodeURIComponent(uni.specialty)}&university=${encodeURIComponent(uni.university_name)}`}
-                    style={{ display: "flex", alignItems: "center", gap: "0.35rem", padding: "0.5rem 0.875rem", background: "linear-gradient(135deg,var(--brand-cyan),#0891b2)", border: "none", borderRadius: "0.625rem", color: "#fff", fontWeight: 700, fontSize: "12px", textDecoration: "none", fontFamily: "inherit", flexShrink: 0 }}
+                    style={{ display: "flex", alignItems: "center", gap: "0.35rem", padding: "0.5rem 0.875rem", background: "var(--brand-accent)", border: "none", borderRadius: "0.625rem", color: "#fff", fontWeight: 700, fontSize: "12px", textDecoration: "none", fontFamily: "inherit", flexShrink: 0 }}
                 >
                     <Calculator size={13} /> Изчисли бал
                 </Link>
@@ -744,7 +735,7 @@ export default function UniversitiesPage() {
                     </div>
                     <h1 style={{ fontSize: "clamp(2rem,5vw,3.25rem)", fontWeight: 900, color: "var(--brand-text)", lineHeight: 1.1, letterSpacing: "-0.03em", margin: "0 0 0.625rem", textWrap: "balance" }}>
                         Открий своето{" "}
-                        <span style={{ background: "linear-gradient(135deg,var(--brand-cyan),var(--brand-violet))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                        <span style={{ color: "var(--brand-accent-text)" }}>
                             бъдеще
                         </span>
                     </h1>
@@ -931,7 +922,7 @@ export default function UniversitiesPage() {
                             <X size={28} style={{ color: "#f87171" }} />
                         </div>
                         <h3 style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--brand-text)", marginBottom: "0.5rem" }}>{error}</h3>
-                        <button onClick={loadInitial} style={{ padding: "0.75rem 1.5rem", background: "linear-gradient(135deg,var(--brand-cyan),var(--brand-violet))", border: "none", borderRadius: "0.75rem", color: "#fff", fontWeight: 700, fontSize: "14px", cursor: "pointer", fontFamily: "inherit" }}>
+                        <button onClick={loadInitial} style={{ padding: "0.75rem 1.5rem", background: "var(--brand-accent)", border: "none", borderRadius: "0.75rem", color: "#fff", fontWeight: 700, fontSize: "14px", cursor: "pointer", fontFamily: "inherit" }}>
                             Опитай отново
                         </button>
                     </m.div>
@@ -1036,7 +1027,7 @@ export default function UniversitiesPage() {
                                     <p style={{ color: "var(--brand-muted)", fontSize: "14px", marginBottom: "1.5rem" }}>
                                         Опитай с различни ключови думи или разшири критериите.
                                     </p>
-                                    <button onClick={resetFilters} style={{ padding: "0.75rem 1.5rem", background: "linear-gradient(135deg,var(--brand-cyan),var(--brand-violet))", border: "none", borderRadius: "0.75rem", color: "#fff", fontWeight: 700, fontSize: "14px", cursor: "pointer", fontFamily: "inherit" }}>
+                                    <button onClick={resetFilters} style={{ padding: "0.75rem 1.5rem", background: "var(--brand-accent)", border: "none", borderRadius: "0.75rem", color: "#fff", fontWeight: 700, fontSize: "14px", cursor: "pointer", fontFamily: "inherit" }}>
                                         Разшири критериите
                                     </button>
                                 </m.div>
@@ -1106,7 +1097,7 @@ export default function UniversitiesPage() {
                     font-size: 1.625rem;
                     font-weight: 900;
                     font-family: monospace;
-                    background: linear-gradient(135deg, var(--brand-cyan), var(--brand-violet));
+                    background: var(--brand-accent);
                     -webkit-background-clip: text;
                     -webkit-text-fill-color: transparent;
                     line-height: 1;

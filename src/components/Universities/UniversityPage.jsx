@@ -46,7 +46,7 @@ function NotFound({ slug }) {
                     style={{
                         display: "inline-flex", alignItems: "center", gap: "0.5rem",
                         marginTop: "1.5rem", padding: "0.75rem 1.5rem",
-                        background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                        background: "var(--brand-accent)",
                         color: "#fff", borderRadius: "0.75rem", fontWeight: 700, textDecoration: "none",
                     }}
                 >
@@ -197,8 +197,7 @@ export default function UniversityPage() {
                     margin: 0, fontSize: "clamp(2rem, 5vw, 3.25rem)",
                     fontWeight: 900, letterSpacing: "-0.035em", lineHeight: 1.1,
                     textWrap: "balance",
-                    background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
-                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                    color: "var(--brand-accent-text)",
                 }}>
                     Прием в {uniName} {ADMISSION_YEAR_SHORT}
                 </h1>
@@ -217,7 +216,7 @@ export default function UniversityPage() {
                         style={{
                             display: "inline-flex", alignItems: "center", gap: "0.5rem",
                             padding: "0.875rem 1.5rem",
-                            background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                            background: "var(--brand-accent)",
                             color: "#fff", borderRadius: "0.75rem", fontWeight: 700,
                             fontSize: "0.9375rem", textDecoration: "none",
                         }}

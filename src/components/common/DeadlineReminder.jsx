@@ -142,7 +142,7 @@ export default function DeadlineReminder({ universityName = null }) {
                                     height: "2.5rem", padding: "0 1rem", borderRadius: "0.625rem", border: "none",
                                     cursor: state === "loading" ? "wait" : "pointer",
                                     fontSize: "13px", fontWeight: 700, color: "#fff",
-                                    background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                    background: "var(--brand-accent)",
                                     opacity: state === "loading" ? 0.7 : 1,
                                 }}
                             >

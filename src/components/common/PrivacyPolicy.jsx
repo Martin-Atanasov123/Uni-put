@@ -75,7 +75,6 @@ const PrivacyPolicy = () => {
                 description="Как УниПът събира, използва и защитава личните ти данни — в съответствие с GDPR."
                 path="/privacy"
             />
-            <div aria-hidden style={{ position: "absolute", top: "-200px", left: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(139,92,246,0.1), transparent 70%)", pointerEvents: "none" }} />
 
             <div style={{ maxWidth: "820px", margin: "0 auto", position: "relative" }}>
                 <div
@@ -109,9 +108,7 @@ const PrivacyPolicy = () => {
                                 fontSize: "clamp(1.75rem, 4vw, 2.5rem)",
                                 fontWeight: 800,
                                 letterSpacing: "-0.02em",
-                                background: "linear-gradient(135deg, var(--brand-violet), var(--brand-cyan))",
-                                WebkitBackgroundClip: "text",
-                                WebkitTextFillColor: "transparent",
+                                color: "var(--brand-accent-text)",
                             }}
                         >
                             Политика за поверителност

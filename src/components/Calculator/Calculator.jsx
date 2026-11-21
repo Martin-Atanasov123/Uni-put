@@ -205,11 +205,6 @@ function drawCalcResultCard({ university, specialty, score, maxBall, chance, mar
     // ── Фаза 2: рисуване
     ctx.fillStyle = "#0F172A";
     ctx.fillRect(0, 0, W, H);
-    const glow = ctx.createRadialGradient(W * 0.82, H * 0.16, 0, W * 0.82, H * 0.16, W * 0.85);
-    glow.addColorStop(0, "rgba(6,182,212,0.16)");
-    glow.addColorStop(1, "rgba(6,182,212,0)");
-    ctx.fillStyle = glow;
-    ctx.fillRect(0, 0, W, H);
     ctx.textBaseline = "alphabetic";
 
     // Лого
@@ -234,10 +229,7 @@ function drawCalcResultCard({ university, specialty, score, maxBall, chance, mar
     ctx.font = mono(176, 900);
     const scoreText = score.toFixed(2);
     const scoreW = ctx.measureText(scoreText).width;
-    const grad = ctx.createLinearGradient(PAD, 0, PAD + scoreW, 0);
-    grad.addColorStop(0, "#06B6D4");
-    grad.addColorStop(1, "#8B5CF6");
-    ctx.fillStyle = grad;
+    ctx.fillStyle = "#06B6D4";
     ctx.fillText(scoreText, PAD, y);
     if (maxBall) {
         ctx.fillStyle = "#64748B";
@@ -767,7 +759,7 @@ export default function CalculatorPage() {
                     </div>
                     <h1 style={{ fontSize: "clamp(2rem,5vw,3rem)", fontWeight: 900, color: "var(--brand-text)", lineHeight: 1.1, letterSpacing: "-0.03em", margin: "0 0 0.625rem", textWrap: "balance" }}>
                         Изчисли своя{" "}
-                        <span style={{ background: "linear-gradient(135deg,var(--brand-violet),var(--brand-cyan))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                        <span style={{ color: "var(--brand-accent-text)" }}>
                             приемен бал
                         </span>
                     </h1>
@@ -949,7 +941,7 @@ export default function CalculatorPage() {
                                 return (
                                     <div key={step.num} style={{ background: S.surface, backdropFilter: "blur(12px)", border: `1px solid ${S.border}`, borderRadius: "1.25rem", padding: "1.25rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
                                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                                            <div style={{ padding: "0.5rem", borderRadius: "0.625rem", background: "linear-gradient(135deg,rgba(6,182,212,0.12),rgba(139,92,246,0.12))", display: "inline-flex" }}>
+                                            <div style={{ padding: "0.5rem", borderRadius: "0.625rem", background: "rgba(6,182,212,0.12)", display: "inline-flex" }}>
                                                 <Icon size={18} style={{ color: "var(--brand-cyan)" }} />
                                             </div>
                                             <span style={{ fontSize: "2rem", fontWeight: 900, color: "var(--brand-border)", letterSpacing: "-0.04em" }}>{step.num}</span>
@@ -978,13 +970,13 @@ export default function CalculatorPage() {
                             style={{
                                 display: "flex", alignItems: "center", gap: "1rem",
                                 padding: "1.25rem 1.5rem",
-                                background: "linear-gradient(135deg, rgba(6,182,212,0.08), rgba(139,92,246,0.08))",
+                                background: "rgba(6,182,212,0.08)",
                                 border: "1px solid var(--brand-card-border)",
                                 borderRadius: "1.25rem",
                                 textDecoration: "none",
                             }}
                         >
-                            <div style={{ flexShrink: 0, padding: "0.625rem", borderRadius: "0.75rem", background: "linear-gradient(135deg,var(--brand-cyan),var(--brand-violet))", display: "inline-flex" }}>
+                            <div style={{ flexShrink: 0, padding: "0.625rem", borderRadius: "0.75rem", background: "var(--brand-accent)", display: "inline-flex" }}>
                                 <Compass size={20} color="#fff" strokeWidth={1.5} />
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
@@ -1010,7 +1002,7 @@ export default function CalculatorPage() {
                     >
                         {/* Header */}
                         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1.25rem" }}>
-                            <div style={{ padding: "0.375rem", borderRadius: "0.5rem", background: "linear-gradient(135deg,rgba(6,182,212,0.12),rgba(139,92,246,0.12))", display: "inline-flex" }}>
+                            <div style={{ padding: "0.375rem", borderRadius: "0.5rem", background: "rgba(6,182,212,0.12)", display: "inline-flex" }}>
                                 <Zap size={15} style={{ color: "var(--brand-cyan)" }} />
                             </div>
                             <h2 style={{ fontSize: "14px", fontWeight: 800, color: "var(--brand-text)", margin: 0 }}>
@@ -1162,7 +1154,7 @@ export default function CalculatorPage() {
                         style={{ background: S.surface, backdropFilter: "blur(12px)", border: `1px solid ${S.border}`, borderRadius: "1.25rem", padding: "1.25rem", marginBottom: "2rem" }}
                     >
                         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.875rem" }}>
-                            <div style={{ padding: "0.375rem", borderRadius: "0.5rem", background: "linear-gradient(135deg,rgba(139,92,246,0.12),rgba(6,182,212,0.12))", display: "inline-flex" }}>
+                            <div style={{ padding: "0.375rem", borderRadius: "0.5rem", background: "rgba(139,92,246,0.12)", display: "inline-flex" }}>
                                 <Info size={15} style={{ color: "var(--brand-violet)" }} />
                             </div>
                             <p style={{ fontSize: "13px", fontWeight: 700, color: "var(--brand-text)", margin: 0 }}>Легенда на формулите</p>
@@ -1240,7 +1232,7 @@ export default function CalculatorPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                         style={{
-                            background: "linear-gradient(135deg, rgba(6,182,212,0.08), rgba(139,92,246,0.08))",
+                            background: "rgba(6,182,212,0.08)",
                             border: "1px solid var(--brand-card-border)",
                             borderRadius: "1.25rem",
                             padding: "2rem 1.75rem",
@@ -1249,7 +1241,7 @@ export default function CalculatorPage() {
                     >
                         <div style={{
                             width: 52, height: 52, borderRadius: "1rem", margin: "0 auto 1.25rem",
-                            background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                            background: "var(--brand-accent)",
                             display: "flex", alignItems: "center", justifyContent: "center",
                             boxShadow: "0 12px 30px rgba(6,182,212,0.3)",
                         }}>
@@ -1435,7 +1427,7 @@ export default function CalculatorPage() {
                                                         minHeight: "44px", padding: "0 0.75rem",
                                                         borderRadius: "0.625rem", border: "none", cursor: "pointer",
                                                         fontSize: "13px", fontWeight: 700, color: "#fff",
-                                                        background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                                        background: "var(--brand-accent)",
                                                     }}
                                                 >
                                                     {shareFeedback?.id === item.id && shareFeedback.kind === "link"
@@ -1508,19 +1500,13 @@ export default function CalculatorPage() {
                         style={{
                             marginTop: "1.5rem",
                             position: "relative",
-                            background: "linear-gradient(135deg, rgba(6,182,212,0.08), rgba(139,92,246,0.08))",
+                            background: "rgba(6,182,212,0.08)",
                             border: "1px solid var(--brand-card-border)",
                             borderRadius: "1.25rem",
                             padding: "1.5rem 1.75rem",
                             overflow: "hidden",
                         }}
                     >
-                        {/* Subtle gradient glow accent */}
-                        <div aria-hidden style={{
-                            position: "absolute", top: 0, right: 0, width: "240px", height: "100%",
-                            background: "radial-gradient(ellipse at right, rgba(139,92,246,0.12), transparent 70%)",
-                            pointerEvents: "none",
-                        }} />
 
                         {/* Dismiss бутон */}
                         <button
@@ -1547,7 +1533,7 @@ export default function CalculatorPage() {
                             <div style={{
                                 flexShrink: 0,
                                 width: "44px", height: "44px", borderRadius: "0.75rem",
-                                background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                background: "var(--brand-accent)",
                                 display: "flex", alignItems: "center", justifyContent: "center",
                                 boxShadow: "0 8px 24px rgba(6,182,212,0.25)",
                             }}>
@@ -1575,7 +1561,7 @@ export default function CalculatorPage() {
                                         style={{
                                             display: "inline-flex", alignItems: "center", gap: "0.5rem",
                                             padding: "0.625rem 1.25rem",
-                                            background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                            background: "var(--brand-accent)",
                                             color: "#fff", borderRadius: "0.625rem",
                                             fontSize: "0.875rem", fontWeight: 700,
                                             textDecoration: "none",

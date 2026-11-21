@@ -18,8 +18,6 @@ export default function NotFound() {
             }}
         >
             <Seo title="Страницата не е намерена" path="/404" noindex />
-            <div aria-hidden style={{ position: "absolute", top: "-200px", left: "50%", transform: "translateX(-50%)", width: "640px", height: "640px", background: "radial-gradient(circle, rgba(139,92,246,0.12), transparent 70%)", pointerEvents: "none" }} />
-            <div aria-hidden style={{ position: "absolute", bottom: "-200px", left: "10%", width: "400px", height: "400px", background: "radial-gradient(circle, rgba(6,182,212,0.1), transparent 70%)", pointerEvents: "none" }} />
 
             <m.div
                 initial={{ opacity: 0, y: 30, scale: 0.96 }}
@@ -54,9 +52,7 @@ export default function NotFound() {
                         fontWeight: 800,
                         lineHeight: 1,
                         letterSpacing: "-0.04em",
-                        background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
+                        color: "var(--brand-accent-text)",
                     }}
                 >
                     Страницата не е намерена
@@ -74,7 +70,7 @@ export default function NotFound() {
                             alignItems: "center",
                             gap: "0.5rem",
                             padding: "0.75rem 1.5rem",
-                            background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                            background: "var(--brand-accent)",
                             border: "none",
                             borderRadius: "0.75rem",
                             color: "#fff",

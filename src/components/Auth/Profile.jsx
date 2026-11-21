@@ -287,27 +287,9 @@ const Profile = () => {
                     height: "240px",
                     position: "relative",
                     overflow: "hidden",
-                    background: "linear-gradient(135deg, rgba(6,182,212,0.18), rgba(139,92,246,0.18))",
+                    background: "rgba(6,182,212,0.18)",
                 }}
             >
-                <div
-                    aria-hidden
-                    style={{
-                        position: "absolute",
-                        inset: 0,
-                        background: "radial-gradient(circle at 30% 30%, rgba(6,182,212,0.25), transparent 50%), radial-gradient(circle at 70% 70%, rgba(139,92,246,0.25), transparent 50%)",
-                    }}
-                />
-                <div
-                    aria-hidden
-                    style={{
-                        position: "absolute",
-                        inset: 0,
-                        backgroundImage: "linear-gradient(rgba(148,163,184,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.05) 1px, transparent 1px)",
-                        backgroundSize: "40px 40px",
-                        maskImage: "radial-gradient(ellipse at center, black 30%, transparent 75%)",
-                    }}
-                />
             </div>
 
             <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 1.5rem 4rem", marginTop: "-120px", position: "relative", zIndex: 1 }}>
@@ -319,7 +301,7 @@ const Profile = () => {
                                 width: "9rem",
                                 height: "9rem",
                                 borderRadius: "1.5rem",
-                                background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                background: "var(--brand-accent)",
                                 border: "3px solid var(--brand-surface)",
                                 boxShadow: "0 16px 40px var(--brand-shadow)",
                                 display: "flex",
@@ -471,8 +453,8 @@ const Profile = () => {
                         return (
                             <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                                 {/* Следваща стъпка — едно конкретно действие вместо статичен списък */}
-                                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1rem", padding: "1.25rem 1.5rem", background: "linear-gradient(135deg, rgba(6,182,212,0.08), rgba(139,92,246,0.08))", border: "1px solid rgba(6,182,212,0.25)", borderRadius: "1.25rem" }}>
-                                    <div style={{ width: "2.75rem", height: "2.75rem", borderRadius: "0.75rem", background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1rem", padding: "1.25rem 1.5rem", background: "rgba(6,182,212,0.08)", border: "1px solid rgba(6,182,212,0.25)", borderRadius: "1.25rem" }}>
+                                    <div style={{ width: "2.75rem", height: "2.75rem", borderRadius: "0.75rem", background: "var(--brand-accent)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                         <Compass size={20} color="#fff" strokeWidth={1.5} />
                                     </div>
                                     <div style={{ flex: 1, minWidth: "200px" }}>
@@ -481,7 +463,7 @@ const Profile = () => {
                                         <p style={{ margin: "0.3rem 0 0", fontSize: "12.5px", color: "var(--brand-muted)", lineHeight: 1.5, maxWidth: "52ch" }}>{nextAction.text}</p>
                                     </div>
                                     {nextAction.link ? (
-                                        <Link to={nextAction.link} style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.65rem 1.1rem", background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))", borderRadius: "0.75rem", color: "#fff", fontSize: "13px", fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
+                                        <Link to={nextAction.link} style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.65rem 1.1rem", background: "var(--brand-accent)", borderRadius: "0.75rem", color: "#fff", fontSize: "13px", fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
                                             {nextAction.cta} <ArrowRight size={13} />
                                         </Link>
                                     ) : (
@@ -489,7 +471,7 @@ const Profile = () => {
                                             type="button"
                                             onClick={nextAction.onClick}
                                             disabled={subscribingAll}
-                                            style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.65rem 1.1rem", background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))", border: "none", borderRadius: "0.75rem", color: "#fff", fontSize: "13px", fontWeight: 700, cursor: subscribingAll ? "wait" : "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}
+                                            style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.65rem 1.1rem", background: "var(--brand-accent)", border: "none", borderRadius: "0.75rem", color: "#fff", fontSize: "13px", fontWeight: 700, cursor: subscribingAll ? "wait" : "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}
                                         >
                                             {nextAction.cta} <ArrowRight size={13} />
                                         </button>
@@ -508,7 +490,7 @@ const Profile = () => {
                                     {/* Track */}
                                     <div style={{ position: "relative", marginBottom: "1rem" }}>
                                         <div style={{ height: "4px", background: "var(--brand-border)", borderRadius: "2px" }} />
-                                        <div style={{ position: "absolute", top: 0, left: 0, height: "4px", borderRadius: "2px", background: "linear-gradient(90deg, var(--brand-cyan), var(--brand-violet))", width: `${(doneCount / progressSteps.length) * 100}%`, transition: "width 0.5s cubic-bezier(0.16,1,0.3,1)" }} />
+                                        <div style={{ position: "absolute", top: 0, left: 0, height: "4px", borderRadius: "2px", background: "var(--brand-accent)", width: `${(doneCount / progressSteps.length) * 100}%`, transition: "width 0.5s cubic-bezier(0.16,1,0.3,1)" }} />
                                     </div>
                                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "0.5rem" }}>
                                         {progressSteps.map((step, i) => {
@@ -770,7 +752,7 @@ const Profile = () => {
                                     disabled={updating}
                                     style={{
                                         padding: "0.75rem 2rem",
-                                        background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                        background: "var(--brand-accent)",
                                         border: "none",
                                         borderRadius: "0.75rem",
                                         color: "#fff",

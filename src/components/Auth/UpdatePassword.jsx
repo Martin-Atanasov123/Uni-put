@@ -70,8 +70,6 @@ const UpdatePassword = () => {
             <Seo title="Нова парола" path="/update-password" noindex />
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
-            <div aria-hidden style={{ position: "absolute", top: "-200px", left: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(139,92,246,0.1), transparent 70%)", pointerEvents: "none" }} />
-            <div aria-hidden style={{ position: "absolute", bottom: "-200px", right: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(6,182,212,0.1), transparent 70%)", pointerEvents: "none" }} />
 
             <div
                 style={{
@@ -91,7 +89,7 @@ const UpdatePassword = () => {
                             width: "3.5rem",
                             height: "3.5rem",
                             borderRadius: "1rem",
-                            background: "linear-gradient(135deg, var(--brand-violet), var(--brand-cyan))",
+                            background: "var(--brand-accent)",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
@@ -152,7 +150,7 @@ const UpdatePassword = () => {
                             style={{
                                 marginTop: "0.75rem",
                                 padding: "0.875rem 1rem",
-                                background: loading ? "rgba(148,163,184,0.15)" : "linear-gradient(135deg, var(--brand-violet), var(--brand-cyan))",
+                                background: loading ? "rgba(148,163,184,0.15)" : "var(--brand-accent)",
                                 border: "none",
                                 borderRadius: "0.75rem",
                                 color: "#fff",

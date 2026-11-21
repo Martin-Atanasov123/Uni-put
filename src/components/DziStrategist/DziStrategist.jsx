@@ -105,10 +105,7 @@ function SubjectRow({ rank, row, max, animate }) {
                             fontWeight: 900,
                             lineHeight: 1,
                             letterSpacing: "-0.03em",
-                            background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                            backgroundClip: "text",
+                            color: "var(--brand-accent-text)",
                         }}
                     >
                         {count}
@@ -125,7 +122,7 @@ function SubjectRow({ rank, row, max, animate }) {
                     initial={prefersReducedMotion ? false : { width: 0 }}
                     animate={{ width: `${pct}%` }}
                     transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                    style={{ height: "100%", background: "linear-gradient(90deg, var(--brand-cyan), var(--brand-violet))", borderRadius: "2px" }}
+                    style={{ height: "100%", background: "var(--brand-accent)", borderRadius: "2px" }}
                 />
             </div>
 
@@ -219,7 +216,7 @@ export default function DziStrategist() {
                     </div>
                     <h1 style={{ fontSize: "clamp(2rem, 5vw, 3.25rem)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.05, color: "var(--brand-text)", textWrap: "balance", margin: "0 0 1rem" }}>
                         Кой втори ДЗИ ти отваря{" "}
-                        <span style={{ background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                        <span style={{ color: "var(--brand-accent-text)" }}>
                             най-много врати
                         </span>
                     </h1>
@@ -271,7 +268,7 @@ export default function DziStrategist() {
                     transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                     style={{
                         marginTop: "3rem",
-                        background: "linear-gradient(135deg, rgba(6,182,212,0.06), rgba(139,92,246,0.06))",
+                        background: "rgba(6,182,212,0.06)",
                         border: "1px solid var(--brand-card-border)",
                         borderRadius: "1.25rem",
                         padding: "1.75rem",
@@ -361,7 +358,7 @@ export default function DziStrategist() {
                             alignItems: "center",
                             gap: "0.5rem",
                             padding: "0.875rem 1.75rem",
-                            background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                            background: "var(--brand-accent)",
                             color: "#fff",
                             borderRadius: "0.75rem",
                             fontWeight: 700,

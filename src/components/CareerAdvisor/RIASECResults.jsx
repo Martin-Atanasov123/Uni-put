@@ -63,11 +63,6 @@ function drawRiasecCard({ code, scores, topSpecialties }) {
 
     ctx.fillStyle = "#0F172A";
     ctx.fillRect(0, 0, W, H);
-    const glow = ctx.createRadialGradient(W * 0.8, H * 0.18, 0, W * 0.8, H * 0.18, W * 0.9);
-    glow.addColorStop(0, primary.color + "33");
-    glow.addColorStop(1, primary.color + "00");
-    ctx.fillStyle = glow;
-    ctx.fillRect(0, 0, W, H);
     ctx.textBaseline = "alphabetic";
 
     ctx.fillStyle = "#06B6D4";
@@ -209,7 +204,7 @@ const RIASECResults = ({ results, onRestart }) => {
                         height: "4rem",
                         margin: "0 auto",
                         borderRadius: "1rem",
-                        background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                        background: "var(--brand-accent)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -220,7 +215,7 @@ const RIASECResults = ({ results, onRestart }) => {
                 </div>
                 <h2 style={{ margin: 0, fontSize: "clamp(1.75rem, 4vw, 2.5rem)", fontWeight: 800, letterSpacing: "-0.02em", textWrap: "balance" }}>
                     Твоят RIASEC Профил:{" "}
-                    <span style={{ fontFamily: "monospace", background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                    <span style={{ fontFamily: "monospace", color: "var(--brand-accent-text)" }}>
                         {riasecCode}
                     </span>
                 </h2>
@@ -268,7 +263,7 @@ const RIASECResults = ({ results, onRestart }) => {
                                     style={{
                                         height: "100%",
                                         width: `${score}%`,
-                                        background: "linear-gradient(90deg, var(--brand-cyan), var(--brand-violet))",
+                                        background: "var(--brand-accent)",
                                         borderRadius: "999px",
                                         transition: "width 1s ease",
                                         boxShadow: "0 0 8px rgba(6,182,212,0.4)",
@@ -284,7 +279,7 @@ const RIASECResults = ({ results, onRestart }) => {
                     <button
                         type="button"
                         onClick={handleShareLink}
-                        style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "0.4rem", minHeight: "44px", padding: "0 1.25rem", borderRadius: "0.75rem", border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: "14px", fontWeight: 700, color: "#fff", background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))" }}
+                        style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "0.4rem", minHeight: "44px", padding: "0 1.25rem", borderRadius: "0.75rem", border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: "14px", fontWeight: 700, color: "#fff", background: "var(--brand-accent)" }}
                     >
                         {shareFeedback === "link"
                             ? <><Check size={16} /> Копирано</>
@@ -424,9 +419,7 @@ const RIASECResults = ({ results, onRestart }) => {
                                                 fontSize: "1.875rem",
                                                 fontWeight: 800,
                                                 fontFamily: "monospace",
-                                                background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
-                                                WebkitBackgroundClip: "text",
-                                                WebkitTextFillColor: "transparent",
+                                                color: "var(--brand-accent-text)",
                                             }}
                                         >
                                             {spec.compatibility}%
@@ -486,7 +479,7 @@ const RIASECResults = ({ results, onRestart }) => {
                                             alignItems: "center",
                                             gap: "0.4rem",
                                             padding: "0.5rem 0.875rem",
-                                            background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                            background: "var(--brand-accent)",
                                             border: "none",
                                             borderRadius: "0.5rem",
                                             color: "#fff",
@@ -560,7 +553,6 @@ const RIASECResults = ({ results, onRestart }) => {
                                 onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.borderColor = "rgba(139,92,246,0.35)"; }}
                                 onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.borderColor = "rgba(148,163,184,0.1)"; }}
                             >
-                                <div aria-hidden style={{ position: "absolute", top: "-80px", right: "-80px", width: "160px", height: "160px", borderRadius: "50%", background: "radial-gradient(circle, rgba(139,92,246,0.1), transparent 70%)", pointerEvents: "none" }} />
 
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative" }}>
                                     <div style={{ width: "2.25rem", height: "2.25rem", borderRadius: "0.5rem", background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.25)", color: "var(--brand-violet)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "monospace", fontSize: "12px", fontWeight: 800 }}>
@@ -572,9 +564,7 @@ const RIASECResults = ({ results, onRestart }) => {
                                                 fontSize: "1.5rem",
                                                 fontWeight: 800,
                                                 fontFamily: "monospace",
-                                                background: "linear-gradient(135deg, var(--brand-violet), var(--brand-cyan))",
-                                                WebkitBackgroundClip: "text",
-                                                WebkitTextFillColor: "transparent",
+                                                color: "var(--brand-accent-text)",
                                             }}
                                         >
                                             {career.compatibility}%
@@ -662,7 +652,7 @@ const RIASECResults = ({ results, onRestart }) => {
             <div
                 style={{
                     padding: "2rem",
-                    background: "linear-gradient(135deg, rgba(6,182,212,0.08), rgba(139,92,246,0.08))",
+                    background: "rgba(6,182,212,0.08)",
                     border: "1px solid rgba(6,182,212,0.25)",
                     borderRadius: "1.25rem",
                     textAlign: "center",
@@ -685,7 +675,7 @@ const RIASECResults = ({ results, onRestart }) => {
                     style={{
                         display: "inline-flex", alignItems: "center", gap: "0.5rem",
                         padding: "0.875rem 2rem",
-                        background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                        background: "var(--brand-accent)",
                         border: "none", borderRadius: "0.75rem", color: "#fff",
                         fontSize: "15px", fontWeight: 800, textDecoration: "none",
                         boxShadow: "0 12px 30px rgba(6,182,212,0.35)",

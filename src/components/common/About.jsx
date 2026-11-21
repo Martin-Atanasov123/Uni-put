@@ -53,7 +53,7 @@ function MemberCard({ member, reverse }) {
                         aspectRatio: "1 / 1",
                         borderRadius: "2rem",
                         overflow: "hidden",
-                        background: `linear-gradient(135deg, ${accentBg}, transparent)`,
+                        background: accentBg,
                         border: `1px solid ${accentBorder}`,
                         boxShadow: `0 24px 60px rgba(${glowRgb}, 0.18)`,
                     }}
@@ -176,8 +176,6 @@ const About = () => {
                 path="/about"
                 image="https://uniput.eu/og/about.png"
             />
-            <div aria-hidden style={{ position: "absolute", top: "-200px", right: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(6,182,212,0.08), transparent 70%)", pointerEvents: "none" }} />
-            <div aria-hidden style={{ position: "absolute", bottom: "20%", left: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(139,92,246,0.08), transparent 70%)", pointerEvents: "none" }} />
 
             <div style={{ maxWidth: "1100px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "5rem", position: "relative" }}>
                 <m.header
@@ -204,9 +202,7 @@ const About = () => {
                         Хората зад{" "}
                         <span
                             style={{
-                                background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
-                                WebkitBackgroundClip: "text",
-                                WebkitTextFillColor: "transparent",
+                                color: "var(--brand-accent-text)",
                             }}
                         >
                             УниПът
@@ -272,7 +268,7 @@ const About = () => {
                     transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                     style={{
                         padding: "2rem",
-                        background: "linear-gradient(135deg, rgba(6,182,212,0.05), rgba(139,92,246,0.05))",
+                        background: "rgba(6,182,212,0.05)",
                         border: "1px solid var(--brand-card-border)",
                         borderRadius: "1.25rem",
                     }}

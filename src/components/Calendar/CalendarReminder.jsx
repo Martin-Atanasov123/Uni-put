@@ -82,7 +82,7 @@ const noticeColor = (kind) => (kind === "error" ? "#f87171" : kind === "warn" ? 
 
 const primaryBtn = {
     display: "inline-flex", alignItems: "center", gap: "0.5rem", minHeight: "44px", padding: "0.625rem 1.25rem",
-    background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))", border: "none", borderRadius: "0.75rem",
+    background: "var(--brand-accent)", border: "none", borderRadius: "0.75rem",
     color: "#fff", fontSize: "13.5px", fontWeight: 700, fontFamily: "inherit", cursor: "pointer",
 };
 const ghostBtn = {
@@ -101,7 +101,7 @@ export default function CalendarReminder({ universityName = null }) {
             style={{
                 display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1rem",
                 padding: "1rem 1.25rem",
-                background: "linear-gradient(135deg, rgba(6,182,212,0.06), rgba(139,92,246,0.06))",
+                background: "rgba(6,182,212,0.06)",
                 border: "1px solid var(--brand-card-border)", borderRadius: "1.25rem",
             }}
         >

@@ -38,7 +38,7 @@ function HeaderAvatar({ user, size = 28 }) {
     return (
         <div style={{
             width: `${size}px`, height: `${size}px`, borderRadius: "50%",
-            background: "linear-gradient(135deg,var(--brand-cyan),var(--brand-violet))",
+            background: "var(--brand-accent)",
             display: "flex", alignItems: "center", justifyContent: "center",
             overflow: "hidden", flexShrink: 0,
             color: "#fff", fontSize: `${fontSize}px`, fontWeight: 900, letterSpacing: "-0.02em",
@@ -260,8 +260,7 @@ export default function Header() {
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
                             <span style={{
                                 fontSize: "1.125rem", fontWeight: 800,
-                                background: "linear-gradient(135deg,var(--brand-cyan),var(--brand-violet))",
-                                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                                color: "var(--brand-accent-text)",
                             }}>УниПът</span>
                             <button onClick={() => setIsMenuOpen(false)} aria-label="Затвори меню" style={{
                                 padding: "0.5rem", background: "rgba(148,163,184,0.08)",

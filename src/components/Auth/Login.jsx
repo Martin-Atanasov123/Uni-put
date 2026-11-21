@@ -86,8 +86,6 @@ const Login = () => {
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
             {/* ambient glows */}
-            <div aria-hidden style={{ position: "absolute", top: "-200px", right: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(6,182,212,0.1), transparent 70%)", pointerEvents: "none" }} />
-            <div aria-hidden style={{ position: "absolute", bottom: "-200px", left: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(139,92,246,0.1), transparent 70%)", pointerEvents: "none" }} />
 
             <m.div
                 initial={{ opacity: 0, y: 24, scale: 0.97 }}
@@ -112,7 +110,7 @@ const Login = () => {
                             width: "3.5rem",
                             height: "3.5rem",
                             borderRadius: "1rem",
-                            background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                            background: "var(--brand-accent)",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
@@ -243,7 +241,7 @@ const Login = () => {
                         style={{
                             marginTop: "0.75rem",
                             padding: "0.875rem 1rem",
-                            background: loading ? "rgba(148,163,184,0.15)" : "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                            background: loading ? "rgba(148,163,184,0.15)" : "var(--brand-accent)",
                             border: "none",
                             borderRadius: "0.75rem",
                             color: "#fff",

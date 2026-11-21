@@ -293,7 +293,7 @@ const CareerAdvisor = () => {
                             onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = v.recommended ? "rgba(6,182,212,0.35)" : "var(--brand-card-border)"; }}
                         >
                             {v.recommended && (
-                                <span style={{ position: "absolute", top: "-12px", left: "50%", transform: "translateX(-50%)", background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))", color: "#fff", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.15em", padding: "0.3rem 0.875rem", borderRadius: "999px", boxShadow: "0 8px 20px rgba(6,182,212,0.3)" }}>
+                                <span style={{ position: "absolute", top: "-12px", left: "50%", transform: "translateX(-50%)", background: "var(--brand-accent)", color: "#fff", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.15em", padding: "0.3rem 0.875rem", borderRadius: "999px", boxShadow: "0 8px 20px rgba(6,182,212,0.3)" }}>
                                     Препоръчано
                                 </span>
                             )}
@@ -355,7 +355,7 @@ const CareerAdvisor = () => {
                             style={{
                                 height: "100%",
                                 width: `${progress}%`,
-                                background: "linear-gradient(90deg, var(--brand-cyan), var(--brand-violet))",
+                                background: "var(--brand-accent)",
                                 borderRadius: "999px",
                                 transition: "width 0.5s ease",
                                 boxShadow: "0 0 12px rgba(6,182,212,0.5)",
@@ -523,8 +523,6 @@ const CareerAdvisor = () => {
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
             {/* ambient glow */}
-            <div aria-hidden style={{ position: "absolute", top: "-200px", right: "-200px", width: "600px", height: "600px", background: "radial-gradient(circle, rgba(6,182,212,0.08), transparent 70%)", pointerEvents: "none" }} />
-            <div aria-hidden style={{ position: "absolute", bottom: "-200px", left: "-200px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(139,92,246,0.08), transparent 70%)", pointerEvents: "none" }} />
 
             <div style={{ maxWidth: "960px", margin: "0 auto", padding: "0 1.5rem", position: "relative" }}>
                 {step === "version" && (
@@ -536,9 +534,7 @@ const CareerAdvisor = () => {
                             Открий своето{" "}
                             <span
                                 style={{
-                                    background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
-                                    WebkitBackgroundClip: "text",
-                                    WebkitTextFillColor: "transparent",
+                                    color: "var(--brand-accent-text)",
                                 }}
                             >
                                 призвание

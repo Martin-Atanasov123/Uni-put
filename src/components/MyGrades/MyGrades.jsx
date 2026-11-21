@@ -267,7 +267,7 @@ export default function MyGradesPage() {
                         margin: "0 0 0.625rem", textWrap: "balance",
                     }}>
                         Моите{" "}
-                        <span style={{ background: "linear-gradient(135deg,var(--brand-violet),var(--brand-cyan))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                        <span style={{ color: "var(--brand-accent-text)" }}>
                             оценки
                         </span>
                     </h1>
@@ -306,7 +306,7 @@ export default function MyGradesPage() {
                         <div style={{ height: "6px", borderRadius: "999px", background: "var(--brand-border)", overflow: "hidden" }}>
                             <div style={{
                                 height: "100%", borderRadius: "999px",
-                                background: "linear-gradient(90deg,var(--brand-cyan),var(--brand-violet))",
+                                background: "var(--brand-accent)",
                                 width: `${pct}%`,
                                 transition: "width 0.4s cubic-bezier(0.16,1,0.3,1)",
                             }} />
@@ -339,7 +339,7 @@ export default function MyGradesPage() {
                         style={{
                             display: "flex", alignItems: "center", gap: "0.375rem",
                             padding: "0.5rem 1rem", borderRadius: "0.625rem",
-                            background: "linear-gradient(135deg,var(--brand-cyan),var(--brand-violet))",
+                            background: "var(--brand-accent)",
                             color: "#fff", fontSize: "13px", fontWeight: 700,
                             textDecoration: "none", flexShrink: 0,
                         }}

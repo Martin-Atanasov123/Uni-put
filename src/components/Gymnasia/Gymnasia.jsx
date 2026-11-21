@@ -217,7 +217,7 @@ function ClassRow({ row, year, inWish, onToggleWish, expanded, onExpand, stage1,
                 <div style={{ textAlign: "right", flexShrink: 0 }}>
                     {bal !== null ? (
                         <>
-                            <div style={{ ...mono, fontSize: "1.5rem", fontWeight: 900, letterSpacing: "-0.03em", lineHeight: 1, background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>{fmt(bal)}</div>
+                            <div style={{ ...mono, fontSize: "1.5rem", fontWeight: 900, letterSpacing: "-0.03em", lineHeight: 1, color: "var(--brand-accent-text)" }}>{fmt(bal)}</div>
                             {v ? (
                                 <span style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", marginTop: "0.25rem", fontSize: "11px", fontWeight: 700, color: v.above ? "#10b981" : "#f87171" }}>
                                     {v.above ? <TrendingUp size={12} strokeWidth={1.5} aria-hidden="true" /> : <TrendingDown size={12} strokeWidth={1.5} aria-hidden="true" />}
@@ -529,7 +529,7 @@ export default function Gymnasia() {
                         <span style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--brand-cyan)" }}>Прием след 7. клас · {region.name}</span>
                     </div>
                     <h1 style={{ margin: "0 0 0.75rem", fontSize: "clamp(2rem, 5vw, 3.25rem)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.05, textWrap: "balance" }}>
-                        Виж в кои гимназии влизаш — <span style={{ background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>преди да подадеш желанията</span>
+                        Виж в кои гимназии влизаш — <span style={{ color: "var(--brand-accent-text)" }}>преди да подадеш желанията</span>
                     </h1>
                     <p style={{ margin: 0, fontSize: "1.0625rem", lineHeight: 1.6, color: "var(--brand-muted)", maxWidth: "62ch" }}>
                         Балът ти по формулата на всяка паралелка, минималните балове от последните 4 кампании и помощник, който казва къде е сигурно, къде е възможно и къде е риск.
@@ -683,7 +683,7 @@ export default function Gymnasia() {
                 <>
                     <button type="button" onClick={() => setWishesOpen(true)} style={{
                         position: "fixed", left: "1rem", right: "1rem", bottom: "1rem", zIndex: 40, minHeight: 52, display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem",
-                        background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))", border: "none", borderRadius: "0.75rem", color: "#fff", fontSize: "15px", fontWeight: 700, fontFamily: "inherit", cursor: "pointer", boxShadow: "0 12px 30px rgba(6,182,212,0.3)",
+                        background: "var(--brand-accent)", border: "none", borderRadius: "0.75rem", color: "#fff", fontSize: "15px", fontWeight: 700, fontFamily: "inherit", cursor: "pointer", boxShadow: "0 12px 30px rgba(6,182,212,0.3)",
                     }}>
                         <ListChecks size={18} strokeWidth={1.5} aria-hidden="true" /> Моите желания{wishes.length ? ` (${wishes.length})` : ""}
                     </button>

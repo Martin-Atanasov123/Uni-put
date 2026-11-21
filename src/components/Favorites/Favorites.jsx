@@ -273,7 +273,7 @@ const FavoritesPage = () => {
                             style={{
                                 display: "inline-flex",
                                 padding: "0.6rem 1.25rem",
-                                background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                background: "var(--brand-accent)",
                                 borderRadius: "0.625rem",
                                 color: "#fff",
                                 fontSize: "13px",
@@ -325,19 +325,6 @@ const FavoritesPage = () => {
                                         e.currentTarget.style.boxShadow = "none";
                                     }}
                                 >
-                                    <div
-                                        aria-hidden
-                                        style={{
-                                            position: "absolute",
-                                            top: "-80px",
-                                            right: "-80px",
-                                            width: "160px",
-                                            height: "160px",
-                                            borderRadius: "50%",
-                                            background: "radial-gradient(circle, rgba(6,182,212,0.08), transparent 70%)",
-                                            pointerEvents: "none",
-                                        }}
-                                    />
 
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "0.5rem", position: "relative" }}>
                                         <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>

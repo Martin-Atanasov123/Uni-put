@@ -439,7 +439,7 @@ export default function ReportButton({ universityName, specialty }) {
                                     padding: "0.875rem",
                                     background: sending || !description.trim()
                                         ? "rgba(148,163,184,0.12)"
-                                        : "linear-gradient(135deg,#fbbf24,#f59e0b)",
+                                        : "#f59e0b",
                                     border: "none",
                                     borderRadius: "0.75rem",
                                     color: sending || !description.trim() ? "var(--brand-muted)" : "var(--brand-bg)",

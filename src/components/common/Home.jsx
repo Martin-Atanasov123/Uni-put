@@ -169,23 +169,6 @@ function HeroSection() {
         >
             <DotsBg cyanOpacity={0.07} violetOpacity={0.05} size={32} />
 
-            {/* ── Layer 0a: статичен gradient fallback (mobile / reduced-motion) ──
-                Заместване на Three.js шейдъра за phone виewport-и. Чисто CSS,
-                нула JS, нула main-thread cost. Двата radial-gradient-а имитират
-                cyan→violet aurora ефекта без 730 KB Three.js парсване. */}
-            {!enableShader && (
-                <div
-                    aria-hidden
-                    style={{
-                        position: "absolute", inset: 0, zIndex: 1,
-                        pointerEvents: "none",
-                        background:
-                            "radial-gradient(ellipse 80% 60% at 20% 30%, rgba(6,182,212,0.18), transparent 60%), " +
-                            "radial-gradient(ellipse 70% 50% at 80% 70%, rgba(139,92,246,0.18), transparent 60%)",
-                    }}
-                />
-            )}
-
             {/* ── Layer 0b: AnoAI shader — desktop only, deferred until after first paint ── */}
             {enableShader && anoaiReady && (
                 <Suspense fallback={null}>
@@ -249,9 +232,7 @@ function HeroSection() {
                         <br /> път към Университета
                         <span
                             style={{
-                                background: "linear-gradient(130deg, #06B6D4 0%, #8B5CF6 100%)",
-                                WebkitBackgroundClip: "text",
-                                WebkitTextFillColor: "transparent",
+                                color: "var(--brand-accent-text)",
                             }}
                         >
                             {/* път към Университета */}
@@ -281,7 +262,7 @@ function HeroSection() {
                                 to="/calculator/"
                                 className="inline-flex items-center gap-3 font-semibold"
                                 style={{
-                                    background: "linear-gradient(135deg, #06B6D4, #8B5CF6)",
+                                    background: "var(--brand-accent)",
                                     color: "#fff",
                                     padding: "0.9rem 1.75rem",
                                     borderRadius: "0.875rem",
@@ -385,9 +366,7 @@ function StatItem({ value, suffix, label, sub, delay, trigger }) {
                 letterSpacing: "-0.04em",
                 lineHeight: 1,
                 fontFamily: "monospace",
-                background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
+                color: "var(--brand-accent-text)",
             }}>
                 {count}{suffix}
             </div>
@@ -521,7 +500,7 @@ function HowItWorksSection() {
                                     <div
                                         className="p-3 rounded-xl"
                                         style={{
-                                            background: "linear-gradient(135deg, rgba(6,182,212,0.14), rgba(139,92,246,0.14))",
+                                            background: "rgba(6,182,212,0.14)",
                                         }}
                                     >
                                         <Icon size={20} style={{ color: "var(--brand-cyan)" }} />
@@ -620,7 +599,7 @@ function PathSection() {
                                     onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.borderColor = "var(--brand-card-border)"; }}
                                 >
                                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
-                                        <div className="inline-flex p-3 rounded-xl" style={{ background: "linear-gradient(135deg, rgba(6,182,212,0.12), rgba(139,92,246,0.12))" }}>
+                                        <div className="inline-flex p-3 rounded-xl" style={{ background: "rgba(6,182,212,0.12)" }}>
                                             <Icon size={20} strokeWidth={1.5} style={{ color: "var(--brand-cyan)" }} aria-hidden="true" />
                                         </div>
                                         <span style={{ fontFamily: "monospace", fontSize: "12px", fontWeight: 800, color: "var(--brand-muted)" }}>
@@ -739,7 +718,7 @@ function FeaturesSection() {
                                 <div
                                     className="inline-flex p-3 rounded-xl mb-4"
                                     style={{
-                                        background: "linear-gradient(135deg, rgba(139,92,246,0.12), rgba(6,182,212,0.12))",
+                                        background: "rgba(139,92,246,0.12)",
                                     }}
                                 >
                                     <Icon size={20} style={{ color: "var(--brand-violet)" }} />
@@ -860,9 +839,7 @@ function CTASection() {
                             <br />
                             <span
                                 style={{
-                                    background: "linear-gradient(130deg, #06B6D4, #8B5CF6)",
-                                    WebkitBackgroundClip: "text",
-                                    WebkitTextFillColor: "transparent",
+                                    color: "var(--brand-accent-text)",
                                 }}
                             >
                                 откриеш своя път?
@@ -884,7 +861,7 @@ function CTASection() {
                                     to="/calculator/"
                                     className="inline-flex items-center gap-3 font-semibold"
                                     style={{
-                                        background: "linear-gradient(135deg, #06B6D4, #8B5CF6)",
+                                        background: "var(--brand-accent)",
                                         color: "#fff",
                                         padding: "0.9rem 1.75rem",
                                         borderRadius: "0.875rem",

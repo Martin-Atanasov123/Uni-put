@@ -75,14 +75,14 @@ export default function SignupPrompt({ variant = "favorite", onDismiss, register
                 gap: "1rem",
                 alignItems: "flex-start",
                 padding: "1.25rem 1.5rem",
-                background: "linear-gradient(135deg, rgba(6,182,212,0.08), rgba(139,92,246,0.08)), var(--brand-surface)", // плътна основа — иначе е прозрачна, когато се носи над съдържание
+                background: "rgba(6,182,212,0.08), var(--brand-surface)", // плътна основа — иначе е прозрачна, когато се носи над съдържание
                 border: "1px solid rgba(6,182,212,0.25)",
                 borderRadius: "1.25rem",
             }}
         >
             <div style={{
                 width: 44, height: 44, borderRadius: "0.75rem", flexShrink: 0,
-                background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                background: "var(--brand-accent)",
                 display: "flex", alignItems: "center", justifyContent: "center",
             }}>
                 <Icon size={22} color="#fff" strokeWidth={2} />
@@ -105,7 +105,7 @@ export default function SignupPrompt({ variant = "favorite", onDismiss, register
                     <Link to={registerTo} state={linkState} className="signup-prompt-cta" style={{
                         display: "inline-flex", alignItems: "center", gap: "0.4rem",
                         padding: "0.6rem 1.1rem", borderRadius: "0.75rem",
-                        background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                        background: "var(--brand-accent)",
                         color: "#fff", fontSize: "13px", fontWeight: 700, textDecoration: "none",
                     }}>
                         <UserPlus size={14} strokeWidth={2} /> Регистрирай се безплатно

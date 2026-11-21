@@ -173,7 +173,7 @@ export default function SpecialtiesIndex() {
                 >
                     <Link to="/calculator/" style={{
                         display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.875rem 1.75rem",
-                        background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                        background: "var(--brand-accent)",
                         color: "#fff", borderRadius: "0.75rem", fontWeight: 700, textDecoration: "none", fontSize: "0.9375rem",
                     }}>
                         Изчисли моя бал <ArrowRight size={16} />

@@ -11,6 +11,10 @@
   --brand-surface-2: rgba(30,41,59,0.7);
   --brand-cyan: #06B6D4;
   --brand-violet: #8B5CF6;
+  /* Плътен акцент вместо градиент (редизайн): запълвания и акцентен текст.
+     Една промяна тук сменя акцента навсякъде. */
+  --brand-accent: var(--brand-cyan);
+  --brand-accent-text: var(--brand-cyan);
   --brand-text: #F1F5F9;
   --brand-muted: #94A3B8;
   --brand-border: rgba(148, 163, 184, 0.1);

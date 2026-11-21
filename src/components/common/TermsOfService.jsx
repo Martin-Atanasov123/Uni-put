@@ -46,7 +46,6 @@ const TermsOfService = () => {
                 description="Условия за ползване на УниПът — безплатна платформа за изчисляване на приемен бал и кариерно ориентиране. Какво обещаваме и какви са правата ти като потребител."
                 path="/terms"
             />
-            <div aria-hidden style={{ position: "absolute", top: "-200px", right: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(6,182,212,0.1), transparent 70%)", pointerEvents: "none" }} />
 
             <div style={{ maxWidth: "820px", margin: "0 auto", position: "relative" }}>
                 <div
@@ -80,9 +79,7 @@ const TermsOfService = () => {
                                 fontSize: "clamp(1.75rem, 4vw, 2.5rem)",
                                 fontWeight: 800,
                                 letterSpacing: "-0.02em",
-                                background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
-                                WebkitBackgroundClip: "text",
-                                WebkitTextFillColor: "transparent",
+                                color: "var(--brand-accent-text)",
                             }}
                         >
                             Условия за ползване

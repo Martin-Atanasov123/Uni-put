@@ -104,20 +104,7 @@ const Footer = () => {
                     position: "absolute",
                     top: 0, left: 0, right: 0,
                     height: "1px",
-                    background: "linear-gradient(90deg, transparent, rgba(6,182,212,0.4), rgba(139,92,246,0.4), transparent)",
-                }}
-            />
-            <div
-                aria-hidden
-                style={{
-                    position: "absolute",
-                    top: "-120px",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    width: "640px",
-                    height: "240px",
-                    background: "radial-gradient(ellipse at center, rgba(6,182,212,0.08), transparent 70%)",
-                    pointerEvents: "none",
+                    background: "var(--brand-border)",
                 }}
             />
 
@@ -143,7 +130,7 @@ const Footer = () => {
                                     width: "2.25rem",
                                     height: "2.25rem",
                                     borderRadius: "0.625rem",
-                                    background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                                    background: "var(--brand-accent)",
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
@@ -165,9 +152,7 @@ const Footer = () => {
                                     fontSize: "1.25rem",
                                     fontWeight: 800,
                                     letterSpacing: "-0.02em",
-                                    background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
-                                    WebkitBackgroundClip: "text",
-                                    WebkitTextFillColor: "transparent",
+                                    color: "var(--brand-accent-text)",
                                 }}
                             >
                                 

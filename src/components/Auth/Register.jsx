@@ -117,23 +117,21 @@ const SignUp = () => {
                     flexDirection: "column",
                     justifyContent: "center",
                     padding: "4rem 3rem",
-                    background: "linear-gradient(160deg, var(--brand-bg-alt) 0%, var(--brand-bg) 100%)",
+                    background: "var(--brand-bg-alt)",
                     borderRight: "1px solid var(--brand-border)",
                     position: "relative",
                     overflow: "hidden",
                 }}
             >
                 {/* ambient glows */}
-                <div aria-hidden style={{ position: "absolute", top: "-100px", left: "-100px", width: "400px", height: "400px", background: "radial-gradient(circle, rgba(6,182,212,0.1), transparent 70%)", pointerEvents: "none" }} />
-                <div aria-hidden style={{ position: "absolute", bottom: "-100px", right: "-100px", width: "400px", height: "400px", background: "radial-gradient(circle, rgba(139,92,246,0.08), transparent 70%)", pointerEvents: "none" }} />
 
                 <div style={{ position: "relative", display: "flex", flexDirection: "column", gap: "2.5rem" }}>
                     {/* Logo */}
                     <Link to="/" style={{ display: "flex", alignItems: "center", gap: "0.625rem", textDecoration: "none" }}>
-                        <div style={{ padding: "0.5rem", borderRadius: "0.625rem", background: "linear-gradient(135deg,var(--brand-cyan),var(--brand-violet))", display: "flex" }}>
+                        <div style={{ padding: "0.5rem", borderRadius: "0.625rem", background: "var(--brand-accent)", display: "flex" }}>
                             <GraduationCap size={20} color="#fff" />
                         </div>
-                        <span style={{ fontSize: "1.25rem", fontWeight: 800, letterSpacing: "-0.02em", background: "linear-gradient(135deg,var(--brand-cyan),var(--brand-violet))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                        <span style={{ fontSize: "1.25rem", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--brand-accent-text)" }}>
                             УниПът
                         </span>
                     </Link>
@@ -177,8 +175,6 @@ const SignUp = () => {
                 }}
             >
                 {/* mobile ambient glows */}
-                <div aria-hidden style={{ position: "absolute", top: "-200px", left: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(139,92,246,0.1), transparent 70%)", pointerEvents: "none" }} />
-                <div aria-hidden style={{ position: "absolute", bottom: "-200px", right: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(6,182,212,0.1), transparent 70%)", pointerEvents: "none" }} />
 
                 <m.div
                     initial={{ opacity: 0, y: 24, scale: 0.97 }}
@@ -201,7 +197,7 @@ const SignUp = () => {
                         <div
                             style={{
                                 width: "3.5rem", height: "3.5rem", borderRadius: "1rem",
-                                background: "linear-gradient(135deg, var(--brand-violet), var(--brand-cyan))",
+                                background: "var(--brand-accent)",
                                 display: "flex", alignItems: "center", justifyContent: "center",
                                 boxShadow: "0 16px 40px rgba(139,92,246,0.35)",
                             }}
@@ -307,7 +303,7 @@ const SignUp = () => {
                             disabled={loading}
                             style={{
                                 marginTop: "0.75rem", padding: "0.875rem 1rem",
-                                background: loading ? "rgba(148,163,184,0.15)" : "linear-gradient(135deg, var(--brand-violet), var(--brand-cyan))",
+                                background: loading ? "rgba(148,163,184,0.15)" : "var(--brand-accent)",
                                 border: "none", borderRadius: "0.75rem", color: "#fff",
                                 fontSize: "14px", fontWeight: 800,
                                 cursor: loading ? "not-allowed" : "pointer",

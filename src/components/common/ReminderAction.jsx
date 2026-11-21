@@ -62,7 +62,7 @@ export default function ReminderAction() {
                     display: "inline-flex", alignItems: "center", justifyContent: "center",
                     minHeight: "44px", padding: "0 1.25rem", borderRadius: "0.75rem",
                     fontSize: "0.9375rem", fontWeight: 700, color: "#fff", textDecoration: "none",
-                    background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
+                    background: "var(--brand-accent)",
                 }}>
                     Към калкулатора
                 </Link>

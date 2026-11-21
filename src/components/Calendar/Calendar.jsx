@@ -565,7 +565,7 @@ const Calendar = () => {
                                         borderRadius: "0.45rem", cursor: "pointer", fontFamily: "inherit", fontSize: "12px", fontWeight: 700,
                                         border: "none",
                                         color: viewMode === mode ? "#fff" : "var(--brand-muted)",
-                                        background: viewMode === mode ? "linear-gradient(135deg,var(--brand-cyan),var(--brand-violet))" : "transparent",
+                                        background: viewMode === mode ? "var(--brand-accent)" : "transparent",
                                     }}>
                                         <Icon size={14} strokeWidth={1.5} /> {label}
                                     </button>
@@ -599,7 +599,7 @@ const Calendar = () => {
                                 : "Опитай да разшириш филтрите или ги изчисти."}
                         </p>
                         {hasFilters && events.length > 0 && (
-                            <button type="button" onClick={clearFilters} style={{ marginTop: "1.25rem", padding: "0.6rem 1.25rem", background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))", border: "none", borderRadius: "0.625rem", color: "#fff", fontSize: "13px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+                            <button type="button" onClick={clearFilters} style={{ marginTop: "1.25rem", padding: "0.6rem 1.25rem", background: "var(--brand-accent)", border: "none", borderRadius: "0.625rem", color: "#fff", fontSize: "13px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
                                 Изчисти филтрите
                             </button>
                         )}

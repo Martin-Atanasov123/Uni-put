@@ -142,7 +142,7 @@ export default function DziPlanner({ specialties }) {
     const remove = (name) => { setChosen((c) => c.filter((x) => x !== name)); setExpanded(null); };
 
     return (
-        <section aria-labelledby="dzi-planner-h" style={{ ...card, background: "linear-gradient(135deg, rgba(6,182,212,0.06), rgba(139,92,246,0.06))", padding: "1.75rem", marginBottom: "2.5rem" }}>
+        <section aria-labelledby="dzi-planner-h" style={{ ...card, background: "rgba(6,182,212,0.06)", padding: "1.75rem", marginBottom: "2.5rem" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
                 <Sparkles size={16} strokeWidth={1.5} style={{ color: "var(--brand-violet)" }} aria-hidden="true" />
                 <span style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--brand-violet)" }}>Обратен калкулатор</span>
@@ -239,7 +239,7 @@ export default function DziPlanner({ specialties }) {
                         <div style={{ ...card, padding: "1.25rem 1.5rem", borderColor: "rgba(6,182,212,0.4)" }}>
                             <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--brand-cyan)", marginBottom: "0.375rem" }}>Най-добър втори ДЗИ за теб</div>
                             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "0.5rem 1rem" }}>
-                                <span style={{ fontSize: "1.5rem", fontWeight: 900, letterSpacing: "-0.03em", background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>{best.label}</span>
+                                <span style={{ fontSize: "1.5rem", fontWeight: 900, letterSpacing: "-0.03em", color: "var(--brand-accent-text)" }}>{best.label}</span>
                                 <span style={{ fontSize: "14px", color: "var(--brand-text)" }}>
                                     <strong style={{ fontFamily: "monospace" }}>{best.counts.open}</strong> от {total} програми без изпит
                                     {best.gain > 0 && <span style={{ color: "#10b981", fontWeight: 700 }}> · +{best.gain} спрямо само БЕЛ</span>}
@@ -308,7 +308,7 @@ export default function DziPlanner({ specialties }) {
                         тогава комбинирай първите два предмета. Данните са по формулите за прием, публикувани от университетите.
                     </p>
 
-                    <Link to={`/calculator/?specialty=${encodeURIComponent(chosen[0])}`} style={{ alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: "0.5rem", minHeight: 44, padding: "0 1.25rem", background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))", borderRadius: "0.75rem", color: "#fff", fontSize: "13.5px", fontWeight: 700, textDecoration: "none" }}>
+                    <Link to={`/calculator/?specialty=${encodeURIComponent(chosen[0])}`} style={{ alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: "0.5rem", minHeight: 44, padding: "0 1.25rem", background: "var(--brand-accent)", borderRadius: "0.75rem", color: "#fff", fontSize: "13.5px", fontWeight: 700, textDecoration: "none" }}>
                         Изчисли бала си за {chosen[0]} <ArrowRight size={15} strokeWidth={1.5} aria-hidden="true" />
                     </Link>
 
