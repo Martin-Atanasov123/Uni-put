@@ -203,12 +203,12 @@ function drawCalcResultCard({ university, specialty, score, maxBall, chance, mar
     canvas.width = W; canvas.height = H;
 
     // ── Фаза 2: рисуване
-    ctx.fillStyle = "#2A2952";
+    ctx.fillStyle = "#0A0A0A";
     ctx.fillRect(0, 0, W, H);
     ctx.textBaseline = "alphabetic";
 
     // Лого
-    ctx.fillStyle = "#5EFBD7";
+    ctx.fillStyle = "#86EFAC";
     ctx.fillRect(PAD, PAD, 8, 40);
     ctx.fillStyle = "#FFFFFF";
     ctx.font = font(38, 800);
@@ -216,7 +216,7 @@ function drawCalcResultCard({ university, specialty, score, maxBall, chance, mar
 
     // Университет + специалност
     let y = PAD + LOGO_BLOCK + 34;
-    ctx.fillStyle = "#C9C8E8";
+    ctx.fillStyle = "#BDBDBD";
     ctx.font = font(28, 600);
     for (const line of uniLines) { ctx.fillText(line, PAD, y); y += 40; }
     y += 20;
@@ -229,18 +229,18 @@ function drawCalcResultCard({ university, specialty, score, maxBall, chance, mar
     ctx.font = mono(176, 900);
     const scoreText = score.toFixed(2);
     const scoreW = ctx.measureText(scoreText).width;
-    ctx.fillStyle = "#5EFBD7";
+    ctx.fillStyle = "#86EFAC";
     ctx.fillText(scoreText, PAD, y);
     if (maxBall) {
-        ctx.fillStyle = "#A5A3D0";
+        ctx.fillStyle = "#9E9E9E";
         ctx.font = font(40, 700);
         ctx.fillText(`/ ${Number(maxBall)}`, PAD + scoreW + 22, y);
     }
-    ctx.fillStyle = "#A5A3D0";
+    ctx.fillStyle = "#9E9E9E";
     ctx.font = font(24, 700);
     ctx.fillText("КОНКУРСЕН БАЛ", PAD + 4, y + 44);
     if (minBall != null) {
-        ctx.fillStyle = "#C9C8E8";
+        ctx.fillStyle = "#BDBDBD";
         ctx.font = font(26, 500);
         ctx.textAlign = "right";
         ctx.fillText(`минимален бал ${minYear || ""}: ${minBall.toFixed(2)}`, W - PAD, y + 44);
@@ -258,14 +258,14 @@ function drawCalcResultCard({ university, specialty, score, maxBall, chance, mar
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        ctx.fillStyle = "#C9C8E8";
+        ctx.fillStyle = "#BDBDBD";
         ctx.font = font(24, 700);
         ctx.fillText("ШАНС ЗА ПРИЕМ", PAD + 44, y + 56);
         ctx.fillStyle = tone;
         ctx.font = font(56, 800);
         ctx.fillText(chance.label, PAD + 44, y + 118);
         if (marginPts != null) {
-            ctx.fillStyle = "#C9C8E8";
+            ctx.fillStyle = "#BDBDBD";
             ctx.font = font(28, 600);
             const sign = marginPts >= 0 ? "+" : "−";
             ctx.fillText(`${sign}${Math.abs(marginPts).toFixed(2)} т. спрямо миналогодишния праг`, PAD + 44, y + 162);
@@ -273,10 +273,10 @@ function drawCalcResultCard({ university, specialty, score, maxBall, chance, mar
     }
 
     // Футър
-    ctx.fillStyle = "#A5A3D0";
+    ctx.fillStyle = "#9E9E9E";
     ctx.font = font(28, 700);
     ctx.fillText("uniput.eu", PAD, H - PAD);
-    ctx.fillStyle = "#C9C8E8";
+    ctx.fillStyle = "#BDBDBD";
     ctx.font = font(26, 500);
     ctx.textAlign = "right";
     ctx.fillText("Изчисли своя бал безплатно", W - PAD, H - PAD);
@@ -863,7 +863,7 @@ export default function CalculatorPage() {
                                     value={facultySearch}
                                     onChange={e => { setFacultySearch(e.target.value); setDropdownShowAll(false); setIsFacultyDropdownOpen(true); }}
                                     onClick={() => { setIsFacultyDropdownOpen(true); setDropdownShowAll(true); }}
-                                    onFocus={e => { setIsFacultyDropdownOpen(true); setDropdownShowAll(true); e.target.style.borderColor = "rgba(70,77,230,0.5)"; }}
+                                    onFocus={e => { setIsFacultyDropdownOpen(true); setDropdownShowAll(true); e.target.style.borderColor = "rgba(31,107,58,0.5)"; }}
                                     onBlur={e => { e.target.style.borderColor = "rgba(148,163,184,0.12)"; }}
                                     style={{ ...S.input, paddingLeft: "1rem", paddingRight: "4.5rem" }}
                                 />
@@ -894,7 +894,7 @@ export default function CalculatorPage() {
                                                     type="button"
                                                     onClick={() => { setSelectedFaculty(f); setFacultySearch(f); setSelectedSpecialtyName(""); setSelectedCity(""); setSelectedUniversity(""); setIsFacultyDropdownOpen(false); setDropdownShowAll(false); }}
                                                     style={{ width: "100%", textAlign: "left", padding: "0.625rem 1rem", fontSize: "13px", fontWeight: 500, color: "var(--brand-text)", background: "none", border: "none", borderBottom: i < filteredFaculties.length - 1 ? "1px solid rgba(148,163,184,0.08)" : "none", cursor: "pointer", fontFamily: "inherit", transition: "background 0.15s" }}
-                                                    onMouseEnter={e => (e.currentTarget.style.background = "rgba(70,77,230,0.08)")}
+                                                    onMouseEnter={e => (e.currentTarget.style.background = "rgba(31,107,58,0.08)")}
                                                     onMouseLeave={e => (e.currentTarget.style.background = "none")}
                                                 >
                                                     {f}
@@ -1016,7 +1016,7 @@ export default function CalculatorPage() {
                     >
                         {/* Header */}
                         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1.25rem" }}>
-                            <div style={{ padding: "0.375rem", borderRadius: "0.5rem", background: "rgba(70,77,230,0.12)", display: "inline-flex" }}>
+                            <div style={{ padding: "0.375rem", borderRadius: "0.5rem", background: "rgba(31,107,58,0.12)", display: "inline-flex" }}>
                                 <Zap size={15} style={{ color: "var(--brand-cyan)" }} />
                             </div>
                             <h2 style={{ fontSize: "14px", fontWeight: 800, color: "var(--brand-text)", margin: 0 }}>
@@ -1045,7 +1045,7 @@ export default function CalculatorPage() {
                                         fontWeight: 700,
                                         borderColor: dziError ? "rgba(248,113,113,0.6)" : undefined,
                                     }}
-                                    onFocus={e => { e.target.style.borderColor = dziError ? "rgba(248,113,113,0.6)" : "rgba(70,77,230,0.5)"; }}
+                                    onFocus={e => { e.target.style.borderColor = dziError ? "rgba(248,113,113,0.6)" : "rgba(31,107,58,0.5)"; }}
                                     onBlur={e => { e.target.style.borderColor = dziError ? "rgba(248,113,113,0.6)" : "var(--brand-input-border)"; }}
                                 />
                                 {dziError && (
@@ -1246,7 +1246,7 @@ export default function CalculatorPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                         style={{
-                            background: "rgba(70,77,230,0.08)",
+                            background: "rgba(31,107,58,0.08)",
                             border: "1px solid var(--brand-card-border)",
                             borderRadius: "1.25rem",
                             padding: "2rem 1.75rem",
@@ -1257,7 +1257,7 @@ export default function CalculatorPage() {
                             width: 52, height: 52, borderRadius: "1rem", margin: "0 auto 1.25rem",
                             background: "var(--brand-accent)",
                             display: "flex", alignItems: "center", justifyContent: "center",
-                            boxShadow: "0 12px 30px rgba(70,77,230,0.3)",
+                            boxShadow: "0 12px 30px rgba(31,107,58,0.3)",
                         }}>
                             <Lock size={24} color="#FFFFFF" strokeWidth={2} />
                         </div>
@@ -1347,7 +1347,7 @@ export default function CalculatorPage() {
                                     </div>
 
                                     {/* Formula */}
-                                    <div className="calc-result-formula" style={{ display: "flex", gap: "0.5rem", padding: "0.75rem", background: "rgba(70,77,230,0.06)", border: "1px solid rgba(70,77,230,0.15)", borderRadius: "0.75rem", minWidth: 0 }}>
+                                    <div className="calc-result-formula" style={{ display: "flex", gap: "0.5rem", padding: "0.75rem", background: "rgba(31,107,58,0.06)", border: "1px solid rgba(31,107,58,0.15)", borderRadius: "0.75rem", minWidth: 0 }}>
                                         <Info size={14} style={{ color: "var(--brand-violet)", flexShrink: 0, marginTop: "1px" }} />
                                         <p style={{ fontSize: "12px", color: "var(--brand-muted)", margin: 0, lineHeight: 1.5, wordBreak: "break-word", overflowWrap: "anywhere", minWidth: 0 }}>
                                             <strong style={{ color: "var(--brand-text)" }}>Формула:</strong> {item.formula_description}
@@ -1483,12 +1483,12 @@ export default function CalculatorPage() {
                                                         fontSize: "13px", fontWeight: 600,
                                                         color: "var(--brand-cyan)",
                                                         textDecoration: "none",
-                                                        background: "rgba(70,77,230,0.06)",
+                                                        background: "rgba(31,107,58,0.06)",
                                                         transition: "background 0.15s, border-color 0.15s",
                                                         flexShrink: 0,
                                                     }}
-                                                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(70,77,230,0.14)"; e.currentTarget.style.borderColor = "var(--brand-cyan)"; }}
-                                                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(70,77,230,0.06)"; e.currentTarget.style.borderColor = "var(--brand-border)"; }}
+                                                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(31,107,58,0.14)"; e.currentTarget.style.borderColor = "var(--brand-cyan)"; }}
+                                                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(31,107,58,0.06)"; e.currentTarget.style.borderColor = "var(--brand-border)"; }}
                                                 >
                                                     <ExternalLink size={13} strokeWidth={2} />
                                                     Провери в сайта
@@ -1515,7 +1515,7 @@ export default function CalculatorPage() {
                         style={{
                             marginTop: "1.5rem",
                             position: "relative",
-                            background: "rgba(70,77,230,0.08)",
+                            background: "rgba(31,107,58,0.08)",
                             border: "1px solid var(--brand-card-border)",
                             borderRadius: "1.25rem",
                             padding: "1.5rem 1.75rem",
@@ -1550,7 +1550,7 @@ export default function CalculatorPage() {
                                 width: "44px", height: "44px", borderRadius: "0.75rem",
                                 background: "var(--brand-accent)",
                                 display: "flex", alignItems: "center", justifyContent: "center",
-                                boxShadow: "0 8px 24px rgba(70,77,230,0.25)",
+                                boxShadow: "0 8px 24px rgba(31,107,58,0.25)",
                             }}>
                                 <Bookmark size={20} color="#FFFFFF" strokeWidth={2} fill="#FFFFFF" />
                             </div>
@@ -1582,7 +1582,7 @@ export default function CalculatorPage() {
                                             textDecoration: "none",
                                             transition: "transform 0.18s, box-shadow 0.18s",
                                         }}
-                                        onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 8px 20px rgba(70,77,230,0.3)"; }}
+                                        onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 8px 20px rgba(31,107,58,0.3)"; }}
                                         onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
                                     >
                                         <UserPlus size={14} strokeWidth={2} />

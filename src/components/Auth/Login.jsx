@@ -114,7 +114,7 @@ const Login = () => {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            boxShadow: "0 16px 40px rgba(70,77,230,0.35)",
+                            boxShadow: "0 16px 40px rgba(31,107,58,0.35)",
                         }}
                     >
                         <GraduationCap size={28} color="#FFFFFF" />
@@ -184,7 +184,7 @@ const Login = () => {
                         transition: "border-color 0.2s, background 0.2s",
                         marginBottom: "0.25rem",
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(70,77,230,0.35)"; e.currentTarget.style.background = "var(--brand-surface)"; }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(31,107,58,0.35)"; e.currentTarget.style.background = "var(--brand-surface)"; }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--brand-input-border)"; e.currentTarget.style.background = "var(--brand-input-bg)"; }}
                 >
                     <svg width="18" height="18" viewBox="0 0 24 24">
@@ -252,7 +252,7 @@ const Login = () => {
                             alignItems: "center",
                             justifyContent: "center",
                             gap: "0.5rem",
-                            boxShadow: loading ? "none" : "0 12px 30px rgba(70,77,230,0.3)",
+                            boxShadow: loading ? "none" : "0 12px 30px rgba(31,107,58,0.3)",
                             fontFamily: "inherit",
                             transition: "transform 0.15s",
                         }}
@@ -301,7 +301,7 @@ export function Field({ label, icon: Icon, right, ...inputProps }) {
                     borderRadius: "0.625rem",
                     transition: "border-color 0.2s, box-shadow 0.2s",
                 }}
-                onFocusCapture={e => { e.currentTarget.style.borderColor = "rgba(70,77,230,0.5)"; e.currentTarget.style.boxShadow = "0 0 0 3px rgba(70,77,230,0.08)"; }}
+                onFocusCapture={e => { e.currentTarget.style.borderColor = "rgba(31,107,58,0.5)"; e.currentTarget.style.boxShadow = "0 0 0 3px rgba(31,107,58,0.08)"; }}
                 onBlurCapture={e => { e.currentTarget.style.borderColor = "var(--brand-input-border)"; e.currentTarget.style.boxShadow = "none"; }}
             >
                 {Icon && <Icon size={16} style={{ color: "var(--brand-muted)", flexShrink: 0 }} />}

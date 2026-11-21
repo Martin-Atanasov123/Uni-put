@@ -258,7 +258,7 @@ const Profile = () => {
             <div style={{ minHeight: "100vh", background: "var(--brand-bg)", color: "var(--brand-text)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}>
-                    <div style={{ width: "3rem", height: "3rem", borderRadius: "50%", border: "3px solid rgba(70,77,230,0.2)", borderTopColor: "var(--brand-cyan)", animation: "spin 1s linear infinite" }} />
+                    <div style={{ width: "3rem", height: "3rem", borderRadius: "50%", border: "3px solid rgba(31,107,58,0.2)", borderTopColor: "var(--brand-cyan)", animation: "spin 1s linear infinite" }} />
                     <p style={{ margin: 0, fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--brand-muted)" }}>
                         Зареждане на профил...
                     </p>
@@ -287,7 +287,7 @@ const Profile = () => {
                     height: "240px",
                     position: "relative",
                     overflow: "hidden",
-                    background: "rgba(70,77,230,0.18)",
+                    background: "rgba(31,107,58,0.18)",
                 }}
             >
             </div>
@@ -327,8 +327,8 @@ const Profile = () => {
                                 <span
                                     style={{
                                         padding: "0.3rem 0.75rem",
-                                        background: "rgba(70,77,230,0.12)",
-                                        border: "1px solid rgba(70,77,230,0.3)",
+                                        background: "rgba(31,107,58,0.12)",
+                                        border: "1px solid rgba(31,107,58,0.3)",
                                         borderRadius: "999px",
                                         color: "var(--brand-cyan)",
                                         fontSize: "10px",
@@ -394,8 +394,8 @@ const Profile = () => {
                                         alignItems: "center",
                                         gap: "0.4rem",
                                         padding: "0.6rem 1rem",
-                                        background: active ? "rgba(70,77,230,0.12)" : "transparent",
-                                        border: `1px solid ${active ? "rgba(70,77,230,0.35)" : "transparent"}`,
+                                        background: active ? "rgba(31,107,58,0.12)" : "transparent",
+                                        border: `1px solid ${active ? "rgba(31,107,58,0.35)" : "transparent"}`,
                                         borderRadius: "0.5rem",
                                         color: active ? "var(--brand-cyan)" : "var(--brand-muted)",
                                         fontSize: "12px",
@@ -453,7 +453,7 @@ const Profile = () => {
                         return (
                             <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                                 {/* Следваща стъпка — едно конкретно действие вместо статичен списък */}
-                                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1rem", padding: "1.25rem 1.5rem", background: "rgba(70,77,230,0.08)", border: "1px solid rgba(70,77,230,0.25)", borderRadius: "1.25rem" }}>
+                                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1rem", padding: "1.25rem 1.5rem", background: "rgba(31,107,58,0.08)", border: "1px solid rgba(31,107,58,0.25)", borderRadius: "1.25rem" }}>
                                     <div style={{ width: "2.75rem", height: "2.75rem", borderRadius: "0.75rem", background: "var(--brand-accent)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                         <Compass size={20} color="#FFFFFF" strokeWidth={1.5} />
                                     </div>
@@ -495,7 +495,7 @@ const Profile = () => {
                                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "0.5rem" }}>
                                         {progressSteps.map((step, i) => {
                                             const inner = (
-                                                <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem", padding: "0.625rem", background: step.done ? "rgba(70,77,230,0.06)" : "transparent", border: `1px solid ${step.done ? "rgba(70,77,230,0.2)" : "transparent"}`, borderRadius: "0.75rem", cursor: step.done ? "default" : "pointer", height: "100%" }}>
+                                                <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem", padding: "0.625rem", background: step.done ? "rgba(31,107,58,0.06)" : "transparent", border: `1px solid ${step.done ? "rgba(31,107,58,0.2)" : "transparent"}`, borderRadius: "0.75rem", cursor: step.done ? "default" : "pointer", height: "100%" }}>
                                                     <div style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
                                                         <span style={{ width: "1.125rem", height: "1.125rem", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, background: step.done ? "var(--brand-cyan)" : "var(--brand-border)" }}>
                                                             {step.done ? <Check size={9} color="#FFFFFF" strokeWidth={3} /> : <span style={{ fontSize: "8px", fontWeight: 800, color: "var(--brand-muted)" }}>{i + 1}</span>}
@@ -547,7 +547,7 @@ const Profile = () => {
                                         <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}>
                                             {favoriteDetails.length > 0 ? favoriteDetails.map(uni => (
                                                 <div key={uni.id} style={{ display: "flex", alignItems: "center", gap: "0.875rem", padding: "0.75rem", background: "var(--brand-input-bg)", border: "1px solid var(--brand-border)", borderRadius: "0.75rem" }}>
-                                                    <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "0.625rem", background: "rgba(70,77,230,0.1)", color: "var(--brand-cyan)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                                    <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "0.625rem", background: "rgba(31,107,58,0.1)", color: "var(--brand-cyan)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                                         <GraduationCap size={18} />
                                                     </div>
                                                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -562,7 +562,7 @@ const Profile = () => {
                                                 <div style={{ padding: "2rem", textAlign: "center", background: "var(--brand-input-bg)", border: "1px dashed var(--brand-input-border)", borderRadius: "1rem" }}>
                                                     <Heart size={28} style={{ color: "var(--brand-muted)", opacity: 0.3, margin: "0 auto 0.625rem" }} />
                                                     <p style={{ margin: "0 0 0.75rem", fontSize: "12px", color: "var(--brand-muted)", fontStyle: "italic" }}>Нямаш добавени любими специалности</p>
-                                                    <Link to="/universities/" style={{ display: "inline-flex", padding: "0.4rem 0.875rem", background: "rgba(70,77,230,0.1)", border: "1px solid rgba(70,77,230,0.3)", borderRadius: "0.5rem", color: "var(--brand-cyan)", fontSize: "11px", fontWeight: 700, textDecoration: "none" }}>
+                                                    <Link to="/universities/" style={{ display: "inline-flex", padding: "0.4rem 0.875rem", background: "rgba(31,107,58,0.1)", border: "1px solid rgba(31,107,58,0.3)", borderRadius: "0.5rem", color: "var(--brand-cyan)", fontSize: "11px", fontWeight: 700, textDecoration: "none" }}>
                                                         Търсене
                                                     </Link>
                                                 </div>
@@ -589,7 +589,7 @@ const Profile = () => {
                                                                 {d.type === "application" ? "Срок за кандидатстване" : "Приемен изпит"} · {new Date(d.deadline).toLocaleDateString("bg-BG", { day: "numeric", month: "long" })}
                                                             </p>
                                                         </div>
-                                                        <span style={{ flexShrink: 0, padding: "0.25rem 0.625rem", borderRadius: "999px", fontSize: "11px", fontWeight: 700, background: d.daysLeft <= 7 ? "rgba(248,113,113,0.12)" : "rgba(70,77,230,0.1)", color: d.daysLeft <= 7 ? "#b91c1c" : "var(--brand-cyan)" }}>
+                                                        <span style={{ flexShrink: 0, padding: "0.25rem 0.625rem", borderRadius: "999px", fontSize: "11px", fontWeight: 700, background: d.daysLeft <= 7 ? "rgba(248,113,113,0.12)" : "rgba(31,107,58,0.1)", color: d.daysLeft <= 7 ? "#b91c1c" : "var(--brand-cyan)" }}>
                                                             {d.daysLeft === 0 ? "днес" : d.daysLeft === 1 ? "утре" : `след ${d.daysLeft} дни`}
                                                         </span>
                                                     </div>
@@ -763,7 +763,7 @@ const Profile = () => {
                                         alignItems: "center",
                                         gap: "0.5rem",
                                         fontFamily: "inherit",
-                                        boxShadow: "0 12px 30px rgba(70,77,230,0.3)",
+                                        boxShadow: "0 12px 30px rgba(31,107,58,0.3)",
                                     }}
                                 >
                                     {updating && <Loader2 size={14} style={{ animation: "spin 1s linear infinite" }} />}
@@ -786,8 +786,8 @@ const Profile = () => {
                                         onClick={() => navigate("/forgot-password")}
                                         style={{
                                             padding: "0.55rem 1rem",
-                                            background: "rgba(70,77,230,0.1)",
-                                            border: "1px solid rgba(70,77,230,0.3)",
+                                            background: "rgba(31,107,58,0.1)",
+                                            border: "1px solid rgba(31,107,58,0.3)",
                                             borderRadius: "0.625rem",
                                             color: "var(--brand-cyan)",
                                             fontSize: "11px",
@@ -888,8 +888,8 @@ function ScoreSparkline({ points }) {
 
 function StatCard({ icon: Icon, label, value, color }) {
     const palette = color === "cyan"
-        ? { bg: "rgba(70,77,230,0.08)", border: "rgba(70,77,230,0.25)", color: "var(--brand-cyan)" }
-        : { bg: "rgba(70,77,230,0.08)", border: "rgba(70,77,230,0.25)", color: "var(--brand-violet)" };
+        ? { bg: "rgba(31,107,58,0.08)", border: "rgba(31,107,58,0.25)", color: "var(--brand-cyan)" }
+        : { bg: "rgba(31,107,58,0.08)", border: "rgba(31,107,58,0.25)", color: "var(--brand-violet)" };
     return (
         <div
             style={{
@@ -949,7 +949,7 @@ function InputGroup({ label, icon: Icon, disabled, ...props }) {
 
 function Section({ icon: Icon, iconColor, title, subtitle, danger, children }) {
     const palette = iconColor === "cyan"
-        ? { bg: "rgba(70,77,230,0.12)", border: "rgba(70,77,230,0.3)", color: "var(--brand-cyan)" }
+        ? { bg: "rgba(31,107,58,0.12)", border: "rgba(31,107,58,0.3)", color: "var(--brand-cyan)" }
         : { bg: "rgba(248,113,113,0.12)", border: "rgba(248,113,113,0.3)", color: "#b91c1c" };
     return (
         <div

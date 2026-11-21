@@ -7,55 +7,55 @@
 [data-theme="dark"] {
   color-scheme: light;
 
-  /* ── Палитра (редизайн по Betheme „Course“): индиго + мента + нейви на светъл фон ── */
-  --brand-indigo: #464DE6;
-  --brand-navy: #2A2952;
-  --brand-mint: #5EFBD7;
-  --brand-cream: #F3F0EC;
+  /* ── Палитра, раздадена от taste-skill (mint-pink-accounts): почти бял фон, тъмнозелен акцент ── */
+  --brand-indigo: #1F6B3A;   /* старо име; сега акцентът (зелен) */
+  --brand-navy: #0A0A0A;
+  --brand-mint: #1F6B3A;
+  --brand-cream: #EEEEEE;
 
-  --brand-bg: #FFFFFF;
-  --brand-bg-alt: #F3F0EC;
+  --brand-bg: #F8F8F8;
+  --brand-bg-alt: #EEEEEE;
   --brand-surface: #FFFFFF;
-  --brand-surface-2: #F3F0EC;
+  --brand-surface-2: #EEEEEE;
   /* Исторически имена: --brand-cyan / --brand-violet сега сочат към индиго (един акцент). */
-  --brand-cyan: #464DE6;
-  --brand-violet: #464DE6;
-  --brand-accent: #464DE6;          /* плътен акцент: бутони и запълвания */
-  --brand-accent-ink: #FFFFFF;      /* текст върху акцента (6,3:1) */
-  --brand-accent-text: #464DE6;     /* акцентен текст върху бяло (6,3:1) */
-  --brand-on-indigo: #5EFBD7;       /* мента върху индиго (hero, ленти) */
+  --brand-cyan: #1F6B3A;
+  --brand-violet: #1F6B3A;
+  --brand-accent: #1F6B3A;          /* плътен акцент: бутони и запълвания */
+  --brand-accent-ink: #FFFFFF;      /* текст върху акцента (6,7:1) */
+  --brand-accent-text: #1F6B3A;     /* акцентен текст върху фона (6,4:1) */
+  --brand-on-indigo: #FFFFFF;
 
-  --font-display: 'Manrope Variable', 'Inter Variable', system-ui, sans-serif;
-  --font-body: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+  --font-display: 'Onest', system-ui, sans-serif;
+  --font-body: 'Onest', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
 
-  --brand-text: #2A2952;
-  --brand-muted: #515075;
-  --brand-border: rgba(42, 41, 82, 0.12);
+  --brand-text: #0A0A0A;
+  --brand-muted: #5E5E5E;
+  --brand-border: rgba(10, 10, 10, 0.12);
   --brand-input-bg: #FFFFFF;
-  --brand-input-border: rgba(42, 41, 82, 0.22);
+  --brand-input-border: rgba(10, 10, 10, 0.22);
   --brand-dropdown-bg: #FFFFFF;
   --brand-nav-bg: rgba(255,255,255,0.92);
   --brand-nav-scrolled: rgba(255,255,255,0.96);
-  --brand-shadow: rgba(42,41,82,0.16);
-  --brand-card-hover: rgba(70,77,230,0.10);
-  --brand-card-border: rgba(42, 41, 82, 0.10);
+  --brand-shadow: rgba(10,10,10,0.12);
+  --brand-card-hover: rgba(31,107,58,0.10);
+  --brand-card-border: rgba(10, 10, 10, 0.10);
   --brand-progress-bg: rgba(255,255,255,0.92);
 
   /* DaisyUI v5 токени (админ панел и др.) */
-  --color-base-100: #FFFFFF;
-  --color-base-200: #F3F0EC;
-  --color-base-300: #E7E3DC;
-  --color-base-content: #2A2952;
-  --color-primary: #464DE6;
+  --color-base-100: #F8F8F8;
+  --color-base-200: #EEEEEE;
+  --color-base-300: #E2E2E2;
+  --color-base-content: #0A0A0A;
+  --color-primary: #1F6B3A;
   --color-primary-content: #FFFFFF;
-  --color-secondary: #2A2952;
+  --color-secondary: #0A0A0A;
   --color-secondary-content: #FFFFFF;
-  --color-accent: #5EFBD7;
-  --color-accent-content: #1D2939;
-  --color-neutral: #2A2952;
+  --color-accent: #1F6B3A;
+  --color-accent-content: #FFFFFF;
+  --color-neutral: #0A0A0A;
   --color-neutral-content: #FFFFFF;
-  --color-info: #464DE6;
+  --color-info: #1F6B3A;
   --color-info-content: #FFFFFF;
   --color-success: #047857;
   --color-success-content: #FFFFFF;

@@ -143,7 +143,7 @@ const Footer = () => {
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
-                                    boxShadow: "0 8px 24px rgba(70,77,230,0.25)",
+                                    boxShadow: "0 8px 24px rgba(31,107,58,0.25)",
                                 }}
                             >
                                 <GraduationCap size={20} color="#FFFFFF" />
@@ -176,10 +176,10 @@ const Footer = () => {
                                 alignItems: "center",
                                 alignSelf: "flex-start",
                                 padding: "0.3rem 0.625rem",
-                                background: "rgba(70,77,230,0.1)",
-                                border: "1px solid rgba(70,77,230,0.3)",
+                                background: "rgba(31,107,58,0.1)",
+                                border: "1px solid rgba(31,107,58,0.3)",
                                 borderRadius: "999px",
-                                color: "#464DE6",
+                                color: "#1F6B3A",
                                 fontSize: "10px",
                                 fontWeight: 700,
                                 letterSpacing: "0.12em",

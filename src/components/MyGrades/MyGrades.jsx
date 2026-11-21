@@ -32,14 +32,14 @@ function GradeField({ label, gradeKey, value, onChange, onBlur }) {
     return (
         <div style={{
             background: "var(--brand-surface)",
-            border: `1px solid ${invalid ? "rgba(248,113,113,0.4)" : filled ? "rgba(70,77,230,0.3)" : "var(--brand-border)"}`,
+            border: `1px solid ${invalid ? "rgba(248,113,113,0.4)" : filled ? "rgba(31,107,58,0.3)" : "var(--brand-border)"}`,
             borderRadius: "0.875rem",
             padding: "0.875rem 1rem",
             display: "flex",
             flexDirection: "column",
             gap: "0.5rem",
             transition: "border-color 0.2s, box-shadow 0.2s",
-            boxShadow: focused && !invalid ? "0 0 0 3px rgba(70,77,230,0.08)" : "none",
+            boxShadow: focused && !invalid ? "0 0 0 3px rgba(31,107,58,0.08)" : "none",
         }}>
             <label style={{
                 fontSize: "11px", fontWeight: 700,

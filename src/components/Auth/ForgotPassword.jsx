@@ -71,7 +71,7 @@ const ForgotPassword = () => {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            boxShadow: "0 16px 40px rgba(70,77,230,0.35)",
+                            boxShadow: "0 16px 40px rgba(31,107,58,0.35)",
                         }}
                     >
                         <KeyRound size={28} color="#FFFFFF" />
@@ -138,7 +138,7 @@ const ForgotPassword = () => {
                                 alignItems: "center",
                                 justifyContent: "center",
                                 gap: "0.5rem",
-                                boxShadow: loading ? "none" : "0 12px 30px rgba(70,77,230,0.3)",
+                                boxShadow: loading ? "none" : "0 12px 30px rgba(31,107,58,0.3)",
                                 fontFamily: "inherit",
                             }}
                         >

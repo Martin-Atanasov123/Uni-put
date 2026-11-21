@@ -4,7 +4,7 @@ import { render, screen, cleanup } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import Home from "@/components/common/Home";
 
-describe("Home landing page", () => {
+describe("Home landing page (taste-skill)", () => {
     afterEach(cleanup);
 
     it("renders the hero section", () => {
@@ -12,23 +12,21 @@ describe("Home landing page", () => {
         expect(screen.getByTestId("hero-section")).toBeTruthy();
     });
 
-    it("renders the main headline", () => {
+    it("names the category in the h1", () => {
         render(<MemoryRouter><Home /></MemoryRouter>);
-        expect(screen.getAllByText(/Открий своя/i).length).toBeGreaterThan(0);
+        expect(screen.getByText("Калкулатор за приемен бал", { selector: "h1" })).toBeTruthy();
     });
 
-    it("renders RIASEC CTA button", () => {
+    it("offers the main action and the career test", () => {
         render(<MemoryRouter><Home /></MemoryRouter>);
-        expect(screen.getByText(/Направи кариерен тест/i)).toBeTruthy();
+        expect(screen.getAllByText(/Изчисли моя бал/i).length).toBeGreaterThan(0);
+        expect(screen.getByText(/Направи кариерния тест/i)).toBeTruthy();
     });
 
-    it("renders the how it works section", () => {
+    it("renders the calculator, tools and FAQ sections", () => {
         render(<MemoryRouter><Home /></MemoryRouter>);
-        expect(screen.getByText(/Три стъпки до правилния избор/i)).toBeTruthy();
-    });
-
-    it("renders the features section", () => {
-        render(<MemoryRouter><Home /></MemoryRouter>);
-        expect(screen.getByText(/Създаден за сериозни избори/i)).toBeTruthy();
+        expect(screen.getByText(/Балът по формулата на всяка специалност/i)).toBeTruthy();
+        expect(screen.getByText(/Още четири инструмента/i)).toBeTruthy();
+        expect(screen.getByText(/Въпроси за калкулатора/i)).toBeTruthy();
     });
 });

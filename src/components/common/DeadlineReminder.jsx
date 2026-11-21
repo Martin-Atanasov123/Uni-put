@@ -67,8 +67,8 @@ export default function DeadlineReminder({ universityName = null }) {
         <div style={{
             display: "flex", flexDirection: "column", gap: "0.625rem",
             padding: "0.875rem", borderRadius: "0.75rem",
-            background: `${color === "var(--brand-cyan)" ? "rgba(70,77,230,0.06)" : color + "14"}`,
-            border: `1px solid ${color === "var(--brand-cyan)" ? "rgba(70,77,230,0.2)" : color + "40"}`,
+            background: `${color === "var(--brand-cyan)" ? "rgba(31,107,58,0.06)" : color + "14"}`,
+            border: `1px solid ${color === "var(--brand-cyan)" ? "rgba(31,107,58,0.2)" : color + "40"}`,
         }}>
             {/* Обратно броене */}
             <div style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>

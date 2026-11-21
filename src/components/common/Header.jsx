@@ -178,7 +178,7 @@ export default function Header() {
                     maxWidth: "80rem", margin: "0 auto",
                     background: scrolled ? "var(--brand-nav-scrolled)" : "var(--brand-nav-bg)",
                     backdropFilter: "blur(16px)",
-                    border: `1px solid ${scrolled ? "rgba(70,77,230,0.2)" : "var(--brand-border)"}`,
+                    border: `1px solid ${scrolled ? "rgba(31,107,58,0.2)" : "var(--brand-border)"}`,
                     borderRadius: "1.25rem",
                     padding: scrolled ? "0.5rem 1rem" : "0.625rem 1rem",
                     display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem",
@@ -275,7 +275,7 @@ export default function Header() {
                                 </button>
                                 {isUserMenuOpen && (
                                     <div className="hd-user-panel">
-                                        <div style={{ padding: "0.625rem 0.75rem", marginBottom: "0.25rem", background: "rgba(70,77,230,0.06)", borderRadius: "0.625rem" }}>
+                                        <div style={{ padding: "0.625rem 0.75rem", marginBottom: "0.25rem", background: "rgba(31,107,58,0.06)", borderRadius: "0.625rem" }}>
                                             <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Добре дошъл</div>
                                             <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--brand-accent-text)", marginTop: "0.125rem", overflow: "hidden", textOverflow: "ellipsis" }}>
                                                 {user.user_metadata?.username || user.email}
@@ -308,7 +308,7 @@ export default function Header() {
             {/* Мобилно меню */}
             {isMenuOpen && (
                 <div style={{ position: "fixed", inset: 0, zIndex: 110 }}>
-                    <div onClick={() => setIsMenuOpen(false)} style={{ position: "absolute", inset: 0, background: "rgba(42,41,82,0.55)", backdropFilter: "blur(6px)" }} />
+                    <div onClick={() => setIsMenuOpen(false)} style={{ position: "absolute", inset: 0, background: "rgba(10,10,10,0.55)", backdropFilter: "blur(6px)" }} />
                     <div className="hd-drawer">
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
                             <span style={{ fontFamily: "var(--font-display)", fontSize: "1.25rem", fontWeight: 800, color: "var(--brand-text)" }}>Меню</span>
@@ -407,7 +407,7 @@ export default function Header() {
                     background: transparent; border: 1px solid transparent; cursor: pointer;
                     transition: background 0.2s, color 0.2s;
                 }
-                .hd-group-btn:hover, .hd-group-btn.is-active { background: rgba(70,77,230,0.09); color: var(--brand-accent-text); }
+                .hd-group-btn:hover, .hd-group-btn.is-active { background: rgba(31,107,58,0.09); color: var(--brand-accent-text); }
                 .hd-panel {
                     position: absolute; top: calc(100% + 0.5rem); left: 0; z-index: 120;
                     width: 25rem; padding: 0.5rem;
@@ -417,8 +417,8 @@ export default function Header() {
                 }
                 @keyframes hdPanel { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
                 .hd-item { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.7rem 0.75rem; border-radius: 0.75rem; text-decoration: none; transition: background 0.15s; }
-                .hd-item:hover, .hd-item.is-current { background: rgba(70,77,230,0.08); }
-                .hd-item-icon { display: inline-flex; flex-shrink: 0; padding: 0.55rem; border-radius: 0.625rem; background: rgba(70,77,230,0.1); color: var(--brand-accent-text); }
+                .hd-item:hover, .hd-item.is-current { background: rgba(31,107,58,0.08); }
+                .hd-item-icon { display: inline-flex; flex-shrink: 0; padding: 0.55rem; border-radius: 0.625rem; background: rgba(31,107,58,0.1); color: var(--brand-accent-text); }
                 .hd-item-text { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
                 .hd-item-text strong { font-size: 14px; font-weight: 800; color: var(--brand-text); }
                 .hd-item-text small { font-size: 12.5px; line-height: 1.4; color: var(--brand-muted); }
@@ -451,12 +451,12 @@ export default function Header() {
                 .hd-login:hover { color: var(--brand-accent-text); }
                 .hd-register { padding: 0.5rem 0.875rem; border-radius: 0.625rem; font-size: 13px; font-weight: 700; color: var(--brand-text); text-decoration: none; background: var(--brand-surface-2); border: 1px solid var(--brand-border); }
                 .hd-register:hover { border-color: var(--brand-accent); }
-                .hd-admin { display: flex; align-items: center; gap: 0.375rem; padding: 0.5rem 0.875rem; border-radius: 0.625rem; font-size: 13px; font-weight: 700; text-decoration: none; color: var(--brand-accent-text); border: 1px solid rgba(70,77,230,0.25); }
+                .hd-admin { display: flex; align-items: center; gap: 0.375rem; padding: 0.5rem 0.875rem; border-radius: 0.625rem; font-size: 13px; font-weight: 700; text-decoration: none; color: var(--brand-accent-text); border: 1px solid rgba(31,107,58,0.25); }
                 .hd-avatar-btn { display: flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.5rem 0.375rem 0.375rem; background: var(--brand-surface-2); border: 1px solid var(--brand-border); border-radius: 999px; cursor: pointer; font-family: inherit; }
                 .hd-user-panel { position: absolute; top: calc(100% + 8px); right: 0; min-width: 15rem; background: var(--brand-dropdown-bg); border: 1px solid var(--brand-border); border-radius: 0.875rem; box-shadow: 0 20px 60px var(--brand-shadow); padding: 0.5rem; z-index: 130; }
                 .hd-logout { width: 100%; display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-size: 13px; font-weight: 600; color: #dc2626; background: none; border: none; cursor: pointer; font-family: inherit; text-align: left; }
                 .uni-menu-item { transition: background 0.15s; }
-                .uni-menu-item:hover { background: rgba(70,77,230,0.07) !important; }
+                .uni-menu-item:hover { background: rgba(31,107,58,0.07) !important; }
                 .uni-logout-btn { transition: background 0.15s; }
                 .uni-logout-btn:hover { background: rgba(220,38,38,0.08) !important; }
                 .hd-burger { padding: 0.5rem; background: var(--brand-surface-2); border: 1px solid var(--brand-border); border-radius: 0.625rem; color: var(--brand-text); cursor: pointer; }
@@ -474,7 +474,7 @@ export default function Header() {
                 /* Долна лента (телефон) */
                 .hd-tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 80; display: grid; grid-template-columns: repeat(5, 1fr); background: rgba(255,255,255,0.97); border-top: 1px solid var(--brand-border); padding: 0.25rem 0.25rem calc(0.25rem + env(safe-area-inset-bottom)); }
                 .hd-tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; min-height: 3.25rem; padding: 0.25rem; border: 0; background: transparent; font: inherit; font-size: 11px; font-weight: 700; color: var(--brand-muted); text-decoration: none; cursor: pointer; border-radius: 0.625rem; }
-                .hd-tab.is-active { color: var(--brand-accent-text); background: rgba(70,77,230,0.08); }
+                .hd-tab.is-active { color: var(--brand-accent-text); background: rgba(31,107,58,0.08); }
                 @media (min-width: 1024px) { .hd-tabbar { display: none; } }
                 @media (max-width: 1023px) { body { padding-bottom: 4.5rem; } }
             `}</style>

@@ -524,7 +524,7 @@ export default function Gymnasia() {
 
             <div style={{ maxWidth: "72rem", margin: "0 auto", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                 <m.header initial={reduced ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}>
-                    <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.375rem 0.875rem", background: "rgba(70,77,230,0.08)", border: "1px solid rgba(70,77,230,0.2)", borderRadius: "999px", marginBottom: "1rem" }}>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.375rem 0.875rem", background: "rgba(31,107,58,0.08)", border: "1px solid rgba(31,107,58,0.2)", borderRadius: "999px", marginBottom: "1rem" }}>
                         <School size={14} strokeWidth={1.5} style={{ color: "var(--brand-cyan)" }} aria-hidden="true" />
                         <span style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--brand-cyan)" }}>Прием след 7. клас · {region.name}</span>
                     </div>
@@ -544,7 +544,7 @@ export default function Gymnasia() {
                     <span style={{ fontSize: "12px", color: "var(--brand-muted)" }}>Добавяме още области — започваме с най-големите.</span>
                 </div>
 
-                <div style={{ display: "flex", gap: "0.625rem", alignItems: "flex-start", padding: "0.75rem 1rem", background: "rgba(70,77,230,0.06)", border: "1px solid rgba(70,77,230,0.2)", borderRadius: "0.875rem" }}>
+                <div style={{ display: "flex", gap: "0.625rem", alignItems: "flex-start", padding: "0.75rem 1rem", background: "rgba(31,107,58,0.06)", border: "1px solid rgba(31,107,58,0.2)", borderRadius: "0.875rem" }}>
                     <Info size={16} strokeWidth={1.5} style={{ color: "var(--brand-cyan)", flexShrink: 0, marginTop: 1 }} aria-hidden="true" />
                     <p style={{ margin: 0, fontSize: "12.5px", lineHeight: 1.55, color: "var(--brand-muted)" }}>
                         Данните са от справките на {region.ruo}: {region.noFormulas ? "паралелки" : "паралелки и балообразуване"} за прием {year ? `${year}/${year + 1}` : ""}, класирания {histRange} г.
@@ -683,7 +683,7 @@ export default function Gymnasia() {
                 <>
                     <button type="button" onClick={() => setWishesOpen(true)} style={{
                         position: "fixed", left: "1rem", right: "1rem", bottom: "1rem", zIndex: 40, minHeight: 52, display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem",
-                        background: "var(--brand-accent)", border: "none", borderRadius: "0.75rem", color: "var(--brand-accent-ink)", fontSize: "15px", fontWeight: 700, fontFamily: "inherit", cursor: "pointer", boxShadow: "0 12px 30px rgba(70,77,230,0.3)",
+                        background: "var(--brand-accent)", border: "none", borderRadius: "0.75rem", color: "var(--brand-accent-ink)", fontSize: "15px", fontWeight: 700, fontFamily: "inherit", cursor: "pointer", boxShadow: "0 12px 30px rgba(31,107,58,0.3)",
                     }}>
                         <ListChecks size={18} strokeWidth={1.5} aria-hidden="true" /> Моите желания{wishes.length ? ` (${wishes.length})` : ""}
                     </button>

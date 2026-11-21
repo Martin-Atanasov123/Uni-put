@@ -80,8 +80,8 @@ function DormCard({ dorm }) {
                 transition: "border-color 0.2s, transform 0.2s, box-shadow 0.2s",
             }}
             onMouseEnter={e => {
-                e.currentTarget.style.borderColor = "rgba(70,77,230,0.35)";
-                e.currentTarget.style.boxShadow = "0 12px 32px rgba(70,77,230,0.08)";
+                e.currentTarget.style.borderColor = "rgba(31,107,58,0.35)";
+                e.currentTarget.style.boxShadow = "0 12px 32px rgba(31,107,58,0.08)";
                 e.currentTarget.style.transform = "translateY(-2px)";
             }}
             onMouseLeave={e => {
@@ -145,7 +145,7 @@ function DormCard({ dorm }) {
                         </span>
                     )}
                     {dorm.has_private_bathroom && (
-                        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", padding: "0.25rem 0.625rem", background: "rgba(70,77,230,0.1)", border: "1px solid rgba(70,77,230,0.3)", borderRadius: "999px", color: "var(--brand-cyan)", fontSize: "11px", fontWeight: 600 }}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", padding: "0.25rem 0.625rem", background: "rgba(31,107,58,0.1)", border: "1px solid rgba(31,107,58,0.3)", borderRadius: "999px", color: "var(--brand-cyan)", fontSize: "11px", fontWeight: 600 }}>
                             <Bath size={11} /> Собствена баня
                         </span>
                     )}
@@ -232,8 +232,8 @@ function DormCard({ dorm }) {
                         justifyContent: "center",
                         gap: "0.5rem",
                         padding: "0.625rem 1rem",
-                        background: "rgba(70,77,230,0.08)",
-                        border: "1px solid rgba(70,77,230,0.25)",
+                        background: "rgba(31,107,58,0.08)",
+                        border: "1px solid rgba(31,107,58,0.25)",
                         borderRadius: "0.625rem",
                         color: "var(--brand-cyan)",
                         fontSize: "13px",
@@ -241,8 +241,8 @@ function DormCard({ dorm }) {
                         textDecoration: "none",
                         transition: "background 0.2s, border-color 0.2s",
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(70,77,230,0.15)"; e.currentTarget.style.borderColor = "rgba(70,77,230,0.45)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(70,77,230,0.08)"; e.currentTarget.style.borderColor = "rgba(70,77,230,0.25)"; }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(31,107,58,0.15)"; e.currentTarget.style.borderColor = "rgba(31,107,58,0.45)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(31,107,58,0.08)"; e.currentTarget.style.borderColor = "rgba(31,107,58,0.25)"; }}
                 >
                     <MapPin size={14} />
                     Виж на картата
@@ -326,7 +326,7 @@ const Dormitories = () => {
                     style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}
                 >
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                        <div style={{ width: 8, height: 8, borderRadius: 999, background: "var(--brand-violet)", boxShadow: "0 0 12px rgba(70,77,230,0.6)" }} />
+                        <div style={{ width: 8, height: 8, borderRadius: 999, background: "var(--brand-violet)", boxShadow: "0 0 12px rgba(31,107,58,0.6)" }} />
                         <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.14em" }}>
                             Жилищна база
                         </span>
@@ -389,8 +389,8 @@ const Dormitories = () => {
                                 alignItems: "center",
                                 gap: "0.3rem",
                                 padding: "0.4rem 0.75rem",
-                                background: "rgba(70,77,230,0.1)",
-                                border: "1px solid rgba(70,77,230,0.3)",
+                                background: "rgba(31,107,58,0.1)",
+                                border: "1px solid rgba(31,107,58,0.3)",
                                 borderRadius: "999px",
                                 color: "var(--brand-cyan)",
                                 fontSize: "12px",
@@ -431,8 +431,8 @@ const Dormitories = () => {
                                 height: "4rem",
                                 margin: "0 auto 1rem",
                                 borderRadius: "1rem",
-                                background: "rgba(70,77,230,0.08)",
-                                border: "1px solid rgba(70,77,230,0.2)",
+                                background: "rgba(31,107,58,0.08)",
+                                border: "1px solid rgba(31,107,58,0.2)",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",

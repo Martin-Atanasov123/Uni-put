@@ -327,7 +327,7 @@ export default function ReportButton({ universityName, specialty }) {
                                         fontFamily: "inherit",
                                         transition: "border-color 0.2s, background 0.2s",
                                     }}
-                                    onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(70,77,230,0.4)"; e.currentTarget.style.background = "rgba(70,77,230,0.04)"; }}
+                                    onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(31,107,58,0.4)"; e.currentTarget.style.background = "rgba(31,107,58,0.04)"; }}
                                     onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--brand-border)"; e.currentTarget.style.background = "var(--brand-surface-2)"; }}
                                 >
                                     <Camera size={22} style={{ opacity: 0.5 }} />

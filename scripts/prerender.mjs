@@ -57,7 +57,7 @@ const STATIC_ROUTES = [
     {
         path: "/",
         title: "Калкулатор за приемен бал и кариерен тест",
-        description: `Изчисли приемния си бал по МОН формулите, направи RIASEC кариерен тест и сравни ${UNIVERSITIES} университета — безплатно, на едно място. За ${ADMISSION_YEAR_SHORT} г.`,
+        description: `Изчисли приемния си бал по формулите на ${UNIVERSITIES} университета, направи кариерния тест и сравни специалностите — безплатно. Прием ${ADMISSION_YEAR_SHORT} г.`,
         image: DEFAULT_IMAGE,
     },
     {
@@ -197,7 +197,7 @@ function injectHead(shell, headTags) {
 
 // H1 текст per route (по-подходящ като заглавие от <title>). Fallback: route.title.
 const PAGE_H1 = {
-    "/": "УниПът — калкулатор за приемен бал и кариерен тест",
+    "/": "Калкулатор за приемен бал",
     "/calculator": `Калкулатор за приемен бал ${ADMISSION_YEAR_SHORT}`,
     "/career-advisor": "Безплатен RIASEC кариерен тест",
     "/universities": `Висши училища в България за прием ${ADMISSION_YEAR_SHORT}`,

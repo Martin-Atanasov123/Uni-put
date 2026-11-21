@@ -77,7 +77,7 @@ export default function NotFound() {
                             fontSize: "14px",
                             fontWeight: 700,
                             textDecoration: "none",
-                            boxShadow: "0 12px 30px rgba(70,77,230,0.3)",
+                            boxShadow: "0 12px 30px rgba(31,107,58,0.3)",
                         }}
                     >
                         <Home size={16} /> Към началната

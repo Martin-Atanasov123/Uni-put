@@ -41,3 +41,6 @@ supabase/.temp/
 graphify-out/
 .playwright-mcp/
 
+
+# taste-skill: състояние на проверките (история на раздаването, gate, снимки)
+.taste-skill/

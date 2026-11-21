@@ -272,7 +272,7 @@ export default function SpecialtyPage() {
                                 )}
 
                                 {p.formula_description && (
-                                    <div style={{ marginTop: "0.75rem", padding: "0.625rem 0.75rem", background: "rgba(70,77,230,0.06)", border: "1px solid rgba(70,77,230,0.15)", borderRadius: "0.625rem", fontSize: "12px", color: "var(--brand-muted)", lineHeight: 1.5, wordBreak: "break-word", overflowWrap: "anywhere" }}>
+                                    <div style={{ marginTop: "0.75rem", padding: "0.625rem 0.75rem", background: "rgba(31,107,58,0.06)", border: "1px solid rgba(31,107,58,0.15)", borderRadius: "0.625rem", fontSize: "12px", color: "var(--brand-muted)", lineHeight: 1.5, wordBreak: "break-word", overflowWrap: "anywhere" }}>
                                         <strong style={{ color: "var(--brand-text)" }}>Формула:</strong> {p.formula_description}
                                     </div>
                                 )}

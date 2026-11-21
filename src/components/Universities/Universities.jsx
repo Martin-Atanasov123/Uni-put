@@ -23,16 +23,16 @@ const GROUPS = [
         name: "Социални, стопански и правни науки",
         icon: Briefcase,
         accent: "#06B6D4",
-        bg: "rgba(70,77,230,0.08)",
-        border: "rgba(70,77,230,0.18)",
+        bg: "rgba(31,107,58,0.08)",
+        border: "rgba(31,107,58,0.18)",
     },
     {
         id: "tech",
         name: "Технически науки",
         icon: Wrench,
-        accent: "#8B5CF6",
-        bg: "rgba(70,77,230,0.08)",
-        border: "rgba(70,77,230,0.18)",
+        accent: "#2563EB",
+        bg: "rgba(31,107,58,0.08)",
+        border: "rgba(31,107,58,0.18)",
     },
     {
         id: "nat",
@@ -78,7 +78,7 @@ const GROUPS = [
         id: "arts",
         name: "Изкуства",
         icon: Palette,
-        accent: "#a855f7",
+        accent: "#BE185D",
         bg: "rgba(168,85,247,0.08)",
         border: "rgba(168,85,247,0.18)",
     },
@@ -619,7 +619,7 @@ export default function UniversitiesPage() {
                             onChange={(e) => setSearchTerm(e.target.value)}
                             onClick={(e) => e.stopPropagation()}
                             style={{ ...inputStyle, paddingLeft: "2.5rem", paddingRight: "1rem" }}
-                            onFocus={(e) => { e.target.style.borderColor = "rgba(70,77,230,0.5)"; if (searchTerm.length > 1) setShowSuggestions(true); }}
+                            onFocus={(e) => { e.target.style.borderColor = "rgba(31,107,58,0.5)"; if (searchTerm.length > 1) setShowSuggestions(true); }}
                             onBlur={(e) => { e.target.style.borderColor = "rgba(148,163,184,0.12)"; }}
                         />
                         <AnimatePresence>
@@ -637,7 +637,7 @@ export default function UniversitiesPage() {
                                             key={s.id || i}
                                             onClick={() => { setSearchTerm(s.specialty); setShowSuggestions(false); }}
                                             style={{ padding: "0.75rem 1rem", display: "flex", alignItems: "center", gap: "0.625rem", cursor: "pointer", borderBottom: i < suggestions.length - 1 ? "1px solid rgba(148,163,184,0.08)" : "none", transition: "background 0.15s" }}
-                                            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(70,77,230,0.06)")}
+                                            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(31,107,58,0.06)")}
                                             onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                                         >
                                             <School size={14} style={{ color: "var(--brand-cyan)", flexShrink: 0 }} />
@@ -680,14 +680,14 @@ export default function UniversitiesPage() {
                         <button
                             onClick={resetFilters}
                             title="Разгледай по направления"
-                            style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "3rem", height: "3rem", background: viewMode === "browse" ? "rgba(70,77,230,0.12)" : "var(--brand-surface-2)", border: viewMode === "browse" ? "1px solid rgba(70,77,230,0.35)" : "1px solid var(--brand-border)", borderRadius: "0.75rem", cursor: "pointer", color: viewMode === "browse" ? "var(--brand-cyan)" : "var(--brand-muted)", transition: "all 0.2s", flexShrink: 0 }}
+                            style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "3rem", height: "3rem", background: viewMode === "browse" ? "rgba(31,107,58,0.12)" : "var(--brand-surface-2)", border: viewMode === "browse" ? "1px solid rgba(31,107,58,0.35)" : "1px solid var(--brand-border)", borderRadius: "0.75rem", cursor: "pointer", color: viewMode === "browse" ? "var(--brand-cyan)" : "var(--brand-muted)", transition: "all 0.2s", flexShrink: 0 }}
                         >
                             <LayoutGrid size={16} strokeWidth={1.5} />
                         </button>
                         <button
                             onClick={() => setViewMode("search")}
                             title="Всички специалности"
-                            style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "3rem", height: "3rem", background: viewMode === "search" ? "rgba(70,77,230,0.12)" : "var(--brand-surface-2)", border: viewMode === "search" ? "1px solid rgba(70,77,230,0.35)" : "1px solid var(--brand-border)", borderRadius: "0.75rem", cursor: "pointer", color: viewMode === "search" ? "var(--brand-cyan)" : "var(--brand-muted)", transition: "all 0.2s", flexShrink: 0 }}
+                            style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "3rem", height: "3rem", background: viewMode === "search" ? "rgba(31,107,58,0.12)" : "var(--brand-surface-2)", border: viewMode === "search" ? "1px solid rgba(31,107,58,0.35)" : "1px solid var(--brand-border)", borderRadius: "0.75rem", cursor: "pointer", color: viewMode === "search" ? "var(--brand-cyan)" : "var(--brand-muted)", transition: "all 0.2s", flexShrink: 0 }}
                         >
                             <Rows3 size={16} strokeWidth={1.5} />
                         </button>
@@ -712,23 +712,23 @@ export default function UniversitiesPage() {
                             )}
                             {/* Faculty chip */}
                             {selectedFaculty && (
-                                <span style={{ display: "flex", alignItems: "center", gap: "0.3rem", padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: "rgba(70,77,230,0.1)", color: "var(--brand-cyan)", border: "1px solid rgba(70,77,230,0.2)" }}>
+                                <span style={{ display: "flex", alignItems: "center", gap: "0.3rem", padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: "rgba(31,107,58,0.1)", color: "var(--brand-cyan)", border: "1px solid rgba(31,107,58,0.2)" }}>
                                     {selectedFaculty}
                                     <button onClick={() => { setSelectedFaculty(null); if (!hasTextFilters && !selectedGroup) { setViewMode("browse"); loadInitial(); } }} style={{ background: "none", border: "none", cursor: "pointer", color: "inherit", padding: 0, lineHeight: 1 }}><X size={10} /></button>
                                 </span>
                             )}
                             {searchTerm && (
-                                <span style={{ padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: "rgba(70,77,230,0.1)", color: "var(--brand-cyan)", border: "1px solid rgba(70,77,230,0.2)" }}>
+                                <span style={{ padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: "rgba(31,107,58,0.1)", color: "var(--brand-cyan)", border: "1px solid rgba(31,107,58,0.2)" }}>
                                     "{searchTerm}"
                                 </span>
                             )}
                             {selectedCity !== "Всички" && (
-                                <span style={{ padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: "rgba(70,77,230,0.1)", color: "var(--brand-violet)", border: "1px solid rgba(70,77,230,0.2)" }}>
+                                <span style={{ padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: "rgba(31,107,58,0.1)", color: "var(--brand-violet)", border: "1px solid rgba(31,107,58,0.2)" }}>
                                     {selectedCity}
                                 </span>
                             )}
                             {selectedLevel !== "Всички" && (
-                                <span style={{ padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: "rgba(70,77,230,0.1)", color: "var(--brand-violet)", border: "1px solid rgba(70,77,230,0.2)" }}>
+                                <span style={{ padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: "rgba(31,107,58,0.1)", color: "var(--brand-violet)", border: "1px solid rgba(31,107,58,0.2)" }}>
                                     {selectedLevel}
                                 </span>
                             )}
@@ -893,7 +893,7 @@ export default function UniversitiesPage() {
                                                 type="button"
                                                 onClick={() => setVisibleCount((c) => c + 60)}
                                                 style={{ padding: "0.75rem 2rem", background: "var(--brand-surface)", border: "1px solid var(--brand-border)", borderRadius: "0.75rem", color: "var(--brand-text)", fontWeight: 600, fontSize: "14px", cursor: "pointer", fontFamily: "inherit" }}
-                                                onMouseEnter={(e) => (e.currentTarget.style.borderColor = "rgba(70,77,230,0.3)")}
+                                                onMouseEnter={(e) => (e.currentTarget.style.borderColor = "rgba(31,107,58,0.3)")}
                                                 onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--brand-border)")}
                                             >
                                                 Покажи още {Math.min(60, displayUnis.length - visibleCount)}
@@ -943,7 +943,7 @@ export default function UniversitiesPage() {
                 .uni-row-uni a:hover { text-decoration-color: var(--brand-accent); }
                 .uni-row-faculty { margin: 0.25rem 0 0; font-size: 12px; color: var(--brand-muted); opacity: 0.75; }
                 .uni-row-actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
-                .uni-row-calc { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 44px; padding: 0 1rem; background: transparent; color: var(--brand-accent-text); border: 1px solid rgba(70,77,230,0.45); border-radius: 0.625rem; font-weight: 700; font-size: 13px; text-decoration: none; transition: background 0.15s ease, color 0.15s ease; }
+                .uni-row-calc { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 44px; padding: 0 1rem; background: transparent; color: var(--brand-accent-text); border: 1px solid rgba(31,107,58,0.45); border-radius: 0.625rem; font-weight: 700; font-size: 13px; text-decoration: none; transition: background 0.15s ease, color 0.15s ease; }
                 .uni-row-calc:hover { background: var(--brand-accent); color: var(--brand-accent-ink); }
                 .uni-row-fav { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 44px; padding: 0 0.875rem; background: transparent; border: 1px solid var(--brand-border); border-radius: 0.625rem; color: var(--brand-muted); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: border-color 0.15s ease, color 0.15s ease; }
                 .uni-row-fav:hover { border-color: var(--brand-accent); color: var(--brand-text); }

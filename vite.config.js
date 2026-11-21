@@ -20,6 +20,8 @@ export default defineConfig({
       'Referrer-Policy': 'strict-origin-when-cross-origin',
       'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
     },
+    // Проверките на taste-skill пишат Chrome профили и снимки тук — не ги наблюдавай.
+    watch: { ignored: ['**/.taste-skill/**'] },
   },
   build: {
     sourcemap: false,
