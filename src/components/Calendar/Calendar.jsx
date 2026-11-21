@@ -20,9 +20,9 @@ import {
 
 // ── Тип събитие → цвят/етикет/икона (сигнатурни цветове, стабилни навсякъде) ──
 const EVENT_TYPES = {
-    application: { label: "Кандидатстване", color: "#06B6D4", Icon: FileText },
-    exam:        { label: "Приемен изпит",  color: "#8B5CF6", Icon: GraduationCap },
-    ranking:     { label: "Класиране",      color: "#b45309", Icon: Trophy },
+    application: { label: "Кандидатстване", color: "#0E7490", Icon: FileText },
+    exam:        { label: "Приемен изпит",  color: "#6D28D9", Icon: GraduationCap },
+    ranking:     { label: "Класиране",      color: "#92400e", Icon: Trophy },
     enrollment:  { label: "Записване",      color: "#047857", Icon: UserCheck },
 };
 const TYPE_ORDER = ["application", "exam", "ranking", "enrollment"];

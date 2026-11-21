@@ -555,7 +555,7 @@ const CareerAdvisor = () => {
                 {step === "version" && (
                     <div style={{ marginTop: "3rem", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1rem" }}>
                         <div style={{ ...S.surface, padding: "1.5rem", display: "flex", gap: "1rem" }}>
-                            <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "0.75rem", background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.3)", color: "#86efac", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                            <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "0.75rem", background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.3)", color: "#047857", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                 <ClipboardList size={20} />
                             </div>
                             <div>

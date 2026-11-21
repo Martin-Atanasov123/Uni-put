@@ -26,12 +26,12 @@ const RESULTS_RETURN = { pathname: "/career-advisor/", search: "?view=results" }
 
 // CLAUDE.md §14 Brand Moat — each RIASEC type has its own distinct color
 const RIASEC_LABELS = {
-    R: { name: "Реалистичен",    desc: "Предпочиташ практическа работа с инструменти и машини.",   color: "#F97316", bg: "rgba(249,115,22,0.1)",   border: "rgba(249,115,22,0.3)"   },
-    I: { name: "Изследователски", desc: "Обичаш да решаваш сложни проблеми и да анализираш данни.", color: "#8B5CF6", bg: "rgba(139,92,246,0.1)",   border: "rgba(139,92,246,0.3)"   },
-    A: { name: "Артистичен",     desc: "Цениш творчеството, изкуството и оригиналността.",         color: "#EC4899", bg: "rgba(236,72,153,0.1)",   border: "rgba(236,72,153,0.3)"   },
+    R: { name: "Реалистичен",    desc: "Предпочиташ практическа работа с инструменти и машини.",   color: "#C2410C", bg: "rgba(249,115,22,0.1)",   border: "rgba(249,115,22,0.3)"   },
+    I: { name: "Изследователски", desc: "Обичаш да решаваш сложни проблеми и да анализираш данни.", color: "#6D28D9", bg: "rgba(139,92,246,0.1)",   border: "rgba(139,92,246,0.3)"   },
+    A: { name: "Артистичен",     desc: "Цениш творчеството, изкуството и оригиналността.",         color: "#BE185D", bg: "rgba(236,72,153,0.1)",   border: "rgba(236,72,153,0.3)"   },
     S: { name: "Социален",       desc: "Харесваш да помагаш на хората и да работиш в екип.",       color: "#047857", bg: "rgba(16,185,129,0.1)",   border: "rgba(16,185,129,0.3)"   },
-    E: { name: "Предприемачески", desc: "Имаш лидерски умения и обичаш да убеждаваш другите.",     color: "#F59E0B", bg: "rgba(245,158,11,0.1)",   border: "rgba(245,158,11,0.3)"   },
-    C: { name: "Конвенционален", desc: "Предпочиташ структурата, детайлите и организацията.",      color: "#06B6D4", bg: "rgba(6,182,212,0.1)",    border: "rgba(6,182,212,0.3)"    },
+    E: { name: "Предприемачески", desc: "Имаш лидерски умения и обичаш да убеждаваш другите.",     color: "#B45309", bg: "rgba(245,158,11,0.1)",   border: "rgba(245,158,11,0.3)"   },
+    C: { name: "Конвенционален", desc: "Предпочиташ структурата, детайлите и организацията.",      color: "#0E7490", bg: "rgba(6,182,212,0.1)",    border: "rgba(6,182,212,0.3)"    },
 };
 
 const S = {
@@ -59,20 +59,20 @@ function drawRiasecCard({ code, scores, topSpecialties }) {
     const mono = (size, weight = 400) =>
         `${weight} ${size}px ui-monospace, "SF Mono", Menlo, Consolas, monospace`;
     const letters = code.split("");
-    const primary = RIASEC_LABELS[letters[0]] || { name: "", desc: "", color: "#06B6D4" };
+    const primary = RIASEC_LABELS[letters[0]] || { name: "", desc: "", color: "#0E7490" };
 
-    ctx.fillStyle = "#2A2952";
+    ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(0, 0, W, H);
     ctx.textBaseline = "alphabetic";
 
-    ctx.fillStyle = "#5EFBD7";
+    ctx.fillStyle = "#464DE6";
     ctx.fillRect(PAD, PAD, 8, 40);
-    ctx.fillStyle = "#FFFFFF";
+    ctx.fillStyle = "#2A2952";
     ctx.font = font(38, 800);
     ctx.fillText("УниПът", PAD + 24, PAD + 32);
 
     let y = PAD + 150;
-    ctx.fillStyle = "#C9C8E8";
+    ctx.fillStyle = "#515075";
     ctx.font = font(26, 700);
     ctx.fillText("МОЯТ КАРИЕРЕН ПРОФИЛ", PAD, y);
 
@@ -90,7 +90,7 @@ function drawRiasecCard({ code, scores, topSpecialties }) {
     ctx.font = font(56, 800);
     ctx.fillText(`${primary.name} тип`, PAD, y);
     y += 56;
-    ctx.fillStyle = "#C9C8E8";
+    ctx.fillStyle = "#515075";
     ctx.font = font(32, 500);
     for (const line of wrapText(ctx, primary.desc, INNER).slice(0, 2)) { ctx.fillText(line, PAD, y); y += 44; }
 
@@ -99,17 +99,17 @@ function drawRiasecCard({ code, scores, topSpecialties }) {
         const info = RIASEC_LABELS[ch];
         if (!info) continue;
         const pct = Math.max(0, Math.min(100, Number(scores?.[ch]) || 0));
-        ctx.fillStyle = "#FFFFFF";
+        ctx.fillStyle = "#2A2952";
         ctx.font = font(30, 700);
         ctx.fillText(`${ch} · ${info.name}`, PAD, y);
-        ctx.fillStyle = "#C9C8E8";
+        ctx.fillStyle = "#515075";
         ctx.font = mono(30, 700);
         ctx.textAlign = "right";
         ctx.fillText(`${Math.round(pct)}%`, W - PAD, y);
         ctx.textAlign = "left";
         y += 22;
         roundRect(ctx, PAD, y, INNER, 14, 7);
-        ctx.fillStyle = "rgba(148,163,184,0.18)";
+        ctx.fillStyle = "rgba(42,41,82,0.10)";
         ctx.fill();
         if (pct > 0) {
             roundRect(ctx, PAD, y, Math.max(14, (INNER * pct) / 100), 14, 7);
@@ -121,11 +121,11 @@ function drawRiasecCard({ code, scores, topSpecialties }) {
 
     if (topSpecialties.length) {
         y += 10;
-        ctx.fillStyle = "#C9C8E8";
+        ctx.fillStyle = "#515075";
         ctx.font = font(24, 700);
         ctx.fillText("ПОДХОДЯЩИ СПЕЦИАЛНОСТИ", PAD, y);
         y += 50;
-        ctx.fillStyle = "#FFFFFF";
+        ctx.fillStyle = "#2A2952";
         ctx.font = font(32, 600);
         for (const name of topSpecialties.slice(0, 3)) {
             const lines = wrapText(ctx, name, INNER - 40);
@@ -134,10 +134,10 @@ function drawRiasecCard({ code, scores, topSpecialties }) {
         }
     }
 
-    ctx.fillStyle = "#A5A3D0";
+    ctx.fillStyle = "#6B6A8F";
     ctx.font = font(28, 700);
     ctx.fillText("uniput.eu", PAD, H - PAD);
-    ctx.fillStyle = "#C9C8E8";
+    ctx.fillStyle = "#515075";
     ctx.font = font(26, 500);
     ctx.textAlign = "right";
     ctx.fillText("Открий своя тип безплатно", W - PAD, H - PAD);
@@ -211,7 +211,7 @@ const RIASECResults = ({ results, onRestart }) => {
                         boxShadow: "0 16px 40px rgba(70,77,230,0.3)",
                     }}
                 >
-                    <Target size={28} color="#111827" />
+                    <Target size={28} color="#FFFFFF" />
                 </div>
                 <h2 style={{ margin: 0, fontSize: "clamp(1.75rem, 4vw, 2.5rem)", fontWeight: 800, letterSpacing: "-0.02em", textWrap: "balance" }}>
                     Твоят RIASEC Профил:{" "}
@@ -586,7 +586,7 @@ const RIASECResults = ({ results, onRestart }) => {
 
                                 <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem", position: "relative" }}>
                                     {/* <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "12px", color: "var(--brand-muted)", fontWeight: 600 }}>
-                                        <DollarSign size={13} style={{ color: "#86efac" }} />
+                                        <DollarSign size={13} style={{ color: "#047857" }} />
                                         <span>{career.salary || "По договаряне"} лв.</span>
                                     </div> */}
                                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "12px", color: "var(--brand-muted)", fontWeight: 600 }}>

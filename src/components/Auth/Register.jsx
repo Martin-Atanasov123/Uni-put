@@ -129,7 +129,7 @@ const SignUp = () => {
                     {/* Logo */}
                     <Link to="/" style={{ display: "flex", alignItems: "center", gap: "0.625rem", textDecoration: "none" }}>
                         <div style={{ padding: "0.5rem", borderRadius: "0.625rem", background: "var(--brand-accent)", display: "flex" }}>
-                            <GraduationCap size={20} color="#111827" />
+                            <GraduationCap size={20} color="#FFFFFF" />
                         </div>
                         <span style={{ fontSize: "1.25rem", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--brand-accent-text)" }}>
                             УниПът
@@ -202,7 +202,7 @@ const SignUp = () => {
                                 boxShadow: "0 16px 40px rgba(70,77,230,0.35)",
                             }}
                         >
-                            <UserPlus size={28} color="#111827" />
+                            <UserPlus size={28} color="#FFFFFF" />
                         </div>
                         <div style={{ textAlign: "center" }}>
                             <h1 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--brand-text)", textWrap: "balance" }}>
@@ -289,7 +289,7 @@ const SignUp = () => {
                                         background: r.ok ? "rgba(34,197,94,0.1)" : "rgba(148,163,184,0.08)",
                                         border: `1px solid ${r.ok ? "rgba(34,197,94,0.3)" : "rgba(148,163,184,0.12)"}`,
                                         borderRadius: "999px", fontSize: "10px", fontWeight: 700,
-                                        color: r.ok ? "#86efac" : "var(--brand-muted)",
+                                        color: r.ok ? "#047857" : "var(--brand-muted)",
                                         letterSpacing: "0.04em", transition: "all 0.2s",
                                     }}
                                 >

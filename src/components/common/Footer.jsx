@@ -146,7 +146,7 @@ const Footer = () => {
                                     boxShadow: "0 8px 24px rgba(70,77,230,0.25)",
                                 }}
                             >
-                                <GraduationCap size={20} color="#111827" />
+                                <GraduationCap size={20} color="#FFFFFF" />
                                 
                             </div> */} {/* Brand */}
                     <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>

@@ -22,12 +22,12 @@ const CARD_BORDER = "1px solid var(--brand-card-border)";
 
 // RIASEC буква → име/цвят. Стабилни цветове (същите като кариерния резултат).
 const RIASEC_LETTER = {
-    R: { name: "Реалистичен", color: "#F97316" },
-    I: { name: "Изследователски", color: "#8B5CF6" },
-    A: { name: "Артистичен", color: "#EC4899" },
+    R: { name: "Реалистичен", color: "#C2410C" },
+    I: { name: "Изследователски", color: "#6D28D9" },
+    A: { name: "Артистичен", color: "#BE185D" },
     S: { name: "Социален", color: "#047857" },
-    E: { name: "Предприемачески", color: "#F59E0B" },
-    C: { name: "Конвенционален", color: "#06B6D4" },
+    E: { name: "Предприемачески", color: "#B45309" },
+    C: { name: "Конвенционален", color: "#0E7490" },
 };
 
 function Loader() {

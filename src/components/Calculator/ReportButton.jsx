@@ -231,7 +231,7 @@ export default function ReportButton({ universityName, specialty }) {
                             borderRadius: "50%",
                             background: "rgba(34,197,94,0.12)",
                             border: "1px solid rgba(34,197,94,0.3)",
-                            color: "#86efac",
+                            color: "#047857",
                             display: "flex", alignItems: "center", justifyContent: "center",
                         }}>
                             <CheckCircle2 size={26} />
@@ -439,7 +439,7 @@ export default function ReportButton({ universityName, specialty }) {
                                     padding: "0.875rem",
                                     background: sending || !description.trim()
                                         ? "rgba(148,163,184,0.12)"
-                                        : "#f59e0b",
+                                        : "#B45309",
                                     border: "none",
                                     borderRadius: "0.75rem",
                                     color: sending || !description.trim() ? "var(--brand-muted)" : "var(--brand-bg)",

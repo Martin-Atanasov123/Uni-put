@@ -101,11 +101,11 @@ const HOW_STEPS = [
 
 // ── DZI points → grade conversion ───────────────────────────────────────────
 const DZI_BANDS = [
-    { min: 0,     max: 29.75, label: "Слаб",        grade_min: 2.00, grade_max: 2.00, color: "#dc2626", bg: "rgba(248,113,113,0.08)", border: "rgba(248,113,113,0.25)" },
-    { min: 30,    max: 40.5,  label: "Среден",      grade_min: 3.00, grade_max: 3.99, color: "#F97316", bg: "rgba(249,115,22,0.08)",   border: "rgba(249,115,22,0.25)"   },
-    { min: 40.75, max: 62.25, label: "Добър",       grade_min: 4.00, grade_max: 4.99, color: "#b45309", bg: "rgba(251,191,36,0.08)",   border: "rgba(251,191,36,0.25)"   },
-    { min: 62.5,  max: 83.75, label: "Много добър", grade_min: 5.00, grade_max: 5.49, color: "#06B6D4", bg: "rgba(6,182,212,0.08)",    border: "rgba(6,182,212,0.25)"    },
-    { min: 84,    max: 94.75, label: "Отличен",     grade_min: 5.50, grade_max: 5.99, color: "#8B5CF6", bg: "rgba(139,92,246,0.08)",   border: "rgba(139,92,246,0.25)"   },
+    { min: 0,     max: 29.75, label: "Слаб",        grade_min: 2.00, grade_max: 2.00, color: "#b91c1c", bg: "rgba(248,113,113,0.08)", border: "rgba(248,113,113,0.25)" },
+    { min: 30,    max: 40.5,  label: "Среден",      grade_min: 3.00, grade_max: 3.99, color: "#C2410C", bg: "rgba(249,115,22,0.08)",   border: "rgba(249,115,22,0.25)"   },
+    { min: 40.75, max: 62.25, label: "Добър",       grade_min: 4.00, grade_max: 4.99, color: "#92400e", bg: "rgba(251,191,36,0.08)",   border: "rgba(251,191,36,0.25)"   },
+    { min: 62.5,  max: 83.75, label: "Много добър", grade_min: 5.00, grade_max: 5.49, color: "#0E7490", bg: "rgba(6,182,212,0.08)",    border: "rgba(6,182,212,0.25)"    },
+    { min: 84,    max: 94.75, label: "Отличен",     grade_min: 5.50, grade_max: 5.99, color: "#6D28D9", bg: "rgba(139,92,246,0.08)",   border: "rgba(139,92,246,0.25)"   },
     { min: 95,    max: 100,   label: "Отличен 6",   grade_min: 6.00, grade_max: 6.00, color: "#047857", bg: "rgba(16,185,129,0.08)",   border: "rgba(16,185,129,0.25)"   },
 ];
 
@@ -1259,7 +1259,7 @@ export default function CalculatorPage() {
                             display: "flex", alignItems: "center", justifyContent: "center",
                             boxShadow: "0 12px 30px rgba(70,77,230,0.3)",
                         }}>
-                            <Lock size={24} color="#111827" strokeWidth={2} />
+                            <Lock size={24} color="#FFFFFF" strokeWidth={2} />
                         </div>
                         <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 800, color: "var(--brand-text)", letterSpacing: "-0.01em", textWrap: "balance" }}>
                             Сравни вече {unlockedHistory.length} специалности
@@ -1552,7 +1552,7 @@ export default function CalculatorPage() {
                                 display: "flex", alignItems: "center", justifyContent: "center",
                                 boxShadow: "0 8px 24px rgba(70,77,230,0.25)",
                             }}>
-                                <Bookmark size={20} color="#111827" strokeWidth={2} fill="#111827" />
+                                <Bookmark size={20} color="#FFFFFF" strokeWidth={2} fill="#FFFFFF" />
                             </div>
 
                             {/* Текст + CTA */}

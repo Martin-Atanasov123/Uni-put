@@ -96,7 +96,7 @@ const UpdatePassword = () => {
                             boxShadow: "0 16px 40px rgba(70,77,230,0.35)",
                         }}
                     >
-                        <Lock size={28} color="#111827" />
+                        <Lock size={28} color="#FFFFFF" />
                     </div>
                     <div style={{ textAlign: "center" }}>
                         <h2 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--brand-text)" }}>

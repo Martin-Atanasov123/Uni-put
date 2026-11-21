@@ -85,7 +85,7 @@ export default function SignupPrompt({ variant = "favorite", onDismiss, register
                 background: "var(--brand-accent)",
                 display: "flex", alignItems: "center", justifyContent: "center",
             }}>
-                <Icon size={22} color="#111827" strokeWidth={2} />
+                <Icon size={22} color="#FFFFFF" strokeWidth={2} />
             </div>
 
             <div style={{ flex: 1, minWidth: 0 }}>

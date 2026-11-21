@@ -37,12 +37,12 @@ import {
 } from "lucide-react";
 
 const RIASEC_TYPES = {
-    R: { label: "Реалист", color: "#F97316", bg: "rgba(249,115,22,0.12)", border: "rgba(249,115,22,0.3)" },
-    I: { label: "Изследовател", color: "#8B5CF6", bg: "rgba(139,92,246,0.12)", border: "rgba(139,92,246,0.3)" },
-    A: { label: "Артист", color: "#EC4899", bg: "rgba(236,72,153,0.12)", border: "rgba(236,72,153,0.3)" },
+    R: { label: "Реалист", color: "#C2410C", bg: "rgba(249,115,22,0.12)", border: "rgba(249,115,22,0.3)" },
+    I: { label: "Изследовател", color: "#6D28D9", bg: "rgba(139,92,246,0.12)", border: "rgba(139,92,246,0.3)" },
+    A: { label: "Артист", color: "#BE185D", bg: "rgba(236,72,153,0.12)", border: "rgba(236,72,153,0.3)" },
     S: { label: "Социален", color: "#047857", bg: "rgba(16,185,129,0.12)", border: "rgba(16,185,129,0.3)" },
-    E: { label: "Предприемач", color: "#F59E0B", bg: "rgba(245,158,11,0.12)", border: "rgba(245,158,11,0.3)" },
-    C: { label: "Конвенционален", color: "#06B6D4", bg: "rgba(6,182,212,0.12)", border: "rgba(6,182,212,0.3)" },
+    E: { label: "Предприемач", color: "#B45309", bg: "rgba(245,158,11,0.12)", border: "rgba(245,158,11,0.3)" },
+    C: { label: "Конвенционален", color: "#0E7490", bg: "rgba(6,182,212,0.12)", border: "rgba(6,182,212,0.3)" },
 };
 
 const SURFACE = {
@@ -423,7 +423,7 @@ const Profile = () => {
                                 background: message.type === "success" ? "rgba(34,197,94,0.08)" : "rgba(248,113,113,0.08)",
                                 border: `1px solid ${message.type === "success" ? "rgba(34,197,94,0.3)" : "rgba(248,113,113,0.3)"}`,
                                 borderRadius: "0.625rem",
-                                color: message.type === "success" ? "#86efac" : "#b91c1c",
+                                color: message.type === "success" ? "#047857" : "#b91c1c",
                                 fontSize: "13px",
                                 fontWeight: 600,
                                 marginBottom: "1.25rem",
@@ -455,7 +455,7 @@ const Profile = () => {
                                 {/* Следваща стъпка — едно конкретно действие вместо статичен списък */}
                                 <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1rem", padding: "1.25rem 1.5rem", background: "rgba(70,77,230,0.08)", border: "1px solid rgba(70,77,230,0.25)", borderRadius: "1.25rem" }}>
                                     <div style={{ width: "2.75rem", height: "2.75rem", borderRadius: "0.75rem", background: "var(--brand-accent)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                                        <Compass size={20} color="#111827" strokeWidth={1.5} />
+                                        <Compass size={20} color="#FFFFFF" strokeWidth={1.5} />
                                     </div>
                                     <div style={{ flex: 1, minWidth: "200px" }}>
                                         <p style={{ margin: 0, fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--brand-cyan)" }}>Следваща стъпка</p>
@@ -498,7 +498,7 @@ const Profile = () => {
                                                 <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem", padding: "0.625rem", background: step.done ? "rgba(70,77,230,0.06)" : "transparent", border: `1px solid ${step.done ? "rgba(70,77,230,0.2)" : "transparent"}`, borderRadius: "0.75rem", cursor: step.done ? "default" : "pointer", height: "100%" }}>
                                                     <div style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
                                                         <span style={{ width: "1.125rem", height: "1.125rem", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, background: step.done ? "var(--brand-cyan)" : "var(--brand-border)" }}>
-                                                            {step.done ? <Check size={9} color="#111827" strokeWidth={3} /> : <span style={{ fontSize: "8px", fontWeight: 800, color: "var(--brand-muted)" }}>{i + 1}</span>}
+                                                            {step.done ? <Check size={9} color="#FFFFFF" strokeWidth={3} /> : <span style={{ fontSize: "8px", fontWeight: 800, color: "var(--brand-muted)" }}>{i + 1}</span>}
                                                         </span>
                                                         <span style={{ fontSize: "11px", fontWeight: 700, color: step.done ? "var(--brand-text)" : "var(--brand-muted)" }}>{step.label}</span>
                                                     </div>

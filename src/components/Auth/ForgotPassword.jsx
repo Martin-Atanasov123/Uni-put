@@ -74,7 +74,7 @@ const ForgotPassword = () => {
                             boxShadow: "0 16px 40px rgba(70,77,230,0.35)",
                         }}
                     >
-                        <KeyRound size={28} color="#111827" />
+                        <KeyRound size={28} color="#FFFFFF" />
                     </div>
                     <div style={{ textAlign: "center" }}>
                         <h1 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--brand-text)", textWrap: "balance" }}>
@@ -179,7 +179,7 @@ const ForgotPassword = () => {
 
 export function Alert({ kind, icon: Icon, children }) {
     const styles = kind === "success"
-        ? { bg: "rgba(34,197,94,0.08)", border: "rgba(34,197,94,0.3)", color: "#86efac" }
+        ? { bg: "rgba(34,197,94,0.08)", border: "rgba(34,197,94,0.3)", color: "#047857" }
         : { bg: "rgba(248,113,113,0.08)", border: "rgba(248,113,113,0.3)", color: "#b91c1c" };
     return (
         <div

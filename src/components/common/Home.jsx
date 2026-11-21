@@ -560,7 +560,7 @@ const CSS = `
 .hm-hero-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: 3rem; align-items: center; }
 .hm-hero-grid > * { min-width: 0; }
 @media (min-width: 960px) { .hm-hero-grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 4rem; } .hm-hero { padding: 10rem 0 6rem; } }
-.hm-chip { display: inline-block; margin: 0 0 1.25rem; padding: 0.4rem 0.875rem; border-radius: 999px; background: rgba(255,255,255,0.14); color: var(--brand-mint); font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.hm-chip { display: inline-block; margin: 0 0 1.25rem; padding: 0.4rem 0.875rem; border-radius: 999px; background: var(--brand-navy); color: var(--brand-mint); font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
 .hm-h1 { margin: 0 0 1.25rem; font-family: var(--font-display); font-weight: 800; font-size: clamp(2.5rem, 5.6vw, 4.25rem); line-height: 1.05; letter-spacing: -0.035em; color: #fff; text-wrap: balance; }
 .hm-lead { margin: 0 0 2rem; max-width: 34rem; font-size: clamp(1.0625rem, 2vw, 1.25rem); line-height: 1.6; color: rgba(255,255,255,0.88); }
 .hm-cta-row { display: flex; flex-direction: column; gap: 0.875rem; }
@@ -570,12 +570,12 @@ const CSS = `
 .hm-btn--ghost { border: 2px solid rgba(255,255,255,0.55); color: #fff; }
 .hm-btn--ghost:hover { background: rgba(255,255,255,0.12); border-color: #fff; }
 .hm-stage { margin-top: 2.25rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.22); }
-.hm-stage-title { margin: 0 0 0.75rem; font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.75); }
+.hm-stage-title { margin: 0 0 0.75rem; font-size: 13px; font-weight: 700; color: #fff; }
 .hm-stage-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.625rem; }
-.hm-stage-link { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.55rem 0.875rem; border-radius: 0.625rem; background: rgba(255,255,255,0.12); color: #fff; font-size: 13px; text-decoration: none; transition: background 0.2s ease; }
+.hm-stage-link { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.55rem 0.875rem; border-radius: 0.625rem; background: rgba(42,41,82,0.35); color: #fff; font-size: 13px; text-decoration: none; transition: background 0.2s ease; }
 .hm-stage-link strong { font-weight: 800; }
-.hm-stage-link span { color: rgba(255,255,255,0.78); }
-.hm-stage-link:hover { background: rgba(255,255,255,0.22); }
+.hm-stage-link span { color: rgba(255,255,255,0.95); }
+.hm-stage-link:hover { background: rgba(42,41,82,0.55); }
 
 .hm-visual { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; align-items: start; max-width: 32rem; width: 100%; justify-self: center; }
 .hm-col { display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
@@ -642,7 +642,7 @@ const CSS = `
 @media (min-width: 720px) { .hm-stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3rem; } }
 .hm-stat-num { font-family: var(--font-display); font-weight: 800; font-size: clamp(2.75rem, 6vw, 4.25rem); line-height: 1; letter-spacing: -0.04em; color: var(--brand-mint); }
 .hm-stat-label { margin-top: 0.5rem; font-size: 1.125rem; font-weight: 800; }
-.hm-stat-sub { margin-top: 0.15rem; font-size: 14px; color: rgba(255,255,255,0.78); }
+.hm-stat-sub { margin-top: 0.15rem; font-size: 14px; color: rgba(255,255,255,0.92); }
 
 /* ЗАЩО */
 .hm-why { display: grid; gap: 2.5rem 2rem; margin-top: 3rem; }

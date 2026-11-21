@@ -140,7 +140,7 @@ function DormCard({ dorm }) {
             {(dorm.is_renovated || dorm.has_private_bathroom) && (
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
                     {dorm.is_renovated && (
-                        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", padding: "0.25rem 0.625rem", background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.3)", borderRadius: "999px", color: "#86efac", fontSize: "11px", fontWeight: 600 }}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", padding: "0.25rem 0.625rem", background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.3)", borderRadius: "999px", color: "#047857", fontSize: "11px", fontWeight: 600 }}>
                             <Hammer size={11} /> Реновиран
                         </span>
                     )}

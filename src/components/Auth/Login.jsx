@@ -117,7 +117,7 @@ const Login = () => {
                             boxShadow: "0 16px 40px rgba(70,77,230,0.35)",
                         }}
                     >
-                        <GraduationCap size={28} color="#111827" />
+                        <GraduationCap size={28} color="#FFFFFF" />
                     </div>
                     <div style={{ textAlign: "center" }}>
                         <h1 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--brand-text)", textWrap: "balance" }}>
@@ -139,7 +139,7 @@ const Login = () => {
                             background: "rgba(34,197,94,0.08)",
                             border: "1px solid rgba(34,197,94,0.3)",
                             borderRadius: "0.625rem",
-                            color: "#86efac",
+                            color: "#047857",
                             fontSize: "13px",
                             fontWeight: 500,
                             marginBottom: "1.25rem",
