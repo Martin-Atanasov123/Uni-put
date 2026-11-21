@@ -15,20 +15,29 @@ import { m } from "motion/react";
 
 const LINK_COLUMNS = [
     {
-        title: "Официални Ресурси",
+        title: "Избери път",
         links: [
-            { label: "Данни от МОН", icon: Database, href: "https://www.mon.bg", external: true },
-            { label: "Информация за ДЗИ", icon: BookOpen, href: "https://www.mon.bg/obshto-obrazovanie/darzhavni-zrelostni-izpiti-dzi", external: true },
-            { label: "Новини от МОН", icon: ExternalLink, href: "https://www.mon.bg/novini/", external: true },
-            { label: "Държавни изпити", icon: FileText, href: "https://www.mon.bg/obshto-obrazovanie/darzhavni-zrelostni-izpiti-dzi/izpitni-materiali-za-dzi-po-godini/", external: true },
+            { label: "Кариерен тест", icon: GraduationCap, href: "/career-advisor/" },
+            { label: "Прием след 7. клас", icon: BookOpen, href: "/priem-7-klas/" },
+            { label: "ДЗИ Стратег", icon: Info, href: "/dzi-strateg/" },
+        ],
+    },
+    {
+        title: "Кандидатствай",
+        links: [
+            { label: "Калкулатор на бала", icon: Database, href: "/calculator/" },
+            { label: "Университети", icon: GraduationCap, href: "/universities/" },
+            { label: "Специалности", icon: BookOpen, href: "/specialnosti/" },
+            { label: "Календар", icon: FileText, href: "/calendar/" },
+            { label: "Общежития", icon: Heart, href: "/dormitories/" },
         ],
     },
     {
         title: "Проектът",
         links: [
             { label: "За нас", icon: Info, href: "/about/" },
-            { label: "Всички специалности", icon: BookOpen, href: "/specialnosti/" },
-            { label: "Всички университети", icon: Database, href: "/universities/" },
+            { label: "Данни от МОН", icon: Database, href: "https://www.mon.bg", external: true },
+            { label: "Информация за ДЗИ", icon: ExternalLink, href: "https://www.mon.bg/obshto-obrazovanie/darzhavni-zrelostni-izpiti-dzi", external: true },
             { label: "Лиценз GNU", icon: ShieldCheck, href: "https://www.gnu.org/licenses/gpl-3.0.html", external: true },
             { label: "uniput1000@gmail.com", icon: Mail, href: "mailto:uniput1000@gmail.com", mail: true },
         ],
@@ -118,7 +127,7 @@ const Footer = () => {
                 <div
                     style={{
                         display: "grid",
-                        gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                        gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
                         gap: "3rem",
                         marginBottom: "3rem",
                     }}

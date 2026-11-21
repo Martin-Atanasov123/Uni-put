@@ -6,7 +6,7 @@ import {
     Globe, FlaskConical, HeartPulse, LayoutGrid, Rows3,
     ArrowLeft, ChevronRight,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import SignupPrompt from "@/components/common/SignupPrompt";
 import { universityService } from "@/services/universityService";
 import { useAuth } from "@/hooks/useAuth";
@@ -356,13 +356,18 @@ function SpecialtyCard({ uni, isFav, onToggleFav, showUser }) {
     );
 }
 
+// Търсене от хедъра: ?q=… (дължина и специални символи се чистят — стойността отива в заявка)
+const readQuery = (search) =>
+    (new URLSearchParams(search).get("q") || "").replace(/[%_\\'";<>]/g, " ").replace(/\s+/g, " ").trim().slice(0, 80);
+
 // ─── Main Component ────────────────────────────────────────────────────────
 export default function UniversitiesPage() {
     const { isFavorite, toggleFavorite } = useAuth();
     const [universities, setUniversities] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [searchTerm, setSearchTerm] = useState("");
+    const location = useLocation();
+    const [searchTerm, setSearchTerm] = useState(() => readQuery(location.search));
     const [selectedCity, setSelectedCity] = useState("Всички");
     const [selectedLevel, setSelectedLevel] = useState("Всички");
     const [cities, setCities] = useState([]);
@@ -374,6 +379,7 @@ export default function UniversitiesPage() {
     const [selectedGroup, setSelectedGroup] = useState(null);   // group id
     const [selectedFaculty, setSelectedFaculty] = useState(null); // exact faculty name from DB
     const gridRef = useRef(null);
+    const searchActiveRef = useRef(false);
     // Покана за акаунт — показва се само когато АНОНИМЕН потребител добави любима.
     const [showFavNudge, setShowFavNudge] = useState(false);
     const handleToggleFav = async (id) => {
@@ -397,7 +403,9 @@ export default function UniversitiesPage() {
                 return all;
             };
             const [unis, cityList] = await Promise.all([loadAll(), universityService.getCities()]);
-            setUniversities(unis);
+            // Ако междувременно е стартирано търсене (напр. от хедъра през ?q=), пълният списък
+            // не бива да го презапише.
+            if (!searchActiveRef.current) setUniversities(unis);
             setCities(cityList);
         } catch (err) {
             console.error("Universities initial load failed:", err);
@@ -416,6 +424,7 @@ export default function UniversitiesPage() {
             selectedCity !== "Всички" ||
             selectedLevel !== "Всички";
 
+        searchActiveRef.current = hasFilters;
         if (!hasFilters) {
             setSuggestions([]);
             setShowSuggestions(false);
@@ -520,6 +529,11 @@ export default function UniversitiesPage() {
         () => new Set(universities.map((u) => u.city).filter(Boolean)).size,
         [universities]
     );
+
+    useEffect(() => {
+        const q = readQuery(location.search);
+        if (q) setSearchTerm(q);
+    }, [location.search]);
 
     const resetFilters = () => {
         setSearchTerm("");

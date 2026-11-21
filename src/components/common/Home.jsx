@@ -557,7 +557,8 @@ const CSS = `
 .hm-hero-dots { position: absolute; inset: 0; pointer-events: none; opacity: 0.28;
   background-image: radial-gradient(circle, var(--brand-mint) 1.25px, transparent 1.5px); background-size: 28px 28px;
   -webkit-mask-image: linear-gradient(to left, #000 0%, transparent 70%); mask-image: linear-gradient(to left, #000 0%, transparent 70%); }
-.hm-hero-grid { position: relative; display: grid; gap: 3rem; align-items: center; }
+.hm-hero-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: 3rem; align-items: center; }
+.hm-hero-grid > * { min-width: 0; }
 @media (min-width: 960px) { .hm-hero-grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 4rem; } .hm-hero { padding: 10rem 0 6rem; } }
 .hm-chip { display: inline-block; margin: 0 0 1.25rem; padding: 0.4rem 0.875rem; border-radius: 999px; background: rgba(255,255,255,0.14); color: var(--brand-mint); font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
 .hm-h1 { margin: 0 0 1.25rem; font-family: var(--font-display); font-weight: 800; font-size: clamp(2.5rem, 5.6vw, 4.25rem); line-height: 1.05; letter-spacing: -0.035em; color: #fff; text-wrap: balance; }
@@ -576,16 +577,16 @@ const CSS = `
 .hm-stage-link span { color: rgba(255,255,255,0.78); }
 .hm-stage-link:hover { background: rgba(255,255,255,0.22); }
 
-.hm-visual { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start; max-width: 32rem; width: 100%; justify-self: center; }
-.hm-col { display: flex; flex-direction: column; gap: 1rem; }
+.hm-visual { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; align-items: start; max-width: 32rem; width: 100%; justify-self: center; }
+.hm-col { display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
 .hm-col--shift { margin-top: 2.5rem; }
-.hm-tile { display: flex; flex-direction: column; gap: 0.5rem; padding: 1.25rem; border-radius: 1.5rem; color: #1D2939; box-shadow: 0 18px 40px rgba(20,22,90,0.28); }
+.hm-tile { display: flex; flex-direction: column; gap: 0.5rem; padding: 1.25rem; min-width: 0; border-radius: 1.5rem; color: #1D2939; box-shadow: 0 18px 40px rgba(20,22,90,0.28); }
 .hm-tile--mint { background: var(--brand-mint); min-height: 15rem; }
 .hm-tile--peach { background: #FFB784; min-height: 14rem; }
 .hm-tile-label { font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.75; }
 .hm-tile-score { font-family: var(--font-mono); font-weight: 600; font-size: clamp(2rem, 4.4vw, 2.75rem); line-height: 1.05; letter-spacing: -0.04em; margin-top: 0.5rem; }
 .hm-tile-letter { font-family: var(--font-display); font-weight: 800; font-size: 4.5rem; line-height: 1; margin-top: 0.25rem; }
-.hm-tile-type { font-family: var(--font-display); font-weight: 800; font-size: 1.25rem; }
+.hm-tile-type { font-family: var(--font-display); font-weight: 800; font-size: clamp(0.95rem, 4vw, 1.25rem); overflow-wrap: anywhere; }
 .hm-tile-note { margin-top: auto; font-size: 11px; opacity: 0.6; }
 .hm-pill { display: inline-flex; align-items: center; gap: 0.4rem; align-self: flex-start; padding: 0.3rem 0.7rem; border-radius: 999px; background: #fff; color: #047857; font-size: 12px; font-weight: 800; }
 .hm-pill--light { background: rgba(255,255,255,0.16); color: var(--brand-mint); }
