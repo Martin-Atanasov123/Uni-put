@@ -142,7 +142,7 @@ const Footer = () => {
                             </div> */} {/* Brand */}
                     <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
                         <img
-                            src="/logo-wordmark.png"
+                            src="/logo-wordmark.png?v=2"
                             alt="УниПът лого"
                             style={{ height: "70px", width: "auto", objectFit: "contain", borderRadius: "0.5rem"  }}
                         />
