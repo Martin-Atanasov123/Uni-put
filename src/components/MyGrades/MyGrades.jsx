@@ -32,14 +32,14 @@ function GradeField({ label, gradeKey, value, onChange, onBlur }) {
     return (
         <div style={{
             background: "var(--brand-surface)",
-            border: `1px solid ${invalid ? "rgba(248,113,113,0.4)" : filled ? "rgba(6,182,212,0.3)" : "var(--brand-border)"}`,
+            border: `1px solid ${invalid ? "rgba(248,113,113,0.4)" : filled ? "rgba(245,181,68,0.3)" : "var(--brand-border)"}`,
             borderRadius: "0.875rem",
             padding: "0.875rem 1rem",
             display: "flex",
             flexDirection: "column",
             gap: "0.5rem",
             transition: "border-color 0.2s, box-shadow 0.2s",
-            boxShadow: focused && !invalid ? "0 0 0 3px rgba(6,182,212,0.08)" : "none",
+            boxShadow: focused && !invalid ? "0 0 0 3px rgba(245,181,68,0.08)" : "none",
         }}>
             <label style={{
                 fontSize: "11px", fontWeight: 700,
@@ -64,7 +64,7 @@ function GradeField({ label, gradeKey, value, onChange, onBlur }) {
                     background: "transparent",
                     border: "none",
                     outline: "none",
-                    fontFamily: "monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: "1.375rem",
                     fontWeight: 800,
                     color: invalid ? "#f87171" : filled ? "var(--brand-text)" : "var(--brand-muted)",
@@ -299,7 +299,7 @@ export default function MyGradesPage() {
                             <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--brand-text)" }}>
                                 Попълнени полета
                             </span>
-                            <span style={{ fontSize: "12px", fontWeight: 800, fontFamily: "monospace", color: "var(--brand-cyan)" }}>
+                            <span style={{ fontSize: "12px", fontWeight: 800, fontFamily: "var(--font-mono)", color: "var(--brand-cyan)" }}>
                                 {totalFilled}/{totalFields}
                             </span>
                         </div>
@@ -340,7 +340,7 @@ export default function MyGradesPage() {
                             display: "flex", alignItems: "center", gap: "0.375rem",
                             padding: "0.5rem 1rem", borderRadius: "0.625rem",
                             background: "var(--brand-accent)",
-                            color: "#fff", fontSize: "13px", fontWeight: 700,
+                            color: "var(--brand-accent-ink)", fontSize: "13px", fontWeight: 700,
                             textDecoration: "none", flexShrink: 0,
                         }}
                     >

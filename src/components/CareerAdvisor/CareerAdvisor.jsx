@@ -67,8 +67,8 @@ const VERSIONS = [
         time: "8–12 мин",
         icon: Layout,
         accent: "var(--brand-cyan)",
-        accentBg: "rgba(6,182,212,0.12)",
-        accentBorder: "rgba(6,182,212,0.35)",
+        accentBg: "rgba(245,181,68,0.12)",
+        accentBorder: "rgba(245,181,68,0.35)",
         desc: "Балансирана версия за прецизни резултати.",
         recommended: true,
     },
@@ -79,8 +79,8 @@ const VERSIONS = [
         time: "15–20 мин",
         icon: Layers,
         accent: "var(--brand-violet)",
-        accentBg: "rgba(139,92,246,0.12)",
-        accentBorder: "rgba(139,92,246,0.35)",
+        accentBg: "rgba(245,181,68,0.12)",
+        accentBorder: "rgba(245,181,68,0.35)",
         desc: "Дълбок анализ на професионалния ти потенциал.",
     },
 ];
@@ -276,9 +276,9 @@ const CareerAdvisor = () => {
                             style={{
                                 position: "relative",
                                 padding: "1.75rem",
-                                background: v.recommended ? "rgba(6,182,212,0.06)" : "var(--brand-surface)",
+                                background: v.recommended ? "rgba(245,181,68,0.06)" : "var(--brand-surface)",
                                 backdropFilter: "blur(8px)",
-                                border: `1px solid ${v.recommended ? "rgba(6,182,212,0.35)" : "var(--brand-card-border)"}`,
+                                border: `1px solid ${v.recommended ? "rgba(245,181,68,0.35)" : "var(--brand-card-border)"}`,
                                 borderRadius: "1.25rem",
                                 cursor: "pointer",
                                 textAlign: "left",
@@ -289,11 +289,11 @@ const CareerAdvisor = () => {
                                 color: "var(--brand-text)",
                                 transition: "transform 0.2s, border-color 0.2s, box-shadow 0.2s",
                             }}
-                            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 16px 40px rgba(6,182,212,0.12)"; e.currentTarget.style.borderColor = v.accentBorder; }}
-                            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = v.recommended ? "rgba(6,182,212,0.35)" : "var(--brand-card-border)"; }}
+                            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 16px 40px rgba(245,181,68,0.12)"; e.currentTarget.style.borderColor = v.accentBorder; }}
+                            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = v.recommended ? "rgba(245,181,68,0.35)" : "var(--brand-card-border)"; }}
                         >
                             {v.recommended && (
-                                <span style={{ position: "absolute", top: "-12px", left: "50%", transform: "translateX(-50%)", background: "var(--brand-accent)", color: "#fff", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.15em", padding: "0.3rem 0.875rem", borderRadius: "999px", boxShadow: "0 8px 20px rgba(6,182,212,0.3)" }}>
+                                <span style={{ position: "absolute", top: "-12px", left: "50%", transform: "translateX(-50%)", background: "var(--brand-accent)", color: "var(--brand-accent-ink)", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.15em", padding: "0.3rem 0.875rem", borderRadius: "999px", boxShadow: "0 8px 20px rgba(245,181,68,0.3)" }}>
                                     Препоръчано
                                 </span>
                             )}
@@ -307,11 +307,11 @@ const CareerAdvisor = () => {
                             <div style={{ marginTop: "auto", paddingTop: "1rem", borderTop: "1px solid var(--brand-border)", display: "flex", justifyContent: "space-between" }}>
                                 <div>
                                     <span style={{ display: "block", fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.1em", opacity: 0.6 }}>Въпроси</span>
-                                    <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--brand-text)", fontFamily: "monospace" }}>{v.questions}</span>
+                                    <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--brand-text)", fontFamily: "var(--font-mono)" }}>{v.questions}</span>
                                 </div>
                                 <div style={{ textAlign: "right" }}>
                                     <span style={{ display: "block", fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.1em", opacity: 0.6 }}>Време</span>
-                                    <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--brand-text)", fontFamily: "monospace" }}>{v.time}</span>
+                                    <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--brand-text)", fontFamily: "var(--font-mono)" }}>{v.time}</span>
                                 </div>
                             </div>
                         </m.button>
@@ -346,7 +346,7 @@ const CareerAdvisor = () => {
                         <span style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--brand-muted)" }}>
                             Въпрос {currentQuestionIndex + 1} от {filteredQuestions.length}
                         </span>
-                        <span style={{ fontSize: "10px", fontWeight: 800, color: "var(--brand-cyan)", textTransform: "uppercase",fontFamily: "monospace" }}>
+                        <span style={{ fontSize: "10px", fontWeight: 800, color: "var(--brand-cyan)", textTransform: "uppercase",fontFamily: "var(--font-mono)" }}>
                             {Math.round(progress)}% завършени
                         </span>
                     </div>
@@ -358,7 +358,7 @@ const CareerAdvisor = () => {
                                 background: "var(--brand-accent)",
                                 borderRadius: "999px",
                                 transition: "width 0.5s ease",
-                                boxShadow: "0 0 12px rgba(6,182,212,0.5)",
+                                boxShadow: "0 0 12px rgba(245,181,68,0.5)",
                             }}
                         />
                     </div>
@@ -384,8 +384,8 @@ const CareerAdvisor = () => {
                                         alignItems: "center",
                                         justifyContent: "space-between",
                                         padding: "0.875rem 1rem",
-                                        background: active ? "rgba(6,182,212,0.12)" : "var(--brand-surface)",
-                                        border: `1px solid ${active ? "rgba(6,182,212,0.5)" : "var(--brand-card-border)"}`,
+                                        background: active ? "rgba(245,181,68,0.12)" : "var(--brand-surface)",
+                                        border: `1px solid ${active ? "rgba(245,181,68,0.5)" : "var(--brand-card-border)"}`,
                                         borderRadius: "0.875rem",
                                         color: active ? "var(--brand-cyan)" : "var(--brand-text)",
                                         fontSize: "14px",
@@ -395,11 +395,11 @@ const CareerAdvisor = () => {
                                         fontFamily: "inherit",
                                         transition: "background 0.2s, border-color 0.2s",
                                     }}
-                                    onMouseEnter={e => { if (!active && !isTransitioning) e.currentTarget.style.borderColor = "rgba(6,182,212,0.3)"; }}
+                                    onMouseEnter={e => { if (!active && !isTransitioning) e.currentTarget.style.borderColor = "rgba(245,181,68,0.3)"; }}
                                     onMouseLeave={e => { if (!active) e.currentTarget.style.borderColor = "var(--brand-card-border)"; }}
                                 >
                                     <span style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                                        <span style={{ width: "1.75rem", height: "1.75rem", borderRadius: "0.5rem", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: 700, background: active ? "var(--brand-cyan)" : "var(--brand-border)", color: active ? "#0F172A" : "var(--brand-muted)", fontFamily: "monospace" }}>
+                                        <span style={{ width: "1.75rem", height: "1.75rem", borderRadius: "0.5rem", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: 700, background: active ? "var(--brand-cyan)" : "var(--brand-border)", color: active ? "#0E1525" : "var(--brand-muted)", fontFamily: "var(--font-mono)" }}>
                                             {val}
                                         </span>
                                         {scaleLabels[val]}
@@ -467,7 +467,7 @@ const CareerAdvisor = () => {
                                 width: "100%",
                                 height: "100%",
                                 borderRadius: "50%",
-                                border: "3px solid rgba(6,182,212,0.15)",
+                                border: "3px solid rgba(245,181,68,0.15)",
                                 borderTopColor: "var(--brand-cyan)",
                                 animation: "spin 1s linear infinite",
                             }}
@@ -527,7 +527,7 @@ const CareerAdvisor = () => {
             <div style={{ maxWidth: "960px", margin: "0 auto", padding: "0 1.5rem", position: "relative" }}>
                 {step === "version" && (
                     <div style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: "1rem", marginBottom: "3rem" }}>
-                        <div style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.4rem 0.875rem", background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.3)", borderRadius: "999px", color: "var(--brand-cyan)", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 auto" }}>
+                        <div style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.4rem 0.875rem", background: "rgba(245,181,68,0.1)", border: "1px solid rgba(245,181,68,0.3)", borderRadius: "999px", color: "var(--brand-cyan)", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 auto" }}>
                             <Sparkles size={12} /> RIASEC
                         </div>
                         <h1 style={{ margin: 0, fontSize: "clamp(2.25rem, 5vw, 3.5rem)", fontWeight: 800, lineHeight: 1.05, letterSpacing: "-0.03em", textWrap: "balance" }}>
@@ -566,7 +566,7 @@ const CareerAdvisor = () => {
                             </div>
                         </div>
                         <div style={{ ...S.surface, padding: "1.5rem", display: "flex", gap: "1rem" }}>
-                            <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "0.75rem", background: "rgba(6,182,212,0.12)", border: "1px solid rgba(6,182,212,0.3)", color: "var(--brand-cyan)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                            <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "0.75rem", background: "rgba(245,181,68,0.12)", border: "1px solid rgba(245,181,68,0.3)", color: "var(--brand-cyan)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                 <AlertCircle size={20} />
                             </div>
                             <div>

@@ -67,15 +67,15 @@ export default function DeadlineReminder({ universityName = null }) {
         <div style={{
             display: "flex", flexDirection: "column", gap: "0.625rem",
             padding: "0.875rem", borderRadius: "0.75rem",
-            background: `${color === "var(--brand-cyan)" ? "rgba(6,182,212,0.06)" : color + "14"}`,
-            border: `1px solid ${color === "var(--brand-cyan)" ? "rgba(6,182,212,0.2)" : color + "40"}`,
+            background: `${color === "var(--brand-cyan)" ? "rgba(245,181,68,0.06)" : color + "14"}`,
+            border: `1px solid ${color === "var(--brand-cyan)" ? "rgba(245,181,68,0.2)" : color + "40"}`,
         }}>
             {/* Обратно броене */}
             <div style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
                 <Clock size={15} style={{ color, flexShrink: 0, marginTop: "1px" }} strokeWidth={1.5} />
                 <div style={{ fontSize: "12px", lineHeight: 1.5, color: "var(--brand-text)" }}>
                     Срок <strong>{kind}</strong> в {deadline.universityName}: до{" "}
-                    <strong style={{ fontFamily: "monospace" }}>{fmtDate(deadline.deadline)}</strong>
+                    <strong style={{ fontFamily: "var(--font-mono)" }}>{fmtDate(deadline.deadline)}</strong>
                     {" — "}
                     <strong style={{ color }}>{daysText}</strong>.
                     {deadline.sourceUrl && (
@@ -141,7 +141,7 @@ export default function DeadlineReminder({ universityName = null }) {
                                 style={{
                                     height: "2.5rem", padding: "0 1rem", borderRadius: "0.625rem", border: "none",
                                     cursor: state === "loading" ? "wait" : "pointer",
-                                    fontSize: "13px", fontWeight: 700, color: "#fff",
+                                    fontSize: "13px", fontWeight: 700, color: "var(--brand-accent-ink)",
                                     background: "var(--brand-accent)",
                                     opacity: state === "loading" ? 0.7 : 1,
                                 }}

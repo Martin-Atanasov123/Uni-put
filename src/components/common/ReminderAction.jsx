@@ -61,7 +61,7 @@ export default function ReminderAction() {
                 <Link to="/calculator/" style={{
                     display: "inline-flex", alignItems: "center", justifyContent: "center",
                     minHeight: "44px", padding: "0 1.25rem", borderRadius: "0.75rem",
-                    fontSize: "0.9375rem", fontWeight: 700, color: "#fff", textDecoration: "none",
+                    fontSize: "0.9375rem", fontWeight: 700, color: "var(--brand-accent-ink)", textDecoration: "none",
                     background: "var(--brand-accent)",
                 }}>
                     Към калкулатора

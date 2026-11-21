@@ -58,7 +58,7 @@ function NotFound({ slug }) {
                 <Link to="/universities/" style={{
                     display: "inline-flex", alignItems: "center", gap: "0.5rem", marginTop: "1.5rem",
                     padding: "0.75rem 1.5rem", background: "var(--brand-accent)",
-                    color: "#fff", borderRadius: "0.75rem", fontWeight: 700, textDecoration: "none",
+                    color: "var(--brand-accent-ink)", borderRadius: "0.75rem", fontWeight: 700, textDecoration: "none",
                 }}>
                     Към университетите <ArrowRight size={16} />
                 </Link>
@@ -75,7 +75,7 @@ function StatChip({ icon: Icon, label, value, color }) {
             border: CARD_BORDER, borderRadius: "999px", fontSize: "0.8125rem",
         }}>
             <Icon size={14} strokeWidth={1.5} color={color || "var(--brand-cyan)"} />
-            <span style={{ fontWeight: 700, fontFamily: "monospace" }}>{value}</span>
+            <span style={{ fontWeight: 700, fontFamily: "var(--font-mono)" }}>{value}</span>
             <span style={{ color: "var(--brand-muted)" }}>{label}</span>
         </div>
     );
@@ -211,8 +211,8 @@ export default function SpecialtyPage() {
                         собствена формула за балообразуване по официалните коефициенти на МОН.
                         {minRange && (
                             <> Историческите минимални балове за прием се движат между{" "}
-                                <strong style={{ color: "var(--brand-text)", fontFamily: "monospace" }}>{minRange.lo.toFixed(2)}</strong> и{" "}
-                                <strong style={{ color: "var(--brand-text)", fontFamily: "monospace" }}>{minRange.hi.toFixed(2)}</strong> т.
+                                <strong style={{ color: "var(--brand-text)", fontFamily: "var(--font-mono)" }}>{minRange.lo.toFixed(2)}</strong> и{" "}
+                                <strong style={{ color: "var(--brand-text)", fontFamily: "var(--font-mono)" }}>{minRange.hi.toFixed(2)}</strong> т.
                                 (по данни за {minRange.n} {minRange.n === 1 ? "програма" : "програми"}).</>
                         )}
                     </p>
@@ -257,7 +257,7 @@ export default function SpecialtyPage() {
                                     </div>
                                     {ms && (
                                         <div style={{ textAlign: "right", flexShrink: 0 }}>
-                                            <div style={{ fontSize: "1.25rem", fontWeight: 900, fontFamily: "monospace", color: "#10b981", lineHeight: 1 }}>
+                                            <div style={{ fontSize: "1.25rem", fontWeight: 900, fontFamily: "var(--font-mono)", color: "#10b981", lineHeight: 1 }}>
                                                 {ms.minBall.toFixed(2)}
                                             </div>
                                             <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: "2px" }}>
@@ -272,7 +272,7 @@ export default function SpecialtyPage() {
                                 )}
 
                                 {p.formula_description && (
-                                    <div style={{ marginTop: "0.75rem", padding: "0.625rem 0.75rem", background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.15)", borderRadius: "0.625rem", fontSize: "12px", color: "var(--brand-muted)", lineHeight: 1.5, wordBreak: "break-word", overflowWrap: "anywhere" }}>
+                                    <div style={{ marginTop: "0.75rem", padding: "0.625rem 0.75rem", background: "rgba(245,181,68,0.06)", border: "1px solid rgba(245,181,68,0.15)", borderRadius: "0.625rem", fontSize: "12px", color: "var(--brand-muted)", lineHeight: 1.5, wordBreak: "break-word", overflowWrap: "anywhere" }}>
                                         <strong style={{ color: "var(--brand-text)" }}>Формула:</strong> {p.formula_description}
                                     </div>
                                 )}
@@ -280,7 +280,7 @@ export default function SpecialtyPage() {
                                 <Link to={calcHref} style={{
                                     display: "inline-flex", alignItems: "center", gap: "0.375rem", marginTop: "0.875rem",
                                     minHeight: "40px", padding: "0 0.875rem", borderRadius: "0.625rem",
-                                    fontSize: "13px", fontWeight: 700, color: "#fff", textDecoration: "none",
+                                    fontSize: "13px", fontWeight: 700, color: "var(--brand-accent-ink)", textDecoration: "none",
                                     background: "var(--brand-accent)",
                                 }}>
                                     <Calculator size={14} strokeWidth={2} /> Изчисли бала си тук
@@ -295,7 +295,7 @@ export default function SpecialtyPage() {
                     <Link to="/calculator/" style={{
                         display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.75rem 1.5rem",
                         background: "var(--brand-accent)",
-                        color: "#fff", borderRadius: "0.75rem", fontWeight: 700, textDecoration: "none", fontSize: "0.9375rem",
+                        color: "var(--brand-accent-ink)", borderRadius: "0.75rem", fontWeight: 700, textDecoration: "none", fontSize: "0.9375rem",
                     }}>
                         <Calculator size={16} /> Калкулатор за бал
                     </Link>

@@ -142,7 +142,7 @@ export default function DziPlanner({ specialties }) {
     const remove = (name) => { setChosen((c) => c.filter((x) => x !== name)); setExpanded(null); };
 
     return (
-        <section aria-labelledby="dzi-planner-h" style={{ ...card, background: "rgba(6,182,212,0.06)", padding: "1.75rem", marginBottom: "2.5rem" }}>
+        <section aria-labelledby="dzi-planner-h" style={{ ...card, background: "rgba(245,181,68,0.06)", padding: "1.75rem", marginBottom: "2.5rem" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
                 <Sparkles size={16} strokeWidth={1.5} style={{ color: "var(--brand-violet)" }} aria-hidden="true" />
                 <span style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--brand-violet)" }}>Обратен калкулатор</span>
@@ -214,8 +214,8 @@ export default function DziPlanner({ specialties }) {
                 <m.div initial={reduced ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }} style={{ marginTop: "1.5rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
                     <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", justifyContent: "space-between", gap: "0.5rem" }}>
                         <span style={{ fontSize: "12.5px", color: "var(--brand-muted)" }}>
-                            <strong style={{ color: "var(--brand-text)", fontFamily: "monospace" }}>{chosen.length}</strong> специалности ·{" "}
-                            <strong style={{ color: "var(--brand-text)", fontFamily: "monospace" }}>{total}</strong> програми в университетите
+                            <strong style={{ color: "var(--brand-text)", fontFamily: "var(--font-mono)" }}>{chosen.length}</strong> специалности ·{" "}
+                            <strong style={{ color: "var(--brand-text)", fontFamily: "var(--font-mono)" }}>{total}</strong> програми в университетите
                         </span>
                         <button type="button" onClick={() => copyLink((ok) => { setCopied(ok); setTimeout(() => setCopied(false), 2000); })}
                             style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", minHeight: 44, padding: "0 0.875rem", background: "transparent", border: "1px solid var(--brand-border)", borderRadius: "0.75rem", color: copied ? "#10b981" : "var(--brand-text)", fontSize: "12.5px", fontWeight: 600, fontFamily: "inherit", cursor: "pointer" }}>
@@ -236,12 +236,12 @@ export default function DziPlanner({ specialties }) {
                             </p>
                         </div>
                     ) : (
-                        <div style={{ ...card, padding: "1.25rem 1.5rem", borderColor: "rgba(6,182,212,0.4)" }}>
+                        <div style={{ ...card, padding: "1.25rem 1.5rem", borderColor: "rgba(245,181,68,0.4)" }}>
                             <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--brand-cyan)", marginBottom: "0.375rem" }}>Най-добър втори ДЗИ за теб</div>
                             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "0.5rem 1rem" }}>
                                 <span style={{ fontSize: "1.5rem", fontWeight: 900, letterSpacing: "-0.03em", color: "var(--brand-accent-text)" }}>{best.label}</span>
                                 <span style={{ fontSize: "14px", color: "var(--brand-text)" }}>
-                                    <strong style={{ fontFamily: "monospace" }}>{best.counts.open}</strong> от {total} програми без изпит
+                                    <strong style={{ fontFamily: "var(--font-mono)" }}>{best.counts.open}</strong> от {total} програми без изпит
                                     {best.gain > 0 && <span style={{ color: "#10b981", fontWeight: 700 }}> · +{best.gain} спрямо само БЕЛ</span>}
                                 </span>
                             </div>
@@ -255,7 +255,7 @@ export default function DziPlanner({ specialties }) {
                                 <li key={c.id} style={{ ...card, overflow: "hidden" }}>
                                     <button type="button" onClick={() => setExpanded(open ? null : c.id)} aria-expanded={open}
                                         style={{ width: "100%", display: "grid", gridTemplateColumns: "2rem 1fr auto", gap: "0.75rem", alignItems: "center", padding: "0.875rem 1rem", background: "transparent", border: "none", color: "var(--brand-text)", fontFamily: "inherit", cursor: "pointer", textAlign: "left" }}>
-                                        <span style={{ fontFamily: "monospace", fontSize: "0.875rem", fontWeight: 800, color: i < 3 ? "var(--brand-cyan)" : "var(--brand-muted)" }}>{i + 1}</span>
+                                        <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.875rem", fontWeight: 800, color: i < 3 ? "var(--brand-cyan)" : "var(--brand-muted)" }}>{i + 1}</span>
                                         <span style={{ minWidth: 0 }}>
                                             <span style={{ display: "block", fontSize: "0.9375rem", fontWeight: 700, letterSpacing: "-0.01em", marginBottom: "0.375rem" }}>{c.label}</span>
                                             <SegmentBar counts={c.counts} total={total} />
@@ -308,7 +308,7 @@ export default function DziPlanner({ specialties }) {
                         тогава комбинирай първите два предмета. Данните са по формулите за прием, публикувани от университетите.
                     </p>
 
-                    <Link to={`/calculator/?specialty=${encodeURIComponent(chosen[0])}`} style={{ alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: "0.5rem", minHeight: 44, padding: "0 1.25rem", background: "var(--brand-accent)", borderRadius: "0.75rem", color: "#fff", fontSize: "13.5px", fontWeight: 700, textDecoration: "none" }}>
+                    <Link to={`/calculator/?specialty=${encodeURIComponent(chosen[0])}`} style={{ alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: "0.5rem", minHeight: 44, padding: "0 1.25rem", background: "var(--brand-accent)", borderRadius: "0.75rem", color: "var(--brand-accent-ink)", fontSize: "13.5px", fontWeight: 700, textDecoration: "none" }}>
                         Изчисли бала си за {chosen[0]} <ArrowRight size={15} strokeWidth={1.5} aria-hidden="true" />
                     </Link>
 

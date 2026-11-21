@@ -1,8 +1,14 @@
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 
-// Self-hosted variable Inter font — eliminates Google Fonts DNS + redirect chain (saves ~600ms on cold load)
-import "@fontsource-variable/inter/wght.css"
+// Самохостнати шрифтове (CSP позволява само font-src 'self'): Source Serif 4 за заглавия,
+// Source Sans 3 за текст, IBM Plex Mono за числа (бал, оценки). Само cyrillic + latin.
+import "@fontsource-variable/source-serif-4/wght.css"
+import "@fontsource-variable/source-sans-3/wght.css"
+import "@fontsource/ibm-plex-mono/latin-500.css"
+import "@fontsource/ibm-plex-mono/latin-600.css"
+import "@fontsource/ibm-plex-mono/cyrillic-500.css"
+import "@fontsource/ibm-plex-mono/cyrillic-600.css"
 
 import App from './App.jsx'
 import { installBulgarianValidation } from '@/lib/bgValidation'

@@ -63,7 +63,7 @@ function DotsBg({ cyanOpacity = 0.1, violetOpacity = 0.07, size = 26 }) {
             aria-hidden
             style={{
                 position: "absolute", inset: 0,
-                backgroundImage: `radial-gradient(circle, rgba(6,182,212,${cyanOpacity}) 1px, transparent 1px), radial-gradient(circle, rgba(139,92,246,${violetOpacity}) 1px, transparent 1px)`,
+                backgroundImage: `radial-gradient(circle, rgba(245,181,68,${cyanOpacity}) 1px, transparent 1px), radial-gradient(circle, rgba(245,181,68,${violetOpacity}) 1px, transparent 1px)`,
                 backgroundSize: `${size}px ${size}px, ${size}px ${size}px`,
                 backgroundPosition: `0 0, ${size / 2}px ${size / 2}px`,
                 pointerEvents: "none",
@@ -162,8 +162,8 @@ function HeroSection() {
                     <div
                         className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 w-fit"
                         style={{
-                            background: "rgba(6,182,212,0.08)",
-                            border: "1px solid rgba(6,182,212,0.28)",
+                            background: "rgba(245,181,68,0.08)",
+                            border: "1px solid rgba(245,181,68,0.28)",
                             color: "var(--brand-cyan)",
                             fontSize: "11px",
                             fontWeight: 700,
@@ -221,13 +221,13 @@ function HeroSection() {
                                 className="inline-flex items-center gap-3 font-semibold"
                                 style={{
                                     background: "var(--brand-accent)",
-                                    color: "#fff",
+                                    color: "var(--brand-accent-ink)",
                                     padding: "0.9rem 1.75rem",
                                     borderRadius: "0.875rem",
                                     fontSize: "0.9375rem",
                                     textDecoration: "none",
                                     boxShadow:
-                                        "0 0 32px rgba(6,182,212,0.35), 0 4px 16px rgba(0,0,0,0.2)",
+                                        "0 0 32px rgba(245,181,68,0.35), 0 4px 16px rgba(0,0,0,0.2)",
                                     transition: "box-shadow 0.2s",
                                 }}
                             >
@@ -253,9 +253,9 @@ function HeroSection() {
                                     transition: "border-color 0.2s, color 0.2s, background 0.2s",
                                 }}
                                 onMouseEnter={(e) => {
-                                    e.currentTarget.style.borderColor = "rgba(6,182,212,0.4)";
+                                    e.currentTarget.style.borderColor = "rgba(245,181,68,0.4)";
                                     e.currentTarget.style.color = "var(--brand-cyan)";
-                                    e.currentTarget.style.background = "rgba(6,182,212,0.04)";
+                                    e.currentTarget.style.background = "rgba(245,181,68,0.04)";
                                 }}
                                 onMouseLeave={(e) => {
                                     e.currentTarget.style.borderColor = "var(--brand-border)";
@@ -323,7 +323,7 @@ function StatItem({ value, suffix, label, sub, delay, trigger }) {
                 fontWeight: 900,
                 letterSpacing: "-0.04em",
                 lineHeight: 1,
-                fontFamily: "monospace",
+                fontFamily: "var(--font-mono)",
                 color: "var(--brand-accent-text)",
             }}>
                 {count}{suffix}
@@ -446,8 +446,8 @@ function HowItWorksSection() {
                                     transition: "border-color 0.2s, box-shadow 0.2s",
                                 }}
                                 onMouseEnter={(e) => {
-                                    e.currentTarget.style.borderColor = "rgba(6,182,212,0.4)";
-                                    e.currentTarget.style.boxShadow = "0 0 28px rgba(6,182,212,0.09)";
+                                    e.currentTarget.style.borderColor = "rgba(245,181,68,0.4)";
+                                    e.currentTarget.style.boxShadow = "0 0 28px rgba(245,181,68,0.09)";
                                 }}
                                 onMouseLeave={(e) => {
                                     e.currentTarget.style.borderColor = "var(--brand-card-border)";
@@ -458,14 +458,14 @@ function HowItWorksSection() {
                                     <div
                                         className="p-3 rounded-xl"
                                         style={{
-                                            background: "rgba(6,182,212,0.14)",
+                                            background: "rgba(245,181,68,0.14)",
                                         }}
                                     >
                                         <Icon size={20} style={{ color: "var(--brand-cyan)" }} />
                                     </div>
                                     <span
                                         className="text-5xl font-black select-none"
-                                        style={{ color: "rgba(148,163,184,0.12)", fontFamily: "monospace" }}
+                                        style={{ color: "rgba(148,163,184,0.12)", fontFamily: "var(--font-mono)" }}
                                     >
                                         {step.num}
                                     </span>
@@ -553,14 +553,14 @@ function PathSection() {
                                         borderRadius: "1.25rem", textDecoration: "none", color: "inherit",
                                         transition: "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease",
                                     }}
-                                    onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.borderColor = "rgba(6,182,212,0.4)"; }}
+                                    onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.borderColor = "rgba(245,181,68,0.4)"; }}
                                     onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.borderColor = "var(--brand-card-border)"; }}
                                 >
                                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
-                                        <div className="inline-flex p-3 rounded-xl" style={{ background: "rgba(6,182,212,0.12)" }}>
+                                        <div className="inline-flex p-3 rounded-xl" style={{ background: "rgba(245,181,68,0.12)" }}>
                                             <Icon size={20} strokeWidth={1.5} style={{ color: "var(--brand-cyan)" }} aria-hidden="true" />
                                         </div>
-                                        <span style={{ fontFamily: "monospace", fontSize: "12px", fontWeight: 800, color: "var(--brand-muted)" }}>
+                                        <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px", fontWeight: 800, color: "var(--brand-muted)" }}>
                                             {String(i + 1).padStart(2, "0")} · {s.grade}
                                         </span>
                                     </div>
@@ -665,8 +665,8 @@ function FeaturesSection() {
                                     transition: "border-color 0.2s, box-shadow 0.2s",
                                 }}
                                 onMouseEnter={(e) => {
-                                    e.currentTarget.style.borderColor = "rgba(139,92,246,0.35)";
-                                    e.currentTarget.style.boxShadow = "0 0 24px rgba(139,92,246,0.07)";
+                                    e.currentTarget.style.borderColor = "rgba(245,181,68,0.35)";
+                                    e.currentTarget.style.boxShadow = "0 0 24px rgba(245,181,68,0.07)";
                                 }}
                                 onMouseLeave={(e) => {
                                     e.currentTarget.style.borderColor = "var(--brand-card-border)";
@@ -676,7 +676,7 @@ function FeaturesSection() {
                                 <div
                                     className="inline-flex p-3 rounded-xl mb-4"
                                     style={{
-                                        background: "rgba(139,92,246,0.12)",
+                                        background: "rgba(245,181,68,0.12)",
                                     }}
                                 >
                                     <Icon size={20} style={{ color: "var(--brand-violet)" }} />
@@ -820,12 +820,12 @@ function CTASection() {
                                     className="inline-flex items-center gap-3 font-semibold"
                                     style={{
                                         background: "var(--brand-accent)",
-                                        color: "#fff",
+                                        color: "var(--brand-accent-ink)",
                                         padding: "0.9rem 1.75rem",
                                         borderRadius: "0.875rem",
                                         fontSize: "0.9375rem",
                                         textDecoration: "none",
-                                        boxShadow: "0 0 40px rgba(6,182,212,0.28)",
+                                        boxShadow: "0 0 40px rgba(245,181,68,0.28)",
                                     }}
                                 >
                                     {user ? "Изчисли моя бал" : "Започни безплатно"}
@@ -848,9 +848,9 @@ function CTASection() {
                                         transition: "border-color 0.2s, color 0.2s, background 0.2s",
                                     }}
                                     onMouseEnter={(e) => {
-                                        e.currentTarget.style.borderColor = "rgba(139,92,246,0.4)";
+                                        e.currentTarget.style.borderColor = "rgba(245,181,68,0.4)";
                                         e.currentTarget.style.color = "var(--brand-violet)";
-                                        e.currentTarget.style.background = "rgba(139,92,246,0.04)";
+                                        e.currentTarget.style.background = "rgba(245,181,68,0.04)";
                                     }}
                                     onMouseLeave={(e) => {
                                         e.currentTarget.style.borderColor = "var(--brand-border)";

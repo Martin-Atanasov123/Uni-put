@@ -5,50 +5,54 @@
 
 :root,
 [data-theme="dark"] {
-  --brand-bg: #0F172A;
-  --brand-bg-alt: #0B1120;
-  --brand-surface: #1E293B;
-  --brand-surface-2: rgba(30,41,59,0.7);
-  --brand-cyan: #06B6D4;
-  --brand-violet: #8B5CF6;
+  --brand-bg: #0E1525;
+  --brand-bg-alt: #0A101E;
+  --brand-surface: #17203A;
+  --brand-surface-2: rgba(23,32,58,0.7);
+  --brand-cyan: #F5B544; /* исторически вариант на името — вече кехлибар */
+  --brand-violet: #F5B544; /* един акцент: виолетът е махнат */
   /* Плътен акцент вместо градиент (редизайн): запълвания и акцентен текст.
      Една промяна тук сменя акцента навсякъде. */
-  --brand-accent: var(--brand-cyan);
-  --brand-accent-text: var(--brand-cyan);
-  --brand-text: #F1F5F9;
+  --brand-accent: #F5B544;
+  --brand-accent-ink: #111827; /* тъмен текст върху плътен акцент (9,8:1) */
+  --brand-accent-text: #F5B544;
+  --font-display: 'Source Serif 4 Variable', Georgia, 'Times New Roman', serif;
+  --font-body: 'Source Sans 3 Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+  --brand-text: #EEF1F7;
   --brand-muted: #94A3B8;
   --brand-border: rgba(148, 163, 184, 0.1);
-  --brand-input-bg: rgba(15,23,42,0.8);
+  --brand-input-bg: rgba(14,21,37,0.8);
   --brand-input-border: rgba(148,163,184,0.12);
-  --brand-dropdown-bg: #1E293B;
-  --brand-nav-bg: rgba(15,23,42,0.55);
-  --brand-nav-scrolled: rgba(15,23,42,0.75);
+  --brand-dropdown-bg: #17203A;
+  --brand-nav-bg: rgba(14,21,37,0.55);
+  --brand-nav-scrolled: rgba(14,21,37,0.75);
   --brand-shadow: rgba(0,0,0,0.5);
-  --brand-card-hover: rgba(139,92,246,0.08);
+  --brand-card-hover: rgba(245,181,68,0.08);
   --brand-card-border: rgba(148,163,184,0.09);
-  --brand-progress-bg: rgba(15,23,42,0.85);
+  --brand-progress-bg: rgba(14,21,37,0.85);
 
   /* Map DaisyUI v5 tokens to brand palette (admin panel & any DaisyUI components) */
-  --color-base-100: #0F172A;
-  --color-base-200: #131d2e;
-  --color-base-300: #1E293B;
-  --color-base-content: #F1F5F9;
-  --color-primary: #06B6D4;
-  --color-primary-content: #0F172A;
-  --color-secondary: #8B5CF6;
-  --color-secondary-content: #F1F5F9;
-  --color-accent: #8B5CF6;
-  --color-accent-content: #F1F5F9;
-  --color-neutral: #1E293B;
+  --color-base-100: #0E1525;
+  --color-base-200: #121A30;
+  --color-base-300: #17203A;
+  --color-base-content: #EEF1F7;
+  --color-primary: #F5B544;
+  --color-primary-content: #111827;
+  --color-secondary: #F5B544;
+  --color-secondary-content: #111827;
+  --color-accent: #F5B544;
+  --color-accent-content: #111827;
+  --color-neutral: #17203A;
   --color-neutral-content: #94A3B8;
-  --color-info: #06B6D4;
-  --color-info-content: #0F172A;
+  --color-info: #F5B544;
+  --color-info-content: #111827;
   --color-success: #10b981;
-  --color-success-content: #F1F5F9;
+  --color-success-content: #0B1410;
   --color-warning: #FBBF24;
-  --color-warning-content: #0F172A;
+  --color-warning-content: #111827;
   --color-error: #f87171;
-  --color-error-content: #F1F5F9;
+  --color-error-content: #1A0F0C;
 }
 
 /* Light theme премахната по продуктово решение (юни 2026).
@@ -60,7 +64,8 @@ html, body {
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
@@ -68,7 +73,16 @@ body {
 }
 
 .landing-page * {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-body);
+}
+
+/* Заглавията — сериф; текстът остава в Source Sans */
+h1, h2, h3 {
+  font-family: var(--font-display);
+  text-wrap: balance;
+}
+.landing-page h1, .landing-page h2, .landing-page h3 {
+  font-family: var(--font-display);
 }
 
 /* ── Global animation keyframes ─────────────────────────────────────────── */

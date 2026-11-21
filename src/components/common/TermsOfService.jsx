@@ -50,7 +50,7 @@ const TermsOfService = () => {
             <div style={{ maxWidth: "820px", margin: "0 auto", position: "relative" }}>
                 <div
                     style={{
-                        background: "rgba(30,41,59,0.55)",
+                        background: "rgba(23,32,58,0.55)",
                         backdropFilter: "blur(10px)",
                         border: "1px solid rgba(148,163,184,0.1)",
                         borderRadius: "1.5rem",
@@ -63,8 +63,8 @@ const TermsOfService = () => {
                                 width: "2.5rem",
                                 height: "2.5rem",
                                 borderRadius: "0.75rem",
-                                background: "rgba(6,182,212,0.12)",
-                                border: "1px solid rgba(6,182,212,0.3)",
+                                background: "rgba(245,181,68,0.12)",
+                                border: "1px solid rgba(245,181,68,0.3)",
                                 color: "var(--brand-cyan)",
                                 display: "flex",
                                 alignItems: "center",

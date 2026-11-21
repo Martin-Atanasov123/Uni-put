@@ -41,7 +41,7 @@ function HeaderAvatar({ user, size = 28 }) {
             background: "var(--brand-accent)",
             display: "flex", alignItems: "center", justifyContent: "center",
             overflow: "hidden", flexShrink: 0,
-            color: "#fff", fontSize: `${fontSize}px`, fontWeight: 900, letterSpacing: "-0.02em",
+            color: "var(--brand-accent-ink)", fontSize: `${fontSize}px`, fontWeight: 900, letterSpacing: "-0.02em",
         }}>
             <span>{initial}</span>
         </div>
@@ -110,7 +110,7 @@ export default function Header() {
                     maxWidth: "80rem", margin: "0 auto",
                     background: scrolled ? "var(--brand-nav-scrolled)" : "var(--brand-nav-bg)",
                     backdropFilter: "blur(16px)",
-                    border: `1px solid ${scrolled ? "rgba(6,182,212,0.2)" : "var(--brand-border)"}`,
+                    border: `1px solid ${scrolled ? "rgba(245,181,68,0.2)" : "var(--brand-border)"}`,
                     borderRadius: "1.25rem",
                     padding: scrolled ? "0.5rem 1rem" : "0.75rem 1rem",
                     display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -147,8 +147,8 @@ export default function Header() {
                                 padding: "0.5rem 0.875rem", borderRadius: "0.625rem",
                                 fontSize: "13px", fontWeight: 700, textDecoration: "none",
                                 color: "var(--brand-violet)",
-                                background: isActive("/admin") ? "rgba(139,92,246,0.12)" : "transparent",
-                                border: "1px solid rgba(139,92,246,0.25)",
+                                background: isActive("/admin") ? "rgba(245,181,68,0.12)" : "transparent",
+                                border: "1px solid rgba(245,181,68,0.25)",
                             }}>
                                 <Settings size={14} /> Админ
                             </Link>
@@ -203,7 +203,7 @@ export default function Header() {
                                         zIndex: 110,
                                     }}>
                                         <div style={{ padding: "0.625rem 0.75rem", marginBottom: "0.25rem",
-                                            background: "rgba(6,182,212,0.06)", borderRadius: "0.625rem" }}>
+                                            background: "rgba(245,181,68,0.06)", borderRadius: "0.625rem" }}>
                                             <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Добре дошъл</div>
                                             <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--brand-cyan)", marginTop: "0.125rem", overflow: "hidden", textOverflow: "ellipsis" }}>
                                                 {user.user_metadata?.username || user.email}
@@ -249,7 +249,7 @@ export default function Header() {
             {isMenuOpen && (
                 <div style={{ position: "fixed", inset: 0, zIndex: 110 }}>
                     <div onClick={() => setIsMenuOpen(false)} style={{
-                        position: "absolute", inset: 0, background: "rgba(15,23,42,0.8)", backdropFilter: "blur(8px)",
+                        position: "absolute", inset: 0, background: "rgba(14,21,37,0.8)", backdropFilter: "blur(8px)",
                     }} />
                     <div style={{
                         position: "absolute", top: 0, right: 0, height: "100%", width: "min(85vw, 22rem)",
@@ -281,8 +281,8 @@ export default function Header() {
                                         padding: "0.875rem 1rem", borderRadius: "0.75rem",
                                         fontSize: "14px", fontWeight: 600, textDecoration: "none",
                                         color: active ? "var(--brand-cyan)" : "var(--brand-text)",
-                                        background: active ? "rgba(6,182,212,0.1)" : "rgba(30,41,59,0.5)",
-                                        border: active ? "1px solid rgba(6,182,212,0.25)" : "1px solid rgba(148,163,184,0.08)",
+                                        background: active ? "rgba(245,181,68,0.1)" : "rgba(23,32,58,0.5)",
+                                        border: active ? "1px solid rgba(245,181,68,0.25)" : "1px solid rgba(148,163,184,0.08)",
                                     }}>
                                         <Icon size={16} /> {link.name}
                                     </Link>
@@ -294,8 +294,8 @@ export default function Header() {
                                     padding: "0.875rem 1rem", borderRadius: "0.75rem",
                                     fontSize: "14px", fontWeight: 700, textDecoration: "none",
                                     color: "var(--brand-violet)",
-                                    background: "rgba(139,92,246,0.08)",
-                                    border: "1px solid rgba(139,92,246,0.25)",
+                                    background: "rgba(245,181,68,0.08)",
+                                    border: "1px solid rgba(245,181,68,0.25)",
                                 }}>
                                     <Settings size={16} /> Админ панел
                                 </Link>
@@ -307,8 +307,8 @@ export default function Header() {
                             <Link to="/calculator/" style={{
                                 padding: "0.875rem", borderRadius: "0.75rem", textAlign: "center",
                                 fontSize: "14px", fontWeight: 800, textDecoration: "none",
-                                color: "var(--brand-cyan)", border: "1px solid rgba(6,182,212,0.4)",
-                                background: "rgba(6,182,212,0.08)",
+                                color: "var(--brand-cyan)", border: "1px solid rgba(245,181,68,0.4)",
+                                background: "rgba(245,181,68,0.08)",
                             }}>Изчисли бал →</Link>
 
                             {!user ? (
@@ -366,21 +366,21 @@ export default function Header() {
                 }
                 .uni-nav-link--active {
                     color: var(--brand-cyan) !important;
-                    background: rgba(6,182,212,0.1);
-                    border-color: rgba(6,182,212,0.25);
+                    background: rgba(245,181,68,0.1);
+                    border-color: rgba(245,181,68,0.25);
                 }
 
                 /* Calculator CTA button — replaces inline hover handlers */
                 .uni-nav-cta {
                     padding: 0.5rem 1rem; border-radius: 0.625rem;
                     font-size: 13px; font-weight: 700; color: var(--brand-cyan); text-decoration: none;
-                    border: 1px solid rgba(6,182,212,0.4);
-                    background: rgba(6,182,212,0.06);
+                    border: 1px solid rgba(245,181,68,0.4);
+                    background: rgba(245,181,68,0.06);
                     transition: background 0.2s, border-color 0.2s;
                 }
                 .uni-nav-cta:hover {
-                    background: rgba(6,182,212,0.12);
-                    border-color: rgba(6,182,212,0.7);
+                    background: rgba(245,181,68,0.12);
+                    border-color: rgba(245,181,68,0.7);
                 }
 
                 /* Dropdown menu item */

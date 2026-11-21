@@ -75,7 +75,7 @@ const UpdatePassword = () => {
                 style={{
                     width: "100%",
                     maxWidth: "440px",
-                    background: "rgba(30,41,59,0.6)",
+                    background: "rgba(23,32,58,0.6)",
                     backdropFilter: "blur(16px)",
                     border: "1px solid rgba(148,163,184,0.12)",
                     borderRadius: "1.5rem",
@@ -93,10 +93,10 @@ const UpdatePassword = () => {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            boxShadow: "0 16px 40px rgba(139,92,246,0.35)",
+                            boxShadow: "0 16px 40px rgba(245,181,68,0.35)",
                         }}
                     >
-                        <Lock size={28} color="#fff" />
+                        <Lock size={28} color="#111827" />
                     </div>
                     <div style={{ textAlign: "center" }}>
                         <h2 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--brand-text)" }}>
@@ -153,7 +153,7 @@ const UpdatePassword = () => {
                                 background: loading ? "rgba(148,163,184,0.15)" : "var(--brand-accent)",
                                 border: "none",
                                 borderRadius: "0.75rem",
-                                color: "#fff",
+                                color: "var(--brand-accent-ink)",
                                 fontSize: "14px",
                                 fontWeight: 800,
                                 cursor: loading ? "not-allowed" : "pointer",
@@ -161,7 +161,7 @@ const UpdatePassword = () => {
                                 alignItems: "center",
                                 justifyContent: "center",
                                 gap: "0.5rem",
-                                boxShadow: loading ? "none" : "0 12px 30px rgba(139,92,246,0.3)",
+                                boxShadow: loading ? "none" : "0 12px 30px rgba(245,181,68,0.3)",
                                 fontFamily: "inherit",
                             }}
                         >

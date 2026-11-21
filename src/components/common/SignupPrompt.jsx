@@ -75,8 +75,8 @@ export default function SignupPrompt({ variant = "favorite", onDismiss, register
                 gap: "1rem",
                 alignItems: "flex-start",
                 padding: "1.25rem 1.5rem",
-                background: "rgba(6,182,212,0.08), var(--brand-surface)", // плътна основа — иначе е прозрачна, когато се носи над съдържание
-                border: "1px solid rgba(6,182,212,0.25)",
+                background: "rgba(245,181,68,0.08), var(--brand-surface)", // плътна основа — иначе е прозрачна, когато се носи над съдържание
+                border: "1px solid rgba(245,181,68,0.25)",
                 borderRadius: "1.25rem",
             }}
         >
@@ -85,7 +85,7 @@ export default function SignupPrompt({ variant = "favorite", onDismiss, register
                 background: "var(--brand-accent)",
                 display: "flex", alignItems: "center", justifyContent: "center",
             }}>
-                <Icon size={22} color="#fff" strokeWidth={2} />
+                <Icon size={22} color="#111827" strokeWidth={2} />
             </div>
 
             <div style={{ flex: 1, minWidth: 0 }}>
@@ -106,7 +106,7 @@ export default function SignupPrompt({ variant = "favorite", onDismiss, register
                         display: "inline-flex", alignItems: "center", gap: "0.4rem",
                         padding: "0.6rem 1.1rem", borderRadius: "0.75rem",
                         background: "var(--brand-accent)",
-                        color: "#fff", fontSize: "13px", fontWeight: 700, textDecoration: "none",
+                        color: "var(--brand-accent-ink)", fontSize: "13px", fontWeight: 700, textDecoration: "none",
                     }}>
                         <UserPlus size={14} strokeWidth={2} /> Регистрирай се безплатно
                     </Link>
@@ -138,7 +138,7 @@ export default function SignupPrompt({ variant = "favorite", onDismiss, register
                 </button>
             )}
 
-            <style>{`.signup-prompt-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(6,182,212,0.3); } .signup-prompt-cta { transition: transform 0.2s, box-shadow 0.2s; }`}</style>
+            <style>{`.signup-prompt-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(245,181,68,0.3); } .signup-prompt-cta { transition: transform 0.2s, box-shadow 0.2s; }`}</style>
         </m.div>
     );
 }

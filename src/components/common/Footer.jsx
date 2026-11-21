@@ -134,10 +134,10 @@ const Footer = () => {
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
-                                    boxShadow: "0 8px 24px rgba(6,182,212,0.25)",
+                                    boxShadow: "0 8px 24px rgba(245,181,68,0.25)",
                                 }}
                             >
-                                <GraduationCap size={20} color="#fff" />
+                                <GraduationCap size={20} color="#111827" />
                                 
                             </div> */} {/* Brand */}
                     <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
@@ -167,8 +167,8 @@ const Footer = () => {
                                 alignItems: "center",
                                 alignSelf: "flex-start",
                                 padding: "0.3rem 0.625rem",
-                                background: "rgba(139,92,246,0.1)",
-                                border: "1px solid rgba(139,92,246,0.3)",
+                                background: "rgba(245,181,68,0.1)",
+                                border: "1px solid rgba(245,181,68,0.3)",
                                 borderRadius: "999px",
                                 color: "#c4b5fd",
                                 fontSize: "10px",

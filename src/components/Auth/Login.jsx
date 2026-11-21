@@ -114,10 +114,10 @@ const Login = () => {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            boxShadow: "0 16px 40px rgba(6,182,212,0.35)",
+                            boxShadow: "0 16px 40px rgba(245,181,68,0.35)",
                         }}
                     >
-                        <GraduationCap size={28} color="#fff" />
+                        <GraduationCap size={28} color="#111827" />
                     </div>
                     <div style={{ textAlign: "center" }}>
                         <h1 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--brand-text)", textWrap: "balance" }}>
@@ -184,7 +184,7 @@ const Login = () => {
                         transition: "border-color 0.2s, background 0.2s",
                         marginBottom: "0.25rem",
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(6,182,212,0.35)"; e.currentTarget.style.background = "var(--brand-surface)"; }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(245,181,68,0.35)"; e.currentTarget.style.background = "var(--brand-surface)"; }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--brand-input-border)"; e.currentTarget.style.background = "var(--brand-input-bg)"; }}
                 >
                     <svg width="18" height="18" viewBox="0 0 24 24">
@@ -244,7 +244,7 @@ const Login = () => {
                             background: loading ? "rgba(148,163,184,0.15)" : "var(--brand-accent)",
                             border: "none",
                             borderRadius: "0.75rem",
-                            color: "#fff",
+                            color: "var(--brand-accent-ink)",
                             fontSize: "14px",
                             fontWeight: 800,
                             cursor: loading ? "not-allowed" : "pointer",
@@ -252,7 +252,7 @@ const Login = () => {
                             alignItems: "center",
                             justifyContent: "center",
                             gap: "0.5rem",
-                            boxShadow: loading ? "none" : "0 12px 30px rgba(6,182,212,0.3)",
+                            boxShadow: loading ? "none" : "0 12px 30px rgba(245,181,68,0.3)",
                             fontFamily: "inherit",
                             transition: "transform 0.15s",
                         }}
@@ -301,7 +301,7 @@ export function Field({ label, icon: Icon, right, ...inputProps }) {
                     borderRadius: "0.625rem",
                     transition: "border-color 0.2s, box-shadow 0.2s",
                 }}
-                onFocusCapture={e => { e.currentTarget.style.borderColor = "rgba(6,182,212,0.5)"; e.currentTarget.style.boxShadow = "0 0 0 3px rgba(6,182,212,0.08)"; }}
+                onFocusCapture={e => { e.currentTarget.style.borderColor = "rgba(245,181,68,0.5)"; e.currentTarget.style.boxShadow = "0 0 0 3px rgba(245,181,68,0.08)"; }}
                 onBlurCapture={e => { e.currentTarget.style.borderColor = "var(--brand-input-border)"; e.currentTarget.style.boxShadow = "none"; }}
             >
                 {Icon && <Icon size={16} style={{ color: "var(--brand-muted)", flexShrink: 0 }} />}

@@ -150,7 +150,7 @@ function EventCard({ event, today, onOpen }) {
 
                 <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", marginTop: "0.25rem" }}>
                     <CalendarDays size={13} style={{ color: "var(--brand-muted)", flexShrink: 0 }} strokeWidth={1.5} />
-                    <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--brand-text)", fontFamily: "monospace" }}>
+                    <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--brand-text)", fontFamily: "var(--font-mono)" }}>
                         {formatRange(event.start_date, event.end_date)}
                     </span>
                 </div>
@@ -271,11 +271,11 @@ function MonthGrid({ monthDate, events, today, onPrev, onNext, onOpenEvent, onOp
                             background: d ? "var(--brand-input-bg)" : "transparent",
                             padding: "0.4rem",
                             display: "flex", flexDirection: "column", gap: "0.2rem",
-                            boxShadow: isToday(d) ? "0 0 0 3px rgba(6,182,212,0.12)" : "none",
+                            boxShadow: isToday(d) ? "0 0 0 3px rgba(245,181,68,0.12)" : "none",
                         }}>
                             {d && (
                                 <span style={{
-                                    fontSize: "11px", fontWeight: isToday(d) ? 800 : 600, fontFamily: "monospace",
+                                    fontSize: "11px", fontWeight: isToday(d) ? 800 : 600, fontFamily: "var(--font-mono)",
                                     color: isToday(d) ? "var(--brand-cyan)" : "var(--brand-muted)",
                                     alignSelf: "flex-end",
                                 }}>{d}</span>
@@ -475,7 +475,7 @@ const Calendar = () => {
                     style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}
                 >
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                        <div style={{ width: 8, height: 8, borderRadius: 999, background: "var(--brand-cyan)", boxShadow: "0 0 12px rgba(6,182,212,0.6)" }} />
+                        <div style={{ width: 8, height: 8, borderRadius: 999, background: "var(--brand-cyan)", boxShadow: "0 0 12px rgba(245,181,68,0.6)" }} />
                         <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.14em" }}>
                             Календар за прием
                         </span>
@@ -491,7 +491,7 @@ const Calendar = () => {
                 </m.div>
 
                 {/* Trust note */}
-                <div style={{ display: "flex", gap: "0.625rem", alignItems: "flex-start", padding: "0.75rem 1rem", background: "rgba(6,182,212,0.06)", border: "1px solid rgba(6,182,212,0.2)", borderRadius: "0.875rem" }}>
+                <div style={{ display: "flex", gap: "0.625rem", alignItems: "flex-start", padding: "0.75rem 1rem", background: "rgba(245,181,68,0.06)", border: "1px solid rgba(245,181,68,0.2)", borderRadius: "0.875rem" }}>
                     <Info size={16} style={{ color: "var(--brand-cyan)", flexShrink: 0, marginTop: 1 }} strokeWidth={1.5} />
                     <p style={{ margin: 0, fontSize: "12.5px", color: "var(--brand-muted)", lineHeight: 1.55 }}>
                         Датите са от заповедите на МОН (ДЗИ) и от официалните сайтове на университетите. Университетите обявяват графиците си за {ADMISSION_YEAR_SHORT} г. през пролетта — добавяме ги веднага.
@@ -517,7 +517,7 @@ const Calendar = () => {
                         {hasFilters && (
                             <button type="button" onClick={clearFilters} style={{
                                 display: "inline-flex", alignItems: "center", gap: "0.3rem", padding: "0.4rem 0.75rem",
-                                background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.3)", borderRadius: "999px",
+                                background: "rgba(245,181,68,0.1)", border: "1px solid rgba(245,181,68,0.3)", borderRadius: "999px",
                                 color: "var(--brand-cyan)", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                             }}>
                                 <X size={12} strokeWidth={1.5} /> Изчисти
@@ -564,7 +564,7 @@ const Calendar = () => {
                                         display: "inline-flex", alignItems: "center", gap: "0.35rem", padding: "0.35rem 0.7rem",
                                         borderRadius: "0.45rem", cursor: "pointer", fontFamily: "inherit", fontSize: "12px", fontWeight: 700,
                                         border: "none",
-                                        color: viewMode === mode ? "#fff" : "var(--brand-muted)",
+                                        color: viewMode === mode ? "var(--brand-accent-ink)" : "var(--brand-muted)",
                                         background: viewMode === mode ? "var(--brand-accent)" : "transparent",
                                     }}>
                                         <Icon size={14} strokeWidth={1.5} /> {label}
@@ -587,7 +587,7 @@ const Calendar = () => {
                     />
                 ) : filtered.length === 0 ? (
                     <div style={{ ...S.surface, padding: "4rem 2rem", textAlign: "center" }}>
-                        <div style={{ width: "4rem", height: "4rem", margin: "0 auto 1rem", borderRadius: "1rem", background: "rgba(6,182,212,0.08)", border: "1px solid rgba(6,182,212,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div style={{ width: "4rem", height: "4rem", margin: "0 auto 1rem", borderRadius: "1rem", background: "rgba(245,181,68,0.08)", border: "1px solid rgba(245,181,68,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                             <CalendarDays size={28} style={{ color: "var(--brand-cyan)" }} strokeWidth={1.5} />
                         </div>
                         <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700, color: "var(--brand-text)", textWrap: "balance" }}>
@@ -599,7 +599,7 @@ const Calendar = () => {
                                 : "Опитай да разшириш филтрите или ги изчисти."}
                         </p>
                         {hasFilters && events.length > 0 && (
-                            <button type="button" onClick={clearFilters} style={{ marginTop: "1.25rem", padding: "0.6rem 1.25rem", background: "var(--brand-accent)", border: "none", borderRadius: "0.625rem", color: "#fff", fontSize: "13px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+                            <button type="button" onClick={clearFilters} style={{ marginTop: "1.25rem", padding: "0.6rem 1.25rem", background: "var(--brand-accent)", border: "none", borderRadius: "0.625rem", color: "var(--brand-accent-ink)", fontSize: "13px", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
                                 Изчисти филтрите
                             </button>
                         )}
@@ -658,7 +658,7 @@ const Calendar = () => {
                                         {group.label}
                                     </h3>
                                     <div style={{ flex: 1, height: 1, background: "var(--brand-border)" }} />
-                                    <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--brand-muted)", fontFamily: "monospace" }}>
+                                    <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--brand-muted)", fontFamily: "var(--font-mono)" }}>
                                         {group.items.length}
                                     </span>
                                 </div>

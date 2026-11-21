@@ -84,7 +84,7 @@ function SubjectRow({ rank, row, max, animate }) {
                         flexShrink: 0,
                         width: 32,
                         textAlign: "center",
-                        fontFamily: "monospace",
+                        fontFamily: "var(--font-mono)",
                         fontSize: "0.875rem",
                         fontWeight: 800,
                         color: rank <= 3 ? "var(--brand-cyan)" : "var(--brand-muted)",
@@ -100,7 +100,7 @@ function SubjectRow({ rank, row, max, animate }) {
                 <div style={{ textAlign: "right", flexShrink: 0 }}>
                     <div
                         style={{
-                            fontFamily: "monospace",
+                            fontFamily: "var(--font-mono)",
                             fontSize: "1.75rem",
                             fontWeight: 900,
                             lineHeight: 1,
@@ -208,7 +208,7 @@ export default function DziStrategist() {
                     transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                     style={{ marginBottom: "2.5rem" }}
                 >
-                    <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.375rem 0.875rem", background: "rgba(6,182,212,0.08)", border: "1px solid rgba(6,182,212,0.2)", borderRadius: "999px", marginBottom: "1rem" }}>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.375rem 0.875rem", background: "rgba(245,181,68,0.08)", border: "1px solid rgba(245,181,68,0.2)", borderRadius: "999px", marginBottom: "1rem" }}>
                         <Compass size={14} strokeWidth={1.5} style={{ color: "var(--brand-cyan)" }} />
                         <span style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--brand-cyan)" }}>
                             ДЗИ Стратег
@@ -268,7 +268,7 @@ export default function DziStrategist() {
                     transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                     style={{
                         marginTop: "3rem",
-                        background: "rgba(6,182,212,0.06)",
+                        background: "rgba(245,181,68,0.06)",
                         border: "1px solid var(--brand-card-border)",
                         borderRadius: "1.25rem",
                         padding: "1.75rem",
@@ -359,7 +359,7 @@ export default function DziStrategist() {
                             gap: "0.5rem",
                             padding: "0.875rem 1.75rem",
                             background: "var(--brand-accent)",
-                            color: "#fff",
+                            color: "var(--brand-accent-ink)",
                             borderRadius: "0.75rem",
                             fontWeight: 700,
                             fontSize: "0.9375rem",

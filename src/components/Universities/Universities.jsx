@@ -23,16 +23,16 @@ const GROUPS = [
         name: "Социални, стопански и правни науки",
         icon: Briefcase,
         accent: "#06B6D4",
-        bg: "rgba(6,182,212,0.08)",
-        border: "rgba(6,182,212,0.18)",
+        bg: "rgba(245,181,68,0.08)",
+        border: "rgba(245,181,68,0.18)",
     },
     {
         id: "tech",
         name: "Технически науки",
         icon: Wrench,
         accent: "#8B5CF6",
-        bg: "rgba(139,92,246,0.08)",
-        border: "rgba(139,92,246,0.18)",
+        bg: "rgba(245,181,68,0.08)",
+        border: "rgba(245,181,68,0.18)",
     },
     {
         id: "nat",
@@ -326,7 +326,7 @@ function GroupCard({ group, total, specialties, univCount, cityCount, onSelect, 
                     </div>
                     <div style={{
                         fontSize: "1.5rem", fontWeight: 900,
-                        fontFamily: "monospace", lineHeight: 1,
+                        fontFamily: "var(--font-mono)", lineHeight: 1,
                         color: group.accent,
                     }}>
                         {total}
@@ -417,13 +417,13 @@ function GroupCard({ group, total, specialties, univCount, cityCount, onSelect, 
 function SpecialtyCard({ uni, isFav, onToggleFav, showUser }) {
     const isMaster = uni.education_level === "магистър";
     const levelStyle = isMaster
-        ? { bg: "rgba(139,92,246,0.12)", color: "var(--brand-violet)", border: "rgba(139,92,246,0.25)" }
-        : { bg: "rgba(6,182,212,0.1)", color: "var(--brand-cyan)", border: "rgba(6,182,212,0.2)" };
+        ? { bg: "rgba(245,181,68,0.12)", color: "var(--brand-violet)", border: "rgba(245,181,68,0.25)" }
+        : { bg: "rgba(245,181,68,0.1)", color: "var(--brand-cyan)", border: "rgba(245,181,68,0.2)" };
 
     return (
         <m.div
             variants={cardVariants}
-            whileHover={{ y: -4, boxShadow: "0 0 0 1px rgba(6,182,212,0.25), 0 24px 48px var(--brand-shadow)", borderColor: "rgba(6,182,212,0.25)" }}
+            whileHover={{ y: -4, boxShadow: "0 0 0 1px rgba(245,181,68,0.25), 0 24px 48px var(--brand-shadow)", borderColor: "rgba(245,181,68,0.25)" }}
             onMouseEnter={(e) => { e.currentTarget.style.willChange = "transform"; }}
             onMouseLeave={(e) => { e.currentTarget.style.willChange = "auto"; }}
             style={{
@@ -490,7 +490,7 @@ function SpecialtyCard({ uni, isFav, onToggleFav, showUser }) {
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", paddingTop: "0.875rem", borderTop: "1px solid var(--brand-border)" }}>
                 <Link
                     to={`/calculator/?specialty=${encodeURIComponent(uni.specialty)}&university=${encodeURIComponent(uni.university_name)}`}
-                    style={{ display: "flex", alignItems: "center", gap: "0.35rem", padding: "0.5rem 0.875rem", background: "var(--brand-accent)", border: "none", borderRadius: "0.625rem", color: "#fff", fontWeight: 700, fontSize: "12px", textDecoration: "none", fontFamily: "inherit", flexShrink: 0 }}
+                    style={{ display: "flex", alignItems: "center", gap: "0.35rem", padding: "0.5rem 0.875rem", background: "var(--brand-accent)", border: "none", borderRadius: "0.625rem", color: "var(--brand-accent-ink)", fontWeight: 700, fontSize: "12px", textDecoration: "none", fontFamily: "inherit", flexShrink: 0 }}
                 >
                     <Calculator size={13} /> Изчисли бал
                 </Link>
@@ -784,7 +784,7 @@ export default function UniversitiesPage() {
                             onChange={(e) => setSearchTerm(e.target.value)}
                             onClick={(e) => e.stopPropagation()}
                             style={{ ...inputStyle, paddingLeft: "2.5rem", paddingRight: "1rem" }}
-                            onFocus={(e) => { e.target.style.borderColor = "rgba(6,182,212,0.5)"; if (searchTerm.length > 1) setShowSuggestions(true); }}
+                            onFocus={(e) => { e.target.style.borderColor = "rgba(245,181,68,0.5)"; if (searchTerm.length > 1) setShowSuggestions(true); }}
                             onBlur={(e) => { e.target.style.borderColor = "rgba(148,163,184,0.12)"; }}
                         />
                         <AnimatePresence>
@@ -802,7 +802,7 @@ export default function UniversitiesPage() {
                                             key={s.id || i}
                                             onClick={() => { setSearchTerm(s.specialty); setShowSuggestions(false); }}
                                             style={{ padding: "0.75rem 1rem", display: "flex", alignItems: "center", gap: "0.625rem", cursor: "pointer", borderBottom: i < suggestions.length - 1 ? "1px solid rgba(148,163,184,0.08)" : "none", transition: "background 0.15s" }}
-                                            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(6,182,212,0.06)")}
+                                            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(245,181,68,0.06)")}
                                             onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                                         >
                                             <School size={14} style={{ color: "var(--brand-cyan)", flexShrink: 0 }} />
@@ -845,14 +845,14 @@ export default function UniversitiesPage() {
                         <button
                             onClick={resetFilters}
                             title="Разгледай по направления"
-                            style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "3rem", height: "3rem", background: viewMode === "browse" ? "rgba(6,182,212,0.12)" : "var(--brand-surface-2)", border: viewMode === "browse" ? "1px solid rgba(6,182,212,0.35)" : "1px solid var(--brand-border)", borderRadius: "0.75rem", cursor: "pointer", color: viewMode === "browse" ? "var(--brand-cyan)" : "var(--brand-muted)", transition: "all 0.2s", flexShrink: 0 }}
+                            style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "3rem", height: "3rem", background: viewMode === "browse" ? "rgba(245,181,68,0.12)" : "var(--brand-surface-2)", border: viewMode === "browse" ? "1px solid rgba(245,181,68,0.35)" : "1px solid var(--brand-border)", borderRadius: "0.75rem", cursor: "pointer", color: viewMode === "browse" ? "var(--brand-cyan)" : "var(--brand-muted)", transition: "all 0.2s", flexShrink: 0 }}
                         >
                             <LayoutGrid size={16} strokeWidth={1.5} />
                         </button>
                         <button
                             onClick={() => setViewMode("search")}
                             title="Всички специалности"
-                            style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "3rem", height: "3rem", background: viewMode === "search" ? "rgba(6,182,212,0.12)" : "var(--brand-surface-2)", border: viewMode === "search" ? "1px solid rgba(6,182,212,0.35)" : "1px solid var(--brand-border)", borderRadius: "0.75rem", cursor: "pointer", color: viewMode === "search" ? "var(--brand-cyan)" : "var(--brand-muted)", transition: "all 0.2s", flexShrink: 0 }}
+                            style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "3rem", height: "3rem", background: viewMode === "search" ? "rgba(245,181,68,0.12)" : "var(--brand-surface-2)", border: viewMode === "search" ? "1px solid rgba(245,181,68,0.35)" : "1px solid var(--brand-border)", borderRadius: "0.75rem", cursor: "pointer", color: viewMode === "search" ? "var(--brand-cyan)" : "var(--brand-muted)", transition: "all 0.2s", flexShrink: 0 }}
                         >
                             <Rows3 size={16} strokeWidth={1.5} />
                         </button>
@@ -877,23 +877,23 @@ export default function UniversitiesPage() {
                             )}
                             {/* Faculty chip */}
                             {selectedFaculty && (
-                                <span style={{ display: "flex", alignItems: "center", gap: "0.3rem", padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: "rgba(6,182,212,0.1)", color: "var(--brand-cyan)", border: "1px solid rgba(6,182,212,0.2)" }}>
+                                <span style={{ display: "flex", alignItems: "center", gap: "0.3rem", padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: "rgba(245,181,68,0.1)", color: "var(--brand-cyan)", border: "1px solid rgba(245,181,68,0.2)" }}>
                                     {selectedFaculty}
                                     <button onClick={() => { setSelectedFaculty(null); if (!hasTextFilters && !selectedGroup) { setViewMode("browse"); loadInitial(); } }} style={{ background: "none", border: "none", cursor: "pointer", color: "inherit", padding: 0, lineHeight: 1 }}><X size={10} /></button>
                                 </span>
                             )}
                             {searchTerm && (
-                                <span style={{ padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: "rgba(6,182,212,0.1)", color: "var(--brand-cyan)", border: "1px solid rgba(6,182,212,0.2)" }}>
+                                <span style={{ padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: "rgba(245,181,68,0.1)", color: "var(--brand-cyan)", border: "1px solid rgba(245,181,68,0.2)" }}>
                                     "{searchTerm}"
                                 </span>
                             )}
                             {selectedCity !== "Всички" && (
-                                <span style={{ padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: "rgba(139,92,246,0.1)", color: "var(--brand-violet)", border: "1px solid rgba(139,92,246,0.2)" }}>
+                                <span style={{ padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: "rgba(245,181,68,0.1)", color: "var(--brand-violet)", border: "1px solid rgba(245,181,68,0.2)" }}>
                                     {selectedCity}
                                 </span>
                             )}
                             {selectedLevel !== "Всички" && (
-                                <span style={{ padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: "rgba(139,92,246,0.1)", color: "var(--brand-violet)", border: "1px solid rgba(139,92,246,0.2)" }}>
+                                <span style={{ padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: "rgba(245,181,68,0.1)", color: "var(--brand-violet)", border: "1px solid rgba(245,181,68,0.2)" }}>
                                     {selectedLevel}
                                 </span>
                             )}
@@ -922,7 +922,7 @@ export default function UniversitiesPage() {
                             <X size={28} style={{ color: "#f87171" }} />
                         </div>
                         <h3 style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--brand-text)", marginBottom: "0.5rem" }}>{error}</h3>
-                        <button onClick={loadInitial} style={{ padding: "0.75rem 1.5rem", background: "var(--brand-accent)", border: "none", borderRadius: "0.75rem", color: "#fff", fontWeight: 700, fontSize: "14px", cursor: "pointer", fontFamily: "inherit" }}>
+                        <button onClick={loadInitial} style={{ padding: "0.75rem 1.5rem", background: "var(--brand-accent)", border: "none", borderRadius: "0.75rem", color: "var(--brand-accent-ink)", fontWeight: 700, fontSize: "14px", cursor: "pointer", fontFamily: "inherit" }}>
                             Опитай отново
                         </button>
                     </m.div>
@@ -1027,7 +1027,7 @@ export default function UniversitiesPage() {
                                     <p style={{ color: "var(--brand-muted)", fontSize: "14px", marginBottom: "1.5rem" }}>
                                         Опитай с различни ключови думи или разшири критериите.
                                     </p>
-                                    <button onClick={resetFilters} style={{ padding: "0.75rem 1.5rem", background: "var(--brand-accent)", border: "none", borderRadius: "0.75rem", color: "#fff", fontWeight: 700, fontSize: "14px", cursor: "pointer", fontFamily: "inherit" }}>
+                                    <button onClick={resetFilters} style={{ padding: "0.75rem 1.5rem", background: "var(--brand-accent)", border: "none", borderRadius: "0.75rem", color: "var(--brand-accent-ink)", fontWeight: 700, fontSize: "14px", cursor: "pointer", fontFamily: "inherit" }}>
                                         Разшири критериите
                                     </button>
                                 </m.div>
@@ -1058,7 +1058,7 @@ export default function UniversitiesPage() {
                                                 type="button"
                                                 onClick={() => setVisibleCount((c) => c + 60)}
                                                 style={{ padding: "0.75rem 2rem", background: "var(--brand-surface)", border: "1px solid var(--brand-border)", borderRadius: "0.75rem", color: "var(--brand-text)", fontWeight: 600, fontSize: "14px", cursor: "pointer", fontFamily: "inherit" }}
-                                                onMouseEnter={(e) => (e.currentTarget.style.borderColor = "rgba(6,182,212,0.3)")}
+                                                onMouseEnter={(e) => (e.currentTarget.style.borderColor = "rgba(245,181,68,0.3)")}
                                                 onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--brand-border)")}
                                             >
                                                 Покажи още {Math.min(60, displayUnis.length - visibleCount)}
@@ -1092,7 +1092,7 @@ export default function UniversitiesPage() {
                     gap: 0.2rem;
                     transition: border-color 0.2s;
                 }
-                .uni-stat-card:hover { border-color: rgba(6,182,212,0.25); }
+                .uni-stat-card:hover { border-color: rgba(245,181,68,0.25); }
                 .uni-stat-num {
                     font-size: 1.625rem;
                     font-weight: 900;

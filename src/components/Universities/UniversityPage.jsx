@@ -47,7 +47,7 @@ function NotFound({ slug }) {
                         display: "inline-flex", alignItems: "center", gap: "0.5rem",
                         marginTop: "1.5rem", padding: "0.75rem 1.5rem",
                         background: "var(--brand-accent)",
-                        color: "#fff", borderRadius: "0.75rem", fontWeight: 700, textDecoration: "none",
+                        color: "var(--brand-accent-ink)", borderRadius: "0.75rem", fontWeight: 700, textDecoration: "none",
                     }}
                 >
                     Към всички университети <ArrowRight size={16} />
@@ -65,7 +65,7 @@ function StatChip({ icon: Icon, label, value }) {
             border: CARD_BORDER, borderRadius: "999px", fontSize: "0.8125rem",
         }}>
             <Icon size={14} strokeWidth={1.5} color="var(--brand-cyan)" />
-            <span style={{ fontWeight: 700, fontFamily: "monospace" }}>{value}</span>
+            <span style={{ fontWeight: 700, fontFamily: "var(--font-mono)" }}>{value}</span>
             <span style={{ color: "var(--brand-muted)" }}>{label}</span>
         </div>
     );
@@ -217,7 +217,7 @@ export default function UniversityPage() {
                             display: "inline-flex", alignItems: "center", gap: "0.5rem",
                             padding: "0.875rem 1.5rem",
                             background: "var(--brand-accent)",
-                            color: "#fff", borderRadius: "0.75rem", fontWeight: 700,
+                            color: "var(--brand-accent-ink)", borderRadius: "0.75rem", fontWeight: 700,
                             fontSize: "0.9375rem", textDecoration: "none",
                         }}
                     >

@@ -73,11 +73,11 @@ export default function NotFound() {
                             background: "var(--brand-accent)",
                             border: "none",
                             borderRadius: "0.75rem",
-                            color: "#fff",
+                            color: "var(--brand-accent-ink)",
                             fontSize: "14px",
                             fontWeight: 700,
                             textDecoration: "none",
-                            boxShadow: "0 12px 30px rgba(6,182,212,0.3)",
+                            boxShadow: "0 12px 30px rgba(245,181,68,0.3)",
                         }}
                     >
                         <Home size={16} /> Към началната

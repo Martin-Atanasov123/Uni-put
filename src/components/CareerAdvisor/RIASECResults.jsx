@@ -61,7 +61,7 @@ function drawRiasecCard({ code, scores, topSpecialties }) {
     const letters = code.split("");
     const primary = RIASEC_LABELS[letters[0]] || { name: "", desc: "", color: "#06B6D4" };
 
-    ctx.fillStyle = "#0F172A";
+    ctx.fillStyle = "#0E1525";
     ctx.fillRect(0, 0, W, H);
     ctx.textBaseline = "alphabetic";
 
@@ -208,14 +208,14 @@ const RIASECResults = ({ results, onRestart }) => {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        boxShadow: "0 16px 40px rgba(6,182,212,0.3)",
+                        boxShadow: "0 16px 40px rgba(245,181,68,0.3)",
                     }}
                 >
-                    <Target size={28} color="#fff" />
+                    <Target size={28} color="#111827" />
                 </div>
                 <h2 style={{ margin: 0, fontSize: "clamp(1.75rem, 4vw, 2.5rem)", fontWeight: 800, letterSpacing: "-0.02em", textWrap: "balance" }}>
                     Твоят RIASEC Профил:{" "}
-                    <span style={{ fontFamily: "monospace", color: "var(--brand-accent-text)" }}>
+                    <span style={{ fontFamily: "var(--font-mono)", color: "var(--brand-accent-text)" }}>
                         {riasecCode}
                     </span>
                 </h2>
@@ -238,7 +238,7 @@ const RIASECResults = ({ results, onRestart }) => {
                                 style={{
                                     fontSize: "1.75rem",
                                     fontWeight: 900,
-                                    fontFamily: "monospace",
+                                    fontFamily: "var(--font-mono)",
                                     color: typeInfo.color || "var(--brand-cyan)",
                                     marginBottom: "0.25rem",
                                     lineHeight: 1,
@@ -257,7 +257,7 @@ const RIASECResults = ({ results, onRestart }) => {
                 <div style={{ maxWidth: "560px", margin: "1rem auto 0", display: "flex", flexDirection: "column", gap: "0.625rem", width: "100%" }}>
                     {Object.entries(scores).sort((a, b) => b[1] - a[1]).map(([type, score]) => (
                         <div key={type} style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                            <span style={{ width: "1.5rem", fontSize: "13px", fontWeight: 800, color: "var(--brand-text)", fontFamily: "monospace" }}>{type}</span>
+                            <span style={{ width: "1.5rem", fontSize: "13px", fontWeight: 800, color: "var(--brand-text)", fontFamily: "var(--font-mono)" }}>{type}</span>
                             <div style={{ flex: 1, height: "8px", background: "rgba(148,163,184,0.1)", borderRadius: "999px", overflow: "hidden" }}>
                                 <div
                                     style={{
@@ -266,11 +266,11 @@ const RIASECResults = ({ results, onRestart }) => {
                                         background: "var(--brand-accent)",
                                         borderRadius: "999px",
                                         transition: "width 1s ease",
-                                        boxShadow: "0 0 8px rgba(6,182,212,0.4)",
+                                        boxShadow: "0 0 8px rgba(245,181,68,0.4)",
                                     }}
                                 />
                             </div>
-                            <span style={{ width: "3rem", textAlign: "right", fontSize: "12px", fontWeight: 700, color: "var(--brand-muted)", fontFamily: "monospace" }}>{score}%</span>
+                            <span style={{ width: "3rem", textAlign: "right", fontSize: "12px", fontWeight: 700, color: "var(--brand-muted)", fontFamily: "var(--font-mono)" }}>{score}%</span>
                         </div>
                     ))}
                 </div>
@@ -279,7 +279,7 @@ const RIASECResults = ({ results, onRestart }) => {
                     <button
                         type="button"
                         onClick={handleShareLink}
-                        style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "0.4rem", minHeight: "44px", padding: "0 1.25rem", borderRadius: "0.75rem", border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: "14px", fontWeight: 700, color: "#fff", background: "var(--brand-accent)" }}
+                        style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "0.4rem", minHeight: "44px", padding: "0 1.25rem", borderRadius: "0.75rem", border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: "14px", fontWeight: 700, color: "var(--brand-accent-ink)", background: "var(--brand-accent)" }}
                     >
                         {shareFeedback === "link"
                             ? <><Check size={16} /> Копирано</>
@@ -335,8 +335,8 @@ const RIASECResults = ({ results, onRestart }) => {
                                 onClick={() => setViewMode(m.id)}
                                 style={{
                                     padding: "0.5rem 1rem",
-                                    background: active ? "rgba(6,182,212,0.12)" : "transparent",
-                                    border: `1px solid ${active ? "rgba(6,182,212,0.35)" : "transparent"}`,
+                                    background: active ? "rgba(245,181,68,0.12)" : "transparent",
+                                    border: `1px solid ${active ? "rgba(245,181,68,0.35)" : "transparent"}`,
                                     borderRadius: "0.5rem",
                                     color: active ? "var(--brand-cyan)" : "var(--brand-muted)",
                                     fontSize: "12px",
@@ -388,13 +388,13 @@ const RIASECResults = ({ results, onRestart }) => {
                                             width: "2.5rem",
                                             height: "2.5rem",
                                             borderRadius: "0.625rem",
-                                            background: "rgba(6,182,212,0.1)",
-                                            border: "1px solid rgba(6,182,212,0.25)",
+                                            background: "rgba(245,181,68,0.1)",
+                                            border: "1px solid rgba(245,181,68,0.25)",
                                             display: "flex",
                                             alignItems: "center",
                                             justifyContent: "center",
                                             color: "var(--brand-cyan)",
-                                            fontFamily: "monospace",
+                                            fontFamily: "var(--font-mono)",
                                             fontSize: "13px",
                                             fontWeight: 800,
                                             flexShrink: 0,
@@ -405,10 +405,10 @@ const RIASECResults = ({ results, onRestart }) => {
                                     <div style={{ flex: 1, minWidth: "180px" }}>
                                         <h4 style={{ margin: 0, fontSize: "1.125rem", fontWeight: 700, color: "var(--brand-text)" }}>{spec.name}</h4>
                                         <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginTop: "0.4rem" }}>
-                                            <span style={{ padding: "0.2rem 0.5rem", background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.25)", borderRadius: "999px", color: "var(--brand-cyan)", fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                                            <span style={{ padding: "0.2rem 0.5rem", background: "rgba(245,181,68,0.1)", border: "1px solid rgba(245,181,68,0.25)", borderRadius: "999px", color: "var(--brand-cyan)", fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>
                                                 {spec.category || "Специалност"}
                                             </span>
-                                            <span style={{ padding: "0.2rem 0.5rem", background: "rgba(148,163,184,0.08)", border: "1px solid rgba(148,163,184,0.15)", borderRadius: "999px", color: "var(--brand-muted)", fontSize: "10px", fontWeight: 700, fontFamily: "monospace" }}>
+                                            <span style={{ padding: "0.2rem 0.5rem", background: "rgba(148,163,184,0.08)", border: "1px solid rgba(148,163,184,0.15)", borderRadius: "999px", color: "var(--brand-muted)", fontSize: "10px", fontWeight: 700, fontFamily: "var(--font-mono)" }}>
                                                 {spec.riasec_code}
                                             </span>
                                         </div>
@@ -418,7 +418,7 @@ const RIASECResults = ({ results, onRestart }) => {
                                             style={{
                                                 fontSize: "1.875rem",
                                                 fontWeight: 800,
-                                                fontFamily: "monospace",
+                                                fontFamily: "var(--font-mono)",
                                                 color: "var(--brand-accent-text)",
                                             }}
                                         >
@@ -482,12 +482,12 @@ const RIASECResults = ({ results, onRestart }) => {
                                             background: "var(--brand-accent)",
                                             border: "none",
                                             borderRadius: "0.5rem",
-                                            color: "#fff",
+                                            color: "var(--brand-accent-ink)",
                                             fontSize: "12px",
                                             fontWeight: 700,
                                             cursor: "pointer",
                                             fontFamily: "inherit",
-                                            boxShadow: "0 8px 20px rgba(6,182,212,0.25)",
+                                            boxShadow: "0 8px 20px rgba(245,181,68,0.25)",
                                         }}
                                     >
                                         <Calculator size={13} /> Изчисли бал
@@ -550,12 +550,12 @@ const RIASECResults = ({ results, onRestart }) => {
                                     overflow: "hidden",
                                     transition: "transform 0.2s, border-color 0.2s",
                                 }}
-                                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.borderColor = "rgba(139,92,246,0.35)"; }}
+                                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.borderColor = "rgba(245,181,68,0.35)"; }}
                                 onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.borderColor = "rgba(148,163,184,0.1)"; }}
                             >
 
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative" }}>
-                                    <div style={{ width: "2.25rem", height: "2.25rem", borderRadius: "0.5rem", background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.25)", color: "var(--brand-violet)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "monospace", fontSize: "12px", fontWeight: 800 }}>
+                                    <div style={{ width: "2.25rem", height: "2.25rem", borderRadius: "0.5rem", background: "rgba(245,181,68,0.1)", border: "1px solid rgba(245,181,68,0.25)", color: "var(--brand-violet)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-mono)", fontSize: "12px", fontWeight: 800 }}>
                                         #{index + 1}
                                     </div>
                                     <div style={{ textAlign: "right" }}>
@@ -563,7 +563,7 @@ const RIASECResults = ({ results, onRestart }) => {
                                             style={{
                                                 fontSize: "1.5rem",
                                                 fontWeight: 800,
-                                                fontFamily: "monospace",
+                                                fontFamily: "var(--font-mono)",
                                                 color: "var(--brand-accent-text)",
                                             }}
                                         >
@@ -596,7 +596,7 @@ const RIASECResults = ({ results, onRestart }) => {
                                 </div>
 
                                 <div style={{ marginTop: "auto", paddingTop: "0.75rem", borderTop: "1px solid rgba(148,163,184,0.08)", display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative" }}>
-                                    <span style={{ padding: "0.2rem 0.5rem", background: "rgba(148,163,184,0.08)", border: "1px solid rgba(148,163,184,0.15)", borderRadius: "999px", fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", fontFamily: "monospace" }}>
+                                    <span style={{ padding: "0.2rem 0.5rem", background: "rgba(148,163,184,0.08)", border: "1px solid rgba(148,163,184,0.15)", borderRadius: "999px", fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", fontFamily: "var(--font-mono)" }}>
                                         {career.riasec_code}
                                     </span>
                                     <div
@@ -604,8 +604,8 @@ const RIASECResults = ({ results, onRestart }) => {
                                             width: "2rem",
                                             height: "2rem",
                                             borderRadius: "50%",
-                                            background: "rgba(139,92,246,0.1)",
-                                            border: "1px solid rgba(139,92,246,0.25)",
+                                            background: "rgba(245,181,68,0.1)",
+                                            border: "1px solid rgba(245,181,68,0.25)",
                                             color: "var(--brand-violet)",
                                             display: "flex",
                                             alignItems: "center",
@@ -652,8 +652,8 @@ const RIASECResults = ({ results, onRestart }) => {
             <div
                 style={{
                     padding: "2rem",
-                    background: "rgba(6,182,212,0.08)",
-                    border: "1px solid rgba(6,182,212,0.25)",
+                    background: "rgba(245,181,68,0.08)",
+                    border: "1px solid rgba(245,181,68,0.25)",
                     borderRadius: "1.25rem",
                     textAlign: "center",
                     display: "flex",
@@ -676,9 +676,9 @@ const RIASECResults = ({ results, onRestart }) => {
                         display: "inline-flex", alignItems: "center", gap: "0.5rem",
                         padding: "0.875rem 2rem",
                         background: "var(--brand-accent)",
-                        border: "none", borderRadius: "0.75rem", color: "#fff",
+                        border: "none", borderRadius: "0.75rem", color: "var(--brand-accent-ink)",
                         fontSize: "15px", fontWeight: 800, textDecoration: "none",
-                        boxShadow: "0 12px 30px rgba(6,182,212,0.35)",
+                        boxShadow: "0 12px 30px rgba(245,181,68,0.35)",
                     }}
                 >
                     <Calculator size={18} /> Изчисли бал за тези специалности <ArrowRight size={16} />
@@ -708,7 +708,7 @@ const RIASECResults = ({ results, onRestart }) => {
                         cursor: "pointer", fontFamily: "inherit",
                         transition: "border-color 0.2s, color 0.2s",
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(6,182,212,0.4)"; e.currentTarget.style.color = "var(--brand-text)"; }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(245,181,68,0.4)"; e.currentTarget.style.color = "var(--brand-text)"; }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--brand-border)"; e.currentTarget.style.color = "var(--brand-muted)"; }}
                 >
                     <RefreshCw size={14} /> Направи теста отново

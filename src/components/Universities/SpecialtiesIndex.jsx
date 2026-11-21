@@ -133,7 +133,7 @@ export default function SpecialtiesIndex() {
                 {status === "ok" && groups.map(([letter, list]) => (
                     <section key={letter} style={{ marginTop: "2rem" }}>
                         <h2 style={{
-                            margin: "0 0 0.75rem", fontSize: "1.125rem", fontWeight: 800, fontFamily: "monospace",
+                            margin: "0 0 0.75rem", fontSize: "1.125rem", fontWeight: 800, fontFamily: "var(--font-mono)",
                             color: "var(--brand-violet)",
                         }}>
                             {letter}
@@ -156,7 +156,7 @@ export default function SpecialtiesIndex() {
                                     >
                                         <span>{it.name}</span>
                                         <span style={{ flexShrink: 0, fontSize: "0.75rem", fontWeight: 500, color: "var(--brand-muted)" }}>
-                                            <span style={{ fontFamily: "monospace", fontWeight: 700 }}>{it.unis}</span> университета
+                                            <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700 }}>{it.unis}</span> университета
                                         </span>
                                     </Link>
                                 </li>
@@ -174,7 +174,7 @@ export default function SpecialtiesIndex() {
                     <Link to="/calculator/" style={{
                         display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.875rem 1.75rem",
                         background: "var(--brand-accent)",
-                        color: "#fff", borderRadius: "0.75rem", fontWeight: 700, textDecoration: "none", fontSize: "0.9375rem",
+                        color: "var(--brand-accent-ink)", borderRadius: "0.75rem", fontWeight: 700, textDecoration: "none", fontSize: "0.9375rem",
                     }}>
                         Изчисли моя бал <ArrowRight size={16} />
                     </Link>

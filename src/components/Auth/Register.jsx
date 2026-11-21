@@ -129,7 +129,7 @@ const SignUp = () => {
                     {/* Logo */}
                     <Link to="/" style={{ display: "flex", alignItems: "center", gap: "0.625rem", textDecoration: "none" }}>
                         <div style={{ padding: "0.5rem", borderRadius: "0.625rem", background: "var(--brand-accent)", display: "flex" }}>
-                            <GraduationCap size={20} color="#fff" />
+                            <GraduationCap size={20} color="#111827" />
                         </div>
                         <span style={{ fontSize: "1.25rem", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--brand-accent-text)" }}>
                             УниПът
@@ -150,7 +150,7 @@ const SignUp = () => {
                     <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
                         {BENEFITS.map(({ icon: Icon, title, desc }) => (
                             <div key={title} style={{ display: "flex", gap: "0.875rem", alignItems: "flex-start" }}>
-                                <div style={{ width: "2.25rem", height: "2.25rem", borderRadius: "0.625rem", background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <div style={{ width: "2.25rem", height: "2.25rem", borderRadius: "0.625rem", background: "rgba(245,181,68,0.1)", border: "1px solid rgba(245,181,68,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                     <Icon size={16} style={{ color: "var(--brand-cyan)" }} />
                                 </div>
                                 <div>
@@ -199,10 +199,10 @@ const SignUp = () => {
                                 width: "3.5rem", height: "3.5rem", borderRadius: "1rem",
                                 background: "var(--brand-accent)",
                                 display: "flex", alignItems: "center", justifyContent: "center",
-                                boxShadow: "0 16px 40px rgba(139,92,246,0.35)",
+                                boxShadow: "0 16px 40px rgba(245,181,68,0.35)",
                             }}
                         >
-                            <UserPlus size={28} color="#fff" />
+                            <UserPlus size={28} color="#111827" />
                         </div>
                         <div style={{ textAlign: "center" }}>
                             <h1 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--brand-text)", textWrap: "balance" }}>
@@ -243,7 +243,7 @@ const SignUp = () => {
                             transition: "border-color 0.2s, background 0.2s",
                             marginBottom: "0.25rem",
                         }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(6,182,212,0.35)"; e.currentTarget.style.background = "var(--brand-surface)"; }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(245,181,68,0.35)"; e.currentTarget.style.background = "var(--brand-surface)"; }}
                         onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--brand-input-border)"; e.currentTarget.style.background = "var(--brand-input-bg)"; }}
                     >
                         <svg width="18" height="18" viewBox="0 0 24 24">
@@ -304,11 +304,11 @@ const SignUp = () => {
                             style={{
                                 marginTop: "0.75rem", padding: "0.875rem 1rem",
                                 background: loading ? "rgba(148,163,184,0.15)" : "var(--brand-accent)",
-                                border: "none", borderRadius: "0.75rem", color: "#fff",
+                                border: "none", borderRadius: "0.75rem", color: "var(--brand-accent-ink)",
                                 fontSize: "14px", fontWeight: 800,
                                 cursor: loading ? "not-allowed" : "pointer",
                                 display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem",
-                                boxShadow: loading ? "none" : "0 12px 30px rgba(139,92,246,0.3)",
+                                boxShadow: loading ? "none" : "0 12px 30px rgba(245,181,68,0.3)",
                                 fontFamily: "inherit",
                                 transition: "transform 0.15s",
                             }}
