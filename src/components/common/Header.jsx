@@ -2,42 +2,20 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { sessionService } from "@/services/sessionService";
 import { useTheme } from "@/hooks/useTheme";
-import {
-    User, LogOut, Menu, X, GraduationCap, Calculator, Search, Settings, Building2,
-    Heart, ChevronDown, Brain, ClipboardList, CalendarDays, School, Compass, BookOpen,
-} from "lucide-react";
+import { User, LogOut, Menu, X, Search, Settings, Heart, ChevronDown, ClipboardList } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { UNIVERSITIES, SPECIALTIES, DORMITORIES } from "@/lib/siteStats";
+import { MAIN_NAV, MORE_TOOLS } from "@/components/common/navItems";
 
 // ── Навигация по design.md (раздел 11) ──────────────────────────────────────
 // Публично: Специалности | Университети | Кариерно ориентиране | Калкулатор на бал | Запазени.
-// Останалите инструменти са в менюто („Още“) и във футъра — намираеми, без да претрупват хедъра.
+// Останалите инструменти са в падащото „Още“ (desktop), в менюто (мобилно) и във футъра.
 //
 // Trailing slash е ЗАДЪЛЖИТЕЛЕН — каноничната форма (виж Seo.jsx). Netlify
 // 301-redirect-ва /about → /about/, затова връзка без наклонена черта праща
 // Googlebot през излишен redirect.
 const NAV_GROUPS = [
-    {
-        key: "main",
-        label: "Основни",
-        items: [
-            { name: "Специалности", desc: `${SPECIALTIES} специалности и къде се учат`, path: "/specialnosti/", icon: BookOpen },
-            { name: "Университети", desc: `${UNIVERSITIES} университета по град и степен`, path: "/universities/", icon: GraduationCap },
-            { name: "Кариерно ориентиране", desc: "Интереси като отправна точка, не присъда", path: "/career-advisor/", icon: Compass },
-            { name: "Калкулатор на бал", desc: "Балът по формулата на специалността", path: "/calculator/", icon: Calculator },
-            { name: "Запазени", desc: "Специалностите, които си отбелязал", path: "/favorites/", icon: Heart },
-        ],
-    },
-    {
-        key: "more",
-        label: "Още инструменти",
-        items: [
-            { name: "ДЗИ Стратег", desc: "Кой втори ДЗИ държи специалностите отворени", path: "/dzi-strateg/", icon: Brain },
-            { name: "Прием след 7. клас", desc: "Балове за гимназиите в София", path: "/priem-7-klas/", icon: School },
-            { name: "Календар", desc: "Срокове с източник и година", path: "/calendar/", icon: CalendarDays },
-            { name: "Общежития", desc: `${DORMITORIES} общежития в 9 града`, path: "/dormitories/", icon: Building2 },
-        ],
-    },
+    { key: "main", label: "Основни", items: MAIN_NAV },
+    { key: "more", label: "Още инструменти", items: MORE_TOOLS },
 ];
 
 // Отрязва дължина и махa специални символи — стойността отива в URL и в заявка към каталога.
@@ -101,6 +79,8 @@ export default function Header() {
     useTheme();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+    const [isMoreOpen, setIsMoreOpen] = useState(false);
+    const moreRef = useRef();
     const [scrolled, setScrolled] = useState(false);
     const userMenuRef = useRef();
     const navRef = useRef();
@@ -126,14 +106,15 @@ export default function Header() {
     useEffect(() => {
         const onClick = (e) => {
             if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setIsUserMenuOpen(false);
+            if (moreRef.current && !moreRef.current.contains(e.target)) setIsMoreOpen(false);
         };
-        const onKey = (e) => { if (e.key === "Escape") { setIsUserMenuOpen(false); setIsMenuOpen(false); } };
+        const onKey = (e) => { if (e.key === "Escape") { setIsUserMenuOpen(false); setIsMenuOpen(false); setIsMoreOpen(false); } };
         window.addEventListener("click", onClick);
         window.addEventListener("keydown", onKey);
         return () => { window.removeEventListener("click", onClick); window.removeEventListener("keydown", onKey); };
     }, []);
 
-    useEffect(() => { setIsMenuOpen(false); setIsUserMenuOpen(false); }, [location.pathname]);
+    useEffect(() => { setIsMenuOpen(false); setIsUserMenuOpen(false); setIsMoreOpen(false); }, [location.pathname]);
 
     const handleLogout = useCallback(async () => {
         await sessionService.logout();
@@ -169,6 +150,33 @@ export default function Header() {
                                 {it.name}
                             </Link>
                         ))}
+                        <div ref={moreRef} className="hd-group">
+                            <button
+                                type="button"
+                                className={`hd-link hd-more${MORE_TOOLS.some((t) => isActive(t.path)) ? " is-current" : ""}`}
+                                aria-expanded={isMoreOpen}
+                                aria-controls="hd-more-panel"
+                                onClick={() => setIsMoreOpen((o) => !o)}
+                            >
+                                Още <ChevronDown size={16} strokeWidth={2} aria-hidden="true" style={{ transform: isMoreOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s ease" }} />
+                            </button>
+                            {isMoreOpen && (
+                                <div id="hd-more-panel" className="hd-panel">
+                                    {MORE_TOOLS.map((it) => {
+                                        const Icon = it.icon;
+                                        return (
+                                            <Link key={it.path} to={it.path} className={`hd-item${isActive(it.path) ? " is-current" : ""}`} aria-current={isActive(it.path) ? "page" : undefined}>
+                                                <span className="hd-item-icon"><Icon size={18} strokeWidth={1.5} aria-hidden="true" /></span>
+                                                <span className="hd-item-text">
+                                                    <strong>{it.name}</strong>
+                                                    <small>{it.desc}</small>
+                                                </span>
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
                         {isAdmin && (
                             <Link to="/admin" className="hd-admin">
                                 <Settings size={14} /> Админ
@@ -293,11 +301,14 @@ export default function Header() {
             <style>{`
                 .hd-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: var(--canvas); border-bottom: 1px solid var(--border); }
                 .hd-bar.is-scrolled { box-shadow: var(--shadow-float); }
+                #hd-more-panel { left: auto; right: 0; }
                 .hd-bar__inner { max-width: 80rem; margin: 0 auto; height: var(--header-h); padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
                 @media (max-width: 767px) { .hd-bar__inner { padding: 0 1rem; } }
                 .hd-links { align-items: center; gap: 0.25rem; }
                 .hd-link { position: relative; display: inline-flex; align-items: center; min-height: 44px; padding: 0 0.75rem; font-size: 15px; font-weight: 600; color: var(--ink); text-decoration: none; border-radius: var(--radius-control); transition: color 0.14s ease, background-color 0.14s ease; white-space: nowrap; }
                 .hd-link:hover { color: var(--brand); }
+                .hd-more { gap: 4px; border: 0; background: transparent; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
+                .hd-more[aria-expanded="true"] { color: var(--brand); }
                 .hd-link.is-current { color: var(--brand); }
                 .hd-link.is-current::after { content: ""; position: absolute; left: 0.75rem; right: 0.75rem; bottom: 6px; height: 2px; background: var(--brand); border-radius: 2px; }
                 .uni-nav-desktop { display: none; }
@@ -325,7 +336,7 @@ export default function Header() {
                 .hd-group-btn:hover, .hd-group-btn.is-active { background: rgba(23,86,217,0.09); color: var(--brand-accent-text); }
                 .hd-panel {
                     position: absolute; top: calc(100% + 0.5rem); left: 0; z-index: 120;
-                    width: 25rem; padding: 0.5rem;
+                    width: 23rem; padding: 0.5rem;
                     background: var(--brand-dropdown-bg); border: 1px solid var(--brand-border); border-radius: 1rem;
                     box-shadow: 0 24px 60px var(--brand-shadow);
                     animation: hdPanel 0.16s ease-out;

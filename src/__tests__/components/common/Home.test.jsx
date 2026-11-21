@@ -76,3 +76,13 @@ describe("Home (посока A — търсене първо)", () => {
         expect(screen.getByText(/не гарантират прием/)).toBeTruthy();
     });
 });
+
+describe("Home — още инструменти", () => {
+    afterEach(cleanup);
+    it("shows every extra tool with a link", () => {
+        renderHome();
+        const sec = screen.getByRole("heading", { name: "Още инструменти" }).parentElement;
+        const hrefs = [...sec.querySelectorAll("a")].map((a) => a.getAttribute("href"));
+        expect(hrefs).toEqual(["/dzi-strateg/", "/calendar/", "/dormitories/", "/priem-7-klas/"]);
+    });
+});

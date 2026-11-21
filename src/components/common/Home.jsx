@@ -5,6 +5,7 @@ import Seo from "@/components/common/Seo";
 import JsonLd from "@/components/common/JsonLd";
 import { supabase } from "@/lib/supabase";
 import { slugify } from "@/lib/slugify";
+import { MORE_TOOLS } from "@/components/common/navItems";
 import { UNIVERSITIES, SPECIALTIES, ADMISSION_YEAR, ADMISSION_YEAR_SHORT } from "@/lib/siteStats";
 
 // Начална страница — посока A „Търсене първо“ (одобрена ноември 2026).
@@ -182,6 +183,20 @@ export default function Home() {
                         Изчисли своя бал <ArrowRight size={18} strokeWidth={2} aria-hidden="true" />
                     </Link>
                 </section>
+                {/* ── Още инструменти: видими, не само в менюто ── */}
+                <section className="hp-tools" aria-labelledby="hp-tools">
+                    <h2 id="hp-tools" className="hp-kicker">Още инструменти</h2>
+                    <ul>
+                        {MORE_TOOLS.map(({ name, desc, path, icon: Icon }) => (
+                            <li key={path}>
+                                <Link to={path}>
+                                    <span className="hp-tools__icon"><Icon size={20} strokeWidth={1.75} aria-hidden="true" /></span>
+                                    <span><b>{name}</b><small>{desc}</small></span>
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </section>
             </div>
 
             {/* ── Как работи: една компактна линия ── */}
@@ -256,15 +271,15 @@ const CSS = `
 
 /* Подредба: мобилно — един поток; desktop — търсене + карта горе, пътища + списък долу */
 .hp-grid { display: grid; gap: 28px; padding-top: calc(var(--header-h) + 20px); padding-bottom: 40px;
-  grid-template-areas: "intro" "routes" "popular" "score"; }
-.hp-intro { grid-area: intro; } .hp-routes { grid-area: routes; } .hp-popular { grid-area: popular; } .hp-score { grid-area: score; }
+  grid-template-areas: "intro" "routes" "popular" "score" "tools"; }
+.hp-intro { grid-area: intro; } .hp-routes { grid-area: routes; } .hp-popular { grid-area: popular; } .hp-score { grid-area: score; } .hp-tools { grid-area: tools; }
 @media (min-width: 768px) {
   .hp-grid { gap: 40px; padding-top: calc(var(--header-h) + 48px); grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-areas: "intro intro" "routes popular" "score score"; }
+    grid-template-areas: "intro intro" "routes popular" "score score" "tools tools"; }
 }
 @media (min-width: 1100px) {
   .hp-grid { column-gap: 64px; row-gap: 56px; padding-top: calc(var(--header-h) + 72px); padding-bottom: 72px;
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-areas: "intro score" "routes popular"; align-items: start; }
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-areas: "intro score" "routes popular" "tools tools"; align-items: start; }
 }
 
 .hp-h1 { margin: 0; font-size: clamp(32px, 4.6vw, 60px); line-height: 1.06; font-weight: 740; letter-spacing: -0.03em; text-wrap: balance; }
@@ -300,6 +315,17 @@ const CSS = `
 .hp-popular li a:hover span { color: var(--brand); }
 .hp-popular small { font-size: 14px; font-weight: 600; color: var(--ink-muted); white-space: nowrap; }
 .hp-more { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-top: 6px; font-weight: 700; color: var(--brand); }
+
+/* Още инструменти: икона + име + какво прави */
+.hp-tools ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; }
+@media (min-width: 768px) { .hp-tools ul { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; } }
+@media (min-width: 1100px) { .hp-tools ul { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.hp-tools a { display: flex; align-items: flex-start; gap: 12px; height: 100%; min-height: 64px; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius-feature); background: var(--surface); color: var(--ink); text-decoration: none; transition: border-color 0.14s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+.hp-tools a:hover { border-color: var(--brand); transform: translateY(-2px); }
+.hp-tools__icon { display: inline-flex; flex-shrink: 0; padding: 8px; border-radius: 10px; background: var(--surface-subtle); color: var(--brand); }
+.hp-tools b { display: block; font-size: 16px; font-weight: 700; }
+.hp-tools small { display: block; margin-top: 2px; font-size: 14px; line-height: 1.4; color: var(--ink-muted); }
+.hp-tools a:hover b { color: var(--brand); }
 
 /* Компактна тъмна карта */
 .hp-score { background: var(--ink); color: #fff; border-radius: var(--radius-feature); padding: 20px; }
@@ -344,5 +370,5 @@ const CSS = `
 .hp-faq__item h3 { margin: 0; font-size: 18px; font-weight: 650; line-height: 1.35; }
 .hp-faq__item p { margin: 8px 0 0; font-size: 16px; line-height: 1.6; color: var(--ink-muted); max-width: 65ch; }
 
-@media (prefers-reduced-motion: reduce) { .hp-route svg { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .hp-route svg, .hp-tools a { transition: none; } .hp-tools a:hover { transform: none; } }
 `;
