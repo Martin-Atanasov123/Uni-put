@@ -78,7 +78,7 @@ function useReminderScope(universityName = null) {
     return { user, scope, subs, mine, coveredByAll, busy, notice, subscribe, stop };
 }
 
-const noticeColor = (kind) => (kind === "error" ? "#dc2626" : kind === "warn" ? "#b45309" : "var(--brand-cyan)");
+const noticeColor = (kind) => (kind === "error" ? "#AA2735" : kind === "warn" ? "#986100" : "var(--brand-cyan)");
 
 const primaryBtn = {
     display: "inline-flex", alignItems: "center", gap: "0.5rem", minHeight: "44px", padding: "0.625rem 1.25rem",
@@ -101,7 +101,7 @@ export default function CalendarReminder({ universityName = null }) {
             style={{
                 display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1rem",
                 padding: "1rem 1.25rem",
-                background: "rgba(31,107,58,0.06)",
+                background: "rgba(23,86,217,0.06)",
                 border: "1px solid var(--brand-card-border)", borderRadius: "1.25rem",
             }}
         >
@@ -128,7 +128,7 @@ export default function CalendarReminder({ universityName = null }) {
 
             {mine ? (
                 <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", fontSize: "12.5px", fontWeight: 700, color: mine.confirmed_at ? "#047857" : "#b45309" }}>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", fontSize: "12.5px", fontWeight: 700, color: mine.confirmed_at ? "#0A6853" : "#986100" }}>
                         <Check size={14} strokeWidth={1.5} aria-hidden="true" />
                         {mine.confirmed_at ? "Напомнянията са включени" : "Чака потвърждение в имейла"}
                     </span>
@@ -155,7 +155,7 @@ export function EventReminderAction({ universityName, national = false }) {
             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.625rem" }}>
                 {mine ? (
                     <>
-                        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", fontSize: "12.5px", fontWeight: 700, color: mine.confirmed_at ? "#047857" : "#b45309" }}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", fontSize: "12.5px", fontWeight: 700, color: mine.confirmed_at ? "#0A6853" : "#986100" }}>
                             <Check size={14} strokeWidth={1.5} aria-hidden="true" />
                             {mine.confirmed_at ? "Напомнянията са включени" : "Чака потвърждение в имейла"}
                         </span>

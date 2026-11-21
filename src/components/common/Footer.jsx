@@ -1,50 +1,41 @@
-import {
-    ExternalLink,
-    ShieldCheck,
-    Info,
-    BookOpen,
-    FileText,
-    GraduationCap,
-    Heart,
-    Database,
-    Mail,
-} from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
-import { DATA_FRESHNESS_NOTE } from "@/lib/siteStats";
-import { m } from "motion/react";
+import { ExternalLink } from "lucide-react";
 
-const LINK_COLUMNS = [
+// Футър по design.md (раздели 11–12): същите пътища като хедъра, източници, отговорност,
+// контакт и правни страници. Без декоративни ефекти; външните връзки не отварят нов раздел.
+const COLUMNS = [
     {
-        title: "Избери път",
+        title: "Разгледай",
         links: [
-            { label: "Кариерен тест", icon: GraduationCap, href: "/career-advisor/" },
-            { label: "Прием след 7. клас", icon: BookOpen, href: "/priem-7-klas/" },
-            { label: "ДЗИ Стратег", icon: Info, href: "/dzi-strateg/" },
+            { label: "Специалности", href: "/specialnosti/" },
+            { label: "Университети", href: "/universities/" },
+            { label: "Кариерно ориентиране", href: "/career-advisor/" },
+            { label: "Калкулатор на бал", href: "/calculator/" },
+            { label: "Запазени", href: "/favorites/" },
         ],
     },
     {
-        title: "Кандидатствай",
+        title: "Още инструменти",
         links: [
-            { label: "Калкулатор на бала", icon: Database, href: "/calculator/" },
-            { label: "Университети", icon: GraduationCap, href: "/universities/" },
-            { label: "Специалности", icon: BookOpen, href: "/specialnosti/" },
-            { label: "Календар", icon: FileText, href: "/calendar/" },
-            { label: "Общежития", icon: Heart, href: "/dormitories/" },
+            { label: "ДЗИ Стратег", href: "/dzi-strateg/" },
+            { label: "Прием след 7. клас", href: "/priem-7-klas/" },
+            { label: "Календар", href: "/calendar/" },
+            { label: "Общежития", href: "/dormitories/" },
+        ],
+    },
+    {
+        title: "Източници",
+        links: [
+            { label: "МОН: висше образование", href: "https://www.mon.bg/visshe-obrazovanie/", external: true },
+            { label: "НАОА: акредитация", href: "https://www.neaa.government.bg/akreditirani-institucii/visshi-uchilischa", external: true },
+            { label: "Рейтингова система на ВУ", href: "https://rsvu.mon.bg/", external: true },
         ],
     },
     {
         title: "Проектът",
         links: [
-            { label: "За нас", icon: Info, href: "/about/" },
-            { label: "Данни от МОН", icon: Database, href: "https://www.mon.bg", external: true },
-            { label: "Информация за ДЗИ", icon: ExternalLink, href: "https://www.mon.bg/obshto-obrazovanie/darzhavni-zrelostni-izpiti-dzi", external: true },
-            { label: "Лиценз GNU", icon: ShieldCheck, href: "https://www.gnu.org/licenses/gpl-3.0.html", external: true },
-            { label: "uniput1000@gmail.com", icon: Mail, href: "mailto:uniput1000@gmail.com", mail: true },
-        ],
-    },
-    {
-        title: "Правна част",
-        links: [
+            { label: "За нас", href: "/about/" },
+            { label: "Пиши ни", href: "mailto:uniput1000@gmail.com", mail: true },
             { label: "Условия за ползване", href: "/terms/" },
             { label: "Поверителност", href: "/privacy/" },
         ],
@@ -52,194 +43,66 @@ const LINK_COLUMNS = [
 ];
 
 function FooterLink({ link }) {
-    const Icon = link.icon;
-    const content = (
-        <>
-            {Icon && <Icon size={13} style={{ opacity: 0.7 }} />}
-            <span>{link.label}</span>
-        </>
-    );
-    const style = {
-        display: "flex",
-        alignItems: "center",
-        gap: "0.5rem",
-        color: "var(--brand-muted)",
-        fontSize: "13px",
-        fontWeight: 500,
-        textDecoration: "none",
-        transition: "color 0.2s",
-    };
-    const onEnter = e => { e.currentTarget.style.color = "var(--brand-cyan)"; };
-    const onLeave = e => { e.currentTarget.style.color = "var(--brand-muted)"; };
-
-    if (link.mail) {
+    if (link.external || link.mail) {
         return (
-            <a href={link.href} style={style} onMouseEnter={onEnter} onMouseLeave={onLeave}>
-                {content}
+            <a href={link.href} className="ft-link">
+                {link.label}
+                {link.external && <ExternalLink size={13} strokeWidth={1.75} aria-hidden="true" />}
+                {link.external && <span className="ft-sr"> (външен сайт)</span>}
             </a>
         );
     }
-    if (link.external) {
-        return (
-            <a href={link.href} target="_blank" rel="noreferrer" style={style} onMouseEnter={onEnter} onMouseLeave={onLeave}>
-                {content}
-            </a>
-        );
-    }
-    return (
-        <Link to={link.href} style={style} onMouseEnter={onEnter} onMouseLeave={onLeave}>
-            {content}
-        </Link>
-    );
+    return <Link to={link.href} className="ft-link">{link.label}</Link>;
 }
 
 const Footer = () => {
-    const currentYear = new Date().getFullYear();
     const location = useLocation();
     if (location.pathname.startsWith("/admin")) return null;
+    const year = new Date().getFullYear();
 
     return (
-        <footer
-            style={{
-                position: "relative",
-                background: "linear-gradient(180deg, transparent 0%, var(--brand-surface) 30%, var(--brand-bg) 100%)",
-                borderTop: "1px solid var(--brand-border)",
-                overflow: "hidden",
-            }}
-        >
-            <div
-                aria-hidden
-                style={{
-                    position: "absolute",
-                    top: 0, left: 0, right: 0,
-                    height: "1px",
-                    background: "var(--brand-border)",
-                }}
-            />
-
-            <m.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-                style={{ maxWidth: "1200px", margin: "0 auto", padding: "3.5rem 1.5rem 2rem", position: "relative" }}
-            >
-                <div
-                    style={{
-                        display: "grid",
-                        gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-                        gap: "3rem",
-                        marginBottom: "3rem",
-                    }}
-                >
-                    <div style={{ display: "flex", flexDirection: "column", gap: "1rem", maxWidth: "320px" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}>
-                            {/* <div
-                                style={{
-                                    width: "2.25rem",
-                                    height: "2.25rem",
-                                    borderRadius: "0.625rem",
-                                    background: "var(--brand-accent)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    boxShadow: "0 8px 24px rgba(31,107,58,0.25)",
-                                }}
-                            >
-                                <GraduationCap size={20} color="#FFFFFF" />
-                                
-                            </div> */} {/* Brand */}
-                    <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
-                        <img
-                            src="/logo-wordmark.png?v=3"
-                            alt="УниПът лого"
-                            style={{ height: "70px", width: "auto", objectFit: "contain", borderRadius: "0.5rem"  }}
-                        />
-                    </Link>
-                            <span
-                                style={{
-                                    fontSize: "1.25rem",
-                                    fontWeight: 800,
-                                    letterSpacing: "-0.02em",
-                                    color: "var(--brand-accent-text)",
-                                }}
-                            >
-                                
-                            </span>
-                        </div>
-                        <p style={{ fontSize: "13px", color: "var(--brand-muted)", lineHeight: 1.6, margin: 0 }}>
-                            Твоят дигитален пътеводител към висшето образование в България. {DATA_FRESHNESS_NOTE}
-                        </p>
-                        {/* <span
-                            style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                alignSelf: "flex-start",
-                                padding: "0.3rem 0.625rem",
-                                background: "rgba(31,107,58,0.1)",
-                                border: "1px solid rgba(31,107,58,0.3)",
-                                borderRadius: "999px",
-                                color: "#1F6B3A",
-                                fontSize: "10px",
-                                fontWeight: 700,
-                                letterSpacing: "0.12em",
-                                textTransform: "uppercase",
-                            }}
-                        >
-                            НОИТ 2026
-                        </span> */}
+        <footer className="ft" aria-labelledby="ft-title">
+            <h2 id="ft-title" className="ft-sr">Долен колонтитул</h2>
+            <div className="ft-wrap">
+                <div className="ft-grid">
+                    <div className="ft-brand">
+                        <Link to="/" className="ft-logo" aria-label="УниПът — начало">
+                            <img src="/logo-uniput.png" alt="UniПът" width="56" height="44" />
+                        </Link>
+                        <p>Независим образователен навигатор за специалности, университети и прием в България.</p>
+                        <p className="ft-note">Не сме част от МОН и не представляваме университетите. Проверявай условията в официалния правилник за прием.</p>
                     </div>
-
-                    {LINK_COLUMNS.map(col => (
-                        <div key={col.title} style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                            <h3
-                                style={{
-                                    margin: 0,
-                                    fontSize: "11px",
-                                    fontWeight: 700,
-                                    letterSpacing: "0.12em",
-                                    textTransform: "uppercase",
-                                    color: "var(--brand-cyan)",
-                                    opacity: 0.85,
-                                }}
-                            >
-                                {col.title}
-                            </h3>
-                            {col.links.map(link => <FooterLink key={link.label} link={link} />)}
-                        </div>
+                    {COLUMNS.map((col) => (
+                        <nav key={col.title} aria-label={col.title} className="ft-col">
+                            <h3>{col.title}</h3>
+                            <ul>
+                                {col.links.map((l) => <li key={l.label}><FooterLink link={l} /></li>)}
+                            </ul>
+                        </nav>
                     ))}
                 </div>
-
-                <div
-                    style={{
-                        paddingTop: "1.5rem",
-                        borderTop: "1px solid var(--brand-border)",
-                        display: "flex",
-                        flexWrap: "wrap",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        gap: "1rem",
-                    }}
-                >
-                    <p
-                        style={{
-                            margin: 0,
-                            fontSize: "11px",
-                            fontWeight: 600,
-                            color: "var(--brand-muted)",
-                            letterSpacing: "0.1em",
-                            textTransform: "uppercase",
-                            opacity: 0.7,
-                            
-                        }}
-                    >
-                        © {currentYear} УниПът Bulgaria — Всички права запазени
-                    </p>
-                    {/* <p style={{ margin: 0, display: "inline-flex", alignItems: "center", gap: "0.375rem", fontSize: "11px", color: "var(--brand-muted)", opacity: 0.7 }}>
-                        Направено с <Heart size={11} style={{ color: "#dc2626", fill: "#dc2626" }} /> в България
-                    </p> */}
+                <div className="ft-legal">
+                    <span>© {year} UniПът</span>
+                    <span>Данните се проверяват за всяка приемна кампания; винаги с година и източник.</span>
                 </div>
-            </m.div>
+            </div>
+            <style>{`
+                .ft { background: var(--surface); border-top: 1px solid var(--border); color: var(--ink); }
+                .ft-wrap { max-width: 1280px; margin: 0 auto; padding: 56px clamp(16px, 4vw, 64px) 32px; }
+                .ft-grid { display: grid; gap: 40px; }
+                @media (min-width: 768px) { .ft-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+                @media (min-width: 1200px) { .ft-grid { grid-template-columns: minmax(0, 1.6fr) repeat(4, minmax(0, 1fr)); gap: 32px; } }
+                .ft-logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font-size: 20px; font-weight: 750; letter-spacing: -0.01em; min-height: 44px; }
+                .ft-logo img { width: auto; height: 44px; object-fit: contain; }
+                .ft-brand p { margin: 12px 0 0; font-size: 15px; line-height: 1.55; color: var(--ink-muted); max-width: 40ch; }
+                .ft-brand .ft-note { font-size: 14px; }
+                .ft-col h3 { margin: 0 0 12px; font-size: 14px; font-weight: 700; color: var(--ink); }
+                .ft-col ul { list-style: none; margin: 0; padding: 0; }
+                .ft-link { display: inline-flex; align-items: center; gap: 5px; min-height: 36px; padding: 4px 0; font-size: 15px; color: var(--ink-muted); text-decoration: none; transition: color 0.14s ease; }
+                .ft-link:hover { color: var(--brand); text-decoration: underline; text-underline-offset: 3px; }
+                .ft-legal { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; font-size: 13px; color: var(--ink-muted); }
+                .ft-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+            `}</style>
         </footer>
     );
 };

@@ -34,9 +34,9 @@ const NO_WISHES = [];
 const reduced = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
 const STATUS = {
-    safe:     { label: "сигурно",   color: "#047857" },
-    possible: { label: "възможно",  color: "#b45309" },
-    risky:    { label: "рисково",   color: "#dc2626" },
+    safe:     { label: "сигурно",   color: "#0A6853" },
+    possible: { label: "възможно",  color: "#986100" },
+    risky:    { label: "рисково",   color: "#AA2735" },
     unknown:  { label: "без данни", color: "var(--brand-muted)" },
 };
 
@@ -156,7 +156,7 @@ function HistoryTable({ cls, stage1, region }) {
             : r.class_name && cls.class_name && r.class_name.toLowerCase().replace(/\s+/g, " ") === cls.class_name.toLowerCase().replace(/\s+/g, " ");
     });
     const years = [...new Set(mine.map((r) => r.campaign_year))].sort((a, b) => b - a);
-    if (err) return <p style={{ margin: 0, fontSize: "12.5px", color: "#dc2626" }}>Не успяхме да заредим класиранията. Опитай пак.</p>;
+    if (err) return <p style={{ margin: 0, fontSize: "12.5px", color: "#AA2735" }}>Не успяхме да заредим класиранията. Опитай пак.</p>;
     if (!rows) return <p style={{ margin: 0, fontSize: "12.5px", color: "var(--brand-muted)" }}>Зареждане на класиранията…</p>;
     if (!years.length) return <p style={{ margin: 0, fontSize: "12.5px", color: "var(--brand-muted)" }}>Няма класирания за тази паралелка — вероятно е нова.</p>;
     return (
@@ -196,7 +196,7 @@ function ClassRow({ row, year, inWish, onToggleWish, expanded, onExpand, stage1,
     const { cls, bal, missing, noFormula, hist, v } = row;
     const prev = hist.slice(1, 4).filter((h) => h.min !== null);
     return (
-        <li style={{ ...card, overflow: "hidden", borderLeft: `3px solid ${v ? (v.above ? "#047857" : "#dc2626") : "var(--brand-border)"}` }}>
+        <li style={{ ...card, overflow: "hidden", borderLeft: `3px solid ${v ? (v.above ? "#0A6853" : "#AA2735") : "var(--brand-border)"}` }}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "0.75rem", padding: "0.875rem 1rem", alignItems: "start" }}>
                 <div style={{ minWidth: 0 }}>
                     <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.375rem 0.5rem", marginBottom: "0.2rem" }}>
@@ -219,7 +219,7 @@ function ClassRow({ row, year, inWish, onToggleWish, expanded, onExpand, stage1,
                         <>
                             <div style={{ ...mono, fontSize: "1.5rem", fontWeight: 900, letterSpacing: "-0.03em", lineHeight: 1, color: "var(--brand-accent-text)" }}>{fmt(bal)}</div>
                             {v ? (
-                                <span style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", marginTop: "0.25rem", fontSize: "11px", fontWeight: 700, color: v.above ? "#047857" : "#dc2626" }}>
+                                <span style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", marginTop: "0.25rem", fontSize: "11px", fontWeight: 700, color: v.above ? "#0A6853" : "#AA2735" }}>
                                     {v.above ? <TrendingUp size={12} strokeWidth={1.5} aria-hidden="true" /> : <TrendingDown size={12} strokeWidth={1.5} aria-hidden="true" />}
                                     {v.above ? "над" : "под"} мин. с {fmt(Math.abs(v.diff))}
                                 </span>
@@ -230,7 +230,7 @@ function ClassRow({ row, year, inWish, onToggleWish, expanded, onExpand, stage1,
                             {region.noFormulas ? "формулата не е публикувана" : "формулата ѝ още не е в данните ни"}
                         </span>
                     ) : (
-                        <span title={missing.map(labelForKey).join(", ")} style={{ fontSize: "11px", color: "#b45309", fontWeight: 600, maxWidth: 140, display: "inline-block", lineHeight: 1.3 }}>
+                        <span title={missing.map(labelForKey).join(", ")} style={{ fontSize: "11px", color: "#986100", fontWeight: 600, maxWidth: 140, display: "inline-block", lineHeight: 1.3 }}>
                             {missing[0]?.startsWith("olimp_") ? "иска резултат от олимпиада" : `въведи ${missing.map((k) => labelForKey(k).replace(/ \(свидетелство\)| \(.*\)/, "")).slice(0, 2).join(", ")}`}
                         </span>
                     )}
@@ -319,17 +319,17 @@ function WishesList({ wishes, rowsByCode, onMove, onRemove, onCopy, copied, user
             </ol>
             {advice && (
                 <p style={{ margin: 0, display: "flex", gap: "0.5rem", alignItems: "flex-start", fontSize: "12.5px", lineHeight: 1.55, color: "var(--brand-text)", padding: "0.625rem 0.75rem", background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: "0.75rem" }}>
-                    <AlertCircle size={14} strokeWidth={1.5} style={{ color: "#b45309", flexShrink: 0, marginTop: 2 }} aria-hidden="true" /> {advice}
+                    <AlertCircle size={14} strokeWidth={1.5} style={{ color: "#986100", flexShrink: 0, marginTop: 2 }} aria-hidden="true" /> {advice}
                 </p>
             )}
             <p style={{ margin: 0, fontSize: "11px", color: "var(--brand-muted)", lineHeight: 1.5 }}>
                 Подреждането е твое — не го сменяме автоматично. „Сигурно“ = поне 15 т. над миналогодишния минимум; „възможно“ = до 5 т. под него. Баловете се менят с около 8 т. годишно.
             </p>
-            <button type="button" onClick={onCopy} style={{ ...ghostBtn, alignSelf: "flex-start", color: copied ? "#047857" : "var(--brand-text)" }}>
+            <button type="button" onClick={onCopy} style={{ ...ghostBtn, alignSelf: "flex-start", color: copied ? "#0A6853" : "var(--brand-text)" }}>
                 {copied ? <Check size={14} strokeWidth={1.5} aria-hidden="true" /> : <Share2 size={14} strokeWidth={1.5} aria-hidden="true" />} {copied ? "Копирано" : "Копирай линк към списъка"}
             </button>
             {user ? (
-                <p style={{ margin: 0, display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "12px", color: "#047857", fontWeight: 600 }}>
+                <p style={{ margin: 0, display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "12px", color: "#0A6853", fontWeight: 600 }}>
                     <Check size={13} strokeWidth={1.5} aria-hidden="true" /> Списъкът се пази в акаунта ти
                 </p>
             ) : (
@@ -524,7 +524,7 @@ export default function Gymnasia() {
 
             <div style={{ maxWidth: "72rem", margin: "0 auto", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                 <m.header initial={reduced ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}>
-                    <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.375rem 0.875rem", background: "rgba(31,107,58,0.08)", border: "1px solid rgba(31,107,58,0.2)", borderRadius: "999px", marginBottom: "1rem" }}>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.375rem 0.875rem", background: "rgba(23,86,217,0.08)", border: "1px solid rgba(23,86,217,0.2)", borderRadius: "999px", marginBottom: "1rem" }}>
                         <School size={14} strokeWidth={1.5} style={{ color: "var(--brand-cyan)" }} aria-hidden="true" />
                         <span style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--brand-cyan)" }}>Прием след 7. клас · {region.name}</span>
                     </div>
@@ -544,7 +544,7 @@ export default function Gymnasia() {
                     <span style={{ fontSize: "12px", color: "var(--brand-muted)" }}>Добавяме още области — започваме с най-големите.</span>
                 </div>
 
-                <div style={{ display: "flex", gap: "0.625rem", alignItems: "flex-start", padding: "0.75rem 1rem", background: "rgba(31,107,58,0.06)", border: "1px solid rgba(31,107,58,0.2)", borderRadius: "0.875rem" }}>
+                <div style={{ display: "flex", gap: "0.625rem", alignItems: "flex-start", padding: "0.75rem 1rem", background: "rgba(23,86,217,0.06)", border: "1px solid rgba(23,86,217,0.2)", borderRadius: "0.875rem" }}>
                     <Info size={16} strokeWidth={1.5} style={{ color: "var(--brand-cyan)", flexShrink: 0, marginTop: 1 }} aria-hidden="true" />
                     <p style={{ margin: 0, fontSize: "12.5px", lineHeight: 1.55, color: "var(--brand-muted)" }}>
                         Данните са от справките на {region.ruo}: {region.noFormulas ? "паралелки" : "паралелки и балообразуване"} за прием {year ? `${year}/${year + 1}` : ""}, класирания {histRange} г.
@@ -626,7 +626,7 @@ export default function Gymnasia() {
                                 {(classes.some((c) => c.kind) ? [["", "Всички"], ["профилирана", "Профилирани"], ["професионална", "Професионални"]] : []).map(([k, l]) => (
                                     <button key={k} type="button" onClick={() => { setKind(k); setShown(PAGE); }} style={chip(kind === k)}>{l}</button>
                                 ))}
-                                <button type="button" onClick={() => { setOnlyIn((v) => !v); setShown(PAGE); }} disabled={!hasNvo} style={{ ...chip(onlyIn, "#047857"), opacity: hasNvo ? 1 : 0.5 }}>
+                                <button type="button" onClick={() => { setOnlyIn((v) => !v); setShown(PAGE); }} disabled={!hasNvo} style={{ ...chip(onlyIn, "#0A6853"), opacity: hasNvo ? 1 : 0.5 }}>
                                     <Check size={13} strokeWidth={1.5} aria-hidden="true" /> Само където влизам
                                 </button>
                                 <select value={sort} onChange={(e) => setSort(e.target.value)} aria-label="Подреди" style={{ ...input, width: "auto", height: 40, marginLeft: "auto", fontSize: "12.5px" }}>
@@ -683,7 +683,7 @@ export default function Gymnasia() {
                 <>
                     <button type="button" onClick={() => setWishesOpen(true)} style={{
                         position: "fixed", left: "1rem", right: "1rem", bottom: "1rem", zIndex: 40, minHeight: 52, display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem",
-                        background: "var(--brand-accent)", border: "none", borderRadius: "0.75rem", color: "var(--brand-accent-ink)", fontSize: "15px", fontWeight: 700, fontFamily: "inherit", cursor: "pointer", boxShadow: "0 12px 30px rgba(31,107,58,0.3)",
+                        background: "var(--brand-accent)", border: "none", borderRadius: "0.75rem", color: "var(--brand-accent-ink)", fontSize: "15px", fontWeight: 700, fontFamily: "inherit", cursor: "pointer", boxShadow: "0 12px 30px rgba(23,86,217,0.3)",
                     }}>
                         <ListChecks size={18} strokeWidth={1.5} aria-hidden="true" /> Моите желания{wishes.length ? ` (${wishes.length})` : ""}
                     </button>

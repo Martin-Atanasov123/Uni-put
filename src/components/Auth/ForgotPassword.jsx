@@ -71,7 +71,7 @@ const ForgotPassword = () => {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            boxShadow: "0 16px 40px rgba(31,107,58,0.35)",
+                            boxShadow: "0 16px 40px rgba(23,86,217,0.35)",
                         }}
                     >
                         <KeyRound size={28} color="#FFFFFF" />
@@ -138,7 +138,7 @@ const ForgotPassword = () => {
                                 alignItems: "center",
                                 justifyContent: "center",
                                 gap: "0.5rem",
-                                boxShadow: loading ? "none" : "0 12px 30px rgba(31,107,58,0.3)",
+                                boxShadow: loading ? "none" : "0 12px 30px rgba(23,86,217,0.3)",
                                 fontFamily: "inherit",
                             }}
                         >
@@ -179,8 +179,8 @@ const ForgotPassword = () => {
 
 export function Alert({ kind, icon: Icon, children }) {
     const styles = kind === "success"
-        ? { bg: "rgba(34,197,94,0.08)", border: "rgba(34,197,94,0.3)", color: "#047857" }
-        : { bg: "rgba(248,113,113,0.08)", border: "rgba(248,113,113,0.3)", color: "#b91c1c" };
+        ? { bg: "rgba(34,197,94,0.08)", border: "rgba(34,197,94,0.3)", color: "#0A6853" }
+        : { bg: "rgba(248,113,113,0.08)", border: "rgba(248,113,113,0.3)", color: "#AA2735" };
     return (
         <div
             style={{

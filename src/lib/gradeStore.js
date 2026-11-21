@@ -59,7 +59,7 @@ export const GRADE_CATEGORIES = [
         id: 'exams',
         label: 'Кандидатстудентски изпити',
         description: 'Оценки от университетски приемни изпити',
-        color: '#047857',
+        color: '#0A6853',
         fields: [
             { key: 'exam_mat',        label: 'Математика (изпит)' },
             { key: 'exam_bel',        label: 'БЕЛ (изпит)' },
@@ -85,7 +85,7 @@ export const GRADE_CATEGORIES = [
         id: 'other',
         label: 'Бонуси и друго',
         description: 'Олимпиади, сертификати, бонификации',
-        color: '#b45309',
+        color: '#986100',
         fields: [
             { key: 'bonifikaciq',              label: 'Бонификация' },
             { key: 'olympiad_laureate_mat_inf', label: 'Олимпиада лауреат (Мат/Инф)' },

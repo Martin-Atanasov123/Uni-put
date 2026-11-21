@@ -7,61 +7,80 @@
 [data-theme="dark"] {
   color-scheme: light;
 
-  /* ── Палитра, раздадена от taste-skill (mint-pink-accounts): почти бял фон, тъмнозелен акцент ── */
-  --brand-indigo: #1F6B3A;   /* старо име; сега акцентът (зелен) */
-  --brand-navy: #0A0A0A;
-  --brand-mint: #1F6B3A;
-  --brand-cream: #EEEEEE;
+  /* ── design.md, раздел 6: светла основа, дълбоко мастило, един синьо-цифров акцент ── */
+  --canvas: #F6F8F5;
+  --surface: #FFFFFF;
+  --surface-subtle: #EAF0EA;
+  --ink: #152B29;
+  --ink-muted: #495D5A;
+  --brand: #1756D9;
+  --brand-hover: #0E43B4;
+  --signal: #C9F27E;          /* редки акценти; никога за ситен текст върху бяло */
+  --border: #DDE5E0;          /* деликатни разделители (декоративни) */
+  --border-strong: #7D918A;   /* граници на полета и бутони: ≥3:1 спрямо фона (WCAG 1.4.11) */
+  --header-h: 76px;
+  --success: #0A6853;
+  --warning: #986100;
+  --danger: #AA2735;
+  --focus: #1756D9;
+  --radius-control: 10px;
+  --radius-panel: 16px;
+  --radius-feature: 24px;
+  --shadow-float: 0 10px 30px rgb(21 43 41 / 8%);
 
-  --brand-bg: #F8F8F8;
-  --brand-bg-alt: #EEEEEE;
-  --brand-surface: #FFFFFF;
-  --brand-surface-2: #EEEEEE;
-  /* Исторически имена: --brand-cyan / --brand-violet сега сочат към индиго (един акцент). */
-  --brand-cyan: #1F6B3A;
-  --brand-violet: #1F6B3A;
-  --brand-accent: #1F6B3A;          /* плътен акцент: бутони и запълвания */
-  --brand-accent-ink: #FFFFFF;      /* текст върху акцента (6,7:1) */
-  --brand-accent-text: #1F6B3A;     /* акцентен текст върху фона (6,4:1) */
+  /* ── Старите имена, насочени към новите токени (компонентите ги ползват) ── */
+  --brand-indigo: var(--brand);
+  --brand-navy: var(--ink);
+  --brand-mint: var(--signal);
+  --brand-cream: var(--surface-subtle);
+  --brand-bg: var(--canvas);
+  --brand-bg-alt: var(--surface-subtle);
+  --brand-surface: var(--surface);
+  --brand-surface-2: var(--surface-subtle);
+  --brand-cyan: var(--brand);
+  --brand-violet: var(--brand);
+  --brand-accent: var(--brand);
+  --brand-accent-ink: #FFFFFF;      /* 6,23:1 върху --brand */
+  --brand-accent-text: var(--brand);
   --brand-on-indigo: #FFFFFF;
 
-  --font-display: 'Onest', system-ui, sans-serif;
-  --font-body: 'Onest', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+  --font-display: 'Manrope Variable', Inter, Arial, sans-serif;
+  --font-body: 'Manrope Variable', Inter, Arial, sans-serif;
+  --font-mono: 'Manrope Variable', Inter, Arial, sans-serif; /* числата: tabular-nums (долу) */
 
-  --brand-text: #0A0A0A;
-  --brand-muted: #5E5E5E;
-  --brand-border: rgba(10, 10, 10, 0.12);
+  --brand-text: var(--ink);
+  --brand-muted: var(--ink-muted);
+  --brand-border: var(--border);
   --brand-input-bg: #FFFFFF;
-  --brand-input-border: rgba(10, 10, 10, 0.22);
+  --brand-input-border: var(--border-strong);
   --brand-dropdown-bg: #FFFFFF;
-  --brand-nav-bg: rgba(255,255,255,0.92);
-  --brand-nav-scrolled: rgba(255,255,255,0.96);
-  --brand-shadow: rgba(10,10,10,0.12);
-  --brand-card-hover: rgba(31,107,58,0.10);
-  --brand-card-border: rgba(10, 10, 10, 0.10);
-  --brand-progress-bg: rgba(255,255,255,0.92);
+  --brand-nav-bg: rgba(246,248,245,0.96);
+  --brand-nav-scrolled: rgba(246,248,245,0.98);
+  --brand-shadow: rgb(21 43 41 / 8%);
+  --brand-card-hover: rgba(23,86,217,0.08);
+  --brand-card-border: var(--border);
+  --brand-progress-bg: rgba(246,248,245,0.96);
 
   /* DaisyUI v5 токени (админ панел и др.) */
-  --color-base-100: #F8F8F8;
-  --color-base-200: #EEEEEE;
-  --color-base-300: #E2E2E2;
-  --color-base-content: #0A0A0A;
-  --color-primary: #1F6B3A;
+  --color-base-100: #F6F8F5;
+  --color-base-200: #EAF0EA;
+  --color-base-300: #DDE5E0;
+  --color-base-content: #152B29;
+  --color-primary: #1756D9;
   --color-primary-content: #FFFFFF;
-  --color-secondary: #0A0A0A;
+  --color-secondary: #152B29;
   --color-secondary-content: #FFFFFF;
-  --color-accent: #1F6B3A;
-  --color-accent-content: #FFFFFF;
-  --color-neutral: #0A0A0A;
+  --color-accent: #C9F27E;
+  --color-accent-content: #152B29;
+  --color-neutral: #152B29;
   --color-neutral-content: #FFFFFF;
-  --color-info: #1F6B3A;
+  --color-info: #1756D9;
   --color-info-content: #FFFFFF;
-  --color-success: #047857;
+  --color-success: #0A6853;
   --color-success-content: #FFFFFF;
-  --color-warning: #b45309;
+  --color-warning: #986100;
   --color-warning-content: #FFFFFF;
-  --color-error: #dc2626;
+  --color-error: #AA2735;
   --color-error-content: #FFFFFF;
 }
 
@@ -73,6 +92,8 @@ html, body {
 
 body {
   font-family: var(--font-body);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
@@ -99,7 +120,7 @@ h1, h2, h3 {
 
 /* ── Focus visible ring — accessibility + premium UX ────────────────────── */
 :focus-visible {
-  outline: 2px solid var(--brand-cyan);
+  outline: 2px solid var(--focus);
   outline-offset: 3px;
   border-radius: 4px;
 }
@@ -194,3 +215,5 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 } */
+
+@media (max-width: 767px) { :root { --header-h: 62px; } }

@@ -25,7 +25,7 @@ export default function ErrorState({
                 ...style,
             }}
         >
-            <AlertCircle size={28} strokeWidth={1.5} style={{ color: "#dc2626" }} aria-hidden="true" />
+            <AlertCircle size={28} strokeWidth={1.5} style={{ color: "#AA2735" }} aria-hidden="true" />
             <p style={{ margin: 0, color: "var(--brand-text)", fontSize: "0.9375rem", maxWidth: "36ch", lineHeight: 1.6 }}>
                 {message}
             </p>

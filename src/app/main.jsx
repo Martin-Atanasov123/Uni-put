@@ -1,20 +1,9 @@
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 
-// Самохостнати шрифтове (CSP позволява само font-src 'self'), раздадени от taste-skill:
-// Onest (заглавия и текст) + JetBrains Mono (числа). Само cyrillic + latin.
-import "@fontsource/onest/latin-400.css"
-import "@fontsource/onest/latin-500.css"
-import "@fontsource/onest/latin-600.css"
-import "@fontsource/onest/latin-700.css"
-import "@fontsource/onest/cyrillic-400.css"
-import "@fontsource/onest/cyrillic-500.css"
-import "@fontsource/onest/cyrillic-600.css"
-import "@fontsource/onest/cyrillic-700.css"
-import "@fontsource/jetbrains-mono/latin-400.css"
-import "@fontsource/jetbrains-mono/latin-500.css"
-import "@fontsource/jetbrains-mono/cyrillic-400.css"
-import "@fontsource/jetbrains-mono/cyrillic-500.css"
+// Самохостнат шрифт (CSP позволява само font-src 'self'): Manrope Variable — едно семейство
+// за заглавия, интерфейс и числа (design.md, раздел 7). Само cyrillic + latin.
+import "@fontsource-variable/manrope/wght.css"
 
 import App from './App.jsx'
 import { installBulgarianValidation } from '@/lib/bgValidation'

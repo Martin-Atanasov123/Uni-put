@@ -65,16 +65,11 @@ function PageLoader() {
 
 function App() {
     const location = useLocation();
-    // Началната е самостоятелна страница по taste-skill: собствен header.nav, main и footer.closing.
-    const isHome = location.pathname === "/" || location.pathname === "/index.html";
     return (
         <GlobalErrorBoundary>
             <LazyMotion features={domAnimation}>
                 <AuthProvider>
                     <ScrollToTop />
-                    {isHome ? (
-                        <Suspense fallback={<PageLoader />}><Home /></Suspense>
-                    ) : (<>
                     <Header />
                     <main id="main" role="main">
                         <Suspense fallback={<PageLoader />}>
@@ -156,7 +151,6 @@ function App() {
                         </Suspense>
                     </main>
                     <Footer />
-                    </>)}
                 </AuthProvider>
             </LazyMotion>
         </GlobalErrorBoundary>

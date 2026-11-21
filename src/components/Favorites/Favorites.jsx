@@ -95,7 +95,7 @@ const FavoritesPage = () => {
                     style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}
                 >
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                        <Heart size={14} style={{ color: "#dc2626", fill: "#dc2626" }} />
+                        <Heart size={14} style={{ color: "#AA2735", fill: "#AA2735" }} />
                         <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.14em" }}>
                             Запазени
                         </span>
@@ -206,7 +206,7 @@ const FavoritesPage = () => {
 
                 {loading ? (
                     <div style={{ display: "flex", justifyContent: "center", padding: "5rem 0" }}>
-                        <div style={{ width: "3rem", height: "3rem", borderRadius: "50%", border: "3px solid rgba(31,107,58,0.2)", borderTopColor: "var(--brand-cyan)", animation: "spin 1s linear infinite" }} />
+                        <div style={{ width: "3rem", height: "3rem", borderRadius: "50%", border: "3px solid rgba(23,86,217,0.2)", borderTopColor: "var(--brand-cyan)", animation: "spin 1s linear infinite" }} />
                         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
                     </div>
                 ) : filtered.length === 0 ? (
@@ -236,7 +236,7 @@ const FavoritesPage = () => {
                                 justifyContent: "center",
                             }}
                         >
-                            <Heart size={28} style={{ color: "#b91c1c" }} />
+                            <Heart size={28} style={{ color: "#AA2735" }} />
                         </div>
                         <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700, textWrap: "balance" }}>
                             {allFavoritesData.length > 0 ? "Нищо не съвпада с този избор." : "Все още нямаш запазени специалности."}
@@ -315,9 +315,9 @@ const FavoritesPage = () => {
                                         transition: "transform 0.2s, border-color 0.2s, box-shadow 0.2s",
                                     }}
                                     onMouseEnter={e => {
-                                        e.currentTarget.style.borderColor = "rgba(31,107,58,0.35)";
+                                        e.currentTarget.style.borderColor = "rgba(23,86,217,0.35)";
                                         e.currentTarget.style.transform = "translateY(-2px)";
-                                        e.currentTarget.style.boxShadow = "0 16px 40px rgba(31,107,58,0.1)";
+                                        e.currentTarget.style.boxShadow = "0 16px 40px rgba(23,86,217,0.1)";
                                     }}
                                     onMouseLeave={e => {
                                         e.currentTarget.style.borderColor = "var(--brand-border)";
@@ -341,8 +341,8 @@ const FavoritesPage = () => {
                                                     alignItems: "center",
                                                     gap: "0.3rem",
                                                     padding: "0.3rem 0.55rem",
-                                                    background: compareIds.has(String(uni.id)) ? "rgba(31,107,58,0.12)" : "var(--brand-border)",
-                                                    border: `1px solid ${compareIds.has(String(uni.id)) ? "rgba(31,107,58,0.35)" : "rgba(148,163,184,0.15)"}`,
+                                                    background: compareIds.has(String(uni.id)) ? "rgba(23,86,217,0.12)" : "var(--brand-border)",
+                                                    border: `1px solid ${compareIds.has(String(uni.id)) ? "rgba(23,86,217,0.35)" : "rgba(148,163,184,0.15)"}`,
                                                     borderRadius: "999px",
                                                     color: compareIds.has(String(uni.id)) ? "var(--brand-violet)" : "var(--brand-muted)",
                                                     fontSize: "10px",
@@ -362,7 +362,7 @@ const FavoritesPage = () => {
                                                     background: favorite ? "rgba(248,113,113,0.1)" : "var(--brand-border)",
                                                     border: `1px solid ${favorite ? "rgba(248,113,113,0.3)" : "rgba(148,163,184,0.15)"}`,
                                                     borderRadius: "999px",
-                                                    color: favorite ? "#dc2626" : "var(--brand-muted)",
+                                                    color: favorite ? "#AA2735" : "var(--brand-muted)",
                                                     cursor: "pointer",
                                                     display: "flex",
                                                     alignItems: "center",
@@ -370,7 +370,7 @@ const FavoritesPage = () => {
                                                 }}
                                                 aria-label="Премахни от любими"
                                             >
-                                                <Heart size={14} fill={favorite ? "#dc2626" : "none"} />
+                                                <Heart size={14} fill={favorite ? "#AA2735" : "none"} />
                                             </button>
                                         </div>
                                     </div>
@@ -392,8 +392,8 @@ const FavoritesPage = () => {
                                                 alignItems: "center",
                                                 gap: "0.4rem",
                                                 padding: "0.5rem 0.875rem",
-                                                background: "rgba(31,107,58,0.1)",
-                                                border: "1px solid rgba(31,107,58,0.3)",
+                                                background: "rgba(23,86,217,0.1)",
+                                                border: "1px solid rgba(23,86,217,0.3)",
                                                 borderRadius: "0.5rem",
                                                 color: "var(--brand-cyan)",
                                                 fontSize: "12px",
@@ -467,7 +467,7 @@ function ComparisonCard({ uni, entry, onRemove }) {
                             label="Твоят бал"
                             value={Number(entry.score).toFixed(2)}
                             mono
-                            color={entry.isAbove === true ? "#047857" : entry.isAbove === false ? "#dc2626" : undefined}
+                            color={entry.isAbove === true ? "#0A6853" : entry.isAbove === false ? "#AA2735" : undefined}
                             icon={entry.isAbove === true ? <TrendingUp size={11} /> : entry.isAbove === false ? <TrendingDown size={11} /> : null}
                         />
                         {entry.minBall != null && (
@@ -488,7 +488,7 @@ function ComparisonCard({ uni, entry, onRemove }) {
 
             <Link
                 to={`/calculator/?specialty=${encodeURIComponent(uni.specialty)}&university=${encodeURIComponent(uni.university_name)}`}
-                style={{ marginTop: "auto", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "0.35rem", padding: "0.5rem 0.75rem", background: "rgba(31,107,58,0.1)", border: "1px solid rgba(31,107,58,0.3)", borderRadius: "0.5rem", color: "var(--brand-cyan)", fontSize: "12px", fontWeight: 700, textDecoration: "none" }}
+                style={{ marginTop: "auto", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "0.35rem", padding: "0.5rem 0.75rem", background: "rgba(23,86,217,0.1)", border: "1px solid rgba(23,86,217,0.3)", borderRadius: "0.5rem", color: "var(--brand-cyan)", fontSize: "12px", fontWeight: 700, textDecoration: "none" }}
             >
                 <Calculator size={12} /> {entry ? "Изчисли пак" : "Изчисли бал"}
             </Link>

@@ -4,52 +4,41 @@ import { sessionService } from "@/services/sessionService";
 import { useTheme } from "@/hooks/useTheme";
 import {
     User, LogOut, Menu, X, GraduationCap, Calculator, Search, Settings, Building2,
-    Heart, ChevronDown, Brain, ClipboardList, CalendarDays, School, Compass, BookOpen, Home,
+    Heart, ChevronDown, Brain, ClipboardList, CalendarDays, School, Compass, BookOpen,
 } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { UNIVERSITIES, SPECIALTIES, DORMITORIES } from "@/lib/siteStats";
 
-// ── Навигация по пътя на ученика ─────────────────────────────────────────────
-// Две групи вместо шест плоски линка:
-//   „Избери път“   — още избираш (тест, 7. клас, ДЗИ)  → води към решение
-//   „Кандидатствай“ — знаеш какво искаш (бал, каталог, срокове) → води към действие
-// Плюс търсачка и един основен бутон (Изчисли бал). „За нас“ е във футъра.
+// ── Навигация по design.md (раздел 11) ──────────────────────────────────────
+// Публично: Специалности | Университети | Кариерно ориентиране | Калкулатор на бал | Запазени.
+// Останалите инструменти са в менюто („Още“) и във футъра — намираеми, без да претрупват хедъра.
 //
 // Trailing slash е ЗАДЪЛЖИТЕЛЕН — каноничната форма (виж Seo.jsx). Netlify
 // 301-redirect-ва /about → /about/, затова връзка без наклонена черта праща
 // Googlebot през излишен redirect.
 const NAV_GROUPS = [
     {
-        key: "path",
-        label: "Избери път",
+        key: "main",
+        label: "Основни",
         items: [
-            { name: "Кариерен тест", desc: "30 въпроса за 3 минути — кои специалности пасват на теб", path: "/career-advisor/", icon: Brain },
-            { name: "Прием след 7. клас", desc: "Бал за паралелка, минимални балове и подреждане на желанията", path: "/priem-7-klas/", icon: School },
-            { name: "ДЗИ Стратег", desc: "Кой втори ДЗИ ти отваря най-много специалности", path: "/dzi-strateg/", icon: Compass },
+            { name: "Специалности", desc: `${SPECIALTIES} специалности и къде се учат`, path: "/specialnosti/", icon: BookOpen },
+            { name: "Университети", desc: `${UNIVERSITIES} университета по град и степен`, path: "/universities/", icon: GraduationCap },
+            { name: "Кариерно ориентиране", desc: "Интереси като отправна точка, не присъда", path: "/career-advisor/", icon: Compass },
+            { name: "Калкулатор на бал", desc: "Балът по формулата на специалността", path: "/calculator/", icon: Calculator },
+            { name: "Запазени", desc: "Специалностите, които си отбелязал", path: "/favorites/", icon: Heart },
         ],
     },
     {
-        key: "apply",
-        label: "Кандидатствай",
+        key: "more",
+        label: "Още инструменти",
         items: [
-            { name: "Калкулатор на бала", desc: "Точният бал по формулата на всяка специалност", path: "/calculator/", icon: Calculator },
-            { name: "Университети", desc: `${UNIVERSITIES} университета по град, направление и степен`, path: "/universities/", icon: GraduationCap },
-            { name: "Специалности", desc: `Всички ${SPECIALTIES} специалности и къде се учат`, path: "/specialnosti/", icon: BookOpen },
-            { name: "Календар", desc: "Срокове за кандидатстване и изпити", path: "/calendar/", icon: CalendarDays },
-            { name: "Общежития", desc: `${DORMITORIES} общежития — цени и градове`, path: "/dormitories/", icon: Building2 },
+            { name: "ДЗИ Стратег", desc: "Кой втори ДЗИ държи специалностите отворени", path: "/dzi-strateg/", icon: Brain },
+            { name: "Прием след 7. клас", desc: "Балове за гимназиите в София", path: "/priem-7-klas/", icon: School },
+            { name: "Календар", desc: "Срокове с източник и година", path: "/calendar/", icon: CalendarDays },
+            { name: "Общежития", desc: `${DORMITORIES} общежития в 9 града`, path: "/dormitories/", icon: Building2 },
         ],
     },
 ];
-
-// Долна лента на телефон — четирите най-чести действия + менюто
-const TAB_ITEMS = [
-    { name: "Начало", path: "/", icon: Home },
-    { name: "Бал", path: "/calculator/", icon: Calculator },
-    { name: "Тест", path: "/career-advisor/", icon: Brain },
-    { name: "Каталог", path: "/universities/", icon: GraduationCap },
-];
-
-const HIDE_TABBAR = ["/login", "/register", "/forgot-password", "/update-password"];
 
 // Отрязва дължина и махa специални символи — стойността отива в URL и в заявка към каталога.
 const cleanQuery = (v) => v.replace(/[%_\\'";<>]/g, " ").replace(/\s+/g, " ").trim().slice(0, 80);
@@ -112,11 +101,9 @@ export default function Header() {
     useTheme();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-    const [openGroup, setOpenGroup] = useState(null);
     const [scrolled, setScrolled] = useState(false);
     const userMenuRef = useRef();
     const navRef = useRef();
-    const closeTimer = useRef(null);
 
     const isAdmin = user?.app_metadata?.role === "admin";
 
@@ -139,15 +126,14 @@ export default function Header() {
     useEffect(() => {
         const onClick = (e) => {
             if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setIsUserMenuOpen(false);
-            if (navRef.current && !navRef.current.contains(e.target)) setOpenGroup(null);
         };
-        const onKey = (e) => { if (e.key === "Escape") { setOpenGroup(null); setIsUserMenuOpen(false); setIsMenuOpen(false); } };
+        const onKey = (e) => { if (e.key === "Escape") { setIsUserMenuOpen(false); setIsMenuOpen(false); } };
         window.addEventListener("click", onClick);
         window.addEventListener("keydown", onKey);
         return () => { window.removeEventListener("click", onClick); window.removeEventListener("keydown", onKey); };
     }, []);
 
-    useEffect(() => { setIsMenuOpen(false); setIsUserMenuOpen(false); setOpenGroup(null); }, [location.pathname]);
+    useEffect(() => { setIsMenuOpen(false); setIsUserMenuOpen(false); }, [location.pathname]);
 
     const handleLogout = useCallback(async () => {
         await sessionService.logout();
@@ -161,85 +147,28 @@ export default function Header() {
         const strip = (p) => (p.length > 1 ? p.replace(/\/+$/, "") : p);
         return strip(location.pathname) === strip(path);
     }, [location.pathname]);
-    const groupActive = (g) => g.items.some((it) => isActive(it.path));
-
-    const hoverOpen = (key) => { clearTimeout(closeTimer.current); setOpenGroup(key); };
-    const hoverClose = () => { clearTimeout(closeTimer.current); closeTimer.current = setTimeout(() => setOpenGroup(null), 140); };
-
-    const showTabBar = !HIDE_TABBAR.some((p) => location.pathname.startsWith(p));
 
     return (
         <>
-            <nav style={{
-                position: "fixed", top: scrolled ? "0.5rem" : 0, left: 0, right: 0, zIndex: 100,
-                padding: "0.75rem 1rem", transition: "top 0.4s",
-            }}>
-                <div ref={navRef} style={{
-                    maxWidth: "80rem", margin: "0 auto",
-                    background: scrolled ? "var(--brand-nav-scrolled)" : "var(--brand-nav-bg)",
-                    backdropFilter: "blur(16px)",
-                    border: `1px solid ${scrolled ? "rgba(31,107,58,0.2)" : "var(--brand-border)"}`,
-                    borderRadius: "1.25rem",
-                    padding: scrolled ? "0.5rem 1rem" : "0.625rem 1rem",
-                    display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem",
-                    transition: "padding 0.4s, border-color 0.4s",
-                    boxShadow: "0 10px 40px var(--brand-shadow)",
-                }}>
+            <nav aria-label="Основна навигация" className={`hd-bar${scrolled ? " is-scrolled" : ""}`}>
+                <div ref={navRef} className="hd-bar__inner">
                     {/* Brand */}
                     <Link to="/" aria-label="УниПът — начало" style={{ display: "flex", alignItems: "center", textDecoration: "none", flexShrink: 0 }}>
                         <img
-                            src="/logo-wordmark.png?v=3"
-                            alt="УниПът лого"
-                            style={{ height: "60px", width: "auto", objectFit: "contain", borderRadius: "0.5rem" }}
+                            src="/logo-uniput.png"
+                            alt="UniПът"
+                            width="56" height="44"
+                            style={{ height: "44px", width: "auto", objectFit: "contain" }}
                         />
                     </Link>
 
-                    {/* Desktop: две групи */}
-                    <div className="uni-nav-desktop hd-groups">
-                        {NAV_GROUPS.map((g) => {
-                            const open = openGroup === g.key;
-                            return (
-                                <div
-                                    key={g.key}
-                                    className="hd-group"
-                                    onMouseEnter={() => hoverOpen(g.key)}
-                                    onMouseLeave={hoverClose}
-                                >
-                                    <button
-                                        type="button"
-                                        className={`hd-group-btn${open || groupActive(g) ? " is-active" : ""}`}
-                                        aria-haspopup="true"
-                                        aria-expanded={open}
-                                        onClick={(e) => { e.stopPropagation(); setOpenGroup(open ? null : g.key); }}
-                                    >
-                                        {g.label}
-                                        <ChevronDown size={15} strokeWidth={1.75} aria-hidden="true" style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} />
-                                    </button>
-                                    {open && (
-                                        <div className="hd-panel" role="menu">
-                                            {g.items.map((it) => {
-                                                const Icon = it.icon;
-                                                return (
-                                                    <Link
-                                                        key={it.path}
-                                                        to={it.path}
-                                                        role="menuitem"
-                                                        className={`hd-item${isActive(it.path) ? " is-current" : ""}`}
-                                                        onClick={() => setOpenGroup(null)}
-                                                    >
-                                                        <span className="hd-item-icon"><Icon size={18} strokeWidth={1.5} aria-hidden="true" /></span>
-                                                        <span className="hd-item-text">
-                                                            <strong>{it.name}</strong>
-                                                            <small>{it.desc}</small>
-                                                        </span>
-                                                    </Link>
-                                                );
-                                            })}
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })}
+                    {/* Desktop: основните пътища като обикновени връзки */}
+                    <div className="uni-nav-desktop hd-links">
+                        {NAV_GROUPS[0].items.map((it) => (
+                            <Link key={it.path} to={it.path} className={`hd-link${isActive(it.path) ? " is-current" : ""}`} aria-current={isActive(it.path) ? "page" : undefined}>
+                                {it.name}
+                            </Link>
+                        ))}
                         {isAdmin && (
                             <Link to="/admin" className="hd-admin">
                                 <Settings size={14} /> Админ
@@ -252,10 +181,6 @@ export default function Header() {
 
                     {/* Вдясно: основен бутон + акаунт */}
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
-                        <Link to="/calculator/" className="uni-nav-desktop uni-nav-cta">
-                            Изчисли бал →
-                        </Link>
-
                         {!user ? (
                             <div className="uni-nav-desktop" style={{ alignItems: "center", gap: "0.375rem" }}>
                                 <Link to="/login" className="hd-login">Вход</Link>
@@ -275,7 +200,7 @@ export default function Header() {
                                 </button>
                                 {isUserMenuOpen && (
                                     <div className="hd-user-panel">
-                                        <div style={{ padding: "0.625rem 0.75rem", marginBottom: "0.25rem", background: "rgba(31,107,58,0.06)", borderRadius: "0.625rem" }}>
+                                        <div style={{ padding: "0.625rem 0.75rem", marginBottom: "0.25rem", background: "rgba(23,86,217,0.06)", borderRadius: "0.625rem" }}>
                                             <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Добре дошъл</div>
                                             <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--brand-accent-text)", marginTop: "0.125rem", overflow: "hidden", textOverflow: "ellipsis" }}>
                                                 {user.user_metadata?.username || user.email}
@@ -308,7 +233,7 @@ export default function Header() {
             {/* Мобилно меню */}
             {isMenuOpen && (
                 <div style={{ position: "fixed", inset: 0, zIndex: 110 }}>
-                    <div onClick={() => setIsMenuOpen(false)} style={{ position: "absolute", inset: 0, background: "rgba(10,10,10,0.55)", backdropFilter: "blur(6px)" }} />
+                    <div onClick={() => setIsMenuOpen(false)} style={{ position: "absolute", inset: 0, background: "rgba(21,43,41,0.55)", backdropFilter: "blur(6px)" }} />
                     <div className="hd-drawer">
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
                             <span style={{ fontFamily: "var(--font-display)", fontSize: "1.25rem", fontWeight: 800, color: "var(--brand-text)" }}>Меню</span>
@@ -365,35 +290,25 @@ export default function Header() {
                 </div>
             )}
 
-            {/* Долна лента на телефон */}
-            {showTabBar && (
-                <nav className="hd-tabbar" aria-label="Бърза навигация">
-                    {TAB_ITEMS.map((t) => {
-                        const Icon = t.icon;
-                        const active = isActive(t.path);
-                        return (
-                            <Link key={t.path} to={t.path} className={`hd-tab${active ? " is-active" : ""}`} aria-current={active ? "page" : undefined}>
-                                <Icon size={20} strokeWidth={1.5} aria-hidden="true" />
-                                <span>{t.name}</span>
-                            </Link>
-                        );
-                    })}
-                    <button type="button" className="hd-tab" onClick={() => setIsMenuOpen(true)}>
-                        <Menu size={20} strokeWidth={1.5} aria-hidden="true" />
-                        <span>Меню</span>
-                    </button>
-                </nav>
-            )}
-
             <style>{`
+                .hd-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: var(--canvas); border-bottom: 1px solid var(--border); }
+                .hd-bar.is-scrolled { box-shadow: var(--shadow-float); }
+                .hd-bar__inner { max-width: 80rem; margin: 0 auto; height: var(--header-h); padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+                @media (max-width: 767px) { .hd-bar__inner { padding: 0 1rem; } }
+                .hd-links { align-items: center; gap: 0.25rem; }
+                .hd-link { position: relative; display: inline-flex; align-items: center; min-height: 44px; padding: 0 0.75rem; font-size: 15px; font-weight: 600; color: var(--ink); text-decoration: none; border-radius: var(--radius-control); transition: color 0.14s ease, background-color 0.14s ease; white-space: nowrap; }
+                .hd-link:hover { color: var(--brand); }
+                .hd-link.is-current { color: var(--brand); }
+                .hd-link.is-current::after { content: ""; position: absolute; left: 0.75rem; right: 0.75rem; bottom: 6px; height: 2px; background: var(--brand); border-radius: 2px; }
                 .uni-nav-desktop { display: none; }
                 .uni-nav-wide { display: none; }
                 .uni-nav-mobile { display: flex; }
-                @media (min-width: 1024px) {
+                /* Пълната навигация от 1200 px (пет пътя + акаунт); под това — компактен хедър и меню */
+                @media (min-width: 1200px) {
                     .uni-nav-desktop { display: flex; }
                     .uni-nav-mobile { display: none; }
                 }
-                @media (min-width: 1200px) { .uni-nav-wide { display: flex; } }
+                @media (min-width: 1400px) { .uni-nav-wide { display: flex; } }
                 @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
                 .hd-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
@@ -407,7 +322,7 @@ export default function Header() {
                     background: transparent; border: 1px solid transparent; cursor: pointer;
                     transition: background 0.2s, color 0.2s;
                 }
-                .hd-group-btn:hover, .hd-group-btn.is-active { background: rgba(31,107,58,0.09); color: var(--brand-accent-text); }
+                .hd-group-btn:hover, .hd-group-btn.is-active { background: rgba(23,86,217,0.09); color: var(--brand-accent-text); }
                 .hd-panel {
                     position: absolute; top: calc(100% + 0.5rem); left: 0; z-index: 120;
                     width: 25rem; padding: 0.5rem;
@@ -417,8 +332,8 @@ export default function Header() {
                 }
                 @keyframes hdPanel { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
                 .hd-item { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.7rem 0.75rem; border-radius: 0.75rem; text-decoration: none; transition: background 0.15s; }
-                .hd-item:hover, .hd-item.is-current { background: rgba(31,107,58,0.08); }
-                .hd-item-icon { display: inline-flex; flex-shrink: 0; padding: 0.55rem; border-radius: 0.625rem; background: rgba(31,107,58,0.1); color: var(--brand-accent-text); }
+                .hd-item:hover, .hd-item.is-current { background: rgba(23,86,217,0.08); }
+                .hd-item-icon { display: inline-flex; flex-shrink: 0; padding: 0.55rem; border-radius: 0.625rem; background: rgba(23,86,217,0.1); color: var(--brand-accent-text); }
                 .hd-item-text { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
                 .hd-item-text strong { font-size: 14px; font-weight: 800; color: var(--brand-text); }
                 .hd-item-text small { font-size: 12.5px; line-height: 1.4; color: var(--brand-muted); }
@@ -451,12 +366,12 @@ export default function Header() {
                 .hd-login:hover { color: var(--brand-accent-text); }
                 .hd-register { padding: 0.5rem 0.875rem; border-radius: 0.625rem; font-size: 13px; font-weight: 700; color: var(--brand-text); text-decoration: none; background: var(--brand-surface-2); border: 1px solid var(--brand-border); }
                 .hd-register:hover { border-color: var(--brand-accent); }
-                .hd-admin { display: flex; align-items: center; gap: 0.375rem; padding: 0.5rem 0.875rem; border-radius: 0.625rem; font-size: 13px; font-weight: 700; text-decoration: none; color: var(--brand-accent-text); border: 1px solid rgba(31,107,58,0.25); }
+                .hd-admin { display: flex; align-items: center; gap: 0.375rem; padding: 0.5rem 0.875rem; border-radius: 0.625rem; font-size: 13px; font-weight: 700; text-decoration: none; color: var(--brand-accent-text); border: 1px solid rgba(23,86,217,0.25); }
                 .hd-avatar-btn { display: flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.5rem 0.375rem 0.375rem; background: var(--brand-surface-2); border: 1px solid var(--brand-border); border-radius: 999px; cursor: pointer; font-family: inherit; }
                 .hd-user-panel { position: absolute; top: calc(100% + 8px); right: 0; min-width: 15rem; background: var(--brand-dropdown-bg); border: 1px solid var(--brand-border); border-radius: 0.875rem; box-shadow: 0 20px 60px var(--brand-shadow); padding: 0.5rem; z-index: 130; }
-                .hd-logout { width: 100%; display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-size: 13px; font-weight: 600; color: #dc2626; background: none; border: none; cursor: pointer; font-family: inherit; text-align: left; }
+                .hd-logout { width: 100%; display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-size: 13px; font-weight: 600; color: #AA2735; background: none; border: none; cursor: pointer; font-family: inherit; text-align: left; }
                 .uni-menu-item { transition: background 0.15s; }
-                .uni-menu-item:hover { background: rgba(31,107,58,0.07) !important; }
+                .uni-menu-item:hover { background: rgba(23,86,217,0.07) !important; }
                 .uni-logout-btn { transition: background 0.15s; }
                 .uni-logout-btn:hover { background: rgba(220,38,38,0.08) !important; }
                 .hd-burger { padding: 0.5rem; background: var(--brand-surface-2); border: 1px solid var(--brand-border); border-radius: 0.625rem; color: var(--brand-text); cursor: pointer; }
@@ -469,14 +384,7 @@ export default function Header() {
                 .hd-drawer-foot { padding-top: 1rem; border-top: 1px solid var(--brand-border); display: flex; flex-direction: column; gap: 0.5rem; }
                 .hd-drawer-cta { display: block; padding: 0.9rem; border-radius: 0.75rem; text-align: center; font-size: 15px; font-weight: 800; text-decoration: none; color: var(--brand-accent-ink); background: var(--brand-accent); }
                 .hd-login--box { display: flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.75rem; text-align: center; border: 1px solid var(--brand-border); background: var(--brand-surface-2); border-radius: 0.625rem; font: inherit; font-size: 13px; font-weight: 700; color: var(--brand-text); text-decoration: none; cursor: pointer; }
-                .hd-logout-box { color: #dc2626; }
-
-                /* Долна лента (телефон) */
-                .hd-tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 80; display: grid; grid-template-columns: repeat(5, 1fr); background: rgba(255,255,255,0.97); border-top: 1px solid var(--brand-border); padding: 0.25rem 0.25rem calc(0.25rem + env(safe-area-inset-bottom)); }
-                .hd-tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; min-height: 3.25rem; padding: 0.25rem; border: 0; background: transparent; font: inherit; font-size: 11px; font-weight: 700; color: var(--brand-muted); text-decoration: none; cursor: pointer; border-radius: 0.625rem; }
-                .hd-tab.is-active { color: var(--brand-accent-text); background: rgba(31,107,58,0.08); }
-                @media (min-width: 1024px) { .hd-tabbar { display: none; } }
-                @media (max-width: 1023px) { body { padding-bottom: 4.5rem; } }
+                .hd-logout-box { color: #AA2735; }
             `}</style>
         </>
     );

@@ -20,8 +20,8 @@ function fmtDate(iso) {
     return `${d} ${MONTHS[m - 1]} ${y} г.`;
 }
 function urgencyColor(days) {
-    if (days <= 7) return "#dc2626";
-    if (days <= 21) return "#b45309";
+    if (days <= 7) return "#AA2735";
+    if (days <= 21) return "#986100";
     return "var(--brand-cyan)";
 }
 
@@ -67,8 +67,8 @@ export default function DeadlineReminder({ universityName = null }) {
         <div style={{
             display: "flex", flexDirection: "column", gap: "0.625rem",
             padding: "0.875rem", borderRadius: "0.75rem",
-            background: `${color === "var(--brand-cyan)" ? "rgba(31,107,58,0.06)" : color + "14"}`,
-            border: `1px solid ${color === "var(--brand-cyan)" ? "rgba(31,107,58,0.2)" : color + "40"}`,
+            background: `${color === "var(--brand-cyan)" ? "rgba(23,86,217,0.06)" : color + "14"}`,
+            border: `1px solid ${color === "var(--brand-cyan)" ? "rgba(23,86,217,0.2)" : color + "40"}`,
         }}>
             {/* Обратно броене */}
             <div style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
@@ -92,7 +92,7 @@ export default function DeadlineReminder({ universityName = null }) {
 
             {/* Опт-ин */}
             {state === "done" && (
-                <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "12px", fontWeight: 600, color: "#047857" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "12px", fontWeight: 600, color: "#0A6853" }}>
                     <Check size={14} /> Записахме те. Ще ти пишем 7 и 1 дни преди срока.
                 </div>
             )}
@@ -150,7 +150,7 @@ export default function DeadlineReminder({ universityName = null }) {
                             </button>
                         </div>
                         {errMsg && (
-                            <div style={{ fontSize: "11px", color: "#dc2626", fontWeight: 600 }}>{errMsg}</div>
+                            <div style={{ fontSize: "11px", color: "#AA2735", fontWeight: 600 }}>{errMsg}</div>
                         )}
                         <div style={{ fontSize: "11px", color: "var(--brand-muted)", lineHeight: 1.5 }}>
                             Само имейл. Отписване с един клик във всяко съобщение.{" "}

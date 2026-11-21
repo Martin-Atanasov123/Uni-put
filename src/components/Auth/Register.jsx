@@ -150,7 +150,7 @@ const SignUp = () => {
                     <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
                         {BENEFITS.map(({ icon: Icon, title, desc }) => (
                             <div key={title} style={{ display: "flex", gap: "0.875rem", alignItems: "flex-start" }}>
-                                <div style={{ width: "2.25rem", height: "2.25rem", borderRadius: "0.625rem", background: "rgba(31,107,58,0.1)", border: "1px solid rgba(31,107,58,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <div style={{ width: "2.25rem", height: "2.25rem", borderRadius: "0.625rem", background: "rgba(23,86,217,0.1)", border: "1px solid rgba(23,86,217,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                     <Icon size={16} style={{ color: "var(--brand-cyan)" }} />
                                 </div>
                                 <div>
@@ -199,7 +199,7 @@ const SignUp = () => {
                                 width: "3.5rem", height: "3.5rem", borderRadius: "1rem",
                                 background: "var(--brand-accent)",
                                 display: "flex", alignItems: "center", justifyContent: "center",
-                                boxShadow: "0 16px 40px rgba(31,107,58,0.35)",
+                                boxShadow: "0 16px 40px rgba(23,86,217,0.35)",
                             }}
                         >
                             <UserPlus size={28} color="#FFFFFF" />
@@ -220,7 +220,7 @@ const SignUp = () => {
                                 display: "flex", alignItems: "center", gap: "0.5rem",
                                 padding: "0.75rem 0.875rem",
                                 background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.3)",
-                                borderRadius: "0.625rem", color: "#b91c1c", fontSize: "13px", fontWeight: 500,
+                                borderRadius: "0.625rem", color: "#AA2735", fontSize: "13px", fontWeight: 500,
                                 marginBottom: "1.25rem",
                             }}
                         >
@@ -243,7 +243,7 @@ const SignUp = () => {
                             transition: "border-color 0.2s, background 0.2s",
                             marginBottom: "0.25rem",
                         }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(31,107,58,0.35)"; e.currentTarget.style.background = "var(--brand-surface)"; }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(23,86,217,0.35)"; e.currentTarget.style.background = "var(--brand-surface)"; }}
                         onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--brand-input-border)"; e.currentTarget.style.background = "var(--brand-input-bg)"; }}
                     >
                         <svg width="18" height="18" viewBox="0 0 24 24">
@@ -289,7 +289,7 @@ const SignUp = () => {
                                         background: r.ok ? "rgba(34,197,94,0.1)" : "rgba(148,163,184,0.08)",
                                         border: `1px solid ${r.ok ? "rgba(34,197,94,0.3)" : "rgba(148,163,184,0.12)"}`,
                                         borderRadius: "999px", fontSize: "10px", fontWeight: 700,
-                                        color: r.ok ? "#047857" : "var(--brand-muted)",
+                                        color: r.ok ? "#0A6853" : "var(--brand-muted)",
                                         letterSpacing: "0.04em", transition: "all 0.2s",
                                     }}
                                 >
@@ -308,7 +308,7 @@ const SignUp = () => {
                                 fontSize: "14px", fontWeight: 800,
                                 cursor: loading ? "not-allowed" : "pointer",
                                 display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem",
-                                boxShadow: loading ? "none" : "0 12px 30px rgba(31,107,58,0.3)",
+                                boxShadow: loading ? "none" : "0 12px 30px rgba(23,86,217,0.3)",
                                 fontFamily: "inherit",
                                 transition: "transform 0.15s",
                             }}

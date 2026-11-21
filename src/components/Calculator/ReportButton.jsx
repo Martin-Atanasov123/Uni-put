@@ -190,7 +190,7 @@ export default function ReportButton({ universityName, specialty }) {
                             borderRadius: "0.625rem",
                             background: "rgba(251,191,36,0.12)",
                             border: "1px solid rgba(251,191,36,0.35)",
-                            color: "#b45309",
+                            color: "#986100",
                             display: "flex", alignItems: "center", justifyContent: "center",
                             flexShrink: 0,
                         }}>
@@ -231,7 +231,7 @@ export default function ReportButton({ universityName, specialty }) {
                             borderRadius: "50%",
                             background: "rgba(34,197,94,0.12)",
                             border: "1px solid rgba(34,197,94,0.3)",
-                            color: "#047857",
+                            color: "#0A6853",
                             display: "flex", alignItems: "center", justifyContent: "center",
                         }}>
                             <CheckCircle2 size={26} />
@@ -286,7 +286,7 @@ export default function ReportButton({ universityName, specialty }) {
                                             borderRadius: "50%",
                                             background: "rgba(15,15,15,0.75)",
                                             border: "1px solid rgba(248,113,113,0.5)",
-                                            color: "#b91c1c",
+                                            color: "#AA2735",
                                             cursor: "pointer",
                                             display: "flex", alignItems: "center", justifyContent: "center",
                                         }}
@@ -327,7 +327,7 @@ export default function ReportButton({ universityName, specialty }) {
                                         fontFamily: "inherit",
                                         transition: "border-color 0.2s, background 0.2s",
                                     }}
-                                    onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(31,107,58,0.4)"; e.currentTarget.style.background = "rgba(31,107,58,0.04)"; }}
+                                    onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(23,86,217,0.4)"; e.currentTarget.style.background = "rgba(23,86,217,0.04)"; }}
                                     onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--brand-border)"; e.currentTarget.style.background = "var(--brand-surface-2)"; }}
                                 >
                                     <Camera size={22} style={{ opacity: 0.5 }} />
@@ -421,7 +421,7 @@ export default function ReportButton({ universityName, specialty }) {
                                     background: "rgba(248,113,113,0.08)",
                                     border: "1px solid rgba(248,113,113,0.3)",
                                     borderRadius: "0.625rem",
-                                    color: "#b91c1c",
+                                    color: "#AA2735",
                                     fontSize: "12px",
                                     fontWeight: 600,
                                 }}>
@@ -439,7 +439,7 @@ export default function ReportButton({ universityName, specialty }) {
                                     padding: "0.875rem",
                                     background: sending || !description.trim()
                                         ? "rgba(148,163,184,0.12)"
-                                        : "#B45309",
+                                        : "#986100",
                                     border: "none",
                                     borderRadius: "0.75rem",
                                     color: sending || !description.trim() ? "var(--brand-muted)" : "var(--brand-bg)",
@@ -481,7 +481,7 @@ export default function ReportButton({ universityName, specialty }) {
                     background: "rgba(251,191,36,0.08)",
                     border: "1px solid rgba(251,191,36,0.25)",
                     borderRadius: "0.5rem",
-                    color: "#b45309",
+                    color: "#986100",
                     fontSize: "12px",
                     fontWeight: 700,
                     cursor: "pointer",

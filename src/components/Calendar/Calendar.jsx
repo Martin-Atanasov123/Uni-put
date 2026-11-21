@@ -22,8 +22,8 @@ import {
 const EVENT_TYPES = {
     application: { label: "Кандидатстване", color: "#0E7490", Icon: FileText },
     exam:        { label: "Приемен изпит",  color: "#6D28D9", Icon: GraduationCap },
-    ranking:     { label: "Класиране",      color: "#92400e", Icon: Trophy },
-    enrollment:  { label: "Записване",      color: "#047857", Icon: UserCheck },
+    ranking:     { label: "Класиране",      color: "#986100", Icon: Trophy },
+    enrollment:  { label: "Записване",      color: "#0A6853", Icon: UserCheck },
 };
 const TYPE_ORDER = ["application", "exam", "ranking", "enrollment"];
 
@@ -138,7 +138,7 @@ function EventCard({ event, today, onOpen }) {
                     {event.is_confirmed === false && (
                         <span style={{
                             fontSize: "9px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em",
-                            color: "#b45309", background: "rgba(251,191,36,0.1)",
+                            color: "#986100", background: "rgba(251,191,36,0.1)",
                             border: "1px solid rgba(251,191,36,0.3)", borderRadius: "999px", padding: "0.05rem 0.4rem",
                         }}>Предстои да се потвърди</span>
                     )}
@@ -271,7 +271,7 @@ function MonthGrid({ monthDate, events, today, onPrev, onNext, onOpenEvent, onOp
                             background: d ? "var(--brand-input-bg)" : "transparent",
                             padding: "0.4rem",
                             display: "flex", flexDirection: "column", gap: "0.2rem",
-                            boxShadow: isToday(d) ? "0 0 0 3px rgba(31,107,58,0.12)" : "none",
+                            boxShadow: isToday(d) ? "0 0 0 3px rgba(23,86,217,0.12)" : "none",
                         }}>
                             {d && (
                                 <span style={{
@@ -475,7 +475,7 @@ const Calendar = () => {
                     style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}
                 >
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                        <div style={{ width: 8, height: 8, borderRadius: 999, background: "var(--brand-cyan)", boxShadow: "0 0 12px rgba(31,107,58,0.6)" }} />
+                        <div style={{ width: 8, height: 8, borderRadius: 999, background: "var(--brand-cyan)", boxShadow: "0 0 12px rgba(23,86,217,0.6)" }} />
                         <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.14em" }}>
                             Календар за прием
                         </span>
@@ -491,7 +491,7 @@ const Calendar = () => {
                 </m.div>
 
                 {/* Trust note */}
-                <div style={{ display: "flex", gap: "0.625rem", alignItems: "flex-start", padding: "0.75rem 1rem", background: "rgba(31,107,58,0.06)", border: "1px solid rgba(31,107,58,0.2)", borderRadius: "0.875rem" }}>
+                <div style={{ display: "flex", gap: "0.625rem", alignItems: "flex-start", padding: "0.75rem 1rem", background: "rgba(23,86,217,0.06)", border: "1px solid rgba(23,86,217,0.2)", borderRadius: "0.875rem" }}>
                     <Info size={16} style={{ color: "var(--brand-cyan)", flexShrink: 0, marginTop: 1 }} strokeWidth={1.5} />
                     <p style={{ margin: 0, fontSize: "12.5px", color: "var(--brand-muted)", lineHeight: 1.55 }}>
                         Датите са от заповедите на МОН (ДЗИ) и от официалните сайтове на университетите. Университетите обявяват графиците си за {ADMISSION_YEAR_SHORT} г. през пролетта — добавяме ги веднага.
@@ -517,7 +517,7 @@ const Calendar = () => {
                         {hasFilters && (
                             <button type="button" onClick={clearFilters} style={{
                                 display: "inline-flex", alignItems: "center", gap: "0.3rem", padding: "0.4rem 0.75rem",
-                                background: "rgba(31,107,58,0.1)", border: "1px solid rgba(31,107,58,0.3)", borderRadius: "999px",
+                                background: "rgba(23,86,217,0.1)", border: "1px solid rgba(23,86,217,0.3)", borderRadius: "999px",
                                 color: "var(--brand-cyan)", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                             }}>
                                 <X size={12} strokeWidth={1.5} /> Изчисти
@@ -587,7 +587,7 @@ const Calendar = () => {
                     />
                 ) : filtered.length === 0 ? (
                     <div style={{ ...S.surface, padding: "4rem 2rem", textAlign: "center" }}>
-                        <div style={{ width: "4rem", height: "4rem", margin: "0 auto 1rem", borderRadius: "1rem", background: "rgba(31,107,58,0.08)", border: "1px solid rgba(31,107,58,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div style={{ width: "4rem", height: "4rem", margin: "0 auto 1rem", borderRadius: "1rem", background: "rgba(23,86,217,0.08)", border: "1px solid rgba(23,86,217,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                             <CalendarDays size={28} style={{ color: "var(--brand-cyan)" }} strokeWidth={1.5} />
                         </div>
                         <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700, color: "var(--brand-text)", textWrap: "balance" }}>

@@ -44,13 +44,13 @@ function RatingStars({ value = 0 }) {
     return (
         <div style={{ display: "flex", gap: "2px" }}>
             {[...Array(5)].map((_, i) => {
-                if (i < full) return <Star key={i} size={13} fill="#b45309" color="#b45309" />;
+                if (i < full) return <Star key={i} size={13} fill="#986100" color="#986100" />;
                 if (i === full && half) {
                     return (
                         <span key={i} style={{ position: "relative", display: "inline-block", width: 13, height: 13 }}>
                             <Star size={13} fill="none" color="rgba(148,163,184,0.3)" />
                             <span style={{ position: "absolute", inset: 0, overflow: "hidden", width: "50%" }}>
-                                <Star size={13} fill="#b45309" color="#b45309" />
+                                <Star size={13} fill="#986100" color="#986100" />
                             </span>
                         </span>
                     );
@@ -80,8 +80,8 @@ function DormCard({ dorm }) {
                 transition: "border-color 0.2s, transform 0.2s, box-shadow 0.2s",
             }}
             onMouseEnter={e => {
-                e.currentTarget.style.borderColor = "rgba(31,107,58,0.35)";
-                e.currentTarget.style.boxShadow = "0 12px 32px rgba(31,107,58,0.08)";
+                e.currentTarget.style.borderColor = "rgba(23,86,217,0.35)";
+                e.currentTarget.style.boxShadow = "0 12px 32px rgba(23,86,217,0.08)";
                 e.currentTarget.style.transform = "translateY(-2px)";
             }}
             onMouseLeave={e => {
@@ -140,12 +140,12 @@ function DormCard({ dorm }) {
             {(dorm.is_renovated || dorm.has_private_bathroom) && (
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
                     {dorm.is_renovated && (
-                        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", padding: "0.25rem 0.625rem", background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.3)", borderRadius: "999px", color: "#047857", fontSize: "11px", fontWeight: 600 }}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", padding: "0.25rem 0.625rem", background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.3)", borderRadius: "999px", color: "#0A6853", fontSize: "11px", fontWeight: 600 }}>
                             <Hammer size={11} /> Реновиран
                         </span>
                     )}
                     {dorm.has_private_bathroom && (
-                        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", padding: "0.25rem 0.625rem", background: "rgba(31,107,58,0.1)", border: "1px solid rgba(31,107,58,0.3)", borderRadius: "999px", color: "var(--brand-cyan)", fontSize: "11px", fontWeight: 600 }}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", padding: "0.25rem 0.625rem", background: "rgba(23,86,217,0.1)", border: "1px solid rgba(23,86,217,0.3)", borderRadius: "999px", color: "var(--brand-cyan)", fontSize: "11px", fontWeight: 600 }}>
                             <Bath size={11} /> Собствена баня
                         </span>
                     )}
@@ -191,7 +191,7 @@ function DormCard({ dorm }) {
             {/* Application period */}
             {dorm.application_period ? (
                 <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.625rem 0.75rem", background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.25)", borderRadius: "0.625rem" }}>
-                    <CalendarDays size={14} style={{ color: "#b45309", flexShrink: 0 }} />
+                    <CalendarDays size={14} style={{ color: "#986100", flexShrink: 0 }} />
                     <div>
                         <span style={{ display: "block", fontSize: "9px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>Кандидатстване</span>
                         <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--brand-text)" }}>{dorm.application_period}</span>
@@ -232,8 +232,8 @@ function DormCard({ dorm }) {
                         justifyContent: "center",
                         gap: "0.5rem",
                         padding: "0.625rem 1rem",
-                        background: "rgba(31,107,58,0.08)",
-                        border: "1px solid rgba(31,107,58,0.25)",
+                        background: "rgba(23,86,217,0.08)",
+                        border: "1px solid rgba(23,86,217,0.25)",
                         borderRadius: "0.625rem",
                         color: "var(--brand-cyan)",
                         fontSize: "13px",
@@ -241,8 +241,8 @@ function DormCard({ dorm }) {
                         textDecoration: "none",
                         transition: "background 0.2s, border-color 0.2s",
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(31,107,58,0.15)"; e.currentTarget.style.borderColor = "rgba(31,107,58,0.45)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(31,107,58,0.08)"; e.currentTarget.style.borderColor = "rgba(31,107,58,0.25)"; }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(23,86,217,0.15)"; e.currentTarget.style.borderColor = "rgba(23,86,217,0.45)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(23,86,217,0.08)"; e.currentTarget.style.borderColor = "rgba(23,86,217,0.25)"; }}
                 >
                     <MapPin size={14} />
                     Виж на картата
@@ -326,7 +326,7 @@ const Dormitories = () => {
                     style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}
                 >
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                        <div style={{ width: 8, height: 8, borderRadius: 999, background: "var(--brand-violet)", boxShadow: "0 0 12px rgba(31,107,58,0.6)" }} />
+                        <div style={{ width: 8, height: 8, borderRadius: 999, background: "var(--brand-violet)", boxShadow: "0 0 12px rgba(23,86,217,0.6)" }} />
                         <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.14em" }}>
                             Жилищна база
                         </span>
@@ -389,8 +389,8 @@ const Dormitories = () => {
                                 alignItems: "center",
                                 gap: "0.3rem",
                                 padding: "0.4rem 0.75rem",
-                                background: "rgba(31,107,58,0.1)",
-                                border: "1px solid rgba(31,107,58,0.3)",
+                                background: "rgba(23,86,217,0.1)",
+                                border: "1px solid rgba(23,86,217,0.3)",
                                 borderRadius: "999px",
                                 color: "var(--brand-cyan)",
                                 fontSize: "12px",
@@ -431,8 +431,8 @@ const Dormitories = () => {
                                 height: "4rem",
                                 margin: "0 auto 1rem",
                                 borderRadius: "1rem",
-                                background: "rgba(31,107,58,0.08)",
-                                border: "1px solid rgba(31,107,58,0.2)",
+                                background: "rgba(23,86,217,0.08)",
+                                border: "1px solid rgba(23,86,217,0.2)",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",

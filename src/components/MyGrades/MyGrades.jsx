@@ -32,14 +32,14 @@ function GradeField({ label, gradeKey, value, onChange, onBlur }) {
     return (
         <div style={{
             background: "var(--brand-surface)",
-            border: `1px solid ${invalid ? "rgba(248,113,113,0.4)" : filled ? "rgba(31,107,58,0.3)" : "var(--brand-border)"}`,
+            border: `1px solid ${invalid ? "rgba(248,113,113,0.4)" : filled ? "rgba(23,86,217,0.3)" : "var(--brand-border)"}`,
             borderRadius: "0.875rem",
             padding: "0.875rem 1rem",
             display: "flex",
             flexDirection: "column",
             gap: "0.5rem",
             transition: "border-color 0.2s, box-shadow 0.2s",
-            boxShadow: focused && !invalid ? "0 0 0 3px rgba(31,107,58,0.08)" : "none",
+            boxShadow: focused && !invalid ? "0 0 0 3px rgba(23,86,217,0.08)" : "none",
         }}>
             <label style={{
                 fontSize: "11px", fontWeight: 700,
@@ -67,7 +67,7 @@ function GradeField({ label, gradeKey, value, onChange, onBlur }) {
                     fontFamily: "var(--font-mono)",
                     fontSize: "1.375rem",
                     fontWeight: 800,
-                    color: invalid ? "#dc2626" : filled ? "var(--brand-text)" : "var(--brand-muted)",
+                    color: invalid ? "#AA2735" : filled ? "var(--brand-text)" : "var(--brand-muted)",
                     width: "100%",
                     padding: 0,
                     letterSpacing: "-0.02em",
@@ -75,7 +75,7 @@ function GradeField({ label, gradeKey, value, onChange, onBlur }) {
             />
 
             {invalid && (
-                <span style={{ fontSize: "10px", color: "#dc2626", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                <span style={{ fontSize: "10px", color: "#AA2735", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.25rem" }}>
                     <AlertCircle size={10} /> 2.00 – 6.00
                 </span>
             )}
@@ -322,7 +322,7 @@ export default function MyGradesPage() {
                             </>
                         ) : lastSavedLabel ? (
                             <>
-                                <Save size={13} style={{ color: "#047857" }} />
+                                <Save size={13} style={{ color: "#0A6853" }} />
                                 <span style={{ fontSize: "12px", color: "var(--brand-muted)" }}>Запазено {lastSavedLabel}</span>
                             </>
                         ) : (
@@ -360,7 +360,7 @@ export default function MyGradesPage() {
                             borderRadius: "0.875rem", marginBottom: "1.5rem",
                         }}
                     >
-                        <AlertCircle size={15} style={{ color: "#b45309", flexShrink: 0, marginTop: "2px" }} />
+                        <AlertCircle size={15} style={{ color: "#986100", flexShrink: 0, marginTop: "2px" }} />
                         <p style={{ fontSize: "13px", color: "var(--brand-muted)", margin: 0, lineHeight: 1.55 }}>
                             Оценките се пазят само в браузъра.{" "}
                             <Link to="/register" style={{ color: "var(--brand-cyan)", fontWeight: 700, textDecoration: "none" }}>

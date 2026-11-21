@@ -12,9 +12,9 @@ import { rankSecondDzi } from "@/lib/dziPlan";
 
 const MAX_CHOSEN = 12;
 const STATUS = {
-    open:   { label: "без изпит",   color: "#047857" },
-    exam:   { label: "с кандидатстудентски изпит", color: "#b45309" },
-    closed: { label: "затворена",   color: "#dc2626" },
+    open:   { label: "без изпит",   color: "#0A6853" },
+    exam:   { label: "с кандидатстудентски изпит", color: "#986100" },
+    closed: { label: "затворена",   color: "#AA2735" },
 };
 const reduced = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
@@ -142,7 +142,7 @@ export default function DziPlanner({ specialties }) {
     const remove = (name) => { setChosen((c) => c.filter((x) => x !== name)); setExpanded(null); };
 
     return (
-        <section aria-labelledby="dzi-planner-h" style={{ ...card, background: "rgba(31,107,58,0.06)", padding: "1.75rem", marginBottom: "2.5rem" }}>
+        <section aria-labelledby="dzi-planner-h" style={{ ...card, background: "rgba(23,86,217,0.06)", padding: "1.75rem", marginBottom: "2.5rem" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
                 <Sparkles size={16} strokeWidth={1.5} style={{ color: "var(--brand-violet)" }} aria-hidden="true" />
                 <span style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--brand-violet)" }}>Обратен калкулатор</span>
@@ -200,7 +200,7 @@ export default function DziPlanner({ specialties }) {
             )}
             {loading && <p style={{ margin: "1.25rem 0 0", fontSize: "13px", color: "var(--brand-muted)" }}>Смятаме по официалните формули…</p>}
             {error && !loading && (
-                <p role="alert" style={{ margin: "1.25rem 0 0", fontSize: "13px", color: "#dc2626" }}>
+                <p role="alert" style={{ margin: "1.25rem 0 0", fontSize: "13px", color: "#AA2735" }}>
                     Не успяхме да заредим формулите. Провери връзката и опитай пак.
                 </p>
             )}
@@ -218,7 +218,7 @@ export default function DziPlanner({ specialties }) {
                             <strong style={{ color: "var(--brand-text)", fontFamily: "var(--font-mono)" }}>{total}</strong> програми в университетите
                         </span>
                         <button type="button" onClick={() => copyLink((ok) => { setCopied(ok); setTimeout(() => setCopied(false), 2000); })}
-                            style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", minHeight: 44, padding: "0 0.875rem", background: "transparent", border: "1px solid var(--brand-border)", borderRadius: "0.75rem", color: copied ? "#047857" : "var(--brand-text)", fontSize: "12.5px", fontWeight: 600, fontFamily: "inherit", cursor: "pointer" }}>
+                            style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", minHeight: 44, padding: "0 0.875rem", background: "transparent", border: "1px solid var(--brand-border)", borderRadius: "0.75rem", color: copied ? "#0A6853" : "var(--brand-text)", fontSize: "12.5px", fontWeight: 600, fontFamily: "inherit", cursor: "pointer" }}>
                             {copied ? <Check size={14} strokeWidth={1.5} aria-hidden="true" /> : <Share2 size={14} strokeWidth={1.5} aria-hidden="true" />}
                             {copied ? "Копирано" : "Копирай линк"}
                         </button>
@@ -226,7 +226,7 @@ export default function DziPlanner({ specialties }) {
 
                     {noEffect ? (
                         <div style={{ ...card, padding: "1.25rem", display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
-                            <AlertCircle size={18} strokeWidth={1.5} style={{ color: "#b45309", flexShrink: 0 }} aria-hidden="true" />
+                            <AlertCircle size={18} strokeWidth={1.5} style={{ color: "#986100", flexShrink: 0 }} aria-hidden="true" />
                             <p style={{ margin: 0, fontSize: "14px", lineHeight: 1.6, color: "var(--brand-text)" }}>
                                 Изборът на втори ДЗИ не променя нищо за тези специалности:{" "}
                                 {plan.baseline.counts.exam > 0 && <>{plan.baseline.counts.exam} от програмите искат кандидатстудентски изпит, </>}
@@ -236,13 +236,13 @@ export default function DziPlanner({ specialties }) {
                             </p>
                         </div>
                     ) : (
-                        <div style={{ ...card, padding: "1.25rem 1.5rem", borderColor: "rgba(31,107,58,0.4)" }}>
+                        <div style={{ ...card, padding: "1.25rem 1.5rem", borderColor: "rgba(23,86,217,0.4)" }}>
                             <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--brand-cyan)", marginBottom: "0.375rem" }}>Най-добър втори ДЗИ за теб</div>
                             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "0.5rem 1rem" }}>
                                 <span style={{ fontSize: "1.5rem", fontWeight: 900, letterSpacing: "-0.03em", color: "var(--brand-accent-text)" }}>{best.label}</span>
                                 <span style={{ fontSize: "14px", color: "var(--brand-text)" }}>
                                     <strong style={{ fontFamily: "var(--font-mono)" }}>{best.counts.open}</strong> от {total} програми без изпит
-                                    {best.gain > 0 && <span style={{ color: "#047857", fontWeight: 700 }}> · +{best.gain} спрямо само БЕЛ</span>}
+                                    {best.gain > 0 && <span style={{ color: "#0A6853", fontWeight: 700 }}> · +{best.gain} спрямо само БЕЛ</span>}
                                 </span>
                             </div>
                         </div>
@@ -313,7 +313,7 @@ export default function DziPlanner({ specialties }) {
                     </Link>
 
                     {user ? (
-                        <p style={{ margin: 0, display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "12px", color: "#047857", fontWeight: 600 }}>
+                        <p style={{ margin: 0, display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "12px", color: "#0A6853", fontWeight: 600 }}>
                             <Check size={13} strokeWidth={1.5} aria-hidden="true" /> Изборът ти се пази в акаунта
                         </p>
                     ) : (
