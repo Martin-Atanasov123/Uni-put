@@ -29,7 +29,7 @@ export default function ReminderAction() {
 
     const title = isUnsub ? "Отписване от напомняния" : "Потвърждаване на напомняния";
     const Icon = status === "ok" ? (isUnsub ? BellOff : CheckCircle2) : XCircle;
-    const color = status === "ok" ? (isUnsub ? "var(--brand-muted)" : "#10b981") : "#f87171";
+    const color = status === "ok" ? (isUnsub ? "var(--brand-muted)" : "#047857") : "#dc2626";
 
     const message = {
         working: "Момент…",

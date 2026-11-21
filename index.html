@@ -2,7 +2,7 @@
 <html data-theme="dark" lang="bg" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/university.png?v=2" />
+    <link rel="icon" type="image/png" href="/university.png?v=3" />
     <link rel="preconnect" href="https://vryaoxncvtnpsngkqteq.supabase.co" crossorigin />
     <link rel="dns-prefetch" href="https://images.unsplash.com" />
     <!-- Inter is self-hosted via @fontsource-variable/inter (see main.jsx) — no Google Fonts round-trip -->
@@ -15,21 +15,21 @@
       The #initial-loader is removed by main.jsx after React's first paint.
     -->
     <style>
-      :root { color-scheme: dark; }
+      :root { color-scheme: light; }
       *,*::before,*::after { box-sizing: border-box; }
-      html, body { margin: 0; background: #0f172a; }
+      html, body { margin: 0; background: #ffffff; }
       #initial-loader {
         position: fixed; inset: 0;
         display: flex; align-items: center; justify-content: center;
-        background: #0f172a;
+        background: #ffffff;
         z-index: 9999;
         opacity: 1;
       }
       @keyframes _il-spin { to { transform: rotate(360deg); } }
       #initial-loader > div {
         width: 32px; height: 32px;
-        border: 2.5px solid rgba(148,163,184,0.18);
-        border-top-color: #06b6d4;
+        border: 2.5px solid rgba(70,77,230,0.18);
+        border-top-color: #464de6;
         border-radius: 50%;
         animation: _il-spin 0.65s linear infinite;
       }
@@ -74,8 +74,8 @@
     />
     <meta data-seo-default name="twitter:image" content="https://uniput.eu/og/default.png" />
     <meta data-seo-default name="robots" content="index,follow" />
-    <meta name="theme-color" content="#0E1525" />
-    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#464DE6" />
+    <meta name="color-scheme" content="light" />
   </head>
   <body>
     <!--

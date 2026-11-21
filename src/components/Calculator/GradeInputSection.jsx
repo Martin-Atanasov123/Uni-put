@@ -179,7 +179,7 @@ export default function GradeInputSection({ coefficients = {}, separateKeys, fac
                                         <button
                                             type="button"
                                             onClick={e => { e.stopPropagation(); setOpenDropdown(isOpen ? null : slot.id); }}
-                                            style={{ display: "flex", alignItems: "center", gap: "0.25rem", padding: "0.2rem 0.5rem", background: "rgba(245,181,68,0.08)", border: "1px solid rgba(245,181,68,0.2)", borderRadius: "999px", color: "var(--brand-cyan)", fontSize: "11px", fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+                                            style={{ display: "flex", alignItems: "center", gap: "0.25rem", padding: "0.2rem 0.5rem", background: "rgba(70,77,230,0.08)", border: "1px solid rgba(70,77,230,0.2)", borderRadius: "999px", color: "var(--brand-cyan)", fontSize: "11px", fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
                                         >
                                             <ArrowUpDown size={10} /> Смени
                                         </button>
@@ -193,7 +193,7 @@ export default function GradeInputSection({ coefficients = {}, separateKeys, fac
                                                         key={alt.key}
                                                         type="button"
                                                         onClick={() => { handleChangeActiveAlt(slot.id, alt.key); setOpenDropdown(null); }}
-                                                        style={{ width: "100%", textAlign: "left", padding: "0.5rem 0.75rem", fontSize: "12px", fontWeight: activeKey === alt.key ? 700 : 500, color: activeKey === alt.key ? "var(--brand-cyan)" : "var(--brand-text)", background: activeKey === alt.key ? "rgba(245,181,68,0.08)" : "none", border: "none", cursor: "pointer", fontFamily: "inherit", transition: "background 0.15s" }}
+                                                        style={{ width: "100%", textAlign: "left", padding: "0.5rem 0.75rem", fontSize: "12px", fontWeight: activeKey === alt.key ? 700 : 500, color: activeKey === alt.key ? "var(--brand-cyan)" : "var(--brand-text)", background: activeKey === alt.key ? "rgba(70,77,230,0.08)" : "none", border: "none", cursor: "pointer", fontFamily: "inherit", transition: "background 0.15s" }}
                                                         onMouseEnter={e => { if (activeKey !== alt.key) e.currentTarget.style.background = "rgba(148,163,184,0.06)"; }}
                                                         onMouseLeave={e => { if (activeKey !== alt.key) e.currentTarget.style.background = "none"; }}
                                                     >
@@ -214,7 +214,7 @@ export default function GradeInputSection({ coefficients = {}, separateKeys, fac
                                 value={value}
                                 onChange={e => handleChangeGrade(activeAlt.key, e.target.value)}
                                 onBlur={() => handleBlurGrade(activeAlt.key)}
-                                onFocus={e => { e.target.style.borderColor = invalid ? "rgba(248,113,113,0.5)" : "rgba(245,181,68,0.5)"; e.target.style.boxShadow = invalid ? "0 0 0 3px rgba(248,113,113,0.08)" : "0 0 0 3px rgba(245,181,68,0.08)"; }}
+                                onFocus={e => { e.target.style.borderColor = invalid ? "rgba(248,113,113,0.5)" : "rgba(70,77,230,0.5)"; e.target.style.boxShadow = invalid ? "0 0 0 3px rgba(248,113,113,0.08)" : "0 0 0 3px rgba(70,77,230,0.08)"; }}
                                 onBlurCapture={e => { e.target.style.borderColor = invalid && value !== "" ? "rgba(248,113,113,0.4)" : "var(--brand-input-border)"; e.target.style.boxShadow = "none"; }}
                                 style={{ width: "100%", height: "2.75rem", padding: "0 0.875rem", background: "var(--brand-input-bg)", border: `1px solid ${invalid && value !== "" ? "rgba(248,113,113,0.4)" : "var(--brand-input-border)"}`, borderRadius: "0.625rem", color: "var(--brand-text)", fontSize: "18px", fontWeight: 700, fontFamily: "var(--font-mono)", outline: "none", boxSizing: "border-box", transition: "border-color 0.2s, box-shadow 0.2s" }}
                             />
@@ -222,7 +222,7 @@ export default function GradeInputSection({ coefficients = {}, separateKeys, fac
                             {/* Hint */}
                             <div style={{ fontSize: "11px", color: "var(--brand-muted)", minHeight: "1rem" }}>
                                 {invalid && value !== "" ? (
-                                    <span style={{ color: "#f87171" }}>Оценка между 2.00 и 6.00</span>
+                                    <span style={{ color: "#dc2626" }}>Оценка между 2.00 и 6.00</span>
                                 ) : bestAlt ? (
                                     <span>Най-добра: <strong style={{ color: "var(--brand-text)", fontFamily: "var(--font-mono)" }}>{bestAlt.grade.toFixed(2)}</strong> <span style={{ opacity: 0.6 }}>({bestAlt.label})</span></span>
                                 ) : (

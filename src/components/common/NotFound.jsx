@@ -34,7 +34,7 @@ export default function NotFound() {
                         background: "rgba(248,113,113,0.1)",
                         border: "1px solid rgba(248,113,113,0.25)",
                         borderRadius: "999px",
-                        color: "#fca5a5",
+                        color: "#b91c1c",
                         fontSize: "11px",
                         fontWeight: 800,
                         textTransform: "uppercase",
@@ -77,7 +77,7 @@ export default function NotFound() {
                             fontSize: "14px",
                             fontWeight: 700,
                             textDecoration: "none",
-                            boxShadow: "0 12px 30px rgba(245,181,68,0.3)",
+                            boxShadow: "0 12px 30px rgba(70,77,230,0.3)",
                         }}
                     >
                         <Home size={16} /> Към началната

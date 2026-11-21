@@ -40,7 +40,7 @@ const RIASEC_TYPES = {
     R: { label: "Реалист", color: "#F97316", bg: "rgba(249,115,22,0.12)", border: "rgba(249,115,22,0.3)" },
     I: { label: "Изследовател", color: "#8B5CF6", bg: "rgba(139,92,246,0.12)", border: "rgba(139,92,246,0.3)" },
     A: { label: "Артист", color: "#EC4899", bg: "rgba(236,72,153,0.12)", border: "rgba(236,72,153,0.3)" },
-    S: { label: "Социален", color: "#10B981", bg: "rgba(16,185,129,0.12)", border: "rgba(16,185,129,0.3)" },
+    S: { label: "Социален", color: "#047857", bg: "rgba(16,185,129,0.12)", border: "rgba(16,185,129,0.3)" },
     E: { label: "Предприемач", color: "#F59E0B", bg: "rgba(245,158,11,0.12)", border: "rgba(245,158,11,0.3)" },
     C: { label: "Конвенционален", color: "#06B6D4", bg: "rgba(6,182,212,0.12)", border: "rgba(6,182,212,0.3)" },
 };
@@ -258,7 +258,7 @@ const Profile = () => {
             <div style={{ minHeight: "100vh", background: "var(--brand-bg)", color: "var(--brand-text)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}>
-                    <div style={{ width: "3rem", height: "3rem", borderRadius: "50%", border: "3px solid rgba(245,181,68,0.2)", borderTopColor: "var(--brand-cyan)", animation: "spin 1s linear infinite" }} />
+                    <div style={{ width: "3rem", height: "3rem", borderRadius: "50%", border: "3px solid rgba(70,77,230,0.2)", borderTopColor: "var(--brand-cyan)", animation: "spin 1s linear infinite" }} />
                     <p style={{ margin: 0, fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--brand-muted)" }}>
                         Зареждане на профил...
                     </p>
@@ -287,7 +287,7 @@ const Profile = () => {
                     height: "240px",
                     position: "relative",
                     overflow: "hidden",
-                    background: "rgba(245,181,68,0.18)",
+                    background: "rgba(70,77,230,0.18)",
                 }}
             >
             </div>
@@ -327,8 +327,8 @@ const Profile = () => {
                                 <span
                                     style={{
                                         padding: "0.3rem 0.75rem",
-                                        background: "rgba(245,181,68,0.12)",
-                                        border: "1px solid rgba(245,181,68,0.3)",
+                                        background: "rgba(70,77,230,0.12)",
+                                        border: "1px solid rgba(70,77,230,0.3)",
                                         borderRadius: "999px",
                                         color: "var(--brand-cyan)",
                                         fontSize: "10px",
@@ -358,7 +358,7 @@ const Profile = () => {
                                 background: "rgba(248,113,113,0.08)",
                                 border: "1px solid rgba(248,113,113,0.25)",
                                 borderRadius: "0.625rem",
-                                color: "#fca5a5",
+                                color: "#b91c1c",
                                 fontSize: "12px",
                                 fontWeight: 700,
                                 cursor: "pointer",
@@ -394,8 +394,8 @@ const Profile = () => {
                                         alignItems: "center",
                                         gap: "0.4rem",
                                         padding: "0.6rem 1rem",
-                                        background: active ? "rgba(245,181,68,0.12)" : "transparent",
-                                        border: `1px solid ${active ? "rgba(245,181,68,0.35)" : "transparent"}`,
+                                        background: active ? "rgba(70,77,230,0.12)" : "transparent",
+                                        border: `1px solid ${active ? "rgba(70,77,230,0.35)" : "transparent"}`,
                                         borderRadius: "0.5rem",
                                         color: active ? "var(--brand-cyan)" : "var(--brand-muted)",
                                         fontSize: "12px",
@@ -423,7 +423,7 @@ const Profile = () => {
                                 background: message.type === "success" ? "rgba(34,197,94,0.08)" : "rgba(248,113,113,0.08)",
                                 border: `1px solid ${message.type === "success" ? "rgba(34,197,94,0.3)" : "rgba(248,113,113,0.3)"}`,
                                 borderRadius: "0.625rem",
-                                color: message.type === "success" ? "#86efac" : "#fca5a5",
+                                color: message.type === "success" ? "#86efac" : "#b91c1c",
                                 fontSize: "13px",
                                 fontWeight: 600,
                                 marginBottom: "1.25rem",
@@ -453,7 +453,7 @@ const Profile = () => {
                         return (
                             <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                                 {/* Следваща стъпка — едно конкретно действие вместо статичен списък */}
-                                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1rem", padding: "1.25rem 1.5rem", background: "rgba(245,181,68,0.08)", border: "1px solid rgba(245,181,68,0.25)", borderRadius: "1.25rem" }}>
+                                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1rem", padding: "1.25rem 1.5rem", background: "rgba(70,77,230,0.08)", border: "1px solid rgba(70,77,230,0.25)", borderRadius: "1.25rem" }}>
                                     <div style={{ width: "2.75rem", height: "2.75rem", borderRadius: "0.75rem", background: "var(--brand-accent)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                         <Compass size={20} color="#111827" strokeWidth={1.5} />
                                     </div>
@@ -495,7 +495,7 @@ const Profile = () => {
                                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "0.5rem" }}>
                                         {progressSteps.map((step, i) => {
                                             const inner = (
-                                                <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem", padding: "0.625rem", background: step.done ? "rgba(245,181,68,0.06)" : "transparent", border: `1px solid ${step.done ? "rgba(245,181,68,0.2)" : "transparent"}`, borderRadius: "0.75rem", cursor: step.done ? "default" : "pointer", height: "100%" }}>
+                                                <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem", padding: "0.625rem", background: step.done ? "rgba(70,77,230,0.06)" : "transparent", border: `1px solid ${step.done ? "rgba(70,77,230,0.2)" : "transparent"}`, borderRadius: "0.75rem", cursor: step.done ? "default" : "pointer", height: "100%" }}>
                                                     <div style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
                                                         <span style={{ width: "1.125rem", height: "1.125rem", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, background: step.done ? "var(--brand-cyan)" : "var(--brand-border)" }}>
                                                             {step.done ? <Check size={9} color="#111827" strokeWidth={3} /> : <span style={{ fontSize: "8px", fontWeight: 800, color: "var(--brand-muted)" }}>{i + 1}</span>}
@@ -547,14 +547,14 @@ const Profile = () => {
                                         <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}>
                                             {favoriteDetails.length > 0 ? favoriteDetails.map(uni => (
                                                 <div key={uni.id} style={{ display: "flex", alignItems: "center", gap: "0.875rem", padding: "0.75rem", background: "var(--brand-input-bg)", border: "1px solid var(--brand-border)", borderRadius: "0.75rem" }}>
-                                                    <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "0.625rem", background: "rgba(245,181,68,0.1)", color: "var(--brand-cyan)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                                    <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "0.625rem", background: "rgba(70,77,230,0.1)", color: "var(--brand-cyan)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                                         <GraduationCap size={18} />
                                                     </div>
                                                     <div style={{ flex: 1, minWidth: 0 }}>
                                                         <p style={{ margin: 0, fontSize: "13px", fontWeight: 700, color: "var(--brand-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{uni.university_name}</p>
                                                         <p style={{ margin: "0.15rem 0 0", display: "inline-flex", alignItems: "center", gap: "0.25rem", fontSize: "10px", color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}><MapPin size={9} /> {uni.city}</p>
                                                     </div>
-                                                    <button onClick={() => toggleFavorite(uni.id.toString())} style={{ width: "1.75rem", height: "1.75rem", borderRadius: "0.5rem", background: "transparent", border: "1px solid rgba(248,113,113,0.2)", color: "#fca5a5", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                                    <button onClick={() => toggleFavorite(uni.id.toString())} style={{ width: "1.75rem", height: "1.75rem", borderRadius: "0.5rem", background: "transparent", border: "1px solid rgba(248,113,113,0.2)", color: "#b91c1c", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
                                                         <Trash2 size={12} />
                                                     </button>
                                                 </div>
@@ -562,7 +562,7 @@ const Profile = () => {
                                                 <div style={{ padding: "2rem", textAlign: "center", background: "var(--brand-input-bg)", border: "1px dashed var(--brand-input-border)", borderRadius: "1rem" }}>
                                                     <Heart size={28} style={{ color: "var(--brand-muted)", opacity: 0.3, margin: "0 auto 0.625rem" }} />
                                                     <p style={{ margin: "0 0 0.75rem", fontSize: "12px", color: "var(--brand-muted)", fontStyle: "italic" }}>Нямаш добавени любими специалности</p>
-                                                    <Link to="/universities/" style={{ display: "inline-flex", padding: "0.4rem 0.875rem", background: "rgba(245,181,68,0.1)", border: "1px solid rgba(245,181,68,0.3)", borderRadius: "0.5rem", color: "var(--brand-cyan)", fontSize: "11px", fontWeight: 700, textDecoration: "none" }}>
+                                                    <Link to="/universities/" style={{ display: "inline-flex", padding: "0.4rem 0.875rem", background: "rgba(70,77,230,0.1)", border: "1px solid rgba(70,77,230,0.3)", borderRadius: "0.5rem", color: "var(--brand-cyan)", fontSize: "11px", fontWeight: 700, textDecoration: "none" }}>
                                                         Търсене
                                                     </Link>
                                                 </div>
@@ -589,7 +589,7 @@ const Profile = () => {
                                                                 {d.type === "application" ? "Срок за кандидатстване" : "Приемен изпит"} · {new Date(d.deadline).toLocaleDateString("bg-BG", { day: "numeric", month: "long" })}
                                                             </p>
                                                         </div>
-                                                        <span style={{ flexShrink: 0, padding: "0.25rem 0.625rem", borderRadius: "999px", fontSize: "11px", fontWeight: 700, background: d.daysLeft <= 7 ? "rgba(248,113,113,0.12)" : "rgba(245,181,68,0.1)", color: d.daysLeft <= 7 ? "#fca5a5" : "var(--brand-cyan)" }}>
+                                                        <span style={{ flexShrink: 0, padding: "0.25rem 0.625rem", borderRadius: "999px", fontSize: "11px", fontWeight: 700, background: d.daysLeft <= 7 ? "rgba(248,113,113,0.12)" : "rgba(70,77,230,0.1)", color: d.daysLeft <= 7 ? "#b91c1c" : "var(--brand-cyan)" }}>
                                                             {d.daysLeft === 0 ? "днес" : d.daysLeft === 1 ? "утре" : `след ${d.daysLeft} дни`}
                                                         </span>
                                                     </div>
@@ -666,21 +666,21 @@ const Profile = () => {
                                                             <p style={{ margin: 0, fontSize: "13px", fontWeight: 800, color: "var(--brand-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{h.specialty || "Неизвестна"}</p>
                                                             <p style={{ margin: "0.2rem 0 0", fontSize: "10px", color: "var(--brand-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{h.university || h.faculty}</p>
                                                         </div>
-                                                        <span style={{ fontFamily: "var(--font-mono)", fontSize: "1.25rem", fontWeight: 800, color: above ? "#34d399" : "var(--brand-text)", flexShrink: 0 }}>{h.score?.toFixed ? h.score.toFixed(2) : h.score}</span>
+                                                        <span style={{ fontFamily: "var(--font-mono)", fontSize: "1.25rem", fontWeight: 800, color: above ? "#047857" : "var(--brand-text)", flexShrink: 0 }}>{h.score?.toFixed ? h.score.toFixed(2) : h.score}</span>
                                                     </div>
                                                     {points.length > 1 && <ScoreSparkline points={points} />}
                                                     {delta !== null && (
-                                                        <span style={{ fontSize: "11px", fontWeight: 700, color: delta > 0 ? "#34d399" : delta < 0 ? "#fca5a5" : "var(--brand-muted)" }}>
+                                                        <span style={{ fontSize: "11px", fontWeight: 700, color: delta > 0 ? "#047857" : delta < 0 ? "#b91c1c" : "var(--brand-muted)" }}>
                                                             {delta > 0 ? "▲ +" : delta < 0 ? "▼ −" : ""}{delta === 0 ? "Без промяна" : Math.abs(delta).toFixed(2) + " т."} спрямо {new Date(prev.date).toLocaleDateString("bg-BG", { day: "numeric", month: "short" })}
                                                         </span>
                                                     )}
                                                     {h.maxBall > 0 && (
                                                         <div style={{ height: "3px", background: "var(--brand-border)", borderRadius: "2px" }}>
-                                                            <div style={{ height: "3px", borderRadius: "2px", background: hasMin ? (above ? "#34d399" : "rgba(248,113,113,0.6)") : "var(--brand-cyan)", width: `${Math.min((h.score / h.maxBall) * 100, 100)}%` }} />
+                                                            <div style={{ height: "3px", borderRadius: "2px", background: hasMin ? (above ? "#047857" : "rgba(248,113,113,0.6)") : "var(--brand-cyan)", width: `${Math.min((h.score / h.maxBall) * 100, 100)}%` }} />
                                                         </div>
                                                     )}
                                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                                        <span style={{ fontSize: "10px", color: hasMin ? (above ? "#34d399" : "#fca5a5") : "var(--brand-muted)", fontWeight: 700 }}>
+                                                        <span style={{ fontSize: "10px", color: hasMin ? (above ? "#047857" : "#b91c1c") : "var(--brand-muted)", fontWeight: 700 }}>
                                                             {hasMin
                                                                 ? (above ? `Над минималния (${Number(h.minBall).toFixed(2)})` : `Под минималния (${Number(h.minBall).toFixed(2)})`)
                                                                 : (h.maxBall > 0 ? `${Math.min((h.score / h.maxBall) * 100, 100).toFixed(0)}% от макс. бал` : "")}
@@ -763,7 +763,7 @@ const Profile = () => {
                                         alignItems: "center",
                                         gap: "0.5rem",
                                         fontFamily: "inherit",
-                                        boxShadow: "0 12px 30px rgba(245,181,68,0.3)",
+                                        boxShadow: "0 12px 30px rgba(70,77,230,0.3)",
                                     }}
                                 >
                                     {updating && <Loader2 size={14} style={{ animation: "spin 1s linear infinite" }} />}
@@ -786,8 +786,8 @@ const Profile = () => {
                                         onClick={() => navigate("/forgot-password")}
                                         style={{
                                             padding: "0.55rem 1rem",
-                                            background: "rgba(245,181,68,0.1)",
-                                            border: "1px solid rgba(245,181,68,0.3)",
+                                            background: "rgba(70,77,230,0.1)",
+                                            border: "1px solid rgba(70,77,230,0.3)",
                                             borderRadius: "0.625rem",
                                             color: "var(--brand-cyan)",
                                             fontSize: "11px",
@@ -813,7 +813,7 @@ const Profile = () => {
                                         {!showDeleteConfirm && (
                                             <button
                                                 onClick={() => setShowDeleteConfirm(true)}
-                                                style={{ padding: "0.55rem 1rem", background: "rgba(248,113,113,0.15)", border: "1px solid rgba(248,113,113,0.35)", borderRadius: "0.625rem", color: "#fca5a5", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", cursor: "pointer", fontFamily: "inherit" }}
+                                                style={{ padding: "0.55rem 1rem", background: "rgba(248,113,113,0.15)", border: "1px solid rgba(248,113,113,0.35)", borderRadius: "0.625rem", color: "#b91c1c", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", cursor: "pointer", fontFamily: "inherit" }}
                                             >
                                                 Изтрий
                                             </button>
@@ -821,7 +821,7 @@ const Profile = () => {
                                     </div>
                                     {showDeleteConfirm && (
                                         <div style={{ padding: "1rem", background: "rgba(248,113,113,0.06)", border: "1px solid rgba(248,113,113,0.25)", borderRadius: "0.75rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                                            <p style={{ margin: 0, fontSize: "12px", color: "#fca5a5", fontWeight: 600 }}>
+                                            <p style={{ margin: 0, fontSize: "12px", color: "#b91c1c", fontWeight: 600 }}>
                                                 Въведи имейл-а си за потвърждение:
                                                 <span style={{ color: "var(--brand-muted)", fontWeight: 500 }}> ({user?.email})</span>
                                             </p>
@@ -842,7 +842,7 @@ const Profile = () => {
                                                 <button
                                                     onClick={handleDeleteAccount}
                                                     disabled={deleteConfirmEmail !== user?.email || deletingAccount}
-                                                    style={{ padding: "0.5rem 1rem", background: deleteConfirmEmail === user?.email ? "rgba(248,113,113,0.2)" : "transparent", border: "1px solid rgba(248,113,113,0.4)", borderRadius: "0.625rem", color: "#fca5a5", fontSize: "12px", fontWeight: 700, cursor: deleteConfirmEmail === user?.email ? "pointer" : "not-allowed", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: "0.375rem", opacity: deleteConfirmEmail === user?.email ? 1 : 0.5 }}
+                                                    style={{ padding: "0.5rem 1rem", background: deleteConfirmEmail === user?.email ? "rgba(248,113,113,0.2)" : "transparent", border: "1px solid rgba(248,113,113,0.4)", borderRadius: "0.625rem", color: "#b91c1c", fontSize: "12px", fontWeight: 700, cursor: deleteConfirmEmail === user?.email ? "pointer" : "not-allowed", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: "0.375rem", opacity: deleteConfirmEmail === user?.email ? 1 : 0.5 }}
                                                 >
                                                     {deletingAccount && <Loader2 size={12} style={{ animation: "spin 1s linear infinite" }} />}
                                                     Изтрий завинаги
@@ -888,8 +888,8 @@ function ScoreSparkline({ points }) {
 
 function StatCard({ icon: Icon, label, value, color }) {
     const palette = color === "cyan"
-        ? { bg: "rgba(245,181,68,0.08)", border: "rgba(245,181,68,0.25)", color: "var(--brand-cyan)" }
-        : { bg: "rgba(245,181,68,0.08)", border: "rgba(245,181,68,0.25)", color: "var(--brand-violet)" };
+        ? { bg: "rgba(70,77,230,0.08)", border: "rgba(70,77,230,0.25)", color: "var(--brand-cyan)" }
+        : { bg: "rgba(70,77,230,0.08)", border: "rgba(70,77,230,0.25)", color: "var(--brand-violet)" };
     return (
         <div
             style={{
@@ -949,8 +949,8 @@ function InputGroup({ label, icon: Icon, disabled, ...props }) {
 
 function Section({ icon: Icon, iconColor, title, subtitle, danger, children }) {
     const palette = iconColor === "cyan"
-        ? { bg: "rgba(245,181,68,0.12)", border: "rgba(245,181,68,0.3)", color: "var(--brand-cyan)" }
-        : { bg: "rgba(248,113,113,0.12)", border: "rgba(248,113,113,0.3)", color: "#fca5a5" };
+        ? { bg: "rgba(70,77,230,0.12)", border: "rgba(70,77,230,0.3)", color: "var(--brand-cyan)" }
+        : { bg: "rgba(248,113,113,0.12)", border: "rgba(248,113,113,0.3)", color: "#b91c1c" };
     return (
         <div
             style={{
@@ -981,7 +981,7 @@ function Section({ icon: Icon, iconColor, title, subtitle, danger, children }) {
                     <Icon size={20} />
                 </div>
                 <div>
-                    <h3 style={{ margin: 0, fontSize: "1rem", fontWeight: 800, color: danger ? "#fca5a5" : "var(--brand-text)", letterSpacing: "-0.01em" }}>{title}</h3>
+                    <h3 style={{ margin: 0, fontSize: "1rem", fontWeight: 800, color: danger ? "#b91c1c" : "var(--brand-text)", letterSpacing: "-0.01em" }}>{title}</h3>
                     <p style={{ margin: "0.2rem 0 0", fontSize: "11px", color: "var(--brand-muted)" }}>{subtitle}</p>
                 </div>
             </div>

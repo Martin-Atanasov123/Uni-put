@@ -5,59 +5,67 @@
 
 :root,
 [data-theme="dark"] {
-  --brand-bg: #0E1525;
-  --brand-bg-alt: #0A101E;
-  --brand-surface: #17203A;
-  --brand-surface-2: rgba(23,32,58,0.7);
-  --brand-cyan: #F5B544; /* исторически вариант на името — вече кехлибар */
-  --brand-violet: #F5B544; /* един акцент: виолетът е махнат */
-  /* Плътен акцент вместо градиент (редизайн): запълвания и акцентен текст.
-     Една промяна тук сменя акцента навсякъде. */
-  --brand-accent: #F5B544;
-  --brand-accent-ink: #111827; /* тъмен текст върху плътен акцент (9,8:1) */
-  --brand-accent-text: #F5B544;
-  --font-display: 'Source Serif 4 Variable', Georgia, 'Times New Roman', serif;
-  --font-body: 'Source Sans 3 Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
-  --brand-text: #EEF1F7;
-  --brand-muted: #94A3B8;
-  --brand-border: rgba(148, 163, 184, 0.1);
-  --brand-input-bg: rgba(14,21,37,0.8);
-  --brand-input-border: rgba(148,163,184,0.12);
-  --brand-dropdown-bg: #17203A;
-  --brand-nav-bg: rgba(14,21,37,0.55);
-  --brand-nav-scrolled: rgba(14,21,37,0.75);
-  --brand-shadow: rgba(0,0,0,0.5);
-  --brand-card-hover: rgba(245,181,68,0.08);
-  --brand-card-border: rgba(148,163,184,0.09);
-  --brand-progress-bg: rgba(14,21,37,0.85);
+  color-scheme: light;
 
-  /* Map DaisyUI v5 tokens to brand palette (admin panel & any DaisyUI components) */
-  --color-base-100: #0E1525;
-  --color-base-200: #121A30;
-  --color-base-300: #17203A;
-  --color-base-content: #EEF1F7;
-  --color-primary: #F5B544;
-  --color-primary-content: #111827;
-  --color-secondary: #F5B544;
-  --color-secondary-content: #111827;
-  --color-accent: #F5B544;
-  --color-accent-content: #111827;
-  --color-neutral: #17203A;
-  --color-neutral-content: #94A3B8;
-  --color-info: #F5B544;
-  --color-info-content: #111827;
-  --color-success: #10b981;
-  --color-success-content: #0B1410;
-  --color-warning: #FBBF24;
-  --color-warning-content: #111827;
-  --color-error: #f87171;
-  --color-error-content: #1A0F0C;
+  /* ── Палитра (редизайн по Betheme „Course“): индиго + мента + нейви на светъл фон ── */
+  --brand-indigo: #464DE6;
+  --brand-navy: #2A2952;
+  --brand-mint: #5EFBD7;
+  --brand-cream: #F3F0EC;
+
+  --brand-bg: #FFFFFF;
+  --brand-bg-alt: #F3F0EC;
+  --brand-surface: #FFFFFF;
+  --brand-surface-2: #F3F0EC;
+  /* Исторически имена: --brand-cyan / --brand-violet сега сочат към индиго (един акцент). */
+  --brand-cyan: #464DE6;
+  --brand-violet: #464DE6;
+  --brand-accent: #464DE6;          /* плътен акцент: бутони и запълвания */
+  --brand-accent-ink: #FFFFFF;      /* текст върху акцента (6,3:1) */
+  --brand-accent-text: #464DE6;     /* акцентен текст върху бяло (6,3:1) */
+  --brand-on-indigo: #5EFBD7;       /* мента върху индиго (hero, ленти) */
+
+  --font-display: 'Manrope Variable', 'Inter Variable', system-ui, sans-serif;
+  --font-body: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+
+  --brand-text: #2A2952;
+  --brand-muted: #515075;
+  --brand-border: rgba(42, 41, 82, 0.12);
+  --brand-input-bg: #FFFFFF;
+  --brand-input-border: rgba(42, 41, 82, 0.22);
+  --brand-dropdown-bg: #FFFFFF;
+  --brand-nav-bg: rgba(255,255,255,0.92);
+  --brand-nav-scrolled: rgba(255,255,255,0.96);
+  --brand-shadow: rgba(42,41,82,0.16);
+  --brand-card-hover: rgba(70,77,230,0.10);
+  --brand-card-border: rgba(42, 41, 82, 0.10);
+  --brand-progress-bg: rgba(255,255,255,0.92);
+
+  /* DaisyUI v5 токени (админ панел и др.) */
+  --color-base-100: #FFFFFF;
+  --color-base-200: #F3F0EC;
+  --color-base-300: #E7E3DC;
+  --color-base-content: #2A2952;
+  --color-primary: #464DE6;
+  --color-primary-content: #FFFFFF;
+  --color-secondary: #2A2952;
+  --color-secondary-content: #FFFFFF;
+  --color-accent: #5EFBD7;
+  --color-accent-content: #1D2939;
+  --color-neutral: #2A2952;
+  --color-neutral-content: #FFFFFF;
+  --color-info: #464DE6;
+  --color-info-content: #FFFFFF;
+  --color-success: #047857;
+  --color-success-content: #FFFFFF;
+  --color-warning: #b45309;
+  --color-warning-content: #FFFFFF;
+  --color-error: #dc2626;
+  --color-error-content: #FFFFFF;
 }
 
-/* Light theme премахната по продуктово решение (юни 2026).
-   Целият продукт е dark-only. data-theme винаги е "dark" (force-set от useTheme).
-   Старият [data-theme="nord"] CSS блок е напълно изтрит за да освободи CSS bundle-а. */
+/* Тема: светла (редизайн). data-theme остава "dark" само като име на селектора от useTheme. */
 
 html, body {
   background: var(--brand-bg);
@@ -65,7 +73,6 @@ html, body {
 
 body {
   font-family: var(--font-body);
-  font-size: 1.0625rem;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;

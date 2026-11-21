@@ -110,7 +110,7 @@ export default function Header() {
                     maxWidth: "80rem", margin: "0 auto",
                     background: scrolled ? "var(--brand-nav-scrolled)" : "var(--brand-nav-bg)",
                     backdropFilter: "blur(16px)",
-                    border: `1px solid ${scrolled ? "rgba(245,181,68,0.2)" : "var(--brand-border)"}`,
+                    border: `1px solid ${scrolled ? "rgba(70,77,230,0.2)" : "var(--brand-border)"}`,
                     borderRadius: "1.25rem",
                     padding: scrolled ? "0.5rem 1rem" : "0.75rem 1rem",
                     display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -120,7 +120,7 @@ export default function Header() {
                     {/* Brand */}
                     <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
                         <img
-                            src="/logo-wordmark.png?v=2"
+                            src="/logo-wordmark.png?v=3"
                             alt="УниПът лого"
                             style={{ height: "70px", width: "auto", objectFit: "contain", borderRadius: "0.5rem"  }}
                         />
@@ -147,8 +147,8 @@ export default function Header() {
                                 padding: "0.5rem 0.875rem", borderRadius: "0.625rem",
                                 fontSize: "13px", fontWeight: 700, textDecoration: "none",
                                 color: "var(--brand-violet)",
-                                background: isActive("/admin") ? "rgba(245,181,68,0.12)" : "transparent",
-                                border: "1px solid rgba(245,181,68,0.25)",
+                                background: isActive("/admin") ? "rgba(70,77,230,0.12)" : "transparent",
+                                border: "1px solid rgba(70,77,230,0.25)",
                             }}>
                                 <Settings size={14} /> Админ
                             </Link>
@@ -203,7 +203,7 @@ export default function Header() {
                                         zIndex: 110,
                                     }}>
                                         <div style={{ padding: "0.625rem 0.75rem", marginBottom: "0.25rem",
-                                            background: "rgba(245,181,68,0.06)", borderRadius: "0.625rem" }}>
+                                            background: "rgba(70,77,230,0.06)", borderRadius: "0.625rem" }}>
                                             <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Добре дошъл</div>
                                             <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--brand-cyan)", marginTop: "0.125rem", overflow: "hidden", textOverflow: "ellipsis" }}>
                                                 {user.user_metadata?.username || user.email}
@@ -217,7 +217,7 @@ export default function Header() {
                                         <button onClick={handleLogout} style={{
                                             width: "100%", display: "flex", alignItems: "center", gap: "0.5rem",
                                             padding: "0.5rem 0.75rem", borderRadius: "0.5rem",
-                                            fontSize: "13px", fontWeight: 600, color: "#f87171",
+                                            fontSize: "13px", fontWeight: 600, color: "#dc2626",
                                             background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", textAlign: "left",
                                         }}
                                         className="uni-logout-btn"
@@ -281,8 +281,8 @@ export default function Header() {
                                         padding: "0.875rem 1rem", borderRadius: "0.75rem",
                                         fontSize: "14px", fontWeight: 600, textDecoration: "none",
                                         color: active ? "var(--brand-cyan)" : "var(--brand-text)",
-                                        background: active ? "rgba(245,181,68,0.1)" : "rgba(23,32,58,0.5)",
-                                        border: active ? "1px solid rgba(245,181,68,0.25)" : "1px solid rgba(148,163,184,0.08)",
+                                        background: active ? "rgba(70,77,230,0.1)" : "rgba(42,41,82,0.05)",
+                                        border: active ? "1px solid rgba(70,77,230,0.25)" : "1px solid rgba(148,163,184,0.08)",
                                     }}>
                                         <Icon size={16} /> {link.name}
                                     </Link>
@@ -294,8 +294,8 @@ export default function Header() {
                                     padding: "0.875rem 1rem", borderRadius: "0.75rem",
                                     fontSize: "14px", fontWeight: 700, textDecoration: "none",
                                     color: "var(--brand-violet)",
-                                    background: "rgba(245,181,68,0.08)",
-                                    border: "1px solid rgba(245,181,68,0.25)",
+                                    background: "rgba(70,77,230,0.08)",
+                                    border: "1px solid rgba(70,77,230,0.25)",
                                 }}>
                                     <Settings size={16} /> Админ панел
                                 </Link>
@@ -307,8 +307,8 @@ export default function Header() {
                             <Link to="/calculator/" style={{
                                 padding: "0.875rem", borderRadius: "0.75rem", textAlign: "center",
                                 fontSize: "14px", fontWeight: 800, textDecoration: "none",
-                                color: "var(--brand-cyan)", border: "1px solid rgba(245,181,68,0.4)",
-                                background: "rgba(245,181,68,0.08)",
+                                color: "var(--brand-cyan)", border: "1px solid rgba(70,77,230,0.4)",
+                                background: "rgba(70,77,230,0.08)",
                             }}>Изчисли бал →</Link>
 
                             {!user ? (
@@ -329,7 +329,7 @@ export default function Header() {
                             ) : (
                                 <button onClick={handleLogout} style={{
                                     width: "100%", padding: "0.75rem", borderRadius: "0.625rem",
-                                    fontSize: "13px", fontWeight: 700, color: "#f87171",
+                                    fontSize: "13px", fontWeight: 700, color: "#dc2626",
                                     background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.25)",
                                     cursor: "pointer", fontFamily: "inherit",
                                     display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem",
@@ -366,22 +366,19 @@ export default function Header() {
                 }
                 .uni-nav-link--active {
                     color: var(--brand-cyan) !important;
-                    background: rgba(245,181,68,0.1);
-                    border-color: rgba(245,181,68,0.25);
+                    background: rgba(70,77,230,0.1);
+                    border-color: rgba(70,77,230,0.25);
                 }
 
-                /* Calculator CTA button — replaces inline hover handlers */
+                /* Calculator CTA button — плътен индиго (основно действие) */
                 .uni-nav-cta {
-                    padding: 0.5rem 1rem; border-radius: 0.625rem;
-                    font-size: 13px; font-weight: 700; color: var(--brand-cyan); text-decoration: none;
-                    border: 1px solid rgba(245,181,68,0.4);
-                    background: rgba(245,181,68,0.06);
-                    transition: background 0.2s, border-color 0.2s;
+                    padding: 0.55rem 1.1rem; border-radius: 0.75rem;
+                    font-size: 13px; font-weight: 700; color: var(--brand-accent-ink); text-decoration: none;
+                    background: var(--brand-accent);
+                    border: 1px solid var(--brand-accent);
+                    transition: background 0.2s, transform 0.2s;
                 }
-                .uni-nav-cta:hover {
-                    background: rgba(245,181,68,0.12);
-                    border-color: rgba(245,181,68,0.7);
-                }
+                .uni-nav-cta:hover { background: var(--brand-navy); border-color: var(--brand-navy); }
 
                 /* Dropdown menu item */
                 .uni-menu-item { transition: background 0.15s; }

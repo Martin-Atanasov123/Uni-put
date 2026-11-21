@@ -231,7 +231,7 @@ const SEO_LINKS = [
 // React рендира за същия route. При промяна в UniversityPage.jsx / Universities.jsx
 // обнови и този файл, иначе Google вижда разминаване prerender ↔ rendered.
 const WRAP_OPEN =
-    `<div style="max-width:1152px;margin:0 auto;padding:96px 24px;color:#e2e8f0;` +
+    `<div style="max-width:1152px;margin:0 auto;padding:96px 24px;color:#2A2952;` +
     `font-family:system-ui,-apple-system,sans-serif;line-height:1.6">`;
 
 function navLinks(selfHref) {

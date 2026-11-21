@@ -134,7 +134,7 @@ const Footer = () => {
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
-                                    boxShadow: "0 8px 24px rgba(245,181,68,0.25)",
+                                    boxShadow: "0 8px 24px rgba(70,77,230,0.25)",
                                 }}
                             >
                                 <GraduationCap size={20} color="#111827" />
@@ -142,7 +142,7 @@ const Footer = () => {
                             </div> */} {/* Brand */}
                     <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
                         <img
-                            src="/logo-wordmark.png?v=2"
+                            src="/logo-wordmark.png?v=3"
                             alt="УниПът лого"
                             style={{ height: "70px", width: "auto", objectFit: "contain", borderRadius: "0.5rem"  }}
                         />
@@ -167,10 +167,10 @@ const Footer = () => {
                                 alignItems: "center",
                                 alignSelf: "flex-start",
                                 padding: "0.3rem 0.625rem",
-                                background: "rgba(245,181,68,0.1)",
-                                border: "1px solid rgba(245,181,68,0.3)",
+                                background: "rgba(70,77,230,0.1)",
+                                border: "1px solid rgba(70,77,230,0.3)",
                                 borderRadius: "999px",
-                                color: "#c4b5fd",
+                                color: "#464DE6",
                                 fontSize: "10px",
                                 fontWeight: 700,
                                 letterSpacing: "0.12em",
@@ -227,7 +227,7 @@ const Footer = () => {
                         © {currentYear} УниПът Bulgaria — Всички права запазени
                     </p>
                     {/* <p style={{ margin: 0, display: "inline-flex", alignItems: "center", gap: "0.375rem", fontSize: "11px", color: "var(--brand-muted)", opacity: 0.7 }}>
-                        Направено с <Heart size={11} style={{ color: "#f87171", fill: "#f87171" }} /> в България
+                        Направено с <Heart size={11} style={{ color: "#dc2626", fill: "#dc2626" }} /> в България
                     </p> */}
                 </div>
             </m.div>

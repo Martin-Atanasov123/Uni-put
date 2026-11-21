@@ -25,7 +25,7 @@ const RIASEC_LETTER = {
     R: { name: "Реалистичен", color: "#F97316" },
     I: { name: "Изследователски", color: "#8B5CF6" },
     A: { name: "Артистичен", color: "#EC4899" },
-    S: { name: "Социален", color: "#10B981" },
+    S: { name: "Социален", color: "#047857" },
     E: { name: "Предприемачески", color: "#F59E0B" },
     C: { name: "Конвенционален", color: "#06B6D4" },
 };
@@ -194,7 +194,7 @@ export default function SpecialtyPage() {
                         <StatChip icon={Compass} value={riasec.riasec_code} label={`тип ${letterInfo.name}`} color={letterInfo.color} />
                     )}
                     {minRange && (
-                        <StatChip icon={TrendingUp} value={minRange.lo.toFixed(2)} label={`най-нисък минимален бал`} color="#10b981" />
+                        <StatChip icon={TrendingUp} value={minRange.lo.toFixed(2)} label={`най-нисък минимален бал`} color="#047857" />
                     )}
                 </div>
 
@@ -257,7 +257,7 @@ export default function SpecialtyPage() {
                                     </div>
                                     {ms && (
                                         <div style={{ textAlign: "right", flexShrink: 0 }}>
-                                            <div style={{ fontSize: "1.25rem", fontWeight: 900, fontFamily: "var(--font-mono)", color: "#10b981", lineHeight: 1 }}>
+                                            <div style={{ fontSize: "1.25rem", fontWeight: 900, fontFamily: "var(--font-mono)", color: "#047857", lineHeight: 1 }}>
                                                 {ms.minBall.toFixed(2)}
                                             </div>
                                             <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: "2px" }}>
@@ -272,7 +272,7 @@ export default function SpecialtyPage() {
                                 )}
 
                                 {p.formula_description && (
-                                    <div style={{ marginTop: "0.75rem", padding: "0.625rem 0.75rem", background: "rgba(245,181,68,0.06)", border: "1px solid rgba(245,181,68,0.15)", borderRadius: "0.625rem", fontSize: "12px", color: "var(--brand-muted)", lineHeight: 1.5, wordBreak: "break-word", overflowWrap: "anywhere" }}>
+                                    <div style={{ marginTop: "0.75rem", padding: "0.625rem 0.75rem", background: "rgba(70,77,230,0.06)", border: "1px solid rgba(70,77,230,0.15)", borderRadius: "0.625rem", fontSize: "12px", color: "var(--brand-muted)", lineHeight: 1.5, wordBreak: "break-word", overflowWrap: "anywhere" }}>
                                         <strong style={{ color: "var(--brand-text)" }}>Формула:</strong> {p.formula_description}
                                     </div>
                                 )}

@@ -1,10 +1,10 @@
 // Генерира социални preview изображения (Open Graph + Twitter Card), 1200×630.
 //
-// Дизайн (редизайн, ноември 2026): плътен тъмен фон, кехлибарен акцент, Source Serif 4 за
-// заглавието и Source Sans 3 за текста — същото като в сайта. Без градиенти и орбове.
+// Дизайн (редизайн по Betheme „Course“): индиго фон, ментов акцент, Manrope за заглавието и Inter за текста —
+// същото като в сайта. Без градиенти и орбове.
 //
 // Шрифтовете са статични TTF в scripts/og-fonts/ (Resvg не чете woff2). Логото е
-// scripts/og-fonts/logo-amber.png (изрязана и намалена версия на public/logo-wordmark.png).
+// scripts/og-fonts/logo-mint.png (изрязана и намалена версия на public/logo-wordmark.png).
 //
 // Стартирай ръчно: `npm run generate:og`. Не е в prebuild — PNG-тата се commit-ват и се
 // регенерират само при промяна на дизайна или на числата в siteStats.
@@ -20,10 +20,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = resolve(__dirname, "..", "public", "og");
 const FONT_DIR = resolve(__dirname, "og-fonts");
 
-const BG = "#0E1525";
-const ACCENT = "#F5B544";
-const TEXT = "#EEF1F7";
-const MUTED = "#94A3B8";
+const BG = "#464DE6";
+const ACCENT = "#5EFBD7";
+const TEXT = "#FFFFFF";
+const MUTED = "#DCDDFB";
 
 const PAGES = [
     { slug: "default", eyebrow: "УНИПЪТ", title: "Калкулатор за приемен бал", subtitle: "и кариерен ориентир за кандидат-студенти" },
@@ -81,7 +81,7 @@ function svgTemplate({ eyebrow, title, subtitle }, logoB64) {
   <text x="80" y="238" font-family="UP Sans Bold" font-size="24" fill="${ACCENT}" letter-spacing="3.2">${esc(eyebrow)}</text>
 
   <!-- Заглавие -->
-  ${lines.map((l, i) => `<text x="80" y="${titleY + i * lh}" font-family="UP Serif" font-size="80" fill="${TEXT}" letter-spacing="-1.4">${esc(l)}</text>`).join("\n  ")}
+  ${lines.map((l, i) => `<text x="80" y="${titleY + i * lh}" font-family="UP Display" font-size="80" fill="${TEXT}" letter-spacing="-2.2">${esc(l)}</text>`).join("\n  ")}
 
   <!-- Подзаглавие -->
   <text x="80" y="${subY}" font-family="UP Sans" font-size="34" fill="${MUTED}">${esc(subtitle)}</text>
@@ -93,8 +93,8 @@ function svgTemplate({ eyebrow, title, subtitle }, logoB64) {
 
 async function main() {
     await mkdir(OUT_DIR, { recursive: true });
-    const logoB64 = (await readFile(resolve(FONT_DIR, "logo-amber.png"))).toString("base64");
-    const fontFiles = ["SourceSerif4-ExtraBold.ttf", "SourceSans3-Bold.ttf", "SourceSans3-Regular.ttf"].map((f) => resolve(FONT_DIR, f));
+    const logoB64 = (await readFile(resolve(FONT_DIR, "logo-mint.png"))).toString("base64");
+    const fontFiles = ["Manrope-ExtraBold.ttf", "Inter-Bold.ttf", "Inter-Regular.ttf"].map((f) => resolve(FONT_DIR, f));
     console.log(`📁 Output: ${OUT_DIR}\n`);
 
     for (const page of PAGES) {

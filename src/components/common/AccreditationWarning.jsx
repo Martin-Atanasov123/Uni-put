@@ -21,7 +21,7 @@ export default function AccreditationWarning({ status, variant = "banner" }) {
     const copy = STATUS_COPY[status];
     if (!copy) return null;
 
-    const AMBER = "#FBBF24";
+    const AMBER = "#b45309";
     const amberBg = "rgba(251,191,36,0.08)";
     const amberBorder = "rgba(251,191,36,0.35)";
 

@@ -101,12 +101,12 @@ const HOW_STEPS = [
 
 // ── DZI points → grade conversion ───────────────────────────────────────────
 const DZI_BANDS = [
-    { min: 0,     max: 29.75, label: "Слаб",        grade_min: 2.00, grade_max: 2.00, color: "#f87171", bg: "rgba(248,113,113,0.08)", border: "rgba(248,113,113,0.25)" },
+    { min: 0,     max: 29.75, label: "Слаб",        grade_min: 2.00, grade_max: 2.00, color: "#dc2626", bg: "rgba(248,113,113,0.08)", border: "rgba(248,113,113,0.25)" },
     { min: 30,    max: 40.5,  label: "Среден",      grade_min: 3.00, grade_max: 3.99, color: "#F97316", bg: "rgba(249,115,22,0.08)",   border: "rgba(249,115,22,0.25)"   },
-    { min: 40.75, max: 62.25, label: "Добър",       grade_min: 4.00, grade_max: 4.99, color: "#FBBF24", bg: "rgba(251,191,36,0.08)",   border: "rgba(251,191,36,0.25)"   },
+    { min: 40.75, max: 62.25, label: "Добър",       grade_min: 4.00, grade_max: 4.99, color: "#b45309", bg: "rgba(251,191,36,0.08)",   border: "rgba(251,191,36,0.25)"   },
     { min: 62.5,  max: 83.75, label: "Много добър", grade_min: 5.00, grade_max: 5.49, color: "#06B6D4", bg: "rgba(6,182,212,0.08)",    border: "rgba(6,182,212,0.25)"    },
     { min: 84,    max: 94.75, label: "Отличен",     grade_min: 5.50, grade_max: 5.99, color: "#8B5CF6", bg: "rgba(139,92,246,0.08)",   border: "rgba(139,92,246,0.25)"   },
-    { min: 95,    max: 100,   label: "Отличен 6",   grade_min: 6.00, grade_max: 6.00, color: "#10b981", bg: "rgba(16,185,129,0.08)",   border: "rgba(16,185,129,0.25)"   },
+    { min: 95,    max: 100,   label: "Отличен 6",   grade_min: 6.00, grade_max: 6.00, color: "#047857", bg: "rgba(16,185,129,0.08)",   border: "rgba(16,185,129,0.25)"   },
 ];
 
 function dziToGrade(pts) {
@@ -203,24 +203,24 @@ function drawCalcResultCard({ university, specialty, score, maxBall, chance, mar
     canvas.width = W; canvas.height = H;
 
     // ── Фаза 2: рисуване
-    ctx.fillStyle = "#0E1525";
+    ctx.fillStyle = "#2A2952";
     ctx.fillRect(0, 0, W, H);
     ctx.textBaseline = "alphabetic";
 
     // Лого
-    ctx.fillStyle = "#06B6D4";
+    ctx.fillStyle = "#5EFBD7";
     ctx.fillRect(PAD, PAD, 8, 40);
-    ctx.fillStyle = "#F1F5F9";
+    ctx.fillStyle = "#FFFFFF";
     ctx.font = font(38, 800);
     ctx.fillText("УниПът", PAD + 24, PAD + 32);
 
     // Университет + специалност
     let y = PAD + LOGO_BLOCK + 34;
-    ctx.fillStyle = "#94A3B8";
+    ctx.fillStyle = "#C9C8E8";
     ctx.font = font(28, 600);
     for (const line of uniLines) { ctx.fillText(line, PAD, y); y += 40; }
     y += 20;
-    ctx.fillStyle = "#F1F5F9";
+    ctx.fillStyle = "#FFFFFF";
     ctx.font = font(58, 800);
     for (const line of specLines) { ctx.fillText(line, PAD, y); y += 70; }
 
@@ -229,18 +229,18 @@ function drawCalcResultCard({ university, specialty, score, maxBall, chance, mar
     ctx.font = mono(176, 900);
     const scoreText = score.toFixed(2);
     const scoreW = ctx.measureText(scoreText).width;
-    ctx.fillStyle = "#06B6D4";
+    ctx.fillStyle = "#5EFBD7";
     ctx.fillText(scoreText, PAD, y);
     if (maxBall) {
-        ctx.fillStyle = "#64748B";
+        ctx.fillStyle = "#A5A3D0";
         ctx.font = font(40, 700);
         ctx.fillText(`/ ${Number(maxBall)}`, PAD + scoreW + 22, y);
     }
-    ctx.fillStyle = "#64748B";
+    ctx.fillStyle = "#A5A3D0";
     ctx.font = font(24, 700);
     ctx.fillText("КОНКУРСЕН БАЛ", PAD + 4, y + 44);
     if (minBall != null) {
-        ctx.fillStyle = "#94A3B8";
+        ctx.fillStyle = "#C9C8E8";
         ctx.font = font(26, 500);
         ctx.textAlign = "right";
         ctx.fillText(`минимален бал ${minYear || ""}: ${minBall.toFixed(2)}`, W - PAD, y + 44);
@@ -249,7 +249,7 @@ function drawCalcResultCard({ university, specialty, score, maxBall, chance, mar
 
     // Лента „шанс за прием"
     if (chance) {
-        const tone = { green: "#10b981", amber: "#FBBF24", red: "#f87171" }[chance.tone];
+        const tone = { green: "#34d399", amber: "#fbbf24", red: "#f87171" }[chance.tone];
         y += bandGap;
         roundRect(ctx, PAD, y, INNER, bandH, 24);
         ctx.fillStyle = tone + "1A"; // ~10% алфа
@@ -258,14 +258,14 @@ function drawCalcResultCard({ university, specialty, score, maxBall, chance, mar
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        ctx.fillStyle = "#94A3B8";
+        ctx.fillStyle = "#C9C8E8";
         ctx.font = font(24, 700);
         ctx.fillText("ШАНС ЗА ПРИЕМ", PAD + 44, y + 56);
         ctx.fillStyle = tone;
         ctx.font = font(56, 800);
         ctx.fillText(chance.label, PAD + 44, y + 118);
         if (marginPts != null) {
-            ctx.fillStyle = "#94A3B8";
+            ctx.fillStyle = "#C9C8E8";
             ctx.font = font(28, 600);
             const sign = marginPts >= 0 ? "+" : "−";
             ctx.fillText(`${sign}${Math.abs(marginPts).toFixed(2)} т. спрямо миналогодишния праг`, PAD + 44, y + 162);
@@ -273,10 +273,10 @@ function drawCalcResultCard({ university, specialty, score, maxBall, chance, mar
     }
 
     // Футър
-    ctx.fillStyle = "#64748B";
+    ctx.fillStyle = "#A5A3D0";
     ctx.font = font(28, 700);
     ctx.fillText("uniput.eu", PAD, H - PAD);
-    ctx.fillStyle = "#94A3B8";
+    ctx.fillStyle = "#C9C8E8";
     ctx.font = font(26, 500);
     ctx.textAlign = "right";
     ctx.fillText("Изчисли своя бал безплатно", W - PAD, H - PAD);
@@ -816,7 +816,7 @@ export default function CalculatorPage() {
                                 marginBottom: "1rem",
                             }}
                         >
-                            <AlertCircle size={16} style={{ color: "#f87171", flexShrink: 0, marginTop: "2px" }} />
+                            <AlertCircle size={16} style={{ color: "#dc2626", flexShrink: 0, marginTop: "2px" }} />
                             <div style={{ flex: 1 }}>
                                 <p style={{ fontSize: "13px", color: "var(--brand-text)", margin: 0, lineHeight: 1.5, fontWeight: 600 }}>
                                     {loadError}
@@ -830,7 +830,7 @@ export default function CalculatorPage() {
                                     background: "rgba(248,113,113,0.15)",
                                     border: "1px solid rgba(248,113,113,0.35)",
                                     borderRadius: "0.5rem",
-                                    color: "#f87171",
+                                    color: "#dc2626",
                                     fontWeight: 700,
                                     fontSize: "12px",
                                     cursor: "pointer",
@@ -863,7 +863,7 @@ export default function CalculatorPage() {
                                     value={facultySearch}
                                     onChange={e => { setFacultySearch(e.target.value); setDropdownShowAll(false); setIsFacultyDropdownOpen(true); }}
                                     onClick={() => { setIsFacultyDropdownOpen(true); setDropdownShowAll(true); }}
-                                    onFocus={e => { setIsFacultyDropdownOpen(true); setDropdownShowAll(true); e.target.style.borderColor = "rgba(245,181,68,0.5)"; }}
+                                    onFocus={e => { setIsFacultyDropdownOpen(true); setDropdownShowAll(true); e.target.style.borderColor = "rgba(70,77,230,0.5)"; }}
                                     onBlur={e => { e.target.style.borderColor = "rgba(148,163,184,0.12)"; }}
                                     style={{ ...S.input, paddingLeft: "1rem", paddingRight: "4.5rem" }}
                                 />
@@ -894,7 +894,7 @@ export default function CalculatorPage() {
                                                     type="button"
                                                     onClick={() => { setSelectedFaculty(f); setFacultySearch(f); setSelectedSpecialtyName(""); setSelectedCity(""); setSelectedUniversity(""); setIsFacultyDropdownOpen(false); setDropdownShowAll(false); }}
                                                     style={{ width: "100%", textAlign: "left", padding: "0.625rem 1rem", fontSize: "13px", fontWeight: 500, color: "var(--brand-text)", background: "none", border: "none", borderBottom: i < filteredFaculties.length - 1 ? "1px solid rgba(148,163,184,0.08)" : "none", cursor: "pointer", fontFamily: "inherit", transition: "background 0.15s" }}
-                                                    onMouseEnter={e => (e.currentTarget.style.background = "rgba(245,181,68,0.08)")}
+                                                    onMouseEnter={e => (e.currentTarget.style.background = "rgba(70,77,230,0.08)")}
                                                     onMouseLeave={e => (e.currentTarget.style.background = "none")}
                                                 >
                                                     {f}
@@ -1016,7 +1016,7 @@ export default function CalculatorPage() {
                     >
                         {/* Header */}
                         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1.25rem" }}>
-                            <div style={{ padding: "0.375rem", borderRadius: "0.5rem", background: "rgba(245,181,68,0.12)", display: "inline-flex" }}>
+                            <div style={{ padding: "0.375rem", borderRadius: "0.5rem", background: "rgba(70,77,230,0.12)", display: "inline-flex" }}>
                                 <Zap size={15} style={{ color: "var(--brand-cyan)" }} />
                             </div>
                             <h2 style={{ fontSize: "14px", fontWeight: 800, color: "var(--brand-text)", margin: 0 }}>
@@ -1045,7 +1045,7 @@ export default function CalculatorPage() {
                                         fontWeight: 700,
                                         borderColor: dziError ? "rgba(248,113,113,0.6)" : undefined,
                                     }}
-                                    onFocus={e => { e.target.style.borderColor = dziError ? "rgba(248,113,113,0.6)" : "rgba(245,181,68,0.5)"; }}
+                                    onFocus={e => { e.target.style.borderColor = dziError ? "rgba(248,113,113,0.6)" : "rgba(70,77,230,0.5)"; }}
                                     onBlur={e => { e.target.style.borderColor = dziError ? "rgba(248,113,113,0.6)" : "var(--brand-input-border)"; }}
                                 />
                                 {dziError && (
@@ -1053,7 +1053,7 @@ export default function CalculatorPage() {
                                         marginTop: "0.35rem",
                                         fontSize: "11px",
                                         fontWeight: 600,
-                                        color: "#fca5a5",
+                                        color: "#b91c1c",
                                         display: "flex",
                                         alignItems: "center",
                                         gap: "0.3rem",
@@ -1246,7 +1246,7 @@ export default function CalculatorPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                         style={{
-                            background: "rgba(245,181,68,0.08)",
+                            background: "rgba(70,77,230,0.08)",
                             border: "1px solid var(--brand-card-border)",
                             borderRadius: "1.25rem",
                             padding: "2rem 1.75rem",
@@ -1257,7 +1257,7 @@ export default function CalculatorPage() {
                             width: 52, height: 52, borderRadius: "1rem", margin: "0 auto 1.25rem",
                             background: "var(--brand-accent)",
                             display: "flex", alignItems: "center", justifyContent: "center",
-                            boxShadow: "0 12px 30px rgba(245,181,68,0.3)",
+                            boxShadow: "0 12px 30px rgba(70,77,230,0.3)",
                         }}>
                             <Lock size={24} color="#111827" strokeWidth={2} />
                         </div>
@@ -1340,14 +1340,14 @@ export default function CalculatorPage() {
 
                                     {/* Бал */}
                                     <div className="calc-result-score">
-                                        <div style={{ fontFamily: "var(--font-mono)", fontSize: "3.25rem", fontWeight: 600, lineHeight: 1, letterSpacing: "-0.04em", color: hasMissing ? "var(--brand-muted)" : isAbove === true && hasStarted ? "#10b981" : "var(--brand-text)" }}>
+                                        <div style={{ fontFamily: "var(--font-mono)", fontSize: "3.25rem", fontWeight: 600, lineHeight: 1, letterSpacing: "-0.04em", color: hasMissing ? "var(--brand-muted)" : isAbove === true && hasStarted ? "#047857" : "var(--brand-text)" }}>
                                             {hasMissing && hasStarted ? "—" : !hasStarted ? "—" : formatted}
                                         </div>
                                         <div style={{ marginTop: "0.35rem", fontSize: "11px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>бал{maxBall ? ` от ${maxBall}` : ""}</div>
                                     </div>
 
                                     {/* Formula */}
-                                    <div className="calc-result-formula" style={{ display: "flex", gap: "0.5rem", padding: "0.75rem", background: "rgba(245,181,68,0.06)", border: "1px solid rgba(245,181,68,0.15)", borderRadius: "0.75rem", minWidth: 0 }}>
+                                    <div className="calc-result-formula" style={{ display: "flex", gap: "0.5rem", padding: "0.75rem", background: "rgba(70,77,230,0.06)", border: "1px solid rgba(70,77,230,0.15)", borderRadius: "0.75rem", minWidth: 0 }}>
                                         <Info size={14} style={{ color: "var(--brand-violet)", flexShrink: 0, marginTop: "1px" }} />
                                         <p style={{ fontSize: "12px", color: "var(--brand-muted)", margin: 0, lineHeight: 1.5, wordBreak: "break-word", overflowWrap: "anywhere", minWidth: 0 }}>
                                             <strong style={{ color: "var(--brand-text)" }}>Формула:</strong> {item.formula_description}
@@ -1367,7 +1367,7 @@ export default function CalculatorPage() {
                                         )}
 
                                         {hasMissing && hasStarted && (
-                                            <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "12px", color: "#f87171", fontWeight: 600 }}>
+                                            <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "12px", color: "#dc2626", fontWeight: 600 }}>
                                                 <AlertCircle size={13} />
                                                 Липсват: {missingSlots.map(describeMissingTerm).join(", ")}
                                             </div>
@@ -1404,7 +1404,7 @@ export default function CalculatorPage() {
                                                     <div style={{ fontSize: "12px", fontWeight: 700, color: "var(--brand-text)" }}>
                                                         Твоят бал е <span style={{ fontFamily: "var(--font-mono)" }}>{percentOfMax.toFixed(0)}%</span> от максималния
                                                     </div>
-                                                    <span style={{ padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", background: "rgba(251,191,36,0.1)", color: "#FBBF24", border: "1px solid rgba(251,191,36,0.25)" }}>
+                                                    <span style={{ padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", background: "rgba(251,191,36,0.1)", color: "#b45309", border: "1px solid rgba(251,191,36,0.25)" }}>
                                                         {percentOfMax.toFixed(0)}% ОТ МАКС.
                                                     </span>
                                                 </div>
@@ -1483,12 +1483,12 @@ export default function CalculatorPage() {
                                                         fontSize: "13px", fontWeight: 600,
                                                         color: "var(--brand-cyan)",
                                                         textDecoration: "none",
-                                                        background: "rgba(245,181,68,0.06)",
+                                                        background: "rgba(70,77,230,0.06)",
                                                         transition: "background 0.15s, border-color 0.15s",
                                                         flexShrink: 0,
                                                     }}
-                                                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(245,181,68,0.14)"; e.currentTarget.style.borderColor = "var(--brand-cyan)"; }}
-                                                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(245,181,68,0.06)"; e.currentTarget.style.borderColor = "var(--brand-border)"; }}
+                                                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(70,77,230,0.14)"; e.currentTarget.style.borderColor = "var(--brand-cyan)"; }}
+                                                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(70,77,230,0.06)"; e.currentTarget.style.borderColor = "var(--brand-border)"; }}
                                                 >
                                                     <ExternalLink size={13} strokeWidth={2} />
                                                     Провери в сайта
@@ -1515,7 +1515,7 @@ export default function CalculatorPage() {
                         style={{
                             marginTop: "1.5rem",
                             position: "relative",
-                            background: "rgba(245,181,68,0.08)",
+                            background: "rgba(70,77,230,0.08)",
                             border: "1px solid var(--brand-card-border)",
                             borderRadius: "1.25rem",
                             padding: "1.5rem 1.75rem",
@@ -1550,7 +1550,7 @@ export default function CalculatorPage() {
                                 width: "44px", height: "44px", borderRadius: "0.75rem",
                                 background: "var(--brand-accent)",
                                 display: "flex", alignItems: "center", justifyContent: "center",
-                                boxShadow: "0 8px 24px rgba(245,181,68,0.25)",
+                                boxShadow: "0 8px 24px rgba(70,77,230,0.25)",
                             }}>
                                 <Bookmark size={20} color="#111827" strokeWidth={2} fill="#111827" />
                             </div>
@@ -1582,7 +1582,7 @@ export default function CalculatorPage() {
                                             textDecoration: "none",
                                             transition: "transform 0.18s, box-shadow 0.18s",
                                         }}
-                                        onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 8px 20px rgba(245,181,68,0.3)"; }}
+                                        onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 8px 20px rgba(70,77,230,0.3)"; }}
                                         onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
                                     >
                                         <UserPlus size={14} strokeWidth={2} />

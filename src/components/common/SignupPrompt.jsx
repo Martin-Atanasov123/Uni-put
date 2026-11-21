@@ -75,8 +75,8 @@ export default function SignupPrompt({ variant = "favorite", onDismiss, register
                 gap: "1rem",
                 alignItems: "flex-start",
                 padding: "1.25rem 1.5rem",
-                background: "rgba(245,181,68,0.08), var(--brand-surface)", // плътна основа — иначе е прозрачна, когато се носи над съдържание
-                border: "1px solid rgba(245,181,68,0.25)",
+                background: "rgba(70,77,230,0.08), var(--brand-surface)", // плътна основа — иначе е прозрачна, когато се носи над съдържание
+                border: "1px solid rgba(70,77,230,0.25)",
                 borderRadius: "1.25rem",
             }}
         >
@@ -138,7 +138,7 @@ export default function SignupPrompt({ variant = "favorite", onDismiss, register
                 </button>
             )}
 
-            <style>{`.signup-prompt-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(245,181,68,0.3); } .signup-prompt-cta { transition: transform 0.2s, box-shadow 0.2s; }`}</style>
+            <style>{`.signup-prompt-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(70,77,230,0.3); } .signup-prompt-cta { transition: transform 0.2s, box-shadow 0.2s; }`}</style>
         </m.div>
     );
 }

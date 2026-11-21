@@ -22,9 +22,9 @@ export const CHANCE_BAND_META = {
     low:        { label: "Малък шанс", tone: "red" },
 };
 export const CHANCE_TONES = {
-    green: { text: "#10b981", bg: "rgba(16,185,129,0.1)",  border: "rgba(16,185,129,0.25)" },
-    amber: { text: "#FBBF24", bg: "rgba(251,191,36,0.1)",  border: "rgba(251,191,36,0.25)" },
-    red:   { text: "#f87171", bg: "rgba(248,113,113,0.1)", border: "rgba(248,113,113,0.25)" },
+    green: { text: "#047857", bg: "rgba(16,185,129,0.1)",  border: "rgba(16,185,129,0.25)" },
+    amber: { text: "#b45309", bg: "rgba(251,191,36,0.1)",  border: "rgba(251,191,36,0.25)" },
+    red:   { text: "#dc2626", bg: "rgba(248,113,113,0.1)", border: "rgba(248,113,113,0.25)" },
 };
 
 export const historyPoints = (h) => {

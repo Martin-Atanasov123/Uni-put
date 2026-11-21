@@ -190,7 +190,7 @@ export default function ReportButton({ universityName, specialty }) {
                             borderRadius: "0.625rem",
                             background: "rgba(251,191,36,0.12)",
                             border: "1px solid rgba(251,191,36,0.35)",
-                            color: "#fbbf24",
+                            color: "#b45309",
                             display: "flex", alignItems: "center", justifyContent: "center",
                             flexShrink: 0,
                         }}>
@@ -286,7 +286,7 @@ export default function ReportButton({ universityName, specialty }) {
                                             borderRadius: "50%",
                                             background: "rgba(15,15,15,0.75)",
                                             border: "1px solid rgba(248,113,113,0.5)",
-                                            color: "#fca5a5",
+                                            color: "#b91c1c",
                                             cursor: "pointer",
                                             display: "flex", alignItems: "center", justifyContent: "center",
                                         }}
@@ -327,7 +327,7 @@ export default function ReportButton({ universityName, specialty }) {
                                         fontFamily: "inherit",
                                         transition: "border-color 0.2s, background 0.2s",
                                     }}
-                                    onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(245,181,68,0.4)"; e.currentTarget.style.background = "rgba(245,181,68,0.04)"; }}
+                                    onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(70,77,230,0.4)"; e.currentTarget.style.background = "rgba(70,77,230,0.04)"; }}
                                     onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--brand-border)"; e.currentTarget.style.background = "var(--brand-surface-2)"; }}
                                 >
                                     <Camera size={22} style={{ opacity: 0.5 }} />
@@ -421,7 +421,7 @@ export default function ReportButton({ universityName, specialty }) {
                                     background: "rgba(248,113,113,0.08)",
                                     border: "1px solid rgba(248,113,113,0.3)",
                                     borderRadius: "0.625rem",
-                                    color: "#fca5a5",
+                                    color: "#b91c1c",
                                     fontSize: "12px",
                                     fontWeight: 600,
                                 }}>
@@ -481,7 +481,7 @@ export default function ReportButton({ universityName, specialty }) {
                     background: "rgba(251,191,36,0.08)",
                     border: "1px solid rgba(251,191,36,0.25)",
                     borderRadius: "0.5rem",
-                    color: "#fbbf24",
+                    color: "#b45309",
                     fontSize: "12px",
                     fontWeight: 700,
                     cursor: "pointer",
