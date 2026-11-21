@@ -57,7 +57,7 @@ const STATIC_ROUTES = [
     {
         path: "/",
         title: "Специалности, университети и приемен бал",
-        description: `Открий специалности, сравни ${UNIVERSITIES} университета и разбери как се образува балът — с източник и година за всяка стойност. Прием ${ADMISSION_YEAR_SHORT} г.`,
+        description: `Потърси специалност или университет, виж формулата за бал и минималния бал от миналите години. ${SPECIALTIES} специалности в ${UNIVERSITIES} университета. Прием ${ADMISSION_YEAR_SHORT} г.`,
         image: DEFAULT_IMAGE,
     },
     {
@@ -197,9 +197,9 @@ function injectHead(shell, headTags) {
 
 // H1 текст per route (по-подходящ като заглавие от <title>). Fallback: route.title.
 const PAGE_H1 = {
-    "/": "Изборът на специалност не трябва да е на сляпо.",
+    "/": "Какво да уча и къде?",
     "/calculator": `Калкулатор за приемен бал ${ADMISSION_YEAR_SHORT}`,
-    "/career-advisor": "Безплатен RIASEC кариерен тест",
+    "/career-advisor": "Какво те интересува?",
     "/universities": `Висши училища в България за прием ${ADMISSION_YEAR_SHORT}`,
     "/specialnosti": `Специалности в България за прием ${ADMISSION_YEAR_SHORT}`,
     "/dormitories": "Студентски общежития в България",

@@ -26,12 +26,7 @@ import {
     ChevronRight,
     ChevronLeft,
     Target,
-    Zap,
-    Layout,
-    Layers,
-    ClipboardList,
     AlertCircle,
-    Sparkles,
 } from "lucide-react";
 
 import RIASECResults from "./RIASECResults";
@@ -49,40 +44,9 @@ const S = {
 };
 
 const VERSIONS = [
-    {
-        id: "short",
-        name: "Кратка",
-        questions: 30,
-        time: "3–5 мин",
-        icon: Zap,
-        accent: "#986100",
-        accentBg: "rgba(251,191,36,0.12)",
-        accentBorder: "rgba(251,191,36,0.3)",
-        desc: "Бърз преглед на твоите основни интереси.",
-    },
-    {
-        id: "standard",
-        name: "Стандартна",
-        questions: 60,
-        time: "8–12 мин",
-        icon: Layout,
-        accent: "var(--brand-cyan)",
-        accentBg: "rgba(23,86,217,0.12)",
-        accentBorder: "rgba(23,86,217,0.35)",
-        desc: "Балансирана версия за прецизни резултати.",
-        recommended: true,
-    },
-    {
-        id: "extended",
-        name: "Разширена",
-        questions: 90,
-        time: "15–20 мин",
-        icon: Layers,
-        accent: "var(--brand-violet)",
-        accentBg: "rgba(23,86,217,0.12)",
-        accentBorder: "rgba(23,86,217,0.35)",
-        desc: "Дълбок анализ на професионалния ти потенциал.",
-    },
+    { id: "short", name: "Кратка", questions: 30, time: "3–5 мин", desc: "Бърз ориентир по основните интереси", cta: "Започни краткия тест" },
+    { id: "standard", name: "Стандартна", questions: 60, time: "8–12 мин", desc: "По-стабилен профил — подходящ за повечето ученици", cta: "Започни стандартния тест", recommended: true },
+    { id: "extended", name: "Разширена", questions: 90, time: "15–20 мин", desc: "Най-подробният профил, ако имаш повече време", cta: "Започни разширения тест" },
 ];
 
 const CareerAdvisor = () => {
@@ -107,6 +71,7 @@ const CareerAdvisor = () => {
     const [results, setResults] = useState(restoredResults);
     const [resultsError, setResultsError] = useState(false);
     const [quizVersion, setQuizVersion] = useState(null);
+    const [pickedVersion, setPickedVersion] = useState("standard");
     const [scaleLabels, setScaleLabels] = useState({});
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [showWarning, setShowWarning] = useState(false);
@@ -245,81 +210,41 @@ const CareerAdvisor = () => {
         } finally { setLoading(false); }
     };
 
-    const renderVersionSelection = () => (
-        <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
-            <div style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                <h2 style={{ margin: 0, fontSize: "1.875rem", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--brand-text)", textWrap: "balance" }}>
-                    Избери версия на теста
-                </h2>
-                <p style={{ margin: 0, color: "var(--brand-muted)", maxWidth: "480px", marginLeft: "auto", marginRight: "auto", fontSize: "15px" }}>
-                    Колкото повече въпроси отговориш, толкова по-точен ще бъде твоят кариерен профил.
-                </p>
+    // Изборът на версия: текстът вляво, вариантите вдясно като радио-редове.
+    // Без времева линия — трите версии са алтернативи, не етапи.
+    const renderVersionSelection = () => {
+        const chosen = VERSIONS.find(v => v.id === pickedVersion) || VERSIONS[1];
+        return (
+            <div className="ca-intro">
+                <style>{INTRO_CSS}</style>
+                <section className="ca-intro__text">
+                    <p className="ca-eyebrow">Кариерно ориентиране · RIASEC</p>
+                    <h1 className="ca-h1">Какво те интересува?</h1>
+                    <p className="ca-lead">Отговаряш на въпроси за дейности, които ти харесват. Получаваш профил на интересите си по модела на Холанд и специалности, които отговарят на него.</p>
+                    <dl className="ca-facts">
+                        <div><dt>Какво получаваш</dt><dd>Шест типа интереси, подредени по сила, и специалности към тях.</dd></div>
+                        <div><dt>Какво не е</dt><dd>Присъда. Резултатът е отправна точка за проучване, не оценка на способностите ти.</dd></div>
+                        <div><dt>Как да отговаряш</dt><dd>Според това, което ти харесва, не според това, което „трябва“.</dd></div>
+                    </dl>
+                </section>
+                <form className="ca-pick" onSubmit={e => { e.preventDefault(); handleVersionSelect(chosen.id); }}>
+                    <fieldset>
+                        <legend>Избери колко време имаш</legend>
+                        {VERSIONS.map(v => (
+                            <label key={v.id} className={"ca-opt" + (v.recommended ? " ca-opt--rec" : "")}>
+                                <input type="radio" name="riasec-version" value={v.id} checked={pickedVersion === v.id} onChange={() => setPickedVersion(v.id)} />
+                                <span className="ca-opt__name">{v.name}{v.recommended && <span className="ca-pill">Препоръчваме</span>}</span>
+                                <span className="ca-opt__desc">{v.desc}</span>
+                                <span className="ca-opt__meta">{v.questions} въпроса<small>{v.time}</small></span>
+                            </label>
+                        ))}
+                    </fieldset>
+                    <button type="submit" className="ca-go">{chosen.cta} <ChevronRight size={18} strokeWidth={2} aria-hidden="true" /></button>
+                    <p className="ca-fine">Без регистрация. Можеш да смениш версията по-късно.</p>
+                </form>
             </div>
-
-            <m.div
-                style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "1.25rem" }}
-                initial="hidden"
-                animate="visible"
-                variants={{ visible: { transition: { staggerChildren: 0.07 } } }}
-            >
-                {VERSIONS.map(v => {
-                    const Icon = v.icon;
-                    return (
-                        <m.button
-                            key={v.id}
-                            variants={{
-                                hidden: { opacity: 0, y: 16 },
-                                visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } },
-                            }}
-                            type="button"
-                            onClick={() => handleVersionSelect(v.id)}
-                            style={{
-                                position: "relative",
-                                padding: "1.75rem",
-                                background: v.recommended ? "rgba(23,86,217,0.06)" : "var(--brand-surface)",
-                                backdropFilter: "blur(8px)",
-                                border: `1px solid ${v.recommended ? "rgba(23,86,217,0.35)" : "var(--brand-card-border)"}`,
-                                borderRadius: "1.25rem",
-                                cursor: "pointer",
-                                textAlign: "left",
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: "1.25rem",
-                                fontFamily: "inherit",
-                                color: "var(--brand-text)",
-                                transition: "transform 0.2s, border-color 0.2s, box-shadow 0.2s",
-                            }}
-                            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 16px 40px rgba(23,86,217,0.12)"; e.currentTarget.style.borderColor = v.accentBorder; }}
-                            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = v.recommended ? "rgba(23,86,217,0.35)" : "var(--brand-card-border)"; }}
-                        >
-                            {v.recommended && (
-                                <span style={{ position: "absolute", top: "-12px", left: "50%", transform: "translateX(-50%)", background: "var(--brand-accent)", color: "var(--brand-accent-ink)", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.15em", padding: "0.3rem 0.875rem", borderRadius: "999px", boxShadow: "0 8px 20px rgba(23,86,217,0.3)" }}>
-                                    Препоръчано
-                                </span>
-                            )}
-                            <div style={{ width: "3rem", height: "3rem", borderRadius: "0.875rem", background: v.accentBg, border: `1px solid ${v.accentBorder}`, display: "flex", alignItems: "center", justifyContent: "center", color: v.accent }}>
-                                <Icon size={26} />
-                            </div>
-                            <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
-                                <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 800, letterSpacing: "-0.01em" }}>{v.name} версия</h3>
-                                <p style={{ margin: 0, fontSize: "13px", color: "var(--brand-muted)", lineHeight: 1.5 }}>{v.desc}</p>
-                            </div>
-                            <div style={{ marginTop: "auto", paddingTop: "1rem", borderTop: "1px solid var(--brand-border)", display: "flex", justifyContent: "space-between" }}>
-                                <div>
-                                    <span style={{ display: "block", fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.1em", opacity: 0.6 }}>Въпроси</span>
-                                    <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--brand-text)", fontFamily: "var(--font-mono)" }}>{v.questions}</span>
-                                </div>
-                                <div style={{ textAlign: "right" }}>
-                                    <span style={{ display: "block", fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.1em", opacity: 0.6 }}>Време</span>
-                                    <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--brand-text)", fontFamily: "var(--font-mono)" }}>{v.time}</span>
-                                </div>
-                            </div>
-                        </m.button>
-                    );
-                })}
-            </m.div>
-        </div>
-    );
+        );
+    };
 
     const renderQuiz = () => {
         if (!filteredQuestions.length) return null;
@@ -511,7 +436,7 @@ const CareerAdvisor = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            style={{ minHeight: "100vh", background: "var(--brand-bg)", color: "var(--brand-text)", paddingTop: step === "quiz" ? "5rem" : "6rem", paddingBottom: "5rem", position: "relative", overflow: "hidden" }}
+            style={{ minHeight: "100vh", background: "var(--brand-bg)", color: "var(--brand-text)", paddingTop: step === "quiz" ? "5rem" : "calc(var(--header-h) + clamp(24px, 5vw, 72px))", paddingBottom: "5rem", position: "relative", overflow: "hidden" }}
         >
             <Seo
                 title="Безплатен RIASEC кариерен тест за специалност"
@@ -524,63 +449,45 @@ const CareerAdvisor = () => {
 
             {/* ambient glow */}
 
-            <div style={{ maxWidth: "960px", margin: "0 auto", padding: "0 1.5rem", position: "relative" }}>
-                {step === "version" && (
-                    <div style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: "1rem", marginBottom: "3rem" }}>
-                        <div style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.4rem 0.875rem", background: "rgba(23,86,217,0.1)", border: "1px solid rgba(23,86,217,0.3)", borderRadius: "999px", color: "var(--brand-cyan)", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 auto" }}>
-                            <Sparkles size={12} /> RIASEC
-                        </div>
-                        <h1 style={{ margin: 0, fontSize: "clamp(2.25rem, 5vw, 3.5rem)", fontWeight: 800, lineHeight: 1.05, letterSpacing: "-0.03em", textWrap: "balance" }}>
-                            Открий своето{" "}
-                            <span
-                                style={{
-                                    color: "var(--brand-accent-text)",
-                                }}
-                            >
-                                призвание
-                            </span>
-                        </h1>
-                        <p style={{ margin: 0, fontSize: "1.0625rem", color: "var(--brand-muted)", maxWidth: "620px", marginLeft: "auto", marginRight: "auto" }}>
-                            Научно обоснован метод за определяне на твоите професионални интереси и намиране на перфектната кариера.
-                        </p>
-                    </div>
-                )}
-
-                <div style={step === "results" ? {} : { ...S.surface, padding: "2rem 1.5rem" }}>
+            <div style={{ maxWidth: step === "version" ? "1280px" : "960px", margin: "0 auto", padding: "0 clamp(16px, 4vw, 64px)", position: "relative" }}>
+                <div style={step === "quiz" ? { ...S.surface, padding: "2rem 1.5rem" } : {}}>
                     {step === "version" && renderVersionSelection()}
                     {step === "quiz" && renderQuiz()}
                     {step === "results" && renderResults()}
                 </div>
 
-                {step === "version" && (
-                    <div style={{ marginTop: "3rem", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1rem" }}>
-                        <div style={{ ...S.surface, padding: "1.5rem", display: "flex", gap: "1rem" }}>
-                            <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "0.75rem", background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.3)", color: "#0A6853", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                                <ClipboardList size={20} />
-                            </div>
-                            <div>
-                                <h4 style={{ margin: 0, fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--brand-muted)" }}>Как работи?</h4>
-                                <p style={{ margin: "0.4rem 0 0", fontSize: "13px", lineHeight: 1.55, color: "var(--brand-text)" }}>
-                                    Алгоритъмът измерва 6 измерения на личността: Реалистичен, Изследователски, Артистичен, Социален, Предприемчив и Конвенционален.
-                                </p>
-                            </div>
-                        </div>
-                        <div style={{ ...S.surface, padding: "1.5rem", display: "flex", gap: "1rem" }}>
-                            <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "0.75rem", background: "rgba(23,86,217,0.12)", border: "1px solid rgba(23,86,217,0.3)", color: "var(--brand-cyan)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                                <AlertCircle size={20} />
-                            </div>
-                            <div>
-                                <h4 style={{ margin: 0, fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--brand-muted)" }}>Съвет</h4>
-                                <p style={{ margin: "0.4rem 0 0", fontSize: "13px", lineHeight: 1.55, color: "var(--brand-text)" }}>
-                                    Отговаряй честно според това как се чувстваш, а не според това как смяташ, че "трябва" да се отговори.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                )}
             </div>
         </m.div>
     );
 };
+
+const INTRO_CSS = `
+.ca-intro { display: grid; gap: 40px; align-items: start; color: var(--ink); }
+@media (min-width: 1000px) { .ca-intro { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 80px; } }
+.ca-eyebrow { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); }
+.ca-h1 { margin: 12px 0 16px; font-size: clamp(34px, 4.4vw, 54px); line-height: 1.08; letter-spacing: -0.03em; font-weight: 740; text-wrap: balance; }
+.ca-lead { margin: 0 0 24px; max-width: 46ch; font-size: clamp(16px, 1.4vw, 18px); line-height: 1.6; color: var(--ink-muted); }
+.ca-facts { margin: 0; border-top: 1px solid var(--border); }
+.ca-facts > div { display: grid; gap: 2px; padding: 14px 0; border-bottom: 1px solid var(--border); font-size: 15px; line-height: 1.5; }
+@media (min-width: 560px) { .ca-facts > div { grid-template-columns: 150px minmax(0, 1fr); gap: 12px; } }
+.ca-facts dt { font-weight: 700; }
+.ca-facts dd { margin: 0; color: var(--ink-muted); }
+.ca-pick fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
+.ca-pick legend { padding: 0; margin-bottom: 14px; font-size: clamp(19px, 1.8vw, 22px); font-weight: 700; }
+.ca-opt { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; grid-template-areas: "radio name meta" "radio desc meta"; column-gap: 14px; row-gap: 2px; align-items: center; min-height: 72px; padding: 16px 18px; margin-bottom: 10px; border: 1px solid var(--border-strong); border-radius: var(--radius-feature); background: var(--surface); cursor: pointer; transition: border-color 0.14s ease; }
+.ca-opt:hover { border-color: var(--ink); }
+.ca-opt:has(input:checked) { border: 2px solid var(--brand); padding: 15px 17px; }
+.ca-opt:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+.ca-opt input { grid-area: radio; width: 22px; height: 22px; margin: 0; accent-color: var(--brand); }
+.ca-opt__name { grid-area: name; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 18px; font-weight: 720; }
+.ca-opt__desc { grid-area: desc; font-size: 15px; line-height: 1.45; color: var(--ink-muted); }
+.ca-opt__meta { grid-area: meta; text-align: right; font-size: 15px; font-weight: 700; line-height: 1.35; white-space: nowrap; }
+.ca-opt__meta small { display: block; font-size: 14px; font-weight: 500; color: var(--ink-muted); }
+.ca-pill { display: inline-block; padding: 3px 10px; border-radius: 999px; background: var(--signal); color: var(--ink); font-size: 12px; font-weight: 750; }
+.ca-go { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; margin-top: 8px; padding: 0 28px; border: 0; border-radius: var(--radius-control); background: var(--brand); color: #fff; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer; transition: background-color 0.14s ease; }
+.ca-go:hover { background: var(--brand-hover); }
+@media (max-width: 559px) { .ca-go { width: 100%; } .ca-opt { padding: 14px; } .ca-opt:has(input:checked) { padding: 13px; } }
+.ca-fine { margin: 12px 0 0; font-size: 14px; color: var(--ink-muted); }
+`;
 
 export default CareerAdvisor;
