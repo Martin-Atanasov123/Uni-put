@@ -6,6 +6,7 @@ import {
     Globe, FlaskConical, HeartPulse, LayoutGrid, Rows3,
     ArrowLeft, ChevronRight,
 } from "lucide-react";
+import { EmptyState, NoMatchArt } from "@/components/common/Illustrations";
 import { Link, useLocation } from "react-router-dom";
 import SignupPrompt from "@/components/common/SignupPrompt";
 import { universityService } from "@/services/universityService";
@@ -854,18 +855,13 @@ export default function UniversitiesPage() {
 
                             {/* Empty */}
                             {displayUnis.length === 0 && (
-                                <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: "center", padding: "6rem 0" }}>
-                                    <div style={{ width: "72px", height: "72px", borderRadius: "50%", background: "var(--brand-surface)", border: "1px solid var(--brand-border)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1.25rem" }}>
-                                        <Search size={28} style={{ color: "var(--brand-muted)", opacity: 0.5 }} />
-                                    </div>
-                                    <h3 style={{ fontSize: "1.375rem", fontWeight: 800, color: "var(--brand-text)", marginBottom: "0.625rem" }}>Нищо не открихме</h3>
-                                    <p style={{ color: "var(--brand-muted)", fontSize: "14px", marginBottom: "1.5rem" }}>
-                                        Опитай с различни ключови думи или разшири критериите.
-                                    </p>
-                                    <button onClick={resetFilters} style={{ padding: "0.75rem 1.5rem", background: "var(--brand-accent)", border: "none", borderRadius: "0.75rem", color: "var(--brand-accent-ink)", fontWeight: 700, fontSize: "14px", cursor: "pointer", fontFamily: "inherit" }}>
-                                        Разшири критериите
-                                    </button>
-                                </m.div>
+                                <EmptyState
+                                    art={<NoMatchArt />}
+                                    title="Нищо не съвпада с тези филтри."
+                                    actions={<button type="button" onClick={resetFilters} className="es-btn es-btn--primary">Изчисти филтрите</button>}
+                                >
+                                    Опитай с по-кратка дума или премахни един от филтрите — град или степен.
+                                </EmptyState>
                             )}
 
                             {/* Card grid */}

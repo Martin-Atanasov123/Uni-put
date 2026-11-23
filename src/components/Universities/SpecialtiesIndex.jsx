@@ -13,6 +13,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { m } from "motion/react";
 import { ArrowRight, Search, AlertCircle } from "lucide-react";
+import { EmptyState, NoMatchArt } from "@/components/common/Illustrations";
 import { universityService } from "@/services/universityService";
 import { slugify } from "@/lib/slugify";
 import Seo from "@/components/common/Seo";
@@ -67,6 +68,9 @@ export default function SpecialtiesIndex() {
             <JsonLd data={BREADCRUMB} />
 
             <div style={{ maxWidth: "72rem", margin: "0 auto" }}>
+                <style>{SI_CSS}</style>
+                <div className="si-head">
+                <div>
                 <div style={{
                     fontSize: "11px", fontWeight: 800, textTransform: "uppercase",
                     letterSpacing: "0.12em", color: "var(--brand-cyan)", marginBottom: "0.5rem",
@@ -109,6 +113,17 @@ export default function SpecialtiesIndex() {
                         />
                     </div>
                 )}
+                </div>
+                <img
+                    className="si-art"
+                    src="/illustrations/universities-network-960.webp"
+                    srcSet="/illustrations/universities-network-480.webp 480w, /illustrations/universities-network-960.webp 960w"
+                    sizes="(min-width: 1000px) 400px, 0px"
+                    width="960" height="717"
+                    alt=""
+                    decoding="async"
+                />
+                </div>
 
                 {status === "loading" && (
                     <p style={{ marginTop: "2rem", color: "var(--brand-muted)" }}>Зареждаме специалностите…</p>
@@ -122,12 +137,14 @@ export default function SpecialtiesIndex() {
                 )}
 
                 {status === "ok" && groups.length === 0 && (
-                    <p style={{ marginTop: "2rem", color: "var(--brand-muted)", lineHeight: 1.65 }}>
-                        Нищо не съвпада с „{query}“. Опитай с по-кратка дума или{" "}
-                        <Link to="/universities/" style={{ color: "var(--brand-cyan)", fontWeight: 600, textDecoration: "none" }}>
-                            търси във всички университети
-                        </Link>.
-                    </p>
+                    <EmptyState
+                        art={<NoMatchArt />}
+                        title={`Нищо не съвпада с „${query}“.`}
+                        headingLevel={2}
+                        actions={<Link to={`/universities/?q=${encodeURIComponent(query)}`} className="es-btn es-btn--primary">Търси във всички университети</Link>}
+                    >
+                        Опитай с по-кратка дума — например само „инженер“ вместо цялото име на специалността.
+                    </EmptyState>
                 )}
 
                 {status === "ok" && groups.map(([letter, list]) => (
@@ -203,3 +220,14 @@ export default function SpecialtiesIndex() {
         </div>
     );
 }
+
+const SI_CSS = `
+.si-head { display: grid; gap: 32px; align-items: center; }
+.si-art { display: none; width: 100%; max-width: 400px; height: auto; justify-self: end; }
+@media (min-width: 1000px) {
+  .si-head { grid-template-columns: minmax(0, 1fr) minmax(0, 400px); gap: 48px; }
+  .si-art { display: block; animation: si-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+}
+@keyframes si-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .si-art { animation: none; } }
+`;

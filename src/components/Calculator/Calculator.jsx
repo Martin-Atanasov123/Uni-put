@@ -763,6 +763,17 @@ export default function CalculatorPage() {
                     .calc-result { display: grid; gap: 1.25rem; }
                     .calc-result-status { padding-top: 1rem; border-top: 1px solid var(--brand-border); display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; }
                     @media (min-width: 640px) { .calc-how { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem 2rem; } }
+                    /* Стъпките като спирки по една линия: точка върху горната граница, последната — целта */
+                    .calc-how-step { position: relative; border-top: 2px solid var(--ink); padding-top: 1.1rem; }
+                    .calc-how-step::before { content: ""; position: absolute; left: 0; top: -7px; width: 12px; height: 12px; border-radius: 50%; background: var(--canvas); border: 2px solid var(--ink); }
+                    .calc-how-step:last-child::before { background: var(--signal); }
+                    .calc-how-wrap { display: grid; gap: 1.5rem; align-items: center; }
+                    .calc-how-art { width: min(280px, 72%); height: auto; justify-self: center; }
+                    @media (min-width: 1100px) {
+                        .calc-how-wrap { grid-template-columns: 360px minmax(0, 1fr); gap: 3rem; }
+                        .calc-how-art { width: 100%; }
+                        .calc-how-wrap .calc-how { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+                    }
                     @media (min-width: 900px) {
                         .calc-head { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: end; gap: 3rem; }
                         .calc-result { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); column-gap: 2.5rem; }
@@ -962,18 +973,32 @@ export default function CalculatorPage() {
                         transition={{ duration: 0.5, delay: 0.15 }}
                         style={{ marginBottom: "2rem" }}
                     >
+                        <div className="calc-how-wrap">
+                        <img
+                            className="calc-how-art"
+                            src="/illustrations/calculator-score-960.webp"
+                            srcSet="/illustrations/calculator-score-480.webp 480w, /illustrations/calculator-score-960.webp 960w"
+                            sizes="(min-width: 1100px) 360px, 280px"
+                            width="960" height="694"
+                            alt=""
+                            loading="lazy"
+                            decoding="async"
+                        />
+                        <div>
                         <h2 style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--brand-accent-text)", margin: 0 }}>
                             Как се изчислява баловият резултат
                         </h2>
                         <ol className="calc-how">
                             {HOW_STEPS.map(step => (
-                                <li key={step.num} style={{ borderTop: "1px solid var(--brand-border)", paddingTop: "1rem" }}>
+                                <li key={step.num} className="calc-how-step">
                                     <span style={{ fontFamily: "var(--font-mono)", fontSize: "13px", fontWeight: 600, color: "var(--brand-accent-text)" }}>{step.num}</span>
                                     <p style={{ fontSize: "1rem", fontWeight: 700, color: "var(--brand-text)", margin: "0.4rem 0 0.35rem", fontFamily: "var(--font-display)" }}>{step.title}</p>
                                     <p style={{ fontSize: "13px", color: "var(--brand-muted)", margin: 0, lineHeight: 1.6 }}>{step.desc}</p>
                                 </li>
                             ))}
                         </ol>
+                        </div>
+                        </div>
                     </m.div>
                 )}
 

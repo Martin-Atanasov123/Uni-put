@@ -30,6 +30,8 @@ import {
 } from "lucide-react";
 
 import RIASECResults from "./RIASECResults";
+import { InterestsHex, IllustrationStyles } from "@/components/common/Illustrations";
+import { RIASEC_TYPES } from "@/lib/riasecTypes";
 import { RIASEC_SPECIALTIES } from "@/lib/siteStats";
 
 const LAST_RESULTS_KEY = "riasec_last_results";
@@ -217,6 +219,7 @@ const CareerAdvisor = () => {
         return (
             <div className="ca-intro">
                 <style>{INTRO_CSS}</style>
+                <IllustrationStyles />
                 <section className="ca-intro__text">
                     <p className="ca-eyebrow">Кариерно ориентиране · RIASEC</p>
                     <h1 className="ca-h1">Какво те интересува?</h1>
@@ -241,7 +244,29 @@ const CareerAdvisor = () => {
                     </fieldset>
                     <button type="submit" className="ca-go">{chosen.cta} <ChevronRight size={18} strokeWidth={2} aria-hidden="true" /></button>
                     <p className="ca-fine">Без регистрация. Можеш да смениш версията по-късно.</p>
+                    <img
+                        className="ca-art"
+                        src="/illustrations/career-paths-960.webp"
+                        srcSet="/illustrations/career-paths-480.webp 480w, /illustrations/career-paths-960.webp 960w"
+                        sizes="(min-width: 1000px) 440px, 0px"
+                        width="960" height="680"
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                    />
                 </form>
+                <section className="ca-types" aria-labelledby="ca-types-h">
+                    <div className="ca-types__art"><InterestsHex /></div>
+                    <div>
+                        <h2 id="ca-types-h" className="ca-types__h">Шестте типа интереси</h2>
+                        <p className="ca-types__lead">Тестът мери колко силно те привлича всеки от тях. Съседните типове в шестоъгълника си приличат, срещуположните са най-различни.</p>
+                        <ul className="ca-types__list">
+                            {RIASEC_TYPES.map(t => (
+                                <li key={t.code}><span className="ca-types__code" aria-hidden="true">{t.code}</span><span><b>{t.name}</b>{t.text}</span></li>
+                            ))}
+                        </ul>
+                    </div>
+                </section>
             </div>
         );
     };
@@ -488,6 +513,22 @@ const INTRO_CSS = `
 .ca-go:hover { background: var(--brand-hover); }
 @media (max-width: 559px) { .ca-go { width: 100%; } .ca-opt { padding: 14px; } .ca-opt:has(input:checked) { padding: 13px; } }
 .ca-fine { margin: 12px 0 0; font-size: 14px; color: var(--ink-muted); }
+.ca-art { display: none; width: 100%; max-width: 460px; height: auto; margin: 40px 0 0 auto; }
+@media (min-width: 1000px) { .ca-art { display: block; animation: ca-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; } }
+@keyframes ca-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+/* Шестте типа: информативна лента под избора */
+.ca-types { display: grid; gap: 24px; align-items: center; padding-top: 40px; border-top: 1px solid var(--border); }
+@media (min-width: 1000px) { .ca-types { grid-column: 1 / -1; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 64px; margin-top: 16px; } }
+.ca-types__art { width: min(240px, 60%); justify-self: center; }
+@media (min-width: 1000px) { .ca-types__art { width: 100%; max-width: 300px; } }
+.ca-types__h { margin: 0; font-size: clamp(22px, 2.2vw, 28px); font-weight: 720; letter-spacing: -0.015em; }
+.ca-types__lead { margin: 8px 0 0; max-width: 60ch; font-size: 16px; line-height: 1.55; color: var(--ink-muted); }
+.ca-types__list { list-style: none; margin: 20px 0 0; padding: 0; display: grid; gap: 4px 32px; }
+@media (min-width: 640px) { .ca-types__list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.ca-types__list li { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 15px; line-height: 1.45; color: var(--ink-muted); }
+.ca-types__list b { display: block; color: var(--ink); font-weight: 700; }
+.ca-types__code { flex-shrink: 0; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--ink); font-size: 13px; font-weight: 800; color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .ca-art { animation: none; } }
 `;
 
 export default CareerAdvisor;

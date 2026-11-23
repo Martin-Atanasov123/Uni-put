@@ -5,6 +5,7 @@ import { universityService } from "@/services/universityService";
 import { Search, MapPin, School, Heart, Calculator, Scale, X, TrendingUp, TrendingDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import SignupPrompt from "@/components/common/SignupPrompt";
+import { EmptyState, EmptyShortlistArt, NoMatchArt } from "@/components/common/Illustrations";
 import { mergeCalculatorHistory, readLocalHistory, CHANCE_BAND_META, CHANCE_TONES } from "@/lib/calcHistory";
 
 const MAX_COMPARE = 3;
@@ -210,81 +211,29 @@ const FavoritesPage = () => {
                         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
                     </div>
                 ) : filtered.length === 0 ? (
-                    <m.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                        style={{
-                            textAlign: "center",
-                            padding: "4rem 2rem",
-                            background: "var(--brand-surface)",
-                            backdropFilter: "blur(8px)",
-                            border: "1px solid var(--brand-border)",
-                            borderRadius: "1.25rem",
-                        }}
-                    >
-                        <div
-                            style={{
-                                width: "4rem",
-                                height: "4rem",
-                                margin: "0 auto 1rem",
-                                borderRadius: "1rem",
-                                background: "rgba(248,113,113,0.1)",
-                                border: "1px solid rgba(248,113,113,0.25)",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                            }}
-                        >
-                            <Heart size={28} style={{ color: "#AA2735" }} />
-                        </div>
-                        <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700, textWrap: "balance" }}>
-                            {allFavoritesData.length > 0 ? "Нищо не съвпада с този избор." : "Все още нямаш запазени специалности."}
-                        </h3>
-                        <p style={{ margin: "0.5rem auto 1.25rem", color: "var(--brand-muted)", fontSize: "14px", maxWidth: "400px", lineHeight: 1.6 }}>
-                            {allFavoritesData.length > 0
-                                ? "Любимите ти са наред — опитай с друга дума или махни филтъра по град."
-                                : "Намери специалност, която те интересува, и я добави тук с натискане на сърцето."}
-                        </p>
+                    <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius-feature)" }}>
                         {allFavoritesData.length > 0 ? (
-                            <button
-                                type="button"
-                                onClick={() => { setSearch(""); setCityFilter("Всички"); }}
-                                style={{
-                                    display: "inline-flex",
-                                    minHeight: "44px",
-                                    alignItems: "center",
-                                    padding: "0.6rem 1.25rem",
-                                    background: "transparent",
-                                    border: "1px solid var(--brand-border)",
-                                    borderRadius: "0.625rem",
-                                    color: "var(--brand-text)",
-                                    fontSize: "13px",
-                                    fontWeight: 700,
-                                    fontFamily: "inherit",
-                                    cursor: "pointer",
-                                }}
+                            <EmptyState
+                                art={<NoMatchArt />}
+                                title="Нищо не съвпада с този избор."
+                                actions={
+                                    <button type="button" className="es-btn es-btn--ghost" onClick={() => { setSearch(""); setCityFilter("Всички"); }}>
+                                        Изчисти филтрите
+                                    </button>
+                                }
                             >
-                                Изчисти филтрите
-                            </button>
+                                Запазените ти специалности са тук — опитай с друга дума или махни филтъра по град.
+                            </EmptyState>
                         ) : (
-                        <Link
-                            to="/universities/"
-                            style={{
-                                display: "inline-flex",
-                                padding: "0.6rem 1.25rem",
-                                background: "var(--brand-accent)",
-                                borderRadius: "0.625rem",
-                                color: "var(--brand-accent-ink)",
-                                fontSize: "13px",
-                                fontWeight: 700,
-                                textDecoration: "none",
-                            }}
-                        >
-                            Към университетите
-                        </Link>
+                            <EmptyState
+                                art={<EmptyShortlistArt />}
+                                title="Още нямаш запазени специалности."
+                                actions={<Link to="/universities/" className="es-btn es-btn--primary">Разгледай университетите</Link>}
+                            >
+                                Натисни сърцето до специалност в каталога и тя ще се появи тук, за да я сравниш с останалите.
+                            </EmptyState>
                         )}
-                    </m.div>
+                    </div>
                 ) : (
                     <m.div
                         initial="hidden"

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Home, ArrowRight, AlertCircle } from "lucide-react";
 import { m } from "motion/react";
 import Seo from "@/components/common/Seo";
+import { BrokenPathArt, IllustrationStyles } from "@/components/common/Illustrations";
 
 export default function NotFound() {
     return (
@@ -25,6 +26,10 @@ export default function NotFound() {
                 transition={{ duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
                 style={{ textAlign: "center", maxWidth: "640px", position: "relative", zIndex: 1 }}
             >
+                <div style={{ width: "min(280px, 72%)", margin: "0 auto 1.75rem" }}>
+                    <IllustrationStyles />
+                    <BrokenPathArt />
+                </div>
                 <div
                     style={{
                         display: "inline-flex",

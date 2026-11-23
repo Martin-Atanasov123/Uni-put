@@ -344,11 +344,19 @@ const CSS = `
 
 /* Как работи: една линия */
 .hp-how { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--surface); }
-.hp-how ol { list-style: none; margin: 0; padding: 18px 0; display: grid; gap: 10px; }
-@media (min-width: 1100px) { .hp-how ol { grid-template-columns: repeat(3, 1fr); gap: 32px; padding: 24px 0; } }
-.hp-how li { display: flex; align-items: baseline; gap: 10px; font-size: 15px; }
-.hp-how li::before { content: ""; flex-shrink: 0; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--ink); transform: translateY(-1px); }
+/* Мотивът ●──●──●: три спирки, свързани с линия (вертикално на телефон, хоризонтално на широк екран) */
+.hp-how ol { list-style: none; margin: 0; padding: 20px 0; display: grid; gap: 14px; }
+.hp-how li { position: relative; padding-left: 26px; font-size: 15px; line-height: 1.45; }
+.hp-how li::before { content: ""; position: absolute; left: 0; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: var(--surface); border: 2px solid var(--ink); z-index: 1; }
+.hp-how li:not(:last-child)::after { content: ""; position: absolute; left: 7px; top: 18px; bottom: -14px; width: 2px; background: var(--ink); }
 .hp-how li:last-child::before { background: var(--signal); }
+.hp-how b { margin-right: 8px; }
+@media (min-width: 1100px) {
+  .hp-how ol { grid-template-columns: repeat(3, 1fr); gap: 32px; padding: 26px 0 24px; }
+  .hp-how li { padding-left: 0; padding-top: 24px; }
+  .hp-how li::before { top: 0; }
+  .hp-how li:not(:last-child)::after { left: 16px; right: -28px; top: 7px; bottom: auto; width: auto; height: 2px; }
+}
 .hp-how b { font-weight: 750; }
 .hp-how span { color: var(--ink-muted); }
 
