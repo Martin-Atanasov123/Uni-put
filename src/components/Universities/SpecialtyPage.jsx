@@ -17,6 +17,7 @@ import Seo from "@/components/common/Seo";
 import JsonLd from "@/components/common/JsonLd";
 import AccreditationWarning from "@/components/common/AccreditationWarning";
 import MobileFold from "@/components/common/MobileFold";
+import FormulaBlock from "./FormulaBlock";
 import { ADMISSION_YEAR_SHORT, DATA_FRESHNESS_NOTE } from "@/lib/siteStats";
 
 const CARD_BORDER = "1px solid var(--brand-card-border)";
@@ -276,11 +277,7 @@ export default function SpecialtyPage() {
                                     <div style={{ marginTop: "0.75rem" }}><AccreditationWarning status={p.accreditation_status} /></div>
                                 )}
 
-                                {p.formula_description && (
-                                    <div style={{ marginTop: "0.75rem", padding: "0.625rem 0.75rem", background: "rgba(23,86,217,0.06)", border: "1px solid rgba(23,86,217,0.15)", borderRadius: "0.625rem", fontSize: "12px", color: "var(--brand-muted)", lineHeight: 1.5, wordBreak: "break-word", overflowWrap: "anywhere" }}>
-                                        <strong style={{ color: "var(--brand-text)" }}>Формула:</strong> {p.formula_description}
-                                    </div>
-                                )}
+                                <FormulaBlock program={p} />
 
                                 <Link className="sp-calc" to={calcHref} style={{
                                     display: "inline-flex", alignItems: "center", gap: "0.375rem", marginTop: "0.875rem",
