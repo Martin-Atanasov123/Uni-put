@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 
 // Форма „Пиши ни“ — записва в public.contact_messages (RLS: всеки може да пише,
-// само админ чете). Без .select() след insert: анонимният няма право да чете.
+// само админ чете) и вика contact-notify, който го праща на uniput1000@gmail.com. Без .select() след insert: анонимният няма право да чете.
 // Полето „website“ е капан за ботове — човек не го вижда и не го попълва.
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
@@ -32,12 +32,20 @@ export default function ContactForm() {
         if (Object.keys(e).length) return;
         if (trap) { setState("sent"); return; }
         setState("sending");
+        // id се създава тук: анонимният не може да прочете реда обратно, а функцията
+        // contact-notify го препраща по имейл само по id.
+        const id = crypto.randomUUID();
         const { error } = await supabase.from("contact_messages").insert({
+            id,
             name: name.trim().slice(0, 80) || null,
             email: email.trim().slice(0, 200),
             message: message.trim().slice(0, 2000),
             user_id: user?.id ?? null,
         });
+        if (!error) {
+            // Имейлът е допълнение — ако не мине, съобщението пак е в админ панела.
+            supabase.functions.invoke("contact-notify", { body: { id } }).catch(() => {});
+        }
         setState(error ? "failed" : "sent");
     };
 
