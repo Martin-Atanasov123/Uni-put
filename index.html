@@ -15,11 +15,11 @@
       The #initial-loader is removed by main.jsx after React's first paint.
     -->
     <script>
-      // Темата се задава преди първото изрисуване: избор от localStorage, иначе системната.
+      // Темата се задава преди първото изрисуване: изборът от localStorage, иначе светла.
       (function () {
         try {
           var t = localStorage.getItem("uniput_theme");
-          if (t !== "light" && t !== "dark") t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+          if (t !== "light" && t !== "dark") t = "light";
           document.documentElement.setAttribute("data-theme", t);
         } catch (e) { document.documentElement.setAttribute("data-theme", "light"); }
       })();
