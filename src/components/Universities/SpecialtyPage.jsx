@@ -16,6 +16,7 @@ import { slugify } from "@/lib/slugify";
 import Seo from "@/components/common/Seo";
 import JsonLd from "@/components/common/JsonLd";
 import AccreditationWarning from "@/components/common/AccreditationWarning";
+import MobileFold from "@/components/common/MobileFold";
 import { ADMISSION_YEAR_SHORT, DATA_FRESHNESS_NOTE } from "@/lib/siteStats";
 
 const CARD_BORDER = "1px solid var(--brand-card-border)";
@@ -166,7 +167,8 @@ export default function SpecialtyPage() {
             <JsonLd data={breadcrumbSchema} />
 
             <div style={{ maxWidth: "72rem", margin: "0 auto" }}>
-                <Link to="/specialnosti/" style={{
+                <style>{SP_CSS}</style>
+                <Link className="sp-back" to="/specialnosti/" style={{
                     display: "inline-flex", alignItems: "center", gap: "0.375rem",
                     fontSize: "0.8125rem", color: "var(--brand-muted)", textDecoration: "none", marginBottom: "1.25rem",
                 }}>
@@ -187,7 +189,7 @@ export default function SpecialtyPage() {
                     {name}
                 </h1>
 
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.625rem", marginTop: "1.25rem" }}>
+                <div className="sp-chips" style={{ display: "flex", flexWrap: "wrap", gap: "0.625rem", marginTop: "1.25rem" }}>
                     <StatChip icon={Building2} value={uniCount} label={uniCount === 1 ? "университет" : "университета"} />
                     <StatChip icon={MapPin} value={cities.length} label={cities.length === 1 ? "град" : "града"} />
                     {letterInfo && (
@@ -199,7 +201,8 @@ export default function SpecialtyPage() {
                 </div>
 
                 {/* Intro — само факти от базата */}
-                <section style={{
+                <MobileFold title="За специалността" className="sp-intro">
+                <section className="sp-intro__in" style={{
                     marginTop: "2rem", background: "var(--brand-surface)", border: CARD_BORDER,
                     borderRadius: "1.25rem", padding: "1.5rem",
                 }}>
@@ -227,12 +230,13 @@ export default function SpecialtyPage() {
                         </p>
                     )}
                 </section>
+                </MobileFold>
 
                 {/* Програми по университети */}
-                <h2 style={{ margin: "2.5rem 0 1rem", fontSize: "1.25rem", fontWeight: 800, letterSpacing: "-0.02em" }}>
+                <h2 className="sp-h2" style={{ margin: "2.5rem 0 1rem", fontSize: "1.25rem", fontWeight: 800, letterSpacing: "-0.02em" }}>
                     Къде се изучава
                 </h2>
-                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                <div className="sp-list" style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                     {programs.map((p, idx) => {
                         const ms = minScores[p.id];
                         const uniSlug = slugify(p.university_name);
@@ -243,11 +247,12 @@ export default function SpecialtyPage() {
                                 initial={{ opacity: 0, y: 12 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.35, delay: Math.min(idx * 0.03, 0.3), ease: [0.16, 1, 0.3, 1] }}
+                                className="sp-prog"
                                 style={{ background: "var(--brand-surface)", border: CARD_BORDER, borderRadius: "1.25rem", padding: "1.25rem 1.5rem" }}
                             >
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "1rem", flexWrap: "wrap" }}>
                                     <div style={{ flex: 1, minWidth: "min(100%, 16rem)" }}>
-                                        <Link to={`/universities/${uniSlug}/`} style={{ color: "var(--brand-text)", textDecoration: "none", fontWeight: 700, fontSize: "1rem", letterSpacing: "-0.01em" }}>
+                                        <Link className="sp-uni" to={`/universities/${uniSlug}/`} style={{ color: "var(--brand-text)", textDecoration: "none", fontWeight: 700, fontSize: "1rem", letterSpacing: "-0.01em" }}>
                                             {p.university_name}
                                         </Link>
                                         <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", marginTop: "0.5rem", fontSize: "0.8125rem", color: "var(--brand-muted)" }}>
@@ -256,7 +261,7 @@ export default function SpecialtyPage() {
                                         </div>
                                     </div>
                                     {ms && (
-                                        <div style={{ textAlign: "right", flexShrink: 0 }}>
+                                        <div className="sp-min" style={{ textAlign: "right", flexShrink: 0 }}>
                                             <div style={{ fontSize: "1.25rem", fontWeight: 900, fontFamily: "var(--font-mono)", color: "var(--success)", lineHeight: 1 }}>
                                                 {ms.minBall.toFixed(2)}
                                             </div>
@@ -277,7 +282,7 @@ export default function SpecialtyPage() {
                                     </div>
                                 )}
 
-                                <Link to={calcHref} style={{
+                                <Link className="sp-calc" to={calcHref} style={{
                                     display: "inline-flex", alignItems: "center", gap: "0.375rem", marginTop: "0.875rem",
                                     minHeight: "40px", padding: "0 0.875rem", borderRadius: "0.625rem",
                                     fontSize: "13px", fontWeight: 700, color: "var(--brand-accent-ink)", textDecoration: "none",
@@ -291,7 +296,7 @@ export default function SpecialtyPage() {
                 </div>
 
                 {/* Долен CTA */}
-                <div style={{ marginTop: "2.5rem", display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+                <div className="sp-ctas" style={{ marginTop: "2.5rem", display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
                     <Link to="/calculator/" style={{
                         display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.75rem 1.5rem",
                         background: "var(--brand-accent)",
@@ -317,3 +322,22 @@ export default function SpecialtyPage() {
         </m.div>
     );
 }
+
+const SP_CSS = `
+@media (max-width: 767px) {
+  .sp-back { min-height: 44px; margin-bottom: 0.25rem !important; }
+  .sp-chips { flex-wrap: nowrap !important; overflow-x: auto; gap: 0.5rem !important; margin: 1rem -1.5rem 0 !important; padding: 0 1.5rem 4px; scrollbar-width: none; }
+  .sp-chips::-webkit-scrollbar { display: none; }
+  .sp-chips > * { flex: none; }
+  .sp-intro { margin-top: 1.25rem; }
+  .sp-intro__in { margin: 0 !important; padding: 0 !important; border: 0 !important; background: none !important; }
+  .sp-h2 { margin: 1.5rem 0 0.25rem !important; }
+  .sp-list { gap: 0 !important; border-top: 1px solid var(--border); }
+  .sp-prog { background: none !important; border: 0 !important; border-bottom: 1px solid var(--border) !important; border-radius: 0 !important; padding: 1rem 0 !important; }
+  .sp-uni { display: inline-flex; align-items: center; min-height: 44px; }
+  .sp-calc { min-height: 48px !important; width: 100%; justify-content: center; font-size: 15px !important; background: transparent !important; color: var(--brand) !important; border: 1.5px solid var(--brand); }
+  .sp-min { display: flex; align-items: baseline; gap: 8px; text-align: left !important; width: 100%; }
+  .sp-min > div:last-child { margin-top: 0 !important; }
+  .sp-ctas > a { flex: 1 1 100%; justify-content: center; min-height: 52px; }
+}
+`;

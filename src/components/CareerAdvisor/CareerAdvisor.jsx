@@ -7,6 +7,7 @@ import riasecData from "@/data/riasec_questions.json";
 import Seo from "@/components/common/Seo";
 import ErrorState from "@/components/common/ErrorState";
 import JsonLd from "@/components/common/JsonLd";
+import MobileFold from "@/components/common/MobileFold";
 
 // Quiz schema — Google rich result за интерактивни тестове.
 // Подчертава че е безплатен + достъпен на български → AI Overview eligibility.
@@ -223,12 +224,14 @@ const CareerAdvisor = () => {
                 <section className="ca-intro__text">
                     <p className="ca-eyebrow">Кариерно ориентиране · RIASEC</p>
                     <h1 className="ca-h1">Какво те интересува?</h1>
-                    <p className="ca-lead">Отговаряш на въпроси за дейности, които ти харесват. Получаваш профил на интересите си по модела на Холанд и специалности, които отговарят на него.</p>
+                    <p className="ca-lead">Отговаряш на въпроси за дейности, които ти харесват. Получаваш профил на интересите си по модела на Холанд и подходящи специалности.</p>
+                    <MobileFold title="Какво получаваш и как да отговаряш" className="ca-facts-wrap">
                     <dl className="ca-facts">
                         <div><dt>Какво получаваш</dt><dd>Шест типа интереси, подредени по сила, и специалности към тях.</dd></div>
                         <div><dt>Какво не е</dt><dd>Присъда. Резултатът е отправна точка за проучване, не оценка на способностите ти.</dd></div>
                         <div><dt>Как да отговаряш</dt><dd>Според това, което ти харесва, не според това, което „трябва“.</dd></div>
                     </dl>
+                    </MobileFold>
                 </section>
                 <form className="ca-pick" onSubmit={e => { e.preventDefault(); handleVersionSelect(chosen.id); }}>
                     <fieldset>
@@ -255,10 +258,11 @@ const CareerAdvisor = () => {
                         decoding="async"
                     />
                 </form>
+                <MobileFold title="Шестте типа интереси" className="ca-types-wrap">
                 <section className="ca-types" aria-labelledby="ca-types-h">
                     <div className="ca-types__art"><InterestsHex /></div>
                     <div>
-                        <h2 id="ca-types-h" className="ca-types__h">Шестте типа интереси</h2>
+                        <h2 id="ca-types-h" className="ca-types__h" data-fold-head>Шестте типа интереси</h2>
                         <p className="ca-types__lead">Тестът мери колко силно те привлича всеки от тях. Съседните типове в шестоъгълника си приличат, срещуположните са най-различни.</p>
                         <ul className="ca-types__list">
                             {RIASEC_TYPES.map(t => (
@@ -267,6 +271,7 @@ const CareerAdvisor = () => {
                         </ul>
                     </div>
                 </section>
+                </MobileFold>
             </div>
         );
     };
@@ -511,6 +516,22 @@ const INTRO_CSS = `
 .ca-pill { display: inline-block; padding: 3px 10px; border-radius: 999px; background: var(--signal); color: var(--on-signal); font-size: 12px; font-weight: 750; }
 .ca-go { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; margin-top: 8px; padding: 0 28px; border: 0; border-radius: var(--radius-control); background: var(--brand); color: var(--on-brand); font: inherit; font-size: 16px; font-weight: 700; cursor: pointer; transition: background-color 0.14s ease; }
 .ca-go:hover { background: var(--brand-hover); }
+@media (max-width: 767px) {
+  .ca-intro { gap: 0; }
+  .ca-intro__text { display: contents; }
+  .ca-h1 { margin: 8px 0 10px; }
+  .ca-lead { margin-bottom: 20px; }
+  .ca-pick { order: 1; margin-bottom: 24px; }
+  .ca-pick legend { margin-bottom: 10px; font-size: 17px; }
+  .ca-facts-wrap { order: 2; }
+  .ca-types-wrap { order: 3; }
+  .ca-types { padding-top: 0; border-top: 0; }
+  .ca-types__art { display: none; }
+  .ca-opt { min-height: 60px; grid-template-areas: "radio name meta"; margin-bottom: 8px; }
+  .ca-opt__desc { display: none; }
+  .ca-opt__name { font-size: 16px; }
+  .ca-opt__meta { font-size: 14px; }
+}
 @media (max-width: 559px) { .ca-go { width: 100%; } .ca-opt { padding: 14px; } .ca-opt:has(input:checked) { padding: 13px; } }
 .ca-fine { margin: 12px 0 0; font-size: 14px; color: var(--ink-muted); }
 .ca-art { display: none; width: 100%; max-width: 460px; height: auto; margin: 40px 0 0 auto; }
@@ -518,7 +539,7 @@ const INTRO_CSS = `
 @keyframes ca-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 /* Шестте типа: информативна лента под избора */
 .ca-types { display: grid; gap: 24px; align-items: center; padding-top: 40px; border-top: 1px solid var(--border); }
-@media (min-width: 1000px) { .ca-types { grid-column: 1 / -1; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 64px; margin-top: 16px; } }
+@media (min-width: 1000px) { .ca-types-wrap { grid-column: 1 / -1; } .ca-types { grid-column: 1 / -1; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 64px; margin-top: 16px; } }
 .ca-types__art { width: min(240px, 60%); justify-self: center; }
 @media (min-width: 1000px) { .ca-types__art { width: 100%; max-width: 300px; } }
 .ca-types__h { margin: 0; font-size: clamp(22px, 2.2vw, 28px); font-weight: 720; letter-spacing: -0.015em; }

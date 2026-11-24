@@ -58,6 +58,7 @@ import { calcStatsService } from "@/services/calcStatsService";
 import { CALC_HISTORY_KEY, historyKey, nextHistoryPoints, readLocalHistory, CHANCE_BAND_META, CHANCE_TONES } from "@/lib/calcHistory";
 import { copyText, wrapText, roundRect, shareOrCopyLink, shareOrDownloadCanvas } from "@/lib/shareCard";
 import ReportButton from "./ReportButton";
+import MobileFold from "@/components/common/MobileFold";
 import { FIELD_LABELS, SLOT_GROUPS } from "@/lib/coefficients_config";
 import { UNIVERSITIES, SPECIALTIES, ADMISSION_YEAR, ADMISSION_YEAR_SHORT, DATA_FRESHNESS_NOTE } from "@/lib/siteStats";
 
@@ -768,6 +769,16 @@ export default function CalculatorPage() {
                     .calc-how-step::before { content: ""; position: absolute; left: 0; top: -7px; width: 12px; height: 12px; border-radius: 50%; background: var(--canvas); border: 2px solid var(--ink); }
                     .calc-how-step:last-child::before { background: var(--signal); }
                     .calc-how-wrap { display: grid; gap: 1.5rem; align-items: center; }
+                    .calc-sel { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.75rem; }
+                    .calc-sel--opt select { height: 3rem !important; font-size: 15px !important; }
+                    @media (min-width: 640px) { .calc-sel { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .calc-sel--opt select { height: 2.5rem !important; font-size: 13px !important; } }
+                    @media (max-width: 767px) {
+                        .calc-head { gap: 0.75rem; margin-bottom: 1.25rem; }
+                        .calc-how-art { display: none; }
+                        .calc-how { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 1.25rem; }
+                        .calc-how-desc { display: none; }
+                        .calc-how-step p { margin-bottom: 0 !important; font-size: 15px !important; }
+                    }
                     .calc-how-art { width: min(280px, 72%); height: auto; justify-self: center; }
                     @media (min-width: 1100px) {
                         .calc-how-wrap { grid-template-columns: 360px minmax(0, 1fr); gap: 3rem; }
@@ -862,7 +873,7 @@ export default function CalculatorPage() {
                     transition={{ duration: 0.5, delay: 0.1 }}
                     style={{ background: S.surface, border: `1px solid ${S.border}`, borderRadius: "1.25rem", padding: "1.25rem", marginBottom: "1.5rem" }}
                 >
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+                    <div className="calc-sel">
                         {/* Faculty searchable */}
                         <div style={{ position: "relative" }}>
                             <label htmlFor="calc-faculty" style={FIELD_LABEL}>1 · Факултет</label>
@@ -880,7 +891,7 @@ export default function CalculatorPage() {
                                 />
                                 <div style={{ position: "absolute", right: "0.75rem", top: "50%", transform: "translateY(-50%)", display: "flex", alignItems: "center", gap: "0.375rem" }}>
                                     {facultySearch && (
-                                        <button type="button" onClick={clearFaculty} style={{ background: "none", border: "none", cursor: "pointer", padding: "2px", color: "var(--brand-muted)", display: "flex" }}>
+                                        <button type="button" onClick={clearFaculty} aria-label="Изчисти факултета" style={{ background: "none", border: "none", cursor: "pointer", padding: "0", width: "36px", height: "36px", justifyContent: "center", alignItems: "center", color: "var(--brand-muted)", display: "flex" }}>
                                             <XCircle size={15} />
                                         </button>
                                     )}
@@ -904,7 +915,7 @@ export default function CalculatorPage() {
                                                     key={i}
                                                     type="button"
                                                     onClick={() => { setSelectedFaculty(f); setFacultySearch(f); setSelectedSpecialtyName(""); setSelectedCity(""); setSelectedUniversity(""); setIsFacultyDropdownOpen(false); setDropdownShowAll(false); }}
-                                                    style={{ width: "100%", textAlign: "left", padding: "0.625rem 1rem", fontSize: "13px", fontWeight: 500, color: "var(--brand-text)", background: "none", border: "none", borderBottom: i < filteredFaculties.length - 1 ? "1px solid rgba(148,163,184,0.08)" : "none", cursor: "pointer", fontFamily: "inherit", transition: "background 0.15s" }}
+                                                    style={{ width: "100%", textAlign: "left", padding: "0.75rem 1rem", minHeight: "44px", fontSize: "14px", fontWeight: 500, color: "var(--brand-text)", background: "none", border: "none", borderBottom: i < filteredFaculties.length - 1 ? "1px solid rgba(148,163,184,0.08)" : "none", cursor: "pointer", fontFamily: "inherit", transition: "background 0.15s" }}
                                                     onMouseEnter={e => (e.currentTarget.style.background = "rgba(23,86,217,0.08)")}
                                                     onMouseLeave={e => (e.currentTarget.style.background = "none")}
                                                 >
@@ -942,7 +953,8 @@ export default function CalculatorPage() {
                                 initial={{ opacity: 0, height: 0 }}
                                 animate={{ opacity: 1, height: "auto" }}
                                 exit={{ opacity: 0, height: 0 }}
-                                style={{ overflow: "hidden", marginTop: "0.75rem", paddingTop: "0.75rem", borderTop: "1px solid rgba(148,163,184,0.08)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}
+                                className="calc-sel calc-sel--opt"
+                                style={{ overflow: "hidden", marginTop: "0.75rem", paddingTop: "0.75rem", borderTop: "1px solid rgba(148,163,184,0.08)" }}
                             >
                                 <select
                                     value={selectedCity}
@@ -993,7 +1005,7 @@ export default function CalculatorPage() {
                                 <li key={step.num} className="calc-how-step">
                                     <span style={{ fontFamily: "var(--font-mono)", fontSize: "13px", fontWeight: 600, color: "var(--brand-accent-text)" }}>{step.num}</span>
                                     <p style={{ fontSize: "1rem", fontWeight: 700, color: "var(--brand-text)", margin: "0.4rem 0 0.35rem", fontFamily: "var(--font-display)" }}>{step.title}</p>
-                                    <p style={{ fontSize: "13px", color: "var(--brand-muted)", margin: 0, lineHeight: 1.6 }}>{step.desc}</p>
+                                    <p className="calc-how-desc" style={{ fontSize: "13px", color: "var(--brand-muted)", margin: 0, lineHeight: 1.6 }}>{step.desc}</p>
                                 </li>
                             ))}
                         </ol>
@@ -1186,14 +1198,15 @@ export default function CalculatorPage() {
 
                 {/* Formula legend — shown only when no faculty selected AND dropdown is closed */}
                 {!selectedFaculty && !isFacultyDropdownOpen && (
+                    <MobileFold title="Легенда на формулите" className="calc-leg">
                     <m.div
-                        className="calc-leg"
+                        className="calc-leg-in"
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.26 }}
                         style={{ borderTop: "1px solid var(--brand-border)", paddingTop: "1.25rem", marginBottom: "2rem" }}
                     >
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.875rem" }}>
+                        <div data-fold-head style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.875rem" }}>
                             <p style={{ fontSize: "13px", fontWeight: 700, color: "var(--brand-text)", margin: 0 }}>Легенда на формулите</p>
                         </div>
                         <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
@@ -1205,18 +1218,20 @@ export default function CalculatorPage() {
                             ))}
                         </div>
                     </m.div>
+                    </MobileFold>
                 )}
 
                 {/* Tips — shown only when no faculty selected AND dropdown is closed */}
                 {!selectedFaculty && !isFacultyDropdownOpen && (
+                    <MobileFold title="Съвети за по-добър резултат" className="calc-tip">
                     <m.div
-                        className="calc-tip"
+                        className="calc-tip-in"
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.29 }}
                         style={{ borderTop: "1px solid var(--brand-border)", paddingTop: "1.25rem", marginBottom: "2rem" }}
                     >
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.875rem" }}>
+                        <div data-fold-head style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.875rem" }}>
                             <p style={{ fontSize: "13px", fontWeight: 700, color: "var(--brand-text)", margin: 0 }}>Съвети за по-добър резултат</p>
                         </div>
                         <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "0.5rem" }}>
@@ -1228,6 +1243,7 @@ export default function CalculatorPage() {
                             ))}
                         </ul>
                     </m.div>
+                    </MobileFold>
                 )}
 
                 </div>

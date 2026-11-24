@@ -366,7 +366,7 @@ const CSS = `
 .hp-wrap { max-width: 1280px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 64px); }
 
 /* Подредба: мобилно — един поток; desktop — търсене + карта горе, пътища + списък долу */
-.hp-grid { display: grid; gap: 28px; padding-top: calc(var(--header-h) + 20px); padding-bottom: 40px;
+.hp-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; padding-top: calc(var(--header-h) + 20px); padding-bottom: 40px;
   grid-template-areas: "intro" "routes" "popular" "score" "tools"; }
 .hp-intro { grid-area: intro; } .hp-routes { grid-area: routes; } .hp-popular { grid-area: popular; } .hp-score { grid-area: score; } .hp-tools { grid-area: tools; }
 @media (min-width: 768px) {
@@ -530,4 +530,15 @@ const CSS = `
 .hp-story__who small { display: block; font-size: 12px; color: var(--ink-muted); }
 .hp-story__av { display: grid; place-items: center; flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--border); background: var(--brand); color: var(--on-brand); font-size: 14px; font-weight: 800; box-sizing: border-box; }
 @media (prefers-reduced-motion: reduce) { .hp-marquee { max-height: none; -webkit-mask-image: none; mask-image: none; } }
+/* Телефон: по-ниска лента с отзиви, без илюстрацията в „Откъде са данните“, по-тесни секции */
+@media (max-width: 767px) {
+  .hp-section { padding: 40px 0; }
+  .hp-marquee { max-height: 440px; margin-top: 24px; }
+  .hp-trust__art { display: none; }
+  .hp-deco--plane { right: 8px; width: 48px; }
+  .hp-sources > div { padding: 14px 0; }
+  .hp-faq__item { padding: 16px 0; }
+  .hp-faq__item h3 { font-size: 17px; }
+  .hp-faq__item p { font-size: 15px; }
+}
 `;

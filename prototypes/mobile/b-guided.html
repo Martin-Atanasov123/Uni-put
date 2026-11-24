@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="bg"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Посока B — водена</title>
+<style>
+:root{--canvas:#F6F8F5;--surface:#fff;--sub:#EAF0EA;--ink:#152B29;--mut:#495D5A;--brand:#1756D9;--line:#DDE5E0;--strong:#7D918A;--signal:#C9F27E}
+*{box-sizing:border-box}body{margin:0;background:#cfd6d2;font:15px/1.45 Manrope,Inter,Arial,sans-serif;color:var(--ink)}
+.row{display:flex;gap:28px;padding:28px;align-items:flex-start;flex-wrap:wrap}.cap{width:100%;font-weight:800;font-size:20px}
+.ph{width:360px;height:760px;background:var(--canvas);border-radius:28px;overflow:hidden;position:relative;box-shadow:0 10px 30px #0003;display:flex;flex-direction:column}
+.hd{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--line);background:var(--surface);flex:none}
+.logo{font-weight:900;color:var(--brand)}.bd{padding:20px 16px;flex:1;display:flex;flex-direction:column}
+.step{font-size:13px;font-weight:700;color:var(--mut)}.bar{height:4px;background:var(--sub);border-radius:4px;margin:8px 0 22px}.bar i{display:block;height:4px;background:var(--brand);border-radius:4px}
+h1{font-size:28px;line-height:1.12;margin:0 0 10px;letter-spacing:-.02em}.mut{color:var(--mut)}
+.opt{min-height:64px;border:1.5px solid var(--strong);border-radius:14px;padding:12px 16px;margin-bottom:10px;background:var(--surface);display:flex;flex-direction:column;justify-content:center}
+.opt.on{border-color:var(--brand);box-shadow:0 0 0 3px #1756D922}.opt b{font-size:16px}.opt small{color:var(--mut)}
+.foot{margin-top:auto;display:flex;gap:10px}.btn{flex:1;height:52px;border-radius:10px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800}
+.back{width:96px;height:52px;border-radius:10px;border:1px solid var(--strong);display:flex;align-items:center;justify-content:center;font-weight:700}
+.big{font-size:56px;font-weight:900;letter-spacing:-.03em;font-variant-numeric:tabular-nums;margin:6px 0}
+.in{height:56px;border:1.5px solid var(--strong);border-radius:12px;font-size:22px;font-weight:800;display:flex;align-items:center;padding:0 16px;background:var(--surface)}
+.search{height:56px;border:1.5px solid var(--ink);border-radius:12px;padding:0 14px;display:flex;align-items:center;color:var(--mut);background:var(--surface)}
+</style></head><body>
+<div class="row"><div class="cap">Посока B — водени стъпки: един въпрос или едно решение на екран</div>
+
+<div class="ph"><div class="hd"><span class="logo">UniПът</span><span>☰</span></div><div class="bd">
+<h1>С какво да започнем?</h1><p class="mut" style="margin:0 0 20px">Избери едно — винаги можеш да се върнеш.</p>
+<div class="opt"><b>Знам какво искам да уча</b><small>Търси специалност</small></div>
+<div class="opt"><b>Искам да видя бала си</b><small>Калкулатор по официалната формула</small></div>
+<div class="opt"><b>Още не знам</b><small>Тест за интереси, 3–5 мин</small></div>
+<div class="opt"><b>Търся университет</b><small>51 университета в 17 града</small></div>
+</div></div>
+
+<div class="ph"><div class="hd"><span class="logo">UniПът</span><span>☰</span></div><div class="bd">
+<div class="step">Търсене · 1 от 2</div><div class="bar"><i style="width:50%"></i></div>
+<h1>Коя област те интересува?</h1>
+<div class="search">⌕ Или напиши специалност</div><div style="height:14px"></div>
+<div class="opt"><b>Социални, стопански и правни науки</b><small>291 специалности</small></div>
+<div class="opt"><b>Технически науки</b><small>269 специалности</small></div>
+<div class="opt"><b>Природни науки и информатика</b><small>156 специалности</small></div>
+<div class="foot"><div class="back">Назад</div><div class="btn">Покажи 156 →</div></div>
+</div></div>
+
+<div class="ph"><div class="hd"><span class="logo">UniПът</span><span>☰</span></div><div class="bd">
+<div class="step">Въпрос 12 от 60</div><div class="bar"><i style="width:20%"></i></div>
+<h1>Да поправям уреди и машини</h1><p class="mut" style="margin:0 0 18px">Колко ти харесва?</p>
+<div class="opt"><b>Много ми харесва</b></div><div class="opt on"><b>Харесва ми</b></div><div class="opt"><b>Не съм сигурен</b></div><div class="opt"><b>Не ми харесва</b></div><div class="opt"><b>Никак</b></div>
+<div class="foot"><div class="back">Назад</div></div>
+</div></div>
+
+<div class="ph"><div class="hd"><span class="logo">UniПът</span><span>☰</span></div><div class="bd">
+<div class="step">Калкулатор · 3 от 3</div><div class="bar"><i style="width:100%"></i></div>
+<h1 style="font-size:22px">Оценка от изпита по математика</h1><p class="mut" style="margin:0 0 14px">Информатика · Пловдивски университет. Тежест ×3.</p>
+<div class="in">5,50</div>
+<p class="mut" style="margin:22px 0 0">Твоят бал до момента</p><div class="big">34,00</div><p class="mut" style="margin:0">от 36 · мин. бал 2025: 18,00 (не гарантира прием)</p>
+<div class="foot"><div class="back">Назад</div><div class="btn">Виж резултата →</div></div>
+</div></div>
+
+</div></body></html>

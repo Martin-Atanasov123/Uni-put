@@ -8,6 +8,7 @@ import ErrorState from "@/components/common/ErrorState";
 import CalendarReminder, { EventReminderAction } from "@/components/Calendar/CalendarReminder";
 import CalendarModal from "@/components/Calendar/CalendarModal";
 import JsonLd from "@/components/common/JsonLd";
+import MobileFold from "@/components/common/MobileFold";
 import { ADMISSION_YEAR_SHORT } from "@/lib/siteStats";
 
 import { PageArt } from "@/components/common/Illustrations";
@@ -181,7 +182,7 @@ function EventCard({ event, today, onOpen }) {
                         </span>
                     )}
                     {event.source_url && (
-                        <a href={event.source_url} target="_blank" rel="noopener noreferrer" style={{
+                        <a className="cal-src" href={event.source_url} target="_blank" rel="noopener noreferrer" style={{
                             display: "inline-flex", alignItems: "center", gap: "0.25rem",
                             fontSize: "11px", fontWeight: 600, color: "var(--brand-muted)", textDecoration: "none", marginLeft: "auto",
                         }}>
@@ -493,17 +494,27 @@ const Calendar = () => {
                     <PageArt name="calendar" height={717} rows={3} />
                 </m.div>
 
-                {/* Trust note */}
-                <div style={{ display: "flex", gap: "0.625rem", alignItems: "flex-start", padding: "0.75rem 1rem", background: "rgba(23,86,217,0.06)", border: "1px solid rgba(23,86,217,0.2)", borderRadius: "0.875rem" }}>
+                {/* Trust note — на телефон свит */}
+                <MobileFold title="Откъде са датите" className="cal-note">
+                <div className="cal-note__in" style={{ display: "flex", gap: "0.625rem", alignItems: "flex-start", padding: "0.75rem 1rem", background: "rgba(23,86,217,0.06)", border: "1px solid rgba(23,86,217,0.2)", borderRadius: "0.875rem" }}>
                     <Info size={16} style={{ color: "var(--brand-cyan)", flexShrink: 0, marginTop: 1 }} strokeWidth={1.5} />
                     <p style={{ margin: 0, fontSize: "12.5px", color: "var(--brand-muted)", lineHeight: 1.55 }}>
                         Датите са от заповедите на МОН (ДЗИ) и от официалните сайтове на университетите. Университетите обявяват графиците си за {ADMISSION_YEAR_SHORT} г. през пролетта — добавяме ги веднага.
                         Винаги проверявай в източника до събитието — графиците понякога се променят.
                     </p>
                 </div>
+                </MobileFold>
 
                 {/* Filters */}
-                <div style={{ ...S.surface, padding: "1rem 1.25rem", display: "flex", flexDirection: "column", gap: "0.875rem" }}>
+                <style>{`@media (max-width: 767px) {
+                    .cal-note { margin: 0; }
+                    .cal-note__in { padding: 0 !important; background: none !important; border: 0 !important; }
+                    .cal-filters { padding: 0.75rem !important; }
+                    .cal-filters select { min-height: 48px; font-size: 16px !important; flex: 1 1 100% !important; min-width: 0 !important; }
+                    .cal-filters button { min-height: 44px; }
+                    .cal-src { min-height: 44px; font-size: 13px !important; }
+                }`}</style>
+                <div className="cal-filters" style={{ ...S.surface, padding: "1rem 1.25rem", display: "flex", flexDirection: "column", gap: "0.875rem" }}>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", alignItems: "center" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--brand-muted)" }}>
                             <Filter size={14} strokeWidth={1.5} />

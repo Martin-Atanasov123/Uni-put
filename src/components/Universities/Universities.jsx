@@ -590,9 +590,9 @@ export default function UniversitiesPage() {
                             Каталог
                         </p>
                         <h1 style={{ fontSize: "clamp(2rem,5vw,3.25rem)", fontWeight: 800, color: "var(--brand-text)", lineHeight: 1.08, letterSpacing: "-0.03em", margin: 0, textWrap: "balance" }}>
-                            Открий своето{" "}
+                            Университети{" "}
                             <span style={{ color: "var(--brand-accent-text)" }}>
-                                бъдеще
+                                и специалности
                             </span>
                         </h1>
                     </div>
@@ -928,6 +928,15 @@ export default function UniversitiesPage() {
                 .uni-group-specs { margin: 0.75rem 0 0 calc(8px + 0.75rem); font-size: 13px; line-height: 1.75; color: var(--brand-muted); }
                 .uni-spec-link { background: none; border: 0; padding: 0; font: inherit; color: var(--brand-text); cursor: pointer; text-decoration: underline; text-decoration-color: var(--brand-border); text-underline-offset: 0.25em; transition: text-decoration-color 0.15s ease; }
                 .uni-spec-link:hover { text-decoration-color: var(--brand-accent); }
+                .uni-spec-link { text-align: left; }
+                @media (max-width: 767px) {
+                    .uni-group { padding: 0.875rem 0 1rem; }
+                    .uni-group-head { min-height: 44px; }
+                    .uni-group-title { font-size: 1.125rem; }
+                    .uni-group-title-btn { min-height: 44px; }
+                    .uni-group-meta { margin-top: 0.25rem; font-size: 13px; }
+                    .uni-group-specs { display: none; }
+                }
 
                 .uni-row { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 1rem 1.5rem; border-top: 1px solid var(--brand-border); padding: 1.25rem 0; }
                 .uni-row-main { flex: 1 1 15rem; min-width: 0; }

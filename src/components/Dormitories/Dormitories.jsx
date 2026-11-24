@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { m } from "motion/react";
 import { getAllDormitories } from "@/lib/api";
 import Seo from "@/components/common/Seo";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import ErrorState from "@/components/common/ErrorState";
 import { DORMITORIES, DORMITORY_CITIES, ADMISSION_YEAR_SHORT } from "@/lib/siteStats";
 import { PageArt } from "@/components/common/Illustrations";
@@ -62,12 +63,80 @@ function RatingStars({ value = 0 }) {
     );
 }
 
+// Телефон: компактен ред — най-важното на два реда, останалото при поискване.
+function DormRow({ dorm }) {
+    const toEur = bgn => Math.round(bgn / BGN_TO_EUR);
+    const rent = dorm.monthly_rent_avg || 0;
+    const deposit = dorm.deposit_amount || 0;
+    const facts = [
+        dorm.distance_to_uni_km != null && `${dorm.distance_to_uni_km} км`,
+        dorm.commute_minutes != null && `${dorm.commute_minutes} мин`,
+        rent > 0 ? `${toEur(rent)} €/мес.` : "цена не е посочена",
+    ].filter(Boolean);
+    const extras = [dorm.is_renovated && "Реновиран", dorm.has_private_bathroom && "Собствена баня"].filter(Boolean);
+    return (
+        <article className="dm-row">
+            <div className="dm-row__top">
+                <h3 className="dm-row__name">{dorm.block_number}</h3>
+                <span className="dm-row__rate" aria-label={`Състояние ${dorm.condition_rating || 0} от 5`}>
+                    <Star size={14} fill="var(--warning)" color="var(--warning)" aria-hidden="true" /> {dorm.condition_rating || 0}/5
+                </span>
+            </div>
+            <p className="dm-row__sub">{dorm.university_id}{dorm.city && !String(dorm.university_id || "").includes(dorm.city) ? ` · ${dorm.city}` : ""}</p>
+            <p className="dm-row__facts">{facts.join(" · ")}{extras.length > 0 && <span> · {extras.join(" · ")}</span>}</p>
+            <details className="dm-row__more">
+                <summary>Транспорт, срокове и разходи</summary>
+                <dl>
+                    <div><dt>Транспорт</dt><dd>{dorm.transport_lines?.length ? dorm.transport_lines.join(", ") : "Няма информация"}</dd></div>
+                    {dorm.application_period && <div><dt>Кандидатстване</dt><dd>{dorm.application_period}</dd></div>}
+                    {rent > 0 && <div><dt>Наем / месец</dt><dd>{toEur(rent)} €</dd></div>}
+                    {deposit > 0 && <div><dt>Депозит (еднократно)</dt><dd>{toEur(deposit)} €</dd></div>}
+                    {rent > 0 && <div><dt>Сметки (прибл.)</dt><dd>{toEur(40)} €</dd></div>}
+                </dl>
+            </details>
+            {dorm.google_maps_url && (
+                <a className="dm-row__map" href={dorm.google_maps_url} target="_blank" rel="noopener noreferrer">
+                    <MapPin size={15} aria-hidden="true" /> Виж на картата <ExternalLink size={12} aria-hidden="true" />
+                </a>
+            )}
+        </article>
+    );
+}
+
+const DM_ROW_CSS = `
+@media (max-width: 767px) {
+  .dm-grid { gap: 0 !important; border-top: 1px solid var(--border); }
+  .dm-filter-label { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .dm-filter select { min-height: 48px; font-size: 16px !important; }
+  .dm-filter { padding: 12px !important; }
+}
+.dm-row { padding: 14px 0 6px; border-bottom: 1px solid var(--border); color: var(--ink); }
+.dm-row__top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.dm-row__name { margin: 0; font-size: 17px; font-weight: 750; letter-spacing: -0.01em; }
+.dm-row__rate { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dm-row__sub { margin: 2px 0 0; font-size: 14px; color: var(--ink-muted); }
+.dm-row__facts { margin: 6px 0 0; font-size: 15px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.dm-row__facts span { font-weight: 500; color: var(--ink-muted); }
+.dm-row__more summary { display: flex; align-items: center; min-height: 44px; font-size: 14px; font-weight: 650; color: var(--brand); cursor: pointer; list-style: none; }
+.dm-row__more summary::-webkit-details-marker { display: none; }
+.dm-row__more summary::after { content: "+"; margin-left: 8px; font-weight: 700; }
+.dm-row__more[open] summary::after { content: "−"; }
+.dm-row__more dl { margin: 0 0 6px; display: grid; gap: 6px; font-size: 14px; }
+.dm-row__more dl > div { display: flex; justify-content: space-between; gap: 12px; }
+.dm-row__more dt { color: var(--ink-muted); }
+.dm-row__more dd { margin: 0; font-weight: 650; text-align: right; font-variant-numeric: tabular-nums; }
+.dm-row__map { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 14px; font-weight: 650; color: var(--brand); text-decoration: none; }
+.dm-row__map:focus-visible, .dm-row__more summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+`;
+
 function DormCard({ dorm }) {
+    const mobile = useIsMobile();
     const toEur = bgn => Math.round(bgn / BGN_TO_EUR);
     const rent = dorm.monthly_rent_avg || 0;
     const deposit = dorm.deposit_amount || 0;
     const utility = 40;
     const hasFinancialData = rent > 0;
+    if (mobile) return <DormRow dorm={dorm} />;
 
     return (
         <div
@@ -338,13 +407,15 @@ const Dormitories = () => {
                         Общежития
                     </h1>
                     <p style={{ margin: 0, color: "var(--brand-muted)", fontSize: "1rem", maxWidth: "640px" }}>
-                        Намери най-доброто място за студентския си живот — бюджет, транспорт и условия на едно място.
+                        Наем, разстояние до университета и транспорт за {DORMITORIES} общежития.
                     </p>
                     <PageArt name="dormitories" height={701} rows={3} />
                 </m.div>
 
                 {/* Filter bar */}
+                <style>{DM_ROW_CSS}</style>
                 <div
+                    className="dm-filter"
                     style={{
                         ...S.surface,
                         padding: "1rem 1.25rem",
@@ -356,11 +427,12 @@ const Dormitories = () => {
                 >
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--brand-muted)" }}>
                         <Filter size={14} />
-                        <h2 style={{ fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Филтриране по университет</h2>
+                        <h2 className="dm-filter-label" style={{ fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Филтриране по университет</h2>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flex: 1, minWidth: "min(240px, 100%)" }}>
                         <School size={14} style={{ color: "var(--brand-muted)", flexShrink: 0 }} />
                         <select
+                            aria-label="Университет"
                             value={selectedUniversity}
                             onChange={e => setSelectedUniversity(e.target.value)}
                             style={{
@@ -412,7 +484,7 @@ const Dormitories = () => {
 
                 {/* Content */}
                 {loading ? (
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "1.25rem" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(320px, 100%), 1fr))", gap: "1.25rem" }}>
                         {[1, 2, 3, 4, 5, 6].map(i => <Skeleton key={i} />)}
                     </div>
                 ) : loadError ? (
@@ -476,7 +548,8 @@ const Dormitories = () => {
                         whileInView="visible"
                         viewport={{ once: true, margin: "-40px" }}
                         variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
-                        style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "1.25rem" }}
+                        className="dm-grid"
+                        style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(320px, 100%), 1fr))", gap: "1.25rem" }}
                     >
                         {filteredDorms.map(dorm => (
                             <m.div

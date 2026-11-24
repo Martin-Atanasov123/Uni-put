@@ -402,7 +402,16 @@ export default function Header() {
                 .hd-drawer { position: absolute; top: 0; right: 0; height: 100%; width: min(88vw, 24rem); background: var(--brand-bg); border-left: 1px solid var(--brand-border); padding: 1.25rem; display: flex; flex-direction: column; animation: slideIn 0.3s ease-out; }
                 .hd-drawer-scroll { flex: 1; overflow-y: auto; padding-bottom: 1rem; }
                 .hd-drawer-title { margin: 0 0 0.5rem; font-size: 12px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--brand-muted); }
-                .hd-about { display: block; margin-top: 1.25rem; padding: 0.5rem 0; font-size: 14px; font-weight: 700; color: var(--brand-muted); text-decoration: none; }
+                .hd-about { display: flex; align-items: center; min-height: 44px; margin-top: 1.25rem; padding: 0.5rem 0; font-size: 14px; font-weight: 700; color: var(--brand-muted); text-decoration: none; }
+                /* Телефон: менюто е списък от заглавия — описанията удвояваха височината */
+                @media (max-width: 767px) {
+                    .hd-drawer .hd-item { align-items: center; min-height: 48px; padding: 0.375rem 0.5rem; }
+                    .hd-drawer .hd-item-text small { display: none; }
+                    .hd-drawer .hd-item-text strong { font-size: 15px; }
+                    .hd-drawer .hd-item-icon { padding: 0.4rem; }
+                    .hd-drawer-title { margin-top: 0.75rem; }
+                    .hd-about { margin-top: 0.5rem; }
+                }
                 .hd-drawer-foot { padding-top: 1rem; border-top: 1px solid var(--brand-border); display: flex; flex-direction: column; gap: 0.5rem; }
                 .hd-drawer-cta { display: block; padding: 0.9rem; border-radius: 0.75rem; text-align: center; font-size: 15px; font-weight: 800; text-decoration: none; color: var(--brand-accent-ink); background: var(--brand-accent); }
                 .hd-login--box { display: flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.75rem; text-align: center; border: 1px solid var(--brand-border); background: var(--brand-surface-2); border-radius: 0.625rem; font: inherit; font-size: 13px; font-weight: 700; color: var(--brand-text); text-decoration: none; cursor: pointer; }

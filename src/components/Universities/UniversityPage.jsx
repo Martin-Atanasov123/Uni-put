@@ -11,6 +11,8 @@ import { slugify } from "@/lib/slugify";
 import Seo from "@/components/common/Seo";
 import JsonLd from "@/components/common/JsonLd";
 import AccreditationWarning from "@/components/common/AccreditationWarning";
+import MobileFold from "@/components/common/MobileFold";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { UNIVERSITIES, RIASEC_SPECIALTIES, ADMISSION_YEAR_SHORT, DATA_FRESHNESS_NOTE } from "@/lib/siteStats";
 
 const CARD_BORDER = "1px solid var(--brand-card-border)";
@@ -121,6 +123,17 @@ export default function UniversityPage() {
         return { faculties: facs, cities, totalSpecialties: distinctSpecialties.size };
     }, [rows]);
 
+    // Телефон: търсене в каталога; факултетите са свити, докато не се търси.
+    const mobile = useIsMobile();
+    const [q, setQ] = useState("");
+    const qn = q.trim().toLocaleLowerCase("bg");
+    const shownFaculties = useMemo(() => {
+        if (!qn) return faculties;
+        return faculties
+            .map((f) => ({ ...f, specs: f.specs.filter((s) => (s.specialty || "").toLocaleLowerCase("bg").includes(qn)) }))
+            .filter((f) => f.specs.length);
+    }, [faculties, qn]);
+
     if (status === "loading") return <Loader />;
     if (status === "notfound") return <NotFound slug={uniSlug} />;
     if (status === "error") return <NotFound slug={uniSlug} />;
@@ -172,10 +185,12 @@ export default function UniversityPage() {
             <JsonLd data={uniSchema} />
             <JsonLd data={breadcrumbSchema} />
 
-            <div style={{ maxWidth: "72rem", margin: "0 auto" }}>
+            <div className="up" style={{ maxWidth: "72rem", margin: "0 auto" }}>
+                <style>{UP_CSS}</style>
 
                 {/* Breadcrumb / back */}
                 <Link
+                    className="up-back"
                     to="/universities/"
                     style={{
                         display: "inline-flex", alignItems: "center", gap: "0.375rem",
@@ -210,7 +225,7 @@ export default function UniversityPage() {
                 </div>
 
                 {/* CTAs */}
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", marginTop: "1.75rem" }}>
+                <div className="up-ctas" style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", marginTop: "1.75rem" }}>
                     <Link
                         to="/calculator/"
                         style={{
@@ -260,14 +275,15 @@ export default function UniversityPage() {
                     Решава „Crawled — currently not indexed" чрез ~110 думи
                     реален текст, разчупващ template thinness. Всички числа
                     идват от Supabase, нула измисляне. */}
-                <section style={{
+                <MobileFold title={`За приема в ${uniName}`} className="up-about">
+                <section className="up-about__in" style={{
                     marginTop: "2.5rem",
                     background: "var(--brand-surface)",
                     border: "1px solid var(--brand-card-border)",
                     borderRadius: "1.25rem",
                     padding: "1.75rem",
                 }}>
-                    <h2 style={{
+                    <h2 data-fold-head style={{
                         margin: 0, fontSize: "1.125rem", fontWeight: 700,
                         letterSpacing: "-0.01em", color: "var(--brand-text)",
                     }}>
@@ -310,10 +326,22 @@ export default function UniversityPage() {
                         {" "}— той сравнява профила ти с {RIASEC_SPECIALTIES} специалности и предлага най-подходящите.
                     </p>
                 </section>
+                </MobileFold>
 
                 {/* Faculties + specialties */}
-                <div style={{ marginTop: "3rem", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-                    {faculties.map((fac, idx) => (
+                {mobile && (
+                    <div className="up-search">
+                        <h2 className="up-search__h">Специалности <span>{totalSpecialties}</span></h2>
+                        <label className="up-search__field">
+                            <span className="up-sr">Търси специалност в {uniName}</span>
+                            <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Търси специалност" autoComplete="off" />
+                        </label>
+                        {qn && shownFaculties.length === 0 && <p className="up-search__empty">Няма специалност с „{q.trim()}“ тук. Опитай с друга дума.</p>}
+                    </div>
+                )}
+                <div className="up-facs" style={{ marginTop: "3rem", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                    {(mobile ? shownFaculties : faculties).map((fac, idx) => (
+                        <MobileFold key={fac.name} title={fac.name} meta={fac.specs.length} open={!!qn} className="up-fac">
                         <m.section
                             key={fac.name}
                             initial={{ opacity: 0, y: 12 }}
@@ -325,13 +353,13 @@ export default function UniversityPage() {
                                 padding: "1.5rem",
                             }}
                         >
-                            <h2 style={{
+                            <h2 data-fold-head style={{
                                 margin: 0, fontSize: "1.0625rem", fontWeight: 700,
                                 letterSpacing: "-0.01em", color: "var(--brand-text)",
                             }}>
                                 {fac.name}
                             </h2>
-                            <div style={{
+                            <div data-fold-head style={{
                                 fontSize: "0.75rem", color: "var(--brand-muted)",
                                 marginTop: "0.25rem",
                             }}>
@@ -346,6 +374,7 @@ export default function UniversityPage() {
                                 {fac.specs.map((s) => (
                                     <li key={s.id} style={{ display: "flex" }}>
                                         <Link
+                                            className="up-spec"
                                             to={`/calculator/?specialty=${encodeURIComponent(s.specialty)}&university=${encodeURIComponent(uniName)}`}
                                             style={{
                                                 flex: 1,
@@ -376,9 +405,31 @@ export default function UniversityPage() {
                                 ))}
                             </ul>
                         </m.section>
+                        </MobileFold>
                     ))}
                 </div>
             </div>
         </m.div>
     );
 }
+
+const UP_CSS = `
+.up-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 767px) {
+  .up-back { min-height: 44px; margin-bottom: 0.25rem !important; }
+  .up-ctas > a { flex: 1 1 100%; justify-content: center; min-height: 52px; }
+  .up-about { margin-top: 1.5rem; }
+  .up-about__in { margin: 0 !important; padding: 0 !important; border: 0 !important; background: none !important; }
+  .up-search { margin-top: 1.75rem; }
+  .up-search__h { margin: 0 0 10px; font-size: 20px; font-weight: 750; letter-spacing: -0.01em; }
+  .up-search__h span { color: var(--ink-muted); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .up-search__field input { width: 100%; box-sizing: border-box; min-height: 48px; padding: 0 14px; border: 1px solid var(--border-strong); border-radius: var(--radius-control); background: var(--surface); color: var(--ink); font: inherit; font-size: 16px; }
+  .up-search__field input:focus { outline: 2px solid var(--focus); outline-offset: 1px; }
+  .up-search__empty { margin: 12px 0 0; color: var(--ink-muted); font-size: 15px; }
+  .up-facs { margin-top: 1rem !important; gap: 0 !important; }
+  .up-fac .mfold__title { font-weight: 650; }
+  .up-fac section { padding: 0 !important; border: 0 !important; background: none !important; }
+  .up-fac ul { margin: 0 !important; gap: 0 !important; grid-template-columns: 1fr !important; }
+  .up-spec { min-height: 48px; padding: 0.5rem 0.25rem !important; background: none !important; border: 0 !important; border-top: 1px solid var(--border) !important; border-radius: 0 !important; font-size: 15px !important; }
+}
+`;

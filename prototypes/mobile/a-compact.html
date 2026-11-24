@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="bg"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Посока A — компактна</title>
+<style>
+:root{--canvas:#F6F8F5;--surface:#fff;--sub:#EAF0EA;--ink:#152B29;--mut:#495D5A;--brand:#1756D9;--line:#DDE5E0;--strong:#7D918A;--signal:#C9F27E;--ok:#0A6853;--inv:#152B29}
+*{box-sizing:border-box}body{margin:0;background:#cfd6d2;font:15px/1.45 Manrope,Inter,Arial,sans-serif;color:var(--ink)}
+.row{display:flex;gap:28px;padding:28px;align-items:flex-start;flex-wrap:wrap}
+.cap{width:100%;font-weight:800;font-size:20px}
+.ph{width:360px;height:760px;background:var(--canvas);border-radius:28px;overflow:hidden;position:relative;box-shadow:0 10px 30px #0003;display:flex;flex-direction:column}
+.ph>.lbl{position:absolute;top:-24px;left:0;font-size:13px;font-weight:700}
+.hd{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--line);background:var(--surface);flex:none}
+.logo{font-weight:900;color:var(--brand)}.ic{width:40px;height:40px;border:1px solid var(--line);border-radius:10px;display:grid;place-items:center}
+.bd{padding:16px;overflow:hidden;flex:1}
+h1{font-size:26px;line-height:1.1;margin:4px 0 6px;letter-spacing:-.02em}h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);margin:18px 0 6px}
+.mut{color:var(--mut);font-size:14px}
+.search{display:flex;align-items:center;gap:8px;height:48px;border:1.5px solid var(--ink);border-radius:10px;padding:0 12px;background:var(--surface);color:var(--mut)}
+.chips{display:flex;gap:8px;overflow:hidden;margin:10px 0}.chip{flex:none;height:36px;padding:0 14px;border:1px solid var(--strong);border-radius:99px;display:flex;align-items:center;font-size:14px}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.list{border-top:1px solid var(--line)}.li{display:flex;justify-content:space-between;align-items:center;min-height:52px;border-bottom:1px solid var(--line);gap:10px}
+.li b{font-weight:650}.li small{color:var(--mut);font-size:13px}.num{font-variant-numeric:tabular-nums;font-weight:800}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--strong);border-radius:10px;overflow:hidden}.seg div{padding:10px 4px;text-align:center;font-size:13px;border-right:1px solid var(--strong)}.seg div:last-child{border:0}.seg .on{background:var(--ink);color:#fff}
+.btn{height:52px;border-radius:10px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;margin-top:12px}
+.ghost{height:44px;border-radius:10px;border:1px solid var(--strong);display:flex;align-items:center;justify-content:center;font-weight:700;margin-top:8px}
+.sticky{position:absolute;left:0;right:0;bottom:0;padding:12px 16px;background:var(--surface);border-top:1px solid var(--line)}
+.score{display:flex;justify-content:space-between;align-items:center}.score .big{font-size:30px;font-weight:900}
+.az{display:flex;gap:2px;overflow:hidden;margin:8px 0}.az span{flex:none;width:32px;height:36px;display:grid;place-items:center;font-weight:700;color:var(--brand)}
+.in{height:48px;border:1px solid var(--strong);border-radius:10px;padding:0 12px;display:flex;align-items:center;justify-content:space-between;background:var(--surface)}
+.grid2{display:grid;grid-template-columns:1fr 92px;gap:8px;align-items:center;margin:8px 0}
+.det{border-top:1px solid var(--line);border-bottom:1px solid var(--line);min-height:48px;display:flex;align-items:center;justify-content:space-between;margin-top:14px;font-weight:700}
+.dot{width:8px;height:8px;border-radius:9px;display:inline-block;margin-right:8px}
+</style></head><body>
+<div class="row"><div class="cap">Посока A — компактен продуктов интерфейс: списъци, лепкави действия, всичко на един поглед</div>
+
+<div class="ph"><span class="lbl">Начало</span><div class="hd"><span class="logo">UniПът</span><span class="ic">☰</span></div><div class="bd">
+<h1>Какво да уча и къде?</h1><p class="mut" style="margin:0 0 12px">859 специалности в 51 университета.</p>
+<div class="search">⌕ Специалност или университет</div>
+<div class="chips"><span class="chip">Информатика</span><span class="chip">Медицина</span><span class="chip">Право</span><span class="chip">Икономика</span></div>
+<div class="list">
+<div class="li"><span><b>Не знам какво да избера</b><br><small>Тест за интереси · 3–5 мин</small></span>→</div>
+<div class="li"><span><b>Изчисли бала си</b><br><small>По формулата на всяка специалност</small></span>→</div>
+<div class="li"><span><b>Университети</b><br><small>По направления и градове</small></span>→</div>
+<div class="li"><span><b>Срокове за прием 2027</b><br><small>Календар с напомняния</small></span>→</div></div>
+<h2>Популярни</h2><div class="list"><div class="li"><b>Право</b><small>9 университета</small></div><div class="li"><b>Медицина</b><small>7 университета</small></div><div class="li"><b>Психология</b><small>7 университета</small></div></div>
+</div></div>
+
+<div class="ph"><span class="lbl">Специалности</span><div class="hd"><span class="logo">UniПът</span><span class="ic">☰</span></div><div class="bd">
+<h1 style="font-size:22px">Специалности</h1>
+<div class="search">⌕ напр. Право, Информатика</div>
+<div class="az"><span>А</span><span>Б</span><span>В</span><span>Г</span><span>Д</span><span>Е</span><span>Ж</span><span>З</span><span>И</span><span>К</span></div>
+<p class="mut" style="margin:4px 0">178 специалности</p>
+<div class="list">
+<div class="li"><b>Авиационен мениджмънт</b><small>2 ун.</small></div>
+<div class="li"><b>Автоматика, информационна и управляваща техника</b><small>3 ун.</small></div>
+<div class="li"><b>Автомобилна електроника</b><small>2 ун.</small></div>
+<div class="li"><b>Автомобилна техника</b><small>2 ун.</small></div>
+<div class="li"><b>Аграрен бизнес</b><small>2 ун.</small></div>
+<div class="li"><b>Аграрна икономика</b><small>2 ун.</small></div>
+<div class="li"><b>Аграрно инженерство</b><small>3 ун.</small></div>
+<div class="li"><b>Агрономство</b><small>2 ун.</small></div>
+<div class="li"><b>Акушерка</b><small>8 ун.</small></div></div>
+</div></div>
+
+<div class="ph"><span class="lbl">Кариерно ориентиране</span><div class="hd"><span class="logo">UniПът</span><span class="ic">☰</span></div><div class="bd">
+<h1>Какво те интересува?</h1><p class="mut">Тест за интереси по модела на Холанд. Без регистрация.</p>
+<h2>Колко време имаш</h2>
+<div class="seg"><div>30 въпр.<br>3–5 мин</div><div class="on">60 въпр.<br>8–12 мин</div><div>90 въпр.<br>15–20 мин</div></div>
+<div class="btn">Започни теста →</div>
+<div class="det">Какво получаваш <span>+</span></div><div class="det" style="margin:0;border-top:0">Шестте типа интереси <span>+</span></div><div class="det" style="margin:0;border-top:0">Какво не е тестът <span>+</span></div>
+</div></div>
+
+<div class="ph"><span class="lbl">Калкулатор</span><div class="hd"><span class="logo">UniПът</span><span class="ic">☰</span></div><div class="bd">
+<h1 style="font-size:22px">Изчисли бала си</h1>
+<div class="in" style="margin-top:8px">Информатика <span>▾</span></div>
+<div class="in" style="margin-top:8px">Пловдивски университет <span>▾</span></div>
+<p class="mut" style="margin:10px 0 0">Формула: 3×Изпит(Мат/Инф) + 2×Мат(д) + Мат/Инф/ИТ(д)</p>
+<div class="grid2"><span>Изпит / ДЗИ по математика</span><div class="in">5,50</div></div>
+<div class="grid2"><span>Математика (диплома)</span><div class="in">5,75</div></div>
+<div class="grid2"><span>Информатика (диплома)</span><div class="in">6,00</div></div>
+<div class="det">Как е сметнато <span>+</span></div>
+</div>
+<div class="sticky"><div class="score"><span><small class="mut">Твоят бал</small><br><span class="big num">34,00</span> <small class="mut">от 36</small></span><span style="text-align:right"><small class="mut">Мин. бал 2025</small><br><b class="num">18,00</b></span></div></div></div>
+
+</div></body></html>

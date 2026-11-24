@@ -306,3 +306,18 @@ button:focus-visible {
 } */
 
 @media (max-width: 767px) { :root { --header-h: 62px; } }
+
+/* ── MobileFold: свит второстепенен раздел на телефон ─────────────────────── */
+.mfold { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 0 0 1rem; }
+.mfold + .mfold { margin-top: -1rem; border-top: 0; }
+.mfold__sum { list-style: none; display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 4px 2px; cursor: pointer; font-weight: 700; font-size: 15px; color: var(--ink); }
+.mfold__sum::-webkit-details-marker { display: none; }
+.mfold__title { flex: 1; min-width: 0; }
+.mfold__meta { font-size: 13px; font-weight: 600; color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+.mfold__chev { flex: none; color: var(--ink-muted); transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+.mfold[open] > .mfold__sum .mfold__chev { transform: rotate(180deg); }
+.mfold__sum:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+.mfold__body { padding: 0 0 1rem; }
+.mfold__body > * { margin-top: 0 !important; border-top: 0 !important; padding-top: 0 !important; }
+.mfold [data-fold-head] { display: none !important; }
+@media (prefers-reduced-motion: reduce) { .mfold__chev { transition: none; } }
