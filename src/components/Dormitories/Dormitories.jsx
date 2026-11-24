@@ -4,6 +4,7 @@ import { getAllDormitories } from "@/lib/api";
 import Seo from "@/components/common/Seo";
 import ErrorState from "@/components/common/ErrorState";
 import { DORMITORIES, DORMITORY_CITIES, ADMISSION_YEAR_SHORT } from "@/lib/siteStats";
+import { PageArt } from "@/components/common/Illustrations";
 import {
     Building2,
     MapPin,
@@ -323,6 +324,7 @@ const Dormitories = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    className="pg-head"
                     style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}
                 >
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
@@ -338,6 +340,7 @@ const Dormitories = () => {
                     <p style={{ margin: 0, color: "var(--brand-muted)", fontSize: "1rem", maxWidth: "640px" }}>
                         Намери най-доброто място за студентския си живот — бюджет, транспорт и условия на едно място.
                     </p>
+                    <PageArt name="dormitories" height={701} rows={3} />
                 </m.div>
 
                 {/* Filter bar */}

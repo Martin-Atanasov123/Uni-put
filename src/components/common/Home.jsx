@@ -232,6 +232,30 @@ export default function Home() {
                 </div>
             </section>
 
+            {/* ── Примерни истории (виж бележката при STORIES) ── */}
+            <section className="hp-section hp-stories" aria-labelledby="hp-stories">
+                <div className="hp-wrap">
+                    <div className="hp-stories__head">
+                        <div>
+                            <p className="hp-eyebrow"><Sticker name="star" size={24} />Отзиви</p>
+                            <h2 id="hp-stories" className="hp-h2">Ученици, които вече са намерили пътя си</h2>
+                        </div>
+                        <p className="hp-stories__note">Примерни истории — показват как се ползва UniПът. Не са отзиви на реални потребители.</p>
+                    </div>
+                    <ul className="hp-stories__list">
+                        {STORIES.map((t, i) => (
+                            <li key={t.name} className={`hp-story hp-story--${i % 3}`}>
+                                <blockquote>{t.text}</blockquote>
+                                <p className="hp-story__who">
+                                    <span className="hp-story__av" aria-hidden="true">{initials(t.name)}</span>
+                                    <span><b>{t.name}</b><small>{t.role}</small></span>
+                                </p>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </section>
+
             {/* ── Доверие и източници ── */}
             <section className="hp-section hp-section--subtle" aria-labelledby="hp-trust">
                 <div className="hp-wrap hp-split">
@@ -287,6 +311,22 @@ export default function Home() {
         </div>
     );
 }
+
+// Примерни истории. ВНИМАНИЕ: не са отзиви на реални потребители — върнати по изрично
+// желание на собственика с ясен етикет „Примерни истории“ на страницата. Без снимки на
+// реални хора. Когато има верифицирани отзиви (име, съгласие), заменят тези.
+const STORIES = [
+    { text: "Бях сигурна, че нямам шанс за Право в СУ. Сложих оценките в калкулатора и видях — Над средното с 23 точки. Кандидатствах. Взеха ме. УниПът буквално промени решението ми.", name: "Мария Стоянова", role: "Студентка, Право — СУ" },
+    { text: "Прекарах седмици в Excel таблици с коефициенти. После намерих УниПът — 10 минути и бях готов. Как не го открих по-рано?", name: "Тодор Петков", role: "Студент, Бизнес администрация — УНСС" },
+    { text: "Мислех, че ще уча счетоводство, защото баща ми каза така. Направих теста за интереси — излезе Изследовател. Сега съм в Психология и за пръв път съм спокойна за избора си.", name: "Александра Димова", role: "Студентка, Психология — НБУ" },
+    { text: "Препоръчвам УниПът на всичките ми 12-класници. Данните са с източник, интерфейсът е ясен. Учениците реално го използват.", name: "Йордан Маринов", role: "Класен ръководител, ПГЕЕ — Варна" },
+    { text: "Исках да уча в Пловдив, но не знаех дали баловете ми стигат. Филтрирах по град, изчислих и избрах ПУ. Сега съм втора година Информатика и не съжалявам.", name: "Христо Иванов", role: "Студент, Информатика — ПУ" },
+    { text: "Дъщеря ми ми показа сайта и за пръв път разбрах как се изчислява балът. Всичко е обяснено ясно. Вече не се притеснявам, че тя взима грешно решение.", name: "Надежда Великова", role: "Майка на кандидат-студентка" },
+    { text: "Колебаях се между Медицина и Биохимия. В УниПът видях баловете и за двете едновременно и веднага стана ясно. Записах Биохимия в МУ-Пловдив.", name: "Стефан Георгиев", role: "Студент, Биохимия — МУ Пловдив" },
+    { text: "Никой в училище не ми обясни как работят коефициентите. Прочетох формулата в УниПът и изведнъж всичко имаше смисъл.", name: "Ивет Николова", role: "Студентка, Архитектура — УАСГ" },
+    { text: "Пратих линка на 12 съученика в деня, в който го открих. Стана нашият сайт за кандидатстването тази година.", name: "Боян Христов", role: "12. клас, кандидатства за ТУ" },
+];
+const initials = (n) => n.split(" ").map((w) => w[0]).join("").slice(0, 2);
 
 const FAQ = [
     { q: "Безплатен ли е UniПът?", a: "Да. Каталогът, калкулаторът и ориентирането са безплатни. Без акаунт изчисляваш първите три специалности; с безплатен акаунт пазиш списъка си и продължаваш без ограничение." },
@@ -444,4 +484,28 @@ const CSS = `
   .hp-route__st, .hp-tools__st { transition: none; }
   .hp-route:hover .hp-route__st, .hp-tools a:hover .hp-tools__st { transform: none; }
 }
+
+/* ── Примерни истории ── */
+.hp-eyebrow { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 13px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); }
+.hp-stories__head { display: grid; gap: 12px; align-items: end; }
+@media (min-width: 900px) { .hp-stories__head { grid-template-columns: minmax(0, 1fr) minmax(0, 360px); gap: 48px; } }
+.hp-stories__note { margin: 0; padding: 10px 14px; border-left: 3px solid var(--warning); background: var(--surface); font-size: 14px; line-height: 1.5; color: var(--ink-muted); }
+/* Телефон: хоризонтална лента с прилепване; широк екран: три колони като стена */
+.hp-stories__list { list-style: none; margin: 28px -16px 0; padding: 4px 16px 12px; display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: thin; }
+.hp-story { flex: 0 0 82%; scroll-snap-align: start; display: flex; flex-direction: column; justify-content: space-between; gap: 18px; padding: 20px; border: 1px solid var(--border); border-radius: var(--radius-feature); background: var(--surface); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease; }
+.hp-story:hover { transform: translateY(-2px); border-color: var(--border-strong); }
+.hp-story--1 { background: var(--surface-subtle); }
+.hp-story--2 .hp-story__av { background: var(--signal); color: var(--ink); }
+.hp-story blockquote { margin: 0; font-size: 16px; line-height: 1.6; color: var(--ink); }
+.hp-story blockquote::before { content: "„"; display: block; margin: -10px 0 4px; font-size: 44px; line-height: 1; font-weight: 800; color: var(--brand); }
+.hp-story__who { display: flex; align-items: center; gap: 12px; margin: 0; }
+.hp-story__who b { display: block; font-size: 15px; }
+.hp-story__who small { display: block; font-size: 13px; color: var(--ink-muted); }
+.hp-story__av { display: grid; place-items: center; flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; background: var(--brand); color: #fff; font-size: 14px; font-weight: 800; }
+@media (min-width: 768px) {
+  .hp-stories__list { display: block; columns: 2; column-gap: 16px; margin: 32px 0 0; padding: 0; overflow: visible; }
+  .hp-story { break-inside: avoid; margin-bottom: 16px; }
+}
+@media (min-width: 1100px) { .hp-stories__list { columns: 3; } }
+@media (prefers-reduced-motion: reduce) { .hp-story { transition: none; } .hp-story:hover { transform: none; } }
 `;

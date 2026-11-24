@@ -17,6 +17,7 @@ import DziPlanner from "@/components/DziStrategist/DziPlanner";
 import SignupPrompt from "@/components/common/SignupPrompt";
 import { useAuth } from "@/hooks/useAuth";
 
+import { PageArt } from "@/components/common/Illustrations";
 const HOWTO_SCHEMA = {
     "@context": "https://schema.org",
     "@type": "HowTo",
@@ -206,6 +207,7 @@ export default function DziStrategist() {
                     initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    className="pg-head"
                     style={{ marginBottom: "2.5rem" }}
                 >
                     <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.375rem 0.875rem", background: "rgba(23,86,217,0.08)", border: "1px solid rgba(23,86,217,0.2)", borderRadius: "999px", marginBottom: "1rem" }}>
@@ -223,6 +225,7 @@ export default function DziStrategist() {
                     <p style={{ fontSize: "1.0625rem", color: "var(--brand-muted)", lineHeight: 1.6, maxWidth: "44rem", margin: 0 }}>
                         Българският език и литература е задължителен. Вторият ДЗИ е твоят избор — и той решава колко специалности ще можеш да караш. Ето подредбата по официалните формули за балообразуване.
                     </p>
+                    <PageArt name="dzi-strateg" height={802} rows={3} />
                 </m.div>
 
                 <DziPlanner specialties={specialties} />

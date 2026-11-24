@@ -15,6 +15,7 @@ import SignupPrompt from "@/components/common/SignupPrompt";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/lib/supabase";
 import { gymnasiaService } from "@/services/gymnasiaService";
+import { PageArt } from "@/components/common/Illustrations";
 import {
     DIPLOMA_SUBJECTS, ABILITY_EXAMS, computeBal, verdict, wishStatus, wishesAdvice, labelForKey, historyForClass, MAX_BAL,
 } from "@/lib/gymnasiaScore";
@@ -523,7 +524,7 @@ export default function Gymnasia() {
             }} />
 
             <div style={{ maxWidth: "72rem", margin: "0 auto", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-                <m.header initial={reduced ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}>
+                <m.header className="pg-head" initial={reduced ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}>
                     <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.375rem 0.875rem", background: "rgba(23,86,217,0.08)", border: "1px solid rgba(23,86,217,0.2)", borderRadius: "999px", marginBottom: "1rem" }}>
                         <School size={14} strokeWidth={1.5} style={{ color: "var(--brand-cyan)" }} aria-hidden="true" />
                         <span style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--brand-cyan)" }}>Прием след 7. клас · {region.name}</span>
@@ -534,6 +535,7 @@ export default function Gymnasia() {
                     <p style={{ margin: 0, fontSize: "1.0625rem", lineHeight: 1.6, color: "var(--brand-muted)", maxWidth: "62ch" }}>
                         Балът ти по формулата на всяка паралелка, минималните балове от последните 4 кампании и помощник, който казва къде е сигурно, къде е възможно и къде е риск.
                     </p>
+                    <PageArt name="priem-7" height={519} rows={3} />
                 </m.header>
 
                 <div role="group" aria-label="Област" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.5rem" }}>

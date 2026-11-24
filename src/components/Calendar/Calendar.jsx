@@ -10,6 +10,7 @@ import CalendarModal from "@/components/Calendar/CalendarModal";
 import JsonLd from "@/components/common/JsonLd";
 import { ADMISSION_YEAR_SHORT } from "@/lib/siteStats";
 
+import { PageArt } from "@/components/common/Illustrations";
 // Национални дати (ДЗИ, НВО) са с „university_name“ = „МОН — …“ — не са университет, без линк към /universities/.
 const isNational = (name) => String(name || "").startsWith("МОН");
 import {
@@ -472,6 +473,7 @@ const Calendar = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    className="pg-head"
                     style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}
                 >
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
@@ -488,6 +490,7 @@ const Calendar = () => {
                         Изпити, срокове за кандидатстване, класирания и записвания — събрани по университети,
                         за да не изпуснеш нито един срок.
                     </p>
+                    <PageArt name="calendar" height={717} rows={3} />
                 </m.div>
 
                 {/* Trust note */}

@@ -134,3 +134,42 @@ export function InterestsHex() {
         </svg>
     );
 }
+
+// ── Илюстрация до заглавието на страница ─────────────────────────────────────
+// Контейнерът получава className="pg-head"; от 1000 px нагоре става две колони:
+// текстът вляво, картината вдясно. На телефон картината се крие — данните са първи.
+// rows = броят на останалите деца в контейнера (за да не се добавят празни редове).
+const PAGE_ART_CSS = `
+.pg-art { display: none; width: 100%; height: auto; }
+@media (min-width: 1000px) {
+  .pg-head { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 300px); column-gap: 48px; align-items: start; align-content: start; }
+  /* Излишната височина от картината отива в последния текстов ред, не между заглавието и текста */
+  .pg-head:has(> .pg-art[data-rows="2"]) { grid-template-rows: auto 1fr; }
+  .pg-head:has(> .pg-art[data-rows="3"]) { grid-template-rows: auto auto 1fr; }
+  .pg-head > * { grid-column: 1; }
+  .pg-head > .pg-art { display: block; grid-column: 2; justify-self: end; align-self: center; animation: pg-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+}
+.pg-art--center { display: block; width: min(420px, 86%); margin: 1rem auto 0; }
+@keyframes pg-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .pg-head > .pg-art { animation: none; } }
+`;
+
+export function PageArt({ name, width = 960, height, rows = 3, center = false }) {
+    return (
+        <>
+            <style>{PAGE_ART_CSS}</style>
+            <img
+                className={center ? "pg-art pg-art--center" : "pg-art"}
+                src={`/illustrations/${name}-960.webp`}
+                srcSet={`/illustrations/${name}-480.webp 480w, /illustrations/${name}-960.webp 960w`}
+                sizes={center ? "420px" : "(min-width: 1000px) 340px, 0px"}
+                width={width}
+                height={height}
+                alt=""
+                decoding="async"
+                data-rows={rows}
+                style={center ? undefined : { gridRow: `1 / span ${rows}` }}
+            />
+        </>
+    );
+}

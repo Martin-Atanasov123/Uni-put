@@ -16,6 +16,7 @@ import { slugify } from "@/lib/slugify";
 import AccreditationWarning from "@/components/common/AccreditationWarning";
 import { UNIVERSITIES, SPECIALTIES, ADMISSION_YEAR_SHORT } from "@/lib/siteStats";
 
+import { PageArt } from "@/components/common/Illustrations";
 // ─── rsvu.mon.bg High-level groups ──────────────────────────────────────────
 // Matches the official МОН classification 
 const GROUPS = [
@@ -579,7 +580,7 @@ export default function UniversitiesPage() {
 
                 {/* ── Header ───────────────────────────────────────────── */}
                 <m.div
-                    className="uni-head"
+                    className="uni-head pg-head"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
@@ -602,6 +603,7 @@ export default function UniversitiesPage() {
                             <span className="uni-head-num">{totalCities}</span> {totalCities === 1 ? "град" : "града"}
                         </p>
                     )}
+                    <PageArt name="universities-map" height={719} rows={2} />
                 </m.div>
 
                 {/* ── Filter bar ────────────────────────────────────────── */}
@@ -969,7 +971,8 @@ export default function UniversitiesPage() {
 
                 @media (min-width: 900px) {
                     .uni-head { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: end; gap: 3rem; }
-                    .uni-head-count { justify-self: end; }
+                    .uni-head:not(.pg-head) .uni-head-count { justify-self: end; }
+                    .uni-head.pg-head { grid-template-columns: minmax(0, 1fr) minmax(0, 300px); align-items: start; gap: 1rem 3rem; }
                     .uni-direction-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
                     .uni-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
                 }

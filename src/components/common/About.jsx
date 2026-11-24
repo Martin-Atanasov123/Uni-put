@@ -3,6 +3,7 @@ import { m } from "motion/react";
 import Seo from "@/components/common/Seo";
 import { RULES_YEAR } from "@/lib/siteStats";
 
+import { PageArt } from "@/components/common/Illustrations";
 const TEAM = [
     {
         name: "Мартин Атанасов",
@@ -211,6 +212,7 @@ const About = () => {
                     <p style={{ margin: "0.5rem auto 0", maxWidth: "720px", fontSize: "1rem", color: "var(--brand-muted)", lineHeight: 1.65 }}>
                         УниПът е създаден, за да помогне на кандидат-студентите в България да вземат информирани решения за своето бъдеще. Комбинираме данни за университети, специалности, балове и общежития в една интуитивна платформа и я развиваме с внимание към детайла, достъпността и високия перформанс.
                     </p>
+                    <PageArt name="about" height={764} center />
                 </m.header>
 
                 {/* ── Why We Built This ── */}
