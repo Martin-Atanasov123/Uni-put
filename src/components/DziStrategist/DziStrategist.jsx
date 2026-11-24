@@ -242,7 +242,7 @@ export default function DziStrategist() {
                 )}
 
                 {error && (
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "1rem 1.25rem", background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.25)", borderRadius: "1rem", color: "#AA2735", fontSize: "14px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "1rem 1.25rem", background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.25)", borderRadius: "1rem", color: "var(--danger)", fontSize: "14px" }}>
                         <AlertCircle size={16} /> {error}
                     </div>
                 )}
@@ -319,7 +319,7 @@ export default function DziStrategist() {
                     )}
 
                     {lookupError && !lookupLoading && (
-                        <p role="alert" style={{ fontSize: "13px", color: "#AA2735", marginTop: "1rem" }}>
+                        <p role="alert" style={{ fontSize: "13px", color: "var(--danger)", marginTop: "1rem" }}>
                             Не успяхме да заредим данните за тази специалност. Провери връзката и опитай пак.
                         </p>
                     )}

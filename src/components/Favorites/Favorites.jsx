@@ -96,7 +96,7 @@ const FavoritesPage = () => {
                     style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}
                 >
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                        <Heart size={14} style={{ color: "#AA2735", fill: "#AA2735" }} />
+                        <Heart size={14} style={{ color: "var(--danger)", fill: "var(--danger)" }} />
                         <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.14em" }}>
                             Запазени
                         </span>
@@ -311,7 +311,7 @@ const FavoritesPage = () => {
                                                     background: favorite ? "rgba(248,113,113,0.1)" : "var(--brand-border)",
                                                     border: `1px solid ${favorite ? "rgba(248,113,113,0.3)" : "rgba(148,163,184,0.15)"}`,
                                                     borderRadius: "999px",
-                                                    color: favorite ? "#AA2735" : "var(--brand-muted)",
+                                                    color: favorite ? "var(--danger)" : "var(--brand-muted)",
                                                     cursor: "pointer",
                                                     display: "flex",
                                                     alignItems: "center",
@@ -319,7 +319,7 @@ const FavoritesPage = () => {
                                                 }}
                                                 aria-label="Премахни от любими"
                                             >
-                                                <Heart size={14} fill={favorite ? "#AA2735" : "none"} />
+                                                <Heart size={14} fill={favorite ? "var(--danger)" : "none"} />
                                             </button>
                                         </div>
                                     </div>
@@ -416,7 +416,7 @@ function ComparisonCard({ uni, entry, onRemove }) {
                             label="Твоят бал"
                             value={Number(entry.score).toFixed(2)}
                             mono
-                            color={entry.isAbove === true ? "#0A6853" : entry.isAbove === false ? "#AA2735" : undefined}
+                            color={entry.isAbove === true ? "var(--success)" : entry.isAbove === false ? "var(--danger)" : undefined}
                             icon={entry.isAbove === true ? <TrendingUp size={11} /> : entry.isAbove === false ? <TrendingDown size={11} /> : null}
                         />
                         {entry.minBall != null && (

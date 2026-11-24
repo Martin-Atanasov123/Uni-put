@@ -222,7 +222,7 @@ export default function GradeInputSection({ coefficients = {}, separateKeys, fac
                             {/* Hint */}
                             <div style={{ fontSize: "11px", color: "var(--brand-muted)", minHeight: "1rem" }}>
                                 {invalid && value !== "" ? (
-                                    <span style={{ color: "#AA2735" }}>Оценка между 2.00 и 6.00</span>
+                                    <span style={{ color: "var(--danger)" }}>Оценка между 2.00 и 6.00</span>
                                 ) : bestAlt ? (
                                     <span>Най-добра: <strong style={{ color: "var(--brand-text)", fontFamily: "var(--font-mono)" }}>{bestAlt.grade.toFixed(2)}</strong> <span style={{ opacity: 0.6 }}>({bestAlt.label})</span></span>
                                 ) : (

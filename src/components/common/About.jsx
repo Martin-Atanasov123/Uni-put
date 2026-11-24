@@ -246,7 +246,7 @@ const About = () => {
                         {[
                             { icon: Calculator, color: "var(--brand-cyan)", bg: "rgba(23,86,217,0.1)", border: "rgba(23,86,217,0.25)", title: "Точен калкулатор", desc: "Прилагаме официалните коефициенти от наредбите на МОН за всяка специалност поотделно — не приблизителна формула." },
                             { icon: Brain, color: "var(--brand-violet)", bg: "rgba(23,86,217,0.1)", border: "rgba(23,86,217,0.25)", title: "RIASEC профил", desc: "Научно обоснован метод за съпоставяне на личностни интереси с кариерни пътища и специалности." },
-                            { icon: BookOpen, color: "#0A6853", bg: "rgba(16,185,129,0.1)", border: "rgba(16,185,129,0.25)", title: "Агрегирани данни", desc: "Университети, факултети, общежития и исторически балове на едно място — без да ровиш в отделни сайтове." },
+                            { icon: BookOpen, color: "var(--success)", bg: "rgba(16,185,129,0.1)", border: "rgba(16,185,129,0.25)", title: "Агрегирани данни", desc: "Университети, факултети, общежития и исторически балове на едно място — без да ровиш в отделни сайтове." },
                         ].map(({ icon: Icon, color, bg, border, title, desc }) => (
                             <div key={title} style={{ display: "flex", gap: "1rem", alignItems: "flex-start", padding: "1.25rem", background: "var(--brand-surface)", border: "1px solid var(--brand-card-border)", borderRadius: "1rem" }}>
                                 <div style={{ width: "2.25rem", height: "2.25rem", borderRadius: "0.625rem", background: bg, border: `1px solid ${border}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>

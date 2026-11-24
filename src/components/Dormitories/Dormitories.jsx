@@ -45,13 +45,13 @@ function RatingStars({ value = 0 }) {
     return (
         <div style={{ display: "flex", gap: "2px" }}>
             {[...Array(5)].map((_, i) => {
-                if (i < full) return <Star key={i} size={13} fill="#986100" color="#986100" />;
+                if (i < full) return <Star key={i} size={13} fill="var(--warning)" color="var(--warning)" />;
                 if (i === full && half) {
                     return (
                         <span key={i} style={{ position: "relative", display: "inline-block", width: 13, height: 13 }}>
                             <Star size={13} fill="none" color="rgba(148,163,184,0.3)" />
                             <span style={{ position: "absolute", inset: 0, overflow: "hidden", width: "50%" }}>
-                                <Star size={13} fill="#986100" color="#986100" />
+                                <Star size={13} fill="var(--warning)" color="var(--warning)" />
                             </span>
                         </span>
                     );
@@ -141,7 +141,7 @@ function DormCard({ dorm }) {
             {(dorm.is_renovated || dorm.has_private_bathroom) && (
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
                     {dorm.is_renovated && (
-                        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", padding: "0.25rem 0.625rem", background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.3)", borderRadius: "999px", color: "#0A6853", fontSize: "11px", fontWeight: 600 }}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", padding: "0.25rem 0.625rem", background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.3)", borderRadius: "999px", color: "var(--success)", fontSize: "11px", fontWeight: 600 }}>
                             <Hammer size={11} /> Реновиран
                         </span>
                     )}
@@ -192,7 +192,7 @@ function DormCard({ dorm }) {
             {/* Application period */}
             {dorm.application_period ? (
                 <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.625rem 0.75rem", background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.25)", borderRadius: "0.625rem" }}>
-                    <CalendarDays size={14} style={{ color: "#986100", flexShrink: 0 }} />
+                    <CalendarDays size={14} style={{ color: "var(--warning)", flexShrink: 0 }} />
                     <div>
                         <span style={{ display: "block", fontSize: "9px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>Кандидатстване</span>
                         <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--brand-text)" }}>{dorm.application_period}</span>

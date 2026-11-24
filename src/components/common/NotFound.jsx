@@ -39,7 +39,7 @@ export default function NotFound() {
                         background: "rgba(248,113,113,0.1)",
                         border: "1px solid rgba(248,113,113,0.25)",
                         borderRadius: "999px",
-                        color: "#AA2735",
+                        color: "var(--danger)",
                         fontSize: "11px",
                         fontWeight: 800,
                         textTransform: "uppercase",

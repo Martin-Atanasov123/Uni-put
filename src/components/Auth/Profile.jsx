@@ -37,12 +37,12 @@ import {
 } from "lucide-react";
 
 const RIASEC_TYPES = {
-    R: { label: "Реалист", color: "#C2410C", bg: "rgba(249,115,22,0.12)", border: "rgba(249,115,22,0.3)" },
-    I: { label: "Изследовател", color: "#6D28D9", bg: "rgba(139,92,246,0.12)", border: "rgba(139,92,246,0.3)" },
-    A: { label: "Артист", color: "#BE185D", bg: "rgba(236,72,153,0.12)", border: "rgba(236,72,153,0.3)" },
-    S: { label: "Социален", color: "#0A6853", bg: "rgba(16,185,129,0.12)", border: "rgba(16,185,129,0.3)" },
-    E: { label: "Предприемач", color: "#986100", bg: "rgba(245,158,11,0.12)", border: "rgba(245,158,11,0.3)" },
-    C: { label: "Конвенционален", color: "#0E7490", bg: "rgba(6,182,212,0.12)", border: "rgba(6,182,212,0.3)" },
+    R: { label: "Реалист", color: "var(--c-orange)", bg: "rgba(249,115,22,0.12)", border: "rgba(249,115,22,0.3)" },
+    I: { label: "Изследовател", color: "var(--c-violet)", bg: "rgba(139,92,246,0.12)", border: "rgba(139,92,246,0.3)" },
+    A: { label: "Артист", color: "var(--c-pink)", bg: "rgba(236,72,153,0.12)", border: "rgba(236,72,153,0.3)" },
+    S: { label: "Социален", color: "var(--success)", bg: "rgba(16,185,129,0.12)", border: "rgba(16,185,129,0.3)" },
+    E: { label: "Предприемач", color: "var(--warning)", bg: "rgba(245,158,11,0.12)", border: "rgba(245,158,11,0.3)" },
+    C: { label: "Конвенционален", color: "var(--c-teal)", bg: "rgba(6,182,212,0.12)", border: "rgba(6,182,212,0.3)" },
 };
 
 const SURFACE = {
@@ -358,7 +358,7 @@ const Profile = () => {
                                 background: "rgba(248,113,113,0.08)",
                                 border: "1px solid rgba(248,113,113,0.25)",
                                 borderRadius: "0.625rem",
-                                color: "#AA2735",
+                                color: "var(--danger)",
                                 fontSize: "12px",
                                 fontWeight: 700,
                                 cursor: "pointer",
@@ -423,7 +423,7 @@ const Profile = () => {
                                 background: message.type === "success" ? "rgba(34,197,94,0.08)" : "rgba(248,113,113,0.08)",
                                 border: `1px solid ${message.type === "success" ? "rgba(34,197,94,0.3)" : "rgba(248,113,113,0.3)"}`,
                                 borderRadius: "0.625rem",
-                                color: message.type === "success" ? "#0A6853" : "#AA2735",
+                                color: message.type === "success" ? "var(--success)" : "var(--danger)",
                                 fontSize: "13px",
                                 fontWeight: 600,
                                 marginBottom: "1.25rem",
@@ -554,7 +554,7 @@ const Profile = () => {
                                                         <p style={{ margin: 0, fontSize: "13px", fontWeight: 700, color: "var(--brand-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{uni.university_name}</p>
                                                         <p style={{ margin: "0.15rem 0 0", display: "inline-flex", alignItems: "center", gap: "0.25rem", fontSize: "10px", color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}><MapPin size={9} /> {uni.city}</p>
                                                     </div>
-                                                    <button onClick={() => toggleFavorite(uni.id.toString())} style={{ width: "1.75rem", height: "1.75rem", borderRadius: "0.5rem", background: "transparent", border: "1px solid rgba(248,113,113,0.2)", color: "#AA2735", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                                    <button onClick={() => toggleFavorite(uni.id.toString())} style={{ width: "1.75rem", height: "1.75rem", borderRadius: "0.5rem", background: "transparent", border: "1px solid rgba(248,113,113,0.2)", color: "var(--danger)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
                                                         <Trash2 size={12} />
                                                     </button>
                                                 </div>
@@ -589,7 +589,7 @@ const Profile = () => {
                                                                 {d.type === "application" ? "Срок за кандидатстване" : "Приемен изпит"} · {new Date(d.deadline).toLocaleDateString("bg-BG", { day: "numeric", month: "long" })}
                                                             </p>
                                                         </div>
-                                                        <span style={{ flexShrink: 0, padding: "0.25rem 0.625rem", borderRadius: "999px", fontSize: "11px", fontWeight: 700, background: d.daysLeft <= 7 ? "rgba(248,113,113,0.12)" : "rgba(23,86,217,0.1)", color: d.daysLeft <= 7 ? "#AA2735" : "var(--brand-cyan)" }}>
+                                                        <span style={{ flexShrink: 0, padding: "0.25rem 0.625rem", borderRadius: "999px", fontSize: "11px", fontWeight: 700, background: d.daysLeft <= 7 ? "rgba(248,113,113,0.12)" : "rgba(23,86,217,0.1)", color: d.daysLeft <= 7 ? "var(--danger)" : "var(--brand-cyan)" }}>
                                                             {d.daysLeft === 0 ? "днес" : d.daysLeft === 1 ? "утре" : `след ${d.daysLeft} дни`}
                                                         </span>
                                                     </div>
@@ -666,21 +666,21 @@ const Profile = () => {
                                                             <p style={{ margin: 0, fontSize: "13px", fontWeight: 800, color: "var(--brand-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{h.specialty || "Неизвестна"}</p>
                                                             <p style={{ margin: "0.2rem 0 0", fontSize: "10px", color: "var(--brand-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{h.university || h.faculty}</p>
                                                         </div>
-                                                        <span style={{ fontFamily: "var(--font-mono)", fontSize: "1.25rem", fontWeight: 800, color: above ? "#0A6853" : "var(--brand-text)", flexShrink: 0 }}>{h.score?.toFixed ? h.score.toFixed(2) : h.score}</span>
+                                                        <span style={{ fontFamily: "var(--font-mono)", fontSize: "1.25rem", fontWeight: 800, color: above ? "var(--success)" : "var(--brand-text)", flexShrink: 0 }}>{h.score?.toFixed ? h.score.toFixed(2) : h.score}</span>
                                                     </div>
                                                     {points.length > 1 && <ScoreSparkline points={points} />}
                                                     {delta !== null && (
-                                                        <span style={{ fontSize: "11px", fontWeight: 700, color: delta > 0 ? "#0A6853" : delta < 0 ? "#AA2735" : "var(--brand-muted)" }}>
+                                                        <span style={{ fontSize: "11px", fontWeight: 700, color: delta > 0 ? "var(--success)" : delta < 0 ? "var(--danger)" : "var(--brand-muted)" }}>
                                                             {delta > 0 ? "▲ +" : delta < 0 ? "▼ −" : ""}{delta === 0 ? "Без промяна" : Math.abs(delta).toFixed(2) + " т."} спрямо {new Date(prev.date).toLocaleDateString("bg-BG", { day: "numeric", month: "short" })}
                                                         </span>
                                                     )}
                                                     {h.maxBall > 0 && (
                                                         <div style={{ height: "3px", background: "var(--brand-border)", borderRadius: "2px" }}>
-                                                            <div style={{ height: "3px", borderRadius: "2px", background: hasMin ? (above ? "#0A6853" : "rgba(248,113,113,0.6)") : "var(--brand-cyan)", width: `${Math.min((h.score / h.maxBall) * 100, 100)}%` }} />
+                                                            <div style={{ height: "3px", borderRadius: "2px", background: hasMin ? (above ? "var(--success)" : "rgba(248,113,113,0.6)") : "var(--brand-cyan)", width: `${Math.min((h.score / h.maxBall) * 100, 100)}%` }} />
                                                         </div>
                                                     )}
                                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                                        <span style={{ fontSize: "10px", color: hasMin ? (above ? "#0A6853" : "#AA2735") : "var(--brand-muted)", fontWeight: 700 }}>
+                                                        <span style={{ fontSize: "10px", color: hasMin ? (above ? "var(--success)" : "var(--danger)") : "var(--brand-muted)", fontWeight: 700 }}>
                                                             {hasMin
                                                                 ? (above ? `Над минималния (${Number(h.minBall).toFixed(2)})` : `Под минималния (${Number(h.minBall).toFixed(2)})`)
                                                                 : (h.maxBall > 0 ? `${Math.min((h.score / h.maxBall) * 100, 100).toFixed(0)}% от макс. бал` : "")}
@@ -813,7 +813,7 @@ const Profile = () => {
                                         {!showDeleteConfirm && (
                                             <button
                                                 onClick={() => setShowDeleteConfirm(true)}
-                                                style={{ padding: "0.55rem 1rem", background: "rgba(248,113,113,0.15)", border: "1px solid rgba(248,113,113,0.35)", borderRadius: "0.625rem", color: "#AA2735", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", cursor: "pointer", fontFamily: "inherit" }}
+                                                style={{ padding: "0.55rem 1rem", background: "rgba(248,113,113,0.15)", border: "1px solid rgba(248,113,113,0.35)", borderRadius: "0.625rem", color: "var(--danger)", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", cursor: "pointer", fontFamily: "inherit" }}
                                             >
                                                 Изтрий
                                             </button>
@@ -821,7 +821,7 @@ const Profile = () => {
                                     </div>
                                     {showDeleteConfirm && (
                                         <div style={{ padding: "1rem", background: "rgba(248,113,113,0.06)", border: "1px solid rgba(248,113,113,0.25)", borderRadius: "0.75rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                                            <p style={{ margin: 0, fontSize: "12px", color: "#AA2735", fontWeight: 600 }}>
+                                            <p style={{ margin: 0, fontSize: "12px", color: "var(--danger)", fontWeight: 600 }}>
                                                 Въведи имейл-а си за потвърждение:
                                                 <span style={{ color: "var(--brand-muted)", fontWeight: 500 }}> ({user?.email})</span>
                                             </p>
@@ -842,7 +842,7 @@ const Profile = () => {
                                                 <button
                                                     onClick={handleDeleteAccount}
                                                     disabled={deleteConfirmEmail !== user?.email || deletingAccount}
-                                                    style={{ padding: "0.5rem 1rem", background: deleteConfirmEmail === user?.email ? "rgba(248,113,113,0.2)" : "transparent", border: "1px solid rgba(248,113,113,0.4)", borderRadius: "0.625rem", color: "#AA2735", fontSize: "12px", fontWeight: 700, cursor: deleteConfirmEmail === user?.email ? "pointer" : "not-allowed", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: "0.375rem", opacity: deleteConfirmEmail === user?.email ? 1 : 0.5 }}
+                                                    style={{ padding: "0.5rem 1rem", background: deleteConfirmEmail === user?.email ? "rgba(248,113,113,0.2)" : "transparent", border: "1px solid rgba(248,113,113,0.4)", borderRadius: "0.625rem", color: "var(--danger)", fontSize: "12px", fontWeight: 700, cursor: deleteConfirmEmail === user?.email ? "pointer" : "not-allowed", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: "0.375rem", opacity: deleteConfirmEmail === user?.email ? 1 : 0.5 }}
                                                 >
                                                     {deletingAccount && <Loader2 size={12} style={{ animation: "spin 1s linear infinite" }} />}
                                                     Изтрий завинаги
@@ -950,7 +950,7 @@ function InputGroup({ label, icon: Icon, disabled, ...props }) {
 function Section({ icon: Icon, iconColor, title, subtitle, danger, children }) {
     const palette = iconColor === "cyan"
         ? { bg: "rgba(23,86,217,0.12)", border: "rgba(23,86,217,0.3)", color: "var(--brand-cyan)" }
-        : { bg: "rgba(248,113,113,0.12)", border: "rgba(248,113,113,0.3)", color: "#AA2735" };
+        : { bg: "rgba(248,113,113,0.12)", border: "rgba(248,113,113,0.3)", color: "var(--danger)" };
     return (
         <div
             style={{
@@ -981,7 +981,7 @@ function Section({ icon: Icon, iconColor, title, subtitle, danger, children }) {
                     <Icon size={20} />
                 </div>
                 <div>
-                    <h3 style={{ margin: 0, fontSize: "1rem", fontWeight: 800, color: danger ? "#AA2735" : "var(--brand-text)", letterSpacing: "-0.01em" }}>{title}</h3>
+                    <h3 style={{ margin: 0, fontSize: "1rem", fontWeight: 800, color: danger ? "var(--danger)" : "var(--brand-text)", letterSpacing: "-0.01em" }}>{title}</h3>
                     <p style={{ margin: "0.2rem 0 0", fontSize: "11px", color: "var(--brand-muted)" }}>{subtitle}</p>
                 </div>
             </div>

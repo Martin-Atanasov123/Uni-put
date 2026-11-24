@@ -4,7 +4,7 @@
 };
 
 :root,
-[data-theme="dark"] {
+[data-theme="light"] {
   color-scheme: light;
 
   /* ── design.md, раздел 6: светла основа, дълбоко мастило, един синьо-цифров акцент ── */
@@ -27,6 +27,21 @@
   --radius-panel: 16px;
   --radius-feature: 24px;
   --shadow-float: 0 10px 30px rgb(21 43 41 / 8%);
+  /* Текст върху синя запълка, тъмен панел (картата с бала), текст върху мента */
+  --on-brand: #FFFFFF;
+  --inverse-bg: #152B29;
+  --inverse-text: #FFFFFF;
+  --inverse-muted: #C7D3CF;
+  --inverse-line: #3A5552;
+  --on-signal: #152B29;
+  --art-plate: transparent;
+  /* Цветове на категории (типове събития, групи, оценки) */
+  --c-teal: #0E7490;
+  --c-violet: #6D28D9;
+  --c-rust: #9A3412;
+  --c-amber: #7A4E00;
+  --c-pink: #BE185D;
+  --c-orange: #C2410C;
 
   /* ── Старите имена, насочени към новите токени (компонентите ги ползват) ── */
   --brand-indigo: var(--brand);
@@ -84,7 +99,81 @@
   --color-error-content: #FFFFFF;
 }
 
-/* Тема: светла (редизайн). data-theme остава "dark" само като име на селектора от useTheme. */
+/* ── Тъмна тема ─────────────────────────────────────────────────────────────
+   Същата идентичност: дълбоко зелено-черно, светъл син акцент, мента за целта.
+   Синьото е по-светло, за да е четимо като текст (7:1); текстът върху синя
+   запълка става тъмен (--on-brand), а не бял. */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --canvas: #0F1B1A;
+  --surface: #162624;
+  --surface-subtle: #1D302D;
+  --ink: #E6EEEA;
+  --ink-muted: #A4B5B0;
+  --brand: #8AB0FF;
+  --brand-hover: #B0CAFF;
+  --signal: #C9F27E;
+  --border: #2A403C;
+  --border-strong: #6B857F;
+  --success: #5BD3A6;
+  --warning: #F0B860;
+  --danger: #FF8F9A;
+  --focus: #8AB0FF;
+  --shadow-float: 0 10px 30px rgb(0 0 0 / 40%);
+  --on-brand: #0F1B1A;
+  --inverse-bg: #213D38;
+  --inverse-text: #FFFFFF;
+  --inverse-muted: #C7D3CF;
+  --inverse-line: #3A5A54;
+  --on-signal: #152B29;
+  --art-plate: #EAF0EA;
+  --c-teal: #5CC8E0;
+  --c-violet: #B79CFF;
+  --c-rust: #FFA27A;
+  --c-amber: #E8B85A;
+  --c-pink: #FF8CC3;
+  --c-orange: #FFA27A;
+
+  --brand-accent-ink: #0F1B1A;
+  --brand-on-indigo: #0F1B1A;
+  --brand-input-bg: #13221F;
+  --brand-dropdown-bg: #1A2B28;
+  --brand-nav-bg: rgba(15,27,26,0.96);
+  --brand-nav-scrolled: rgba(15,27,26,0.98);
+  --brand-shadow: rgb(0 0 0 / 40%);
+  --brand-card-hover: rgba(138,176,255,0.12);
+  --brand-progress-bg: rgba(15,27,26,0.96);
+
+  --color-base-100: #0F1B1A;
+  --color-base-200: #162624;
+  --color-base-300: #2A403C;
+  --color-base-content: #E6EEEA;
+  --color-primary: #8AB0FF;
+  --color-primary-content: #0F1B1A;
+  --color-secondary: #E6EEEA;
+  --color-secondary-content: #0F1B1A;
+  --color-neutral: #213D38;
+  --color-neutral-content: #FFFFFF;
+  --color-info: #8AB0FF;
+  --color-info-content: #0F1B1A;
+  --color-success: #5BD3A6;
+  --color-success-content: #0F1B1A;
+  --color-warning: #F0B860;
+  --color-warning-content: #0F1B1A;
+  --color-error: #FF8F9A;
+  --color-error-content: #0F1B1A;
+}
+
+/* Генерираните илюстрации са с тъмно мастило — в тъмната тема стоят на светла плочка.
+   Стикерите имат собствен бял кант и не се нуждаят от нея. */
+[data-theme="dark"] img[src*="/illustrations/"]:not([src*="/stickers/"]) {
+  background: var(--art-plate);
+  border-radius: var(--radius-feature);
+  padding: 14px;
+}
+[data-theme="dark"] img[src*="/stickers/"] { filter: drop-shadow(0 2px 6px rgb(0 0 0 / 35%)); }
+
+html { transition: background-color 0.2s ease; }
 
 html, body {
   background: var(--brand-bg);

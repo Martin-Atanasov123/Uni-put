@@ -220,7 +220,7 @@ const SignUp = () => {
                                 display: "flex", alignItems: "center", gap: "0.5rem",
                                 padding: "0.75rem 0.875rem",
                                 background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.3)",
-                                borderRadius: "0.625rem", color: "#AA2735", fontSize: "13px", fontWeight: 500,
+                                borderRadius: "0.625rem", color: "var(--danger)", fontSize: "13px", fontWeight: 500,
                                 marginBottom: "1.25rem",
                             }}
                         >
@@ -289,7 +289,7 @@ const SignUp = () => {
                                         background: r.ok ? "rgba(34,197,94,0.1)" : "rgba(148,163,184,0.08)",
                                         border: `1px solid ${r.ok ? "rgba(34,197,94,0.3)" : "rgba(148,163,184,0.12)"}`,
                                         borderRadius: "999px", fontSize: "10px", fontWeight: 700,
-                                        color: r.ok ? "#0A6853" : "var(--brand-muted)",
+                                        color: r.ok ? "var(--success)" : "var(--brand-muted)",
                                         letterSpacing: "0.04em", transition: "all 0.2s",
                                     }}
                                 >

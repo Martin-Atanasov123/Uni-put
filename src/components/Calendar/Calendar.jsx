@@ -21,10 +21,10 @@ import {
 
 // ── Тип събитие → цвят/етикет/икона (сигнатурни цветове, стабилни навсякъде) ──
 const EVENT_TYPES = {
-    application: { label: "Кандидатстване", color: "#0E7490", Icon: FileText },
-    exam:        { label: "Приемен изпит",  color: "#6D28D9", Icon: GraduationCap },
-    ranking:     { label: "Класиране",      color: "#986100", Icon: Trophy },
-    enrollment:  { label: "Записване",      color: "#0A6853", Icon: UserCheck },
+    application: { label: "Кандидатстване", color: "var(--c-teal)", Icon: FileText },
+    exam:        { label: "Приемен изпит",  color: "var(--c-violet)", Icon: GraduationCap },
+    ranking:     { label: "Класиране",      color: "var(--warning)", Icon: Trophy },
+    enrollment:  { label: "Записване",      color: "var(--success)", Icon: UserCheck },
 };
 const TYPE_ORDER = ["application", "exam", "ranking", "enrollment"];
 
@@ -116,8 +116,8 @@ function EventCard({ event, today, onOpen }) {
         }}>
             <div style={{
                 width: 38, height: 38, borderRadius: "0.625rem", flexShrink: 0,
-                background: `${type.color}1a`,
-                border: `1px solid ${type.color}40`,
+                background: `${"color-mix(in srgb, " + (type.color) + " 10%, transparent)"}`,
+                border: `1px solid ${"color-mix(in srgb, " + (type.color) + " 25%, transparent)"}`,
                 display: "flex", alignItems: "center", justifyContent: "center",
             }}>
                 <Icon size={18} style={{ color: type.color }} strokeWidth={1.5} />
@@ -139,7 +139,7 @@ function EventCard({ event, today, onOpen }) {
                     {event.is_confirmed === false && (
                         <span style={{
                             fontSize: "9px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em",
-                            color: "#986100", background: "rgba(251,191,36,0.1)",
+                            color: "var(--warning)", background: "rgba(251,191,36,0.1)",
                             border: "1px solid rgba(251,191,36,0.3)", borderRadius: "999px", padding: "0.05rem 0.4rem",
                         }}>Предстои да се потвърди</span>
                     )}
@@ -289,7 +289,7 @@ function MonthGrid({ monthDate, events, today, onPrev, onNext, onOpenEvent, onOp
                                         aria-label={`${t.label} — ${ev.university_name}. Отвори`}
                                         style={{
                                             display: "flex", alignItems: "center", gap: "0.25rem", width: "100%", minWidth: 0,
-                                            background: `${t.color}1a`, border: "none", borderLeft: `2px solid ${t.color}`,
+                                            background: `${"color-mix(in srgb, " + (t.color) + " 10%, transparent)"}`, border: "none", borderLeft: `2px solid ${t.color}`,
                                             borderRadius: "0.25rem", padding: "0.15rem 0.25rem", overflow: "hidden",
                                             cursor: "pointer", fontFamily: "inherit", textAlign: "left",
                                         }}>
@@ -539,8 +539,8 @@ const Calendar = () => {
                                     padding: "0.35rem 0.75rem", borderRadius: "999px", cursor: "pointer", fontFamily: "inherit",
                                     fontSize: "12px", fontWeight: 600,
                                     color: on ? t.color : "var(--brand-muted)",
-                                    background: on ? `${t.color}1a` : "var(--brand-surface-2)",
-                                    border: `1px solid ${on ? `${t.color}55` : "var(--brand-border)"}`,
+                                    background: on ? `${"color-mix(in srgb, " + (t.color) + " 10%, transparent)"}` : "var(--brand-surface-2)",
+                                    border: `1px solid ${on ? `${"color-mix(in srgb, " + (t.color) + " 33%, transparent)"}` : "var(--brand-border)"}`,
                                     transition: "all 0.15s",
                                 }}>
                                     <span style={{ width: 9, height: 9, borderRadius: "3px", background: on ? t.color : "var(--brand-muted)" }} />

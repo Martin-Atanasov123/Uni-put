@@ -22,12 +22,12 @@ const CARD_BORDER = "1px solid var(--brand-card-border)";
 
 // RIASEC буква → име/цвят. Стабилни цветове (същите като кариерния резултат).
 const RIASEC_LETTER = {
-    R: { name: "Реалистичен", color: "#C2410C" },
-    I: { name: "Изследователски", color: "#6D28D9" },
-    A: { name: "Артистичен", color: "#BE185D" },
-    S: { name: "Социален", color: "#0A6853" },
-    E: { name: "Предприемачески", color: "#986100" },
-    C: { name: "Конвенционален", color: "#0E7490" },
+    R: { name: "Реалистичен", color: "var(--c-orange)" },
+    I: { name: "Изследователски", color: "var(--c-violet)" },
+    A: { name: "Артистичен", color: "var(--c-pink)" },
+    S: { name: "Социален", color: "var(--success)" },
+    E: { name: "Предприемачески", color: "var(--warning)" },
+    C: { name: "Конвенционален", color: "var(--c-teal)" },
 };
 
 function Loader() {
@@ -194,7 +194,7 @@ export default function SpecialtyPage() {
                         <StatChip icon={Compass} value={riasec.riasec_code} label={`тип ${letterInfo.name}`} color={letterInfo.color} />
                     )}
                     {minRange && (
-                        <StatChip icon={TrendingUp} value={minRange.lo.toFixed(2)} label={`най-нисък минимален бал`} color="#0A6853" />
+                        <StatChip icon={TrendingUp} value={minRange.lo.toFixed(2)} label={`най-нисък минимален бал`} color="var(--success)" />
                     )}
                 </div>
 
@@ -257,7 +257,7 @@ export default function SpecialtyPage() {
                                     </div>
                                     {ms && (
                                         <div style={{ textAlign: "right", flexShrink: 0 }}>
-                                            <div style={{ fontSize: "1.25rem", fontWeight: 900, fontFamily: "var(--font-mono)", color: "#0A6853", lineHeight: 1 }}>
+                                            <div style={{ fontSize: "1.25rem", fontWeight: 900, fontFamily: "var(--font-mono)", color: "var(--success)", lineHeight: 1 }}>
                                                 {ms.minBall.toFixed(2)}
                                             </div>
                                             <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: "2px" }}>

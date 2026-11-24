@@ -101,12 +101,12 @@ const HOW_STEPS = [
 
 // ── DZI points → grade conversion ───────────────────────────────────────────
 const DZI_BANDS = [
-    { min: 0,     max: 29.75, label: "Слаб",        grade_min: 2.00, grade_max: 2.00, color: "#AA2735", bg: "rgba(248,113,113,0.08)", border: "rgba(248,113,113,0.25)" },
-    { min: 30,    max: 40.5,  label: "Среден",      grade_min: 3.00, grade_max: 3.99, color: "#9A3412", bg: "rgba(249,115,22,0.08)",   border: "rgba(249,115,22,0.25)"   },
-    { min: 40.75, max: 62.25, label: "Добър",       grade_min: 4.00, grade_max: 4.99, color: "#7A4E00", bg: "rgba(251,191,36,0.08)",   border: "rgba(251,191,36,0.25)"   },
-    { min: 62.5,  max: 83.75, label: "Много добър", grade_min: 5.00, grade_max: 5.49, color: "#0E7490", bg: "rgba(6,182,212,0.08)",    border: "rgba(6,182,212,0.25)"    },
-    { min: 84,    max: 94.75, label: "Отличен",     grade_min: 5.50, grade_max: 5.99, color: "#6D28D9", bg: "rgba(139,92,246,0.08)",   border: "rgba(139,92,246,0.25)"   },
-    { min: 95,    max: 100,   label: "Отличен 6",   grade_min: 6.00, grade_max: 6.00, color: "#0A6853", bg: "rgba(16,185,129,0.08)",   border: "rgba(16,185,129,0.25)"   },
+    { min: 0,     max: 29.75, label: "Слаб",        grade_min: 2.00, grade_max: 2.00, color: "var(--danger)", bg: "rgba(248,113,113,0.08)", border: "rgba(248,113,113,0.25)" },
+    { min: 30,    max: 40.5,  label: "Среден",      grade_min: 3.00, grade_max: 3.99, color: "var(--c-rust)", bg: "rgba(249,115,22,0.08)",   border: "rgba(249,115,22,0.25)"   },
+    { min: 40.75, max: 62.25, label: "Добър",       grade_min: 4.00, grade_max: 4.99, color: "var(--c-amber)", bg: "rgba(251,191,36,0.08)",   border: "rgba(251,191,36,0.25)"   },
+    { min: 62.5,  max: 83.75, label: "Много добър", grade_min: 5.00, grade_max: 5.49, color: "var(--c-teal)", bg: "rgba(6,182,212,0.08)",    border: "rgba(6,182,212,0.25)"    },
+    { min: 84,    max: 94.75, label: "Отличен",     grade_min: 5.50, grade_max: 5.99, color: "var(--c-violet)", bg: "rgba(139,92,246,0.08)",   border: "rgba(139,92,246,0.25)"   },
+    { min: 95,    max: 100,   label: "Отличен 6",   grade_min: 6.00, grade_max: 6.00, color: "var(--success)", bg: "rgba(16,185,129,0.08)",   border: "rgba(16,185,129,0.25)"   },
 ];
 
 function dziToGrade(pts) {
@@ -252,7 +252,7 @@ function drawCalcResultCard({ university, specialty, score, maxBall, chance, mar
         const tone = { green: "#34d399", amber: "#fbbf24", red: "#f87171" }[chance.tone];
         y += bandGap;
         roundRect(ctx, PAD, y, INNER, bandH, 24);
-        ctx.fillStyle = tone + "1A"; // ~10% алфа
+        ctx.fillStyle = `color-mix(in srgb, ${tone} 10%, transparent)`; // ~10% алфа
         ctx.fill();
         ctx.strokeStyle = tone;
         ctx.lineWidth = 2;
@@ -827,7 +827,7 @@ export default function CalculatorPage() {
                                 marginBottom: "1rem",
                             }}
                         >
-                            <AlertCircle size={16} style={{ color: "#AA2735", flexShrink: 0, marginTop: "2px" }} />
+                            <AlertCircle size={16} style={{ color: "var(--danger)", flexShrink: 0, marginTop: "2px" }} />
                             <div style={{ flex: 1 }}>
                                 <p style={{ fontSize: "13px", color: "var(--brand-text)", margin: 0, lineHeight: 1.5, fontWeight: 600 }}>
                                     {loadError}
@@ -841,7 +841,7 @@ export default function CalculatorPage() {
                                     background: "rgba(248,113,113,0.15)",
                                     border: "1px solid rgba(248,113,113,0.35)",
                                     borderRadius: "0.5rem",
-                                    color: "#AA2735",
+                                    color: "var(--danger)",
                                     fontWeight: 700,
                                     fontSize: "12px",
                                     cursor: "pointer",
@@ -1078,7 +1078,7 @@ export default function CalculatorPage() {
                                         marginTop: "0.35rem",
                                         fontSize: "11px",
                                         fontWeight: 600,
-                                        color: "#AA2735",
+                                        color: "var(--danger)",
                                         display: "flex",
                                         alignItems: "center",
                                         gap: "0.3rem",
@@ -1365,7 +1365,7 @@ export default function CalculatorPage() {
 
                                     {/* Бал */}
                                     <div className="calc-result-score">
-                                        <div style={{ fontFamily: "var(--font-mono)", fontSize: "3.25rem", fontWeight: 600, lineHeight: 1, letterSpacing: "-0.04em", color: hasMissing ? "var(--brand-muted)" : isAbove === true && hasStarted ? "#0A6853" : "var(--brand-text)" }}>
+                                        <div style={{ fontFamily: "var(--font-mono)", fontSize: "3.25rem", fontWeight: 600, lineHeight: 1, letterSpacing: "-0.04em", color: hasMissing ? "var(--brand-muted)" : isAbove === true && hasStarted ? "var(--success)" : "var(--brand-text)" }}>
                                             {hasMissing && hasStarted ? "—" : !hasStarted ? "—" : formatted}
                                         </div>
                                         <div style={{ marginTop: "0.35rem", fontSize: "11px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>бал{maxBall ? ` от ${maxBall}` : ""}</div>
@@ -1392,7 +1392,7 @@ export default function CalculatorPage() {
                                         )}
 
                                         {hasMissing && hasStarted && (
-                                            <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "12px", color: "#AA2735", fontWeight: 600 }}>
+                                            <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "12px", color: "var(--danger)", fontWeight: 600 }}>
                                                 <AlertCircle size={13} />
                                                 Липсват: {missingSlots.map(describeMissingTerm).join(", ")}
                                             </div>
@@ -1429,7 +1429,7 @@ export default function CalculatorPage() {
                                                     <div style={{ fontSize: "12px", fontWeight: 700, color: "var(--brand-text)" }}>
                                                         Твоят бал е <span style={{ fontFamily: "var(--font-mono)" }}>{percentOfMax.toFixed(0)}%</span> от максималния
                                                     </div>
-                                                    <span style={{ padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", background: "rgba(251,191,36,0.1)", color: "#986100", border: "1px solid rgba(251,191,36,0.25)" }}>
+                                                    <span style={{ padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", background: "rgba(251,191,36,0.1)", color: "var(--warning)", border: "1px solid rgba(251,191,36,0.25)" }}>
                                                         {percentOfMax.toFixed(0)}% ОТ МАКС.
                                                     </span>
                                                 </div>

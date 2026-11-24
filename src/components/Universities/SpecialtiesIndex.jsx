@@ -131,7 +131,7 @@ export default function SpecialtiesIndex() {
 
                 {status === "error" && (
                     <p style={{ marginTop: "2rem", display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--brand-muted)" }}>
-                        <AlertCircle size={16} strokeWidth={1.5} color="#986100" />
+                        <AlertCircle size={16} strokeWidth={1.5} color="var(--warning)" />
                         Нещо се обърка при зареждането. Провери връзката и опитай пак.
                     </p>
                 )}

@@ -362,7 +362,7 @@ const CareerAdvisor = () => {
                 </div>
 
                 {showWarning && (
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", color: "#AA2735", fontWeight: 600, fontSize: "13px" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", color: "var(--danger)", fontWeight: 600, fontSize: "13px" }}>
                         <AlertCircle size={18} />
                         <span>Моля, отговорете на въпроса, преди да продължите!</span>
                     </div>
@@ -508,8 +508,8 @@ const INTRO_CSS = `
 .ca-opt__desc { grid-area: desc; font-size: 15px; line-height: 1.45; color: var(--ink-muted); }
 .ca-opt__meta { grid-area: meta; text-align: right; font-size: 15px; font-weight: 700; line-height: 1.35; white-space: nowrap; }
 .ca-opt__meta small { display: block; font-size: 14px; font-weight: 500; color: var(--ink-muted); }
-.ca-pill { display: inline-block; padding: 3px 10px; border-radius: 999px; background: var(--signal); color: var(--ink); font-size: 12px; font-weight: 750; }
-.ca-go { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; margin-top: 8px; padding: 0 28px; border: 0; border-radius: var(--radius-control); background: var(--brand); color: #fff; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer; transition: background-color 0.14s ease; }
+.ca-pill { display: inline-block; padding: 3px 10px; border-radius: 999px; background: var(--signal); color: var(--on-signal); font-size: 12px; font-weight: 750; }
+.ca-go { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; margin-top: 8px; padding: 0 28px; border: 0; border-radius: var(--radius-control); background: var(--brand); color: var(--on-brand); font: inherit; font-size: 16px; font-weight: 700; cursor: pointer; transition: background-color 0.14s ease; }
 .ca-go:hover { background: var(--brand-hover); }
 @media (max-width: 559px) { .ca-go { width: 100%; } .ca-opt { padding: 14px; } .ca-opt:has(input:checked) { padding: 13px; } }
 .ca-fine { margin: 12px 0 0; font-size: 14px; color: var(--ink-muted); }

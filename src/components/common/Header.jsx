@@ -2,7 +2,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { sessionService } from "@/services/sessionService";
 import { useTheme } from "@/hooks/useTheme";
-import { User, LogOut, Menu, X, Search, Settings, Heart, ChevronDown, ClipboardList } from "lucide-react";
+import { User, LogOut, Menu, X, Search, Settings, Heart, ChevronDown, ClipboardList, Sun, Moon } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { MAIN_NAV, MORE_TOOLS } from "@/components/common/navItems";
 
@@ -75,8 +75,7 @@ export default function Header() {
     const { user } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
-    // useTheme принуждава единствената тема. Извикваме за side effect.
-    useTheme();
+    const { theme, toggle: toggleTheme } = useTheme();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [isMoreOpen, setIsMoreOpen] = useState(false);
@@ -189,6 +188,16 @@ export default function Header() {
 
                     {/* Вдясно: основен бутон + акаунт */}
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
+                        <button
+                            type="button"
+                            onClick={toggleTheme}
+                            className="hd-theme"
+                            aria-label={theme === "dark" ? "Светла тема" : "Тъмна тема"}
+                            aria-pressed={theme === "dark"}
+                            title={theme === "dark" ? "Светла тема" : "Тъмна тема"}
+                        >
+                            {theme === "dark" ? <Sun size={18} strokeWidth={1.75} aria-hidden="true" /> : <Moon size={18} strokeWidth={1.75} aria-hidden="true" />}
+                        </button>
                         {!user ? (
                             <div className="uni-nav-desktop" style={{ alignItems: "center", gap: "0.375rem" }}>
                                 <Link to="/login" className="hd-login">Вход</Link>
@@ -319,7 +328,7 @@ export default function Header() {
                     .uni-nav-desktop { display: flex; }
                     .uni-nav-mobile { display: none; }
                 }
-                @media (min-width: 1400px) { .uni-nav-wide { display: flex; } }
+                @media (min-width: 1560px) { .uni-nav-wide { display: flex; } }
                 @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
                 .hd-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
@@ -360,7 +369,7 @@ export default function Header() {
                     transition: border-color 0.15s, background 0.15s;
                 }
                 .hd-search input::placeholder { color: var(--brand-muted); }
-                .hd-search input:focus { background: #fff; border-color: var(--brand-accent); }
+                .hd-search input:focus { background: var(--surface); border-color: var(--brand-accent); }
                 .hd-search--inline { flex: 1 1 0; min-width: 12rem; max-width: 22rem; }
                 .hd-search--drawer { display: flex; }
                 .hd-search--drawer input { height: 3rem; font-size: 15px; }
@@ -380,11 +389,13 @@ export default function Header() {
                 .hd-admin { display: flex; align-items: center; gap: 0.375rem; padding: 0.5rem 0.875rem; border-radius: 0.625rem; font-size: 13px; font-weight: 700; text-decoration: none; color: var(--brand-accent-text); border: 1px solid rgba(23,86,217,0.25); }
                 .hd-avatar-btn { display: flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.5rem 0.375rem 0.375rem; background: var(--brand-surface-2); border: 1px solid var(--brand-border); border-radius: 999px; cursor: pointer; font-family: inherit; }
                 .hd-user-panel { position: absolute; top: calc(100% + 8px); right: 0; min-width: 15rem; background: var(--brand-dropdown-bg); border: 1px solid var(--brand-border); border-radius: 0.875rem; box-shadow: 0 20px 60px var(--brand-shadow); padding: 0.5rem; z-index: 130; }
-                .hd-logout { width: 100%; display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-size: 13px; font-weight: 600; color: #AA2735; background: none; border: none; cursor: pointer; font-family: inherit; text-align: left; }
+                .hd-logout { width: 100%; display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-size: 13px; font-weight: 600; color: var(--danger); background: none; border: none; cursor: pointer; font-family: inherit; text-align: left; }
                 .uni-menu-item { transition: background 0.15s; }
                 .uni-menu-item:hover { background: rgba(23,86,217,0.07) !important; }
                 .uni-logout-btn { transition: background 0.15s; }
                 .uni-logout-btn:hover { background: rgba(220,38,38,0.08) !important; }
+                .hd-theme { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: var(--radius-control); border: 1px solid var(--border); background: var(--surface); color: var(--ink); cursor: pointer; transition: border-color 0.14s ease, color 0.14s ease; }
+                .hd-theme:hover { border-color: var(--brand); color: var(--brand); }
                 .hd-burger { padding: 0.5rem; background: var(--brand-surface-2); border: 1px solid var(--brand-border); border-radius: 0.625rem; color: var(--brand-text); cursor: pointer; }
 
                 /* Мобилно меню */
@@ -395,7 +406,7 @@ export default function Header() {
                 .hd-drawer-foot { padding-top: 1rem; border-top: 1px solid var(--brand-border); display: flex; flex-direction: column; gap: 0.5rem; }
                 .hd-drawer-cta { display: block; padding: 0.9rem; border-radius: 0.75rem; text-align: center; font-size: 15px; font-weight: 800; text-decoration: none; color: var(--brand-accent-ink); background: var(--brand-accent); }
                 .hd-login--box { display: flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.75rem; text-align: center; border: 1px solid var(--brand-border); background: var(--brand-surface-2); border-radius: 0.625rem; font: inherit; font-size: 13px; font-weight: 700; color: var(--brand-text); text-decoration: none; cursor: pointer; }
-                .hd-logout-box { color: #AA2735; }
+                .hd-logout-box { color: var(--danger); }
             `}</style>
         </>
     );

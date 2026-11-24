@@ -40,7 +40,7 @@ const GROUPS = [
         id: "nat",
         name: "Природни науки, математика и информатика",
         icon: FlaskConical,
-        accent: "#0A6853",
+        accent: "var(--success)",
         bg: "rgba(16,185,129,0.08)",
         border: "rgba(16,185,129,0.18)",
     },
@@ -56,7 +56,7 @@ const GROUPS = [
         id: "hum",
         name: "Хуманитарни науки",
         icon: Globe,
-        accent: "#986100",
+        accent: "var(--warning)",
         bg: "rgba(251,191,36,0.08)",
         border: "rgba(251,191,36,0.18)",
     },
@@ -80,7 +80,7 @@ const GROUPS = [
         id: "arts",
         name: "Изкуства",
         icon: Palette,
-        accent: "#BE185D",
+        accent: "var(--c-pink)",
         bg: "rgba(168,85,247,0.08)",
         border: "rgba(168,85,247,0.18)",
     },
@@ -708,7 +708,7 @@ export default function UniversitiesPage() {
                         >
                             {/* Group chip */}
                             {activeGroupObj && (
-                                <span style={{ display: "flex", alignItems: "center", gap: "0.3rem", padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: `${activeGroupObj.accent}18`, color: activeGroupObj.accent, border: `1px solid ${activeGroupObj.accent}33` }}>
+                                <span style={{ display: "flex", alignItems: "center", gap: "0.3rem", padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: `${"color-mix(in srgb, " + (activeGroupObj.accent) + " 9%, transparent)"}`, color: activeGroupObj.accent, border: `1px solid ${"color-mix(in srgb, " + (activeGroupObj.accent) + " 20%, transparent)"}` }}>
                                     {activeGroupObj.name}
                                     <button onClick={() => { setSelectedGroup(null); if (!hasTextFilters && !selectedFaculty) { setViewMode("browse"); loadInitial(); } }} style={{ background: "none", border: "none", cursor: "pointer", color: "inherit", padding: 0, lineHeight: 1 }}><X size={10} /></button>
                                 </span>
@@ -757,7 +757,7 @@ export default function UniversitiesPage() {
                 {!loading && error && (
                     <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: "center", padding: "5rem 1rem" }}>
                         <div style={{ width: "72px", height: "72px", borderRadius: "50%", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1.25rem" }}>
-                            <X size={28} style={{ color: "#AA2735" }} />
+                            <X size={28} style={{ color: "var(--danger)" }} />
                         </div>
                         <h3 style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--brand-text)", marginBottom: "0.5rem" }}>{error}</h3>
                         <button onClick={loadInitial} style={{ padding: "0.75rem 1.5rem", background: "var(--brand-accent)", border: "none", borderRadius: "0.75rem", color: "var(--brand-accent-ink)", fontWeight: 700, fontSize: "14px", cursor: "pointer", fontFamily: "inherit" }}>

@@ -363,7 +363,7 @@ const CSS = `
 .hp-search__box svg { flex-shrink: 0; color: var(--ink-muted); }
 .hp-search__box input { flex: 1; min-width: 0; height: 52px; border: 0; background: transparent; font: inherit; font-size: 17px; color: var(--ink); outline: none; }
 .hp-search__box input::placeholder { color: var(--ink-muted); opacity: 1; }
-.hp-search__go { flex-shrink: 0; min-height: 48px; padding: 0 20px; border: 0; border-radius: 8px; background: var(--brand); color: #fff; font: inherit; font-weight: 700; cursor: pointer; transition: background-color 0.14s ease; }
+.hp-search__go { flex-shrink: 0; min-height: 48px; padding: 0 20px; border: 0; border-radius: 8px; background: var(--brand); color: var(--on-brand); font: inherit; font-weight: 700; cursor: pointer; transition: background-color 0.14s ease; }
 .hp-search__go:hover { background: var(--brand-hover); }
 
 /* Бързо търсене: пренасят се на нов ред, нищо не се отрязва */
@@ -400,18 +400,18 @@ const CSS = `
 .hp-tools a:hover b { color: var(--brand); }
 
 /* Компактна тъмна карта */
-.hp-score { background: var(--ink); color: #fff; border-radius: var(--radius-feature); padding: 20px; }
+.hp-score { background: var(--inverse-bg); color: var(--inverse-text); border-radius: var(--radius-feature); padding: 20px; }
 @media (min-width: 768px) { .hp-score { padding: 28px; } }
 .hp-score__tag { margin: 0; font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--signal); }
 .hp-score__title { margin: 8px 0 0; font-size: 18px; line-height: 1.3; font-weight: 700; }
-.hp-score__uni { margin: 2px 0 0; font-size: 14px; color: #C7D3CF; }
-.hp-score__nums { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 18px 0 0; padding-top: 16px; border-top: 1px solid #3A5552; }
+.hp-score__uni { margin: 2px 0 0; font-size: 14px; color: var(--inverse-muted); }
+.hp-score__nums { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 18px 0 0; padding-top: 16px; border-top: 1px solid var(--inverse-line); }
 .hp-score__nums div { display: flex; flex-direction: column-reverse; }
 .hp-score__nums dd { margin: 0; font-size: clamp(30px, 3vw, 40px); font-weight: 780; letter-spacing: -0.02em; line-height: 1.1; }
-.hp-score__nums dt { margin-top: 4px; font-size: 13px; line-height: 1.35; color: #C7D3CF; }
-.hp-score__note { margin: 14px 0 0; font-size: 14px; color: #E4ECE8; }
-.hp-score__cta { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; margin-top: 16px; border-radius: var(--radius-control); background: var(--signal); color: var(--ink); font-weight: 750; text-decoration: none; transition: background-color 0.14s ease; }
-.hp-score__cta:hover { background: #DDF8A9; color: var(--ink); }
+.hp-score__nums dt { margin-top: 4px; font-size: 13px; line-height: 1.35; color: var(--inverse-muted); }
+.hp-score__note { margin: 14px 0 0; font-size: 14px; color: var(--inverse-muted); }
+.hp-score__cta { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; margin-top: 16px; border-radius: var(--radius-control); background: var(--signal); color: var(--on-signal); font-weight: 750; text-decoration: none; transition: background-color 0.14s ease; }
+.hp-score__cta:hover { background: #DDF8A9; color: var(--on-signal); }
 .hp-score__cta:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
 /* Как работи: една линия */
@@ -495,13 +495,13 @@ const CSS = `
 .hp-story { flex: 0 0 82%; scroll-snap-align: start; display: flex; flex-direction: column; justify-content: space-between; gap: 18px; padding: 20px; border: 1px solid var(--border); border-radius: var(--radius-feature); background: var(--surface); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease; }
 .hp-story:hover { transform: translateY(-2px); border-color: var(--border-strong); }
 .hp-story--1 { background: var(--surface-subtle); }
-.hp-story--2 .hp-story__av { background: var(--signal); color: var(--ink); }
+.hp-story--2 .hp-story__av { background: var(--signal); color: var(--on-signal); }
 .hp-story blockquote { margin: 0; font-size: 16px; line-height: 1.6; color: var(--ink); }
 .hp-story blockquote::before { content: "„"; display: block; margin: -10px 0 4px; font-size: 44px; line-height: 1; font-weight: 800; color: var(--brand); }
 .hp-story__who { display: flex; align-items: center; gap: 12px; margin: 0; }
 .hp-story__who b { display: block; font-size: 15px; }
 .hp-story__who small { display: block; font-size: 13px; color: var(--ink-muted); }
-.hp-story__av { display: grid; place-items: center; flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; background: var(--brand); color: #fff; font-size: 14px; font-weight: 800; }
+.hp-story__av { display: grid; place-items: center; flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; background: var(--brand); color: var(--on-brand); font-size: 14px; font-weight: 800; }
 @media (min-width: 768px) {
   .hp-stories__list { display: block; columns: 2; column-gap: 16px; margin: 32px 0 0; padding: 0; overflow: visible; }
   .hp-story { break-inside: avoid; margin-bottom: 16px; }

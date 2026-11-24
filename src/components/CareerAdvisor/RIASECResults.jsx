@@ -25,6 +25,10 @@ import SignupPrompt from "@/components/common/SignupPrompt";
 const RESULTS_RETURN = { pathname: "/career-advisor/", search: "?view=results" };
 
 // CLAUDE.md §14 Brand Moat — each RIASEC type has its own distinct color
+// Цветовете в RIASEC_LABELS са за картинката за споделяне (canvas — само hex).
+// В интерфейса — токени, за да са четими и в тъмната тема.
+const UI_TYPE_COLOR = { R: "var(--c-orange)", I: "var(--c-violet)", A: "var(--c-pink)", S: "var(--success)", E: "var(--warning)", C: "var(--c-teal)" };
+
 const RIASEC_LABELS = {
     R: { name: "Реалистичен",    desc: "Предпочиташ практическа работа с инструменти и машини.",   color: "#C2410C", bg: "rgba(249,115,22,0.1)",   border: "rgba(249,115,22,0.3)"   },
     I: { name: "Изследователски", desc: "Обичаш да решаваш сложни проблеми и да анализираш данни.", color: "#6D28D9", bg: "rgba(139,92,246,0.1)",   border: "rgba(139,92,246,0.3)"   },
@@ -239,7 +243,7 @@ const RIASECResults = ({ results, onRestart }) => {
                                     fontSize: "1.75rem",
                                     fontWeight: 900,
                                     fontFamily: "var(--font-mono)",
-                                    color: typeInfo.color || "var(--brand-cyan)",
+                                    color: UI_TYPE_COLOR[char] || "var(--brand-cyan)",
                                     marginBottom: "0.25rem",
                                     lineHeight: 1,
                                 }}

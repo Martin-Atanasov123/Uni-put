@@ -67,7 +67,7 @@ function GradeField({ label, gradeKey, value, onChange, onBlur }) {
                     fontFamily: "var(--font-mono)",
                     fontSize: "1.375rem",
                     fontWeight: 800,
-                    color: invalid ? "#AA2735" : filled ? "var(--brand-text)" : "var(--brand-muted)",
+                    color: invalid ? "var(--danger)" : filled ? "var(--brand-text)" : "var(--brand-muted)",
                     width: "100%",
                     padding: 0,
                     letterSpacing: "-0.02em",
@@ -75,7 +75,7 @@ function GradeField({ label, gradeKey, value, onChange, onBlur }) {
             />
 
             {invalid && (
-                <span style={{ fontSize: "10px", color: "#AA2735", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                <span style={{ fontSize: "10px", color: "var(--danger)", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.25rem" }}>
                     <AlertCircle size={10} /> 2.00 – 6.00
                 </span>
             )}
@@ -109,8 +109,8 @@ function CategorySection({ category, grades, onChange, onBlur, defaultOpen = fal
             >
                 <div style={{
                     width: "36px", height: "36px", borderRadius: "0.625rem", flexShrink: 0,
-                    background: `${category.color}18`,
-                    border: `1px solid ${category.color}35`,
+                    background: `${"color-mix(in srgb, " + (category.color) + " 9%, transparent)"}`,
+                    border: `1px solid ${"color-mix(in srgb, " + (category.color) + " 21%, transparent)"}`,
                     display: "flex", alignItems: "center", justifyContent: "center",
                 }}>
                     <BookOpen size={16} style={{ color: category.color }} />
@@ -128,8 +128,8 @@ function CategorySection({ category, grades, onChange, onBlur, defaultOpen = fal
                 {/* Progress pill */}
                 <div style={{
                     padding: "0.2rem 0.625rem", borderRadius: "999px", flexShrink: 0,
-                    background: filled > 0 ? `${category.color}15` : "var(--brand-surface-2)",
-                    border: `1px solid ${filled > 0 ? category.color + "30" : "var(--brand-border)"}`,
+                    background: filled > 0 ? `${"color-mix(in srgb, " + (category.color) + " 8%, transparent)"}` : "var(--brand-surface-2)",
+                    border: `1px solid ${filled > 0 ? `color-mix(in srgb, ${category.color} 19%, transparent)` : "var(--brand-border)"}`,
                     fontSize: "11px", fontWeight: 700,
                     color: filled > 0 ? category.color : "var(--brand-muted)",
                 }}>
@@ -322,7 +322,7 @@ export default function MyGradesPage() {
                             </>
                         ) : lastSavedLabel ? (
                             <>
-                                <Save size={13} style={{ color: "#0A6853" }} />
+                                <Save size={13} style={{ color: "var(--success)" }} />
                                 <span style={{ fontSize: "12px", color: "var(--brand-muted)" }}>Запазено {lastSavedLabel}</span>
                             </>
                         ) : (
@@ -360,7 +360,7 @@ export default function MyGradesPage() {
                             borderRadius: "0.875rem", marginBottom: "1.5rem",
                         }}
                     >
-                        <AlertCircle size={15} style={{ color: "#986100", flexShrink: 0, marginTop: "2px" }} />
+                        <AlertCircle size={15} style={{ color: "var(--warning)", flexShrink: 0, marginTop: "2px" }} />
                         <p style={{ fontSize: "13px", color: "var(--brand-muted)", margin: 0, lineHeight: 1.55 }}>
                             Оценките се пазят само в браузъра.{" "}
                             <Link to="/register" style={{ color: "var(--brand-cyan)", fontWeight: 700, textDecoration: "none" }}>

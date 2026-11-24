@@ -32,8 +32,8 @@ const CSS = `
 .es p { margin: 6px 0 0; max-width: 46ch; font-size: 15px; line-height: 1.55; color: var(--ink-muted); }
 .es__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 18px; }
 .es-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 48px; padding: 0 20px; border-radius: var(--radius-control); font: inherit; font-size: 15px; font-weight: 700; text-decoration: none; cursor: pointer; transition: background-color 0.14s ease, border-color 0.14s ease, color 0.14s ease; }
-.es-btn--primary { background: var(--brand); color: #fff; border: 1px solid var(--brand); }
-.es-btn--primary:hover { background: var(--brand-hover); border-color: var(--brand-hover); color: #fff; }
+.es-btn--primary { background: var(--brand); color: var(--on-brand); border: 1px solid var(--brand); }
+.es-btn--primary:hover { background: var(--brand-hover); border-color: var(--brand-hover); color: var(--on-brand); }
 .es-btn--ghost { background: var(--surface); color: var(--ink); border: 1px solid var(--border-strong); }
 .es-btn--ghost:hover { border-color: var(--ink); color: var(--ink); }
 `;

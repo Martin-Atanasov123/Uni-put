@@ -179,8 +179,8 @@ const ForgotPassword = () => {
 
 export function Alert({ kind, icon: Icon, children }) {
     const styles = kind === "success"
-        ? { bg: "rgba(34,197,94,0.08)", border: "rgba(34,197,94,0.3)", color: "#0A6853" }
-        : { bg: "rgba(248,113,113,0.08)", border: "rgba(248,113,113,0.3)", color: "#AA2735" };
+        ? { bg: "rgba(34,197,94,0.08)", border: "rgba(34,197,94,0.3)", color: "var(--success)" }
+        : { bg: "rgba(248,113,113,0.08)", border: "rgba(248,113,113,0.3)", color: "var(--danger)" };
     return (
         <div
             style={{

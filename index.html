@@ -14,8 +14,20 @@
       browser renders coloured pixels as soon as the HTML is parsed.
       The #initial-loader is removed by main.jsx after React's first paint.
     -->
+    <script>
+      // Темата се задава преди първото изрисуване: избор от localStorage, иначе системната.
+      (function () {
+        try {
+          var t = localStorage.getItem("uniput_theme");
+          if (t !== "light" && t !== "dark") t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+          document.documentElement.setAttribute("data-theme", t);
+        } catch (e) { document.documentElement.setAttribute("data-theme", "light"); }
+      })();
+    </script>
     <style>
       :root { color-scheme: light; }
+      [data-theme="dark"] { color-scheme: dark; }
+      [data-theme="dark"] body, [data-theme="dark"] #initial-loader { background: #0f1b1a !important; }
       *,*::before,*::after { box-sizing: border-box; }
       html, body { margin: 0; background: #f6f8f5; }
       #initial-loader {
