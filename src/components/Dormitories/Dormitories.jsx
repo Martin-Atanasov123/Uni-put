@@ -1,8 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { m } from "motion/react";
 import { getAllDormitories } from "@/lib/api";
 import Seo from "@/components/common/Seo";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import DormFilters from "./DormFilters";
+import { applyFilters, readFilters, writeFilters, hasRent, DISTANCE_OPTIONS } from "@/lib/dormFilters";
 import ErrorState from "@/components/common/ErrorState";
 import { DORMITORIES, DORMITORY_CITIES, ADMISSION_YEAR_SHORT } from "@/lib/siteStats";
 import { PageArt } from "@/components/common/Illustrations";
@@ -78,9 +81,11 @@ function DormRow({ dorm }) {
         <article className="dm-row">
             <div className="dm-row__top">
                 <h3 className="dm-row__name">{dorm.block_number}</h3>
-                <span className="dm-row__rate" aria-label={`Състояние ${dorm.condition_rating || 0} от 5`}>
-                    <Star size={14} fill="var(--warning)" color="var(--warning)" aria-hidden="true" /> {dorm.condition_rating || 0}/5
-                </span>
+                {dorm.condition_rating ? (
+                    <span className="dm-row__rate" aria-label={`Състояние ${dorm.condition_rating} от 5`}>
+                        <Star size={14} fill="var(--warning)" color="var(--warning)" aria-hidden="true" /> {dorm.condition_rating}/5
+                    </span>
+                ) : <span className="dm-row__norate">Няма оценка</span>}
             </div>
             <p className="dm-row__sub">{dorm.university_id}{dorm.city && !String(dorm.university_id || "").includes(dorm.city) ? ` · ${dorm.city}` : ""}</p>
             <p className="dm-row__facts">{facts.join(" · ")}{extras.length > 0 && <span> · {extras.join(" · ")}</span>}</p>
@@ -114,6 +119,10 @@ const DM_ROW_CSS = `
 .dm-row__top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .dm-row__name { margin: 0; font-size: 17px; font-weight: 750; letter-spacing: -0.01em; }
 .dm-row__rate { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dm-row__norate { font-size: 13px; color: var(--ink-muted); white-space: nowrap; }
+.dm-empty-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 1rem; }
+.dm-empty-actions button { min-height: 44px; padding: 0 16px; border: 1px solid var(--border-strong); border-radius: var(--radius-control); background: var(--surface); color: var(--ink); font: inherit; font-weight: 650; cursor: pointer; }
+.dm-empty-actions button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .dm-row__sub { margin: 2px 0 0; font-size: 14px; color: var(--ink-muted); }
 .dm-row__facts { margin: 6px 0 0; font-size: 15px; font-weight: 650; font-variant-numeric: tabular-nums; }
 .dm-row__facts span { font-weight: 500; color: var(--ink-muted); }
@@ -199,10 +208,16 @@ function DormCard({ dorm }) {
                     </div>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", flexShrink: 0 }}>
-                    <RatingStars value={dorm.condition_rating || 0} />
-                    <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", opacity: 0.6, marginTop: "0.25rem" }}>
-                        {dorm.condition_rating || 0}/5
-                    </span>
+                    {dorm.condition_rating ? (
+                        <>
+                            <span role="img" aria-label={`Състояние ${dorm.condition_rating} от 5`}><RatingStars value={dorm.condition_rating} /></span>
+                            <span aria-hidden="true" style={{ fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", opacity: 0.6, marginTop: "0.25rem" }}>
+                                {dorm.condition_rating}/5
+                            </span>
+                        </>
+                    ) : (
+                        <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--brand-muted)" }}>Няма оценка</span>
+                    )}
                 </div>
             </div>
 
@@ -351,8 +366,7 @@ function Skeleton() {
 const Dormitories = () => {
     const [dormitories, setDormitories] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [selectedUniversity, setSelectedUniversity] = useState("");
-    const [universities, setUniversities] = useState([]);
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const [loadError, setLoadError] = useState(false);
 
@@ -362,8 +376,6 @@ const Dormitories = () => {
         try {
             const data = await getAllDormitories({ throwOnError: true });
             setDormitories(data);
-            const unis = [...new Set(data.map(d => d.university_id))].filter(Boolean).sort();
-            setUniversities(unis);
         } catch {
             setLoadError(true);
         } finally {
@@ -373,9 +385,15 @@ const Dormitories = () => {
 
     useEffect(() => { loadDormitories(); }, [loadDormitories]);
 
-    const filteredDorms = selectedUniversity
-        ? dormitories.filter(d => d.university_id === selectedUniversity)
-        : dormitories;
+    // Филтрите живеят в адреса (?city=&uni=&km=&sort=) — споделими и пазени при „Назад“.
+    const filters = useMemo(() => readFilters(searchParams, dormitories), [searchParams, dormitories]);
+    const setFilters = useCallback(patch => {
+        setSearchParams(writeFilters({ ...filters, ...patch }), { replace: true });
+    }, [filters, setSearchParams]);
+    const resetFilters = useCallback(() => setFilters({ city: "", uni: "", km: "" }), [setFilters]);
+    const filteredDorms = useMemo(() => applyFilters(dormitories, filters), [dormitories, filters]);
+    const rentCount = useMemo(() => dormitories.filter(hasRent).length, [dormitories]);
+    const kmLabel = DISTANCE_OPTIONS.find(o => o.value === filters.km)?.label;
 
     return (
         <div style={{ minHeight: "100vh", background: "var(--brand-bg)", padding: "7rem 1.5rem 3rem", color: "var(--brand-text)" }}>
@@ -412,77 +430,21 @@ const Dormitories = () => {
                     <PageArt name="dormitories" height={701} rows={3} />
                 </m.div>
 
-                {/* Filter bar */}
+                {/* Filters */}
                 <style>{DM_ROW_CSS}</style>
-                <div
-                    className="dm-filter"
-                    style={{
-                        ...S.surface,
-                        padding: "1rem 1.25rem",
-                        display: "flex",
-                        flexWrap: "wrap",
-                        alignItems: "center",
-                        gap: "1rem",
-                    }}
-                >
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--brand-muted)" }}>
-                        <Filter size={14} />
-                        <h2 className="dm-filter-label" style={{ fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Филтриране по университет</h2>
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flex: 1, minWidth: "min(240px, 100%)" }}>
-                        <School size={14} style={{ color: "var(--brand-muted)", flexShrink: 0 }} />
-                        <select
-                            aria-label="Университет"
-                            value={selectedUniversity}
-                            onChange={e => setSelectedUniversity(e.target.value)}
-                            style={{
-                                flex: 1,
-                                minWidth: 0,
-                                maxWidth: "100%",
-                                padding: "0.55rem 0.75rem",
-                                background: "var(--brand-input-bg)",
-                                border: "1px solid var(--brand-input-border)",
-                                borderRadius: "0.5rem",
-                                color: "var(--brand-text)",
-                                fontSize: "13px",
-                                fontFamily: "inherit",
-                                outline: "none",
-                            }}
-                        >
-                            <option value="" style={{ background: "var(--brand-dropdown-bg)" }}>Всички университети</option>
-                            {universities.map(u => (
-                                <option key={u} value={u} style={{ background: "var(--brand-dropdown-bg)" }}>{u}</option>
-                            ))}
-                        </select>
-                    </div>
-                    {selectedUniversity && (
-                        <button
-                            type="button"
-                            onClick={() => setSelectedUniversity("")}
-                            style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: "0.3rem",
-                                padding: "0.4rem 0.75rem",
-                                background: "rgba(23,86,217,0.1)",
-                                border: "1px solid rgba(23,86,217,0.3)",
-                                borderRadius: "999px",
-                                color: "var(--brand-cyan)",
-                                fontSize: "12px",
-                                fontWeight: 600,
-                                cursor: "pointer",
-                                fontFamily: "inherit",
-                            }}
-                        >
-                            <X size={12} /> Изчисти
-                        </button>
-                    )}
-                    <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--brand-muted)", marginLeft: "auto" }}>
-                        {loading ? "..." : loadError ? "" : `${filteredDorms.length} резултат${filteredDorms.length === 1 ? "" : "а"}`}
-                    </span>
-                </div>
+                {!loading && !loadError && (
+                    <DormFilters
+                        dorms={dormitories}
+                        filters={filters}
+                        onChange={setFilters}
+                        onReset={resetFilters}
+                        shown={filteredDorms.length}
+                        total={dormitories.length}
+                        rentCount={rentCount}
+                        previewCount={f => applyFilters(dormitories, f).length}
+                    />
+                )}
 
-                {/* Content */}
                 {loading ? (
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(320px, 100%), 1fr))", gap: "1.25rem" }}>
                         {[1, 2, 3, 4, 5, 6].map(i => <Skeleton key={i} />)}
@@ -516,31 +478,16 @@ const Dormitories = () => {
                             <Search size={28} style={{ color: "var(--brand-cyan)" }} />
                         </div>
                         <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700, color: "var(--brand-text)", textWrap: "balance" }}>
-                            Няма намерени общежития
+                            Нищо не съвпада с тези филтри
                         </h3>
                         <p style={{ margin: "0.5rem 0 0", color: "var(--brand-muted)", fontSize: "14px" }}>
-                            Опитай с по-широко търсене или премахни филтъра по университет.
+                            Премахни един от филтрите:
                         </p>
-                        {selectedUniversity && (
-                            <button
-                                type="button"
-                                onClick={() => setSelectedUniversity("")}
-                                style={{
-                                    marginTop: "1.25rem",
-                                    padding: "0.6rem 1.25rem",
-                                    background: "var(--brand-accent)",
-                                    border: "none",
-                                    borderRadius: "0.625rem",
-                                    color: "var(--brand-accent-ink)",
-                                    fontSize: "13px",
-                                    fontWeight: 700,
-                                    cursor: "pointer",
-                                    fontFamily: "inherit",
-                                }}
-                            >
-                                Покажи всички
-                            </button>
-                        )}
+                        <div className="dm-empty-actions">
+                            {filters.km && <button type="button" onClick={() => setFilters({ km: "" })}>Без „{kmLabel}“</button>}
+                            {filters.uni && <button type="button" onClick={() => setFilters({ uni: "" })}>Всички университети</button>}
+                            {filters.city && <button type="button" onClick={() => setFilters({ city: "", uni: "" })}>Всички градове</button>}
+                        </div>
                     </div>
                 ) : (
                     <m.div
