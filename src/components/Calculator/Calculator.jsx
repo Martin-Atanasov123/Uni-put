@@ -59,6 +59,7 @@ import { CALC_HISTORY_KEY, historyKey, nextHistoryPoints, readLocalHistory, CHAN
 import { copyText, wrapText, roundRect, shareOrCopyLink, shareOrDownloadCanvas } from "@/lib/shareCard";
 import ReportButton from "./ReportButton";
 import MobileFold from "@/components/common/MobileFold";
+import CalcScoreBar from "./CalcScoreBar";
 import { FIELD_LABELS, SLOT_GROUPS } from "@/lib/coefficients_config";
 import { UNIVERSITIES, SPECIALTIES, ADMISSION_YEAR, ADMISSION_YEAR_SHORT, DATA_FRESHNESS_NOTE } from "@/lib/siteStats";
 
@@ -748,7 +749,7 @@ export default function CalculatorPage() {
     };
 
     return (
-        <div style={{ minHeight: "100vh", background: "var(--brand-bg)", paddingTop: "7rem", paddingBottom: "5rem" }}>
+        <div className="calc-page" style={{ minHeight: "100vh", background: "var(--brand-bg)", paddingTop: "7rem", paddingBottom: "5rem" }}>
             <Seo
                 title="Калкулатор за приемен бал — балообразуване по МОН"
                 description={`Изчисли приемния си бал за ${ADMISSION_YEAR_SHORT} г. Точните коефициенти и формули на МОН за ${UNIVERSITIES} университета и ${SPECIALTIES} специалности. Безплатно, без регистрация.`}
@@ -756,7 +757,7 @@ export default function CalculatorPage() {
                 image="https://uniput.eu/og/calculator.png"
             />
             <JsonLd data={CALCULATOR_SCHEMA} />
-            <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 1.5rem" }}>
+            <div className={`calc-root${!selectedFaculty && !isFacultyDropdownOpen ? " calc-root--empty" : ""}`} style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 1.5rem" }}>
                 <style>{`
                     .calc-head { display: grid; gap: 1.25rem; margin-bottom: 2.5rem; }
                     .calc-how { display: grid; grid-template-columns: 1fr; gap: 1.25rem; list-style: none; margin: 1rem 0 0; padding: 0; }
@@ -769,6 +770,10 @@ export default function CalculatorPage() {
                     .calc-how-step::before { content: ""; position: absolute; left: 0; top: -7px; width: 12px; height: 12px; border-radius: 50%; background: var(--canvas); border: 2px solid var(--ink); }
                     .calc-how-step:last-child::before { background: var(--signal); }
                     .calc-how-wrap { display: grid; gap: 1.5rem; align-items: center; }
+                    #calc-results { scroll-margin-top: calc(var(--header-h, 64px) + 12px); }
+                    .calc-note-m { display: none; margin: -0.75rem 0 1.25rem; font-size: 14px; color: var(--brand-muted); }
+                    .calc-note-m a { color: var(--brand-accent-text); font-weight: 650; }
+                    @media (max-width: 767px) { .calc-note-m { display: block; } }
                     .calc-sel { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.75rem; }
                     .calc-sel--opt select { height: 3rem !important; font-size: 15px !important; }
                     @media (min-width: 640px) { .calc-sel { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .calc-sel--opt select { height: 2.5rem !important; font-size: 13px !important; } }
@@ -776,8 +781,12 @@ export default function CalculatorPage() {
                         .calc-head { gap: 0.75rem; margin-bottom: 1.25rem; }
                         .calc-how-art { display: none; }
                         .calc-how { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 1.25rem; }
-                        .calc-how-desc { display: none; }
-                        .calc-how-step p { margin-bottom: 0 !important; font-size: 15px !important; }
+                        .calc-page { padding-top: 6rem !important; padding-bottom: calc(3rem + var(--calc-bar-h, 0px)) !important; }
+                        .calc-note { display: none; }
+                        .calc-root--empty { display: flex; flex-direction: column; }
+                        .calc-root--empty > .calc-how-block, .calc-root--empty > .calc-promo { order: 2; }
+                        .calc-how-block { margin-bottom: 0 !important; }
+                        .calc-promo { margin: 1rem 0 0 !important; }
                     }
                     .calc-how-art { width: min(280px, 72%); height: auto; justify-self: center; }
                     @media (min-width: 1100px) {
@@ -814,8 +823,8 @@ export default function CalculatorPage() {
                         </h1>
                     </div>
 
-                    {/* Notice */}
-                    <p style={{ margin: 0, paddingLeft: "1rem", borderLeft: "2px solid var(--brand-accent)", fontSize: "14px", color: "var(--brand-muted)", lineHeight: 1.6, maxWidth: "30rem" }}>
+                    {/* Notice (на телефон — кратък ред под полетата) */}
+                    <p className="calc-note" style={{ margin: 0, paddingLeft: "1rem", borderLeft: "2px solid var(--brand-accent)", fontSize: "14px", color: "var(--brand-muted)", lineHeight: 1.6, maxWidth: "30rem" }}>
                         Калкулаторът има формулите на 51 университета. Ако не намираш своята специалност, пиши ни на uniput1000@gmail.com — ще я добавим.
                     </p>
                 </m.div>
@@ -976,15 +985,18 @@ export default function CalculatorPage() {
                         )}
                     </AnimatePresence>
                 </m.div>
+                <p className="calc-note-m">Не намираш специалността си? <a href="mailto:uniput1000@gmail.com">Пиши ни</a> — ще я добавим.</p>
 
                 {/* How it works — shown only when no faculty selected AND dropdown is closed */}
                 {!selectedFaculty && !isFacultyDropdownOpen && (
                     <m.div
+                        className="calc-how-block"
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.15 }}
                         style={{ marginBottom: "2rem" }}
                     >
+                        <MobileFold title="Как работи калкулаторът">
                         <div className="calc-how-wrap">
                         <img
                             className="calc-how-art"
@@ -997,7 +1009,7 @@ export default function CalculatorPage() {
                             decoding="async"
                         />
                         <div>
-                        <h2 style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--brand-accent-text)", margin: 0 }}>
+                        <h2 data-fold-head style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--brand-accent-text)", margin: 0 }}>
                             Как се изчислява баловият резултат
                         </h2>
                         <ol className="calc-how">
@@ -1011,12 +1023,14 @@ export default function CalculatorPage() {
                         </ol>
                         </div>
                         </div>
+                        </MobileFold>
                     </m.div>
                 )}
 
                 {/* ДЗИ Стратег промо — за 11-класници, които още нямат оценки */}
                 {!selectedFaculty && !isFacultyDropdownOpen && (
                     <m.div
+                        className="calc-promo"
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.18 }}
@@ -1356,9 +1370,17 @@ export default function CalculatorPage() {
                     </m.div>
                 )}
 
+                {/* Долна лента на телефон — само обобщава готовите резултати */}
+                <CalcScoreBar
+                    results={calcResults}
+                    targetId="calc-results"
+                    active={!!selectedSpecialtyName && !isSpecialtyLocked && hasAnyValidGrade}
+                />
+
                 {/* Results */}
                 {calcResults.length > 0 && !isSpecialtyLocked && (
                     <m.div
+                        id="calc-results"
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, delay: 0.1 }}
