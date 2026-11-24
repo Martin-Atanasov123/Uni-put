@@ -39,10 +39,26 @@ const AREAS = ["Информатика", "Инженерство", "Педаго
 const POPULAR = ["Право", "Медицина", "Психология", "Софтуерно инженерство", "Маркетинг"];
 
 const ROUTES = [
-    { title: "Знам какво искам да уча", text: "Виж къде се учи и какъв бал трябва", to: "/specialnosti/" },
-    { title: "Търся университет", text: "Специалности, град и условия за прием", to: "/universities/" },
-    { title: "Не знам какво да избера", text: "Кратко ориентиране по интереси", to: "/career-advisor/" },
+    { title: "Знам какво искам да уча", text: "Виж къде се учи и какъв бал трябва", to: "/specialnosti/", sticker: "book-path" },
+    { title: "Търся университет", text: "Специалности, град и условия за прием", to: "/universities/", sticker: "map-pin" },
+    { title: "Не знам какво да избера", text: "Кратко ориентиране по интереси", to: "/career-advisor/", sticker: "signpost" },
 ];
+
+// Малки генерирани стикери (public/illustrations/stickers, виж docs/illustration-sources.md).
+// Само декорация: празен alt; размерите са зададени, за да няма подскачане.
+function Sticker({ name, size = 40, className = "" }) {
+    return (
+        <img
+            src={`/illustrations/stickers/${name}.webp`}
+            alt=""
+            aria-hidden="true"
+            width={size}
+            height={size}
+            decoding="async"
+            className={`hp-sticker ${className}`}
+        />
+    );
+}
 
 // ── Примерът е от базата на UniПът ───────────────────────────────────────────
 // Пловдивски университет, „Математика, информатика и информационни технологии“:
@@ -108,7 +124,11 @@ export default function Home() {
 
             <div className="hp-wrap hp-grid">
                 {/* ── Първи екран: търсенето е главното действие ── */}
+                <Sticker name="flag" size={52} className="hp-deco hp-deco--flag" />
+                <Sticker name="pencil-ruler" size={56} className="hp-deco hp-deco--ruler" />
+                <Sticker name="puzzle" size={52} className="hp-deco hp-deco--puzzle" />
                 <section className="hp-intro" data-testid="hero-section" aria-labelledby="hp-h1">
+                    <Sticker name="plane" size={60} className="hp-deco hp-deco--plane" />
                     <h1 id="hp-h1" className="hp-h1">Какво да уча и къде?</h1>
                     <p className="hp-lead">{SPECIALTIES} специалности в {UNIVERSITIES} университета, с формулата за бал за всяка.</p>
                     <form className="hp-search" role="search" onSubmit={onSearch}>
@@ -138,7 +158,8 @@ export default function Home() {
                 <nav className="hp-routes" aria-label="Откъде да започнеш">
                     {ROUTES.map((r) => (
                         <Link key={r.to} to={r.to} className="hp-route">
-                            <span>
+                            <Sticker name={r.sticker} size={44} className="hp-route__st" />
+                            <span className="hp-route__text">
                                 <b>{r.title}</b>
                                 <small>{r.text}</small>
                             </span>
@@ -149,7 +170,7 @@ export default function Home() {
 
                 {/* ── Популярни специалности (броят е от базата) ── */}
                 <section className="hp-popular" aria-labelledby="hp-pop">
-                    <h2 id="hp-pop" className="hp-kicker">Популярни специалности</h2>
+                    <h2 id="hp-pop" className="hp-kicker"><Sticker name="star" size={28} />Популярни специалности</h2>
                     <ul>
                         {POPULAR.map((name) => (
                             <li key={name}>
@@ -185,12 +206,12 @@ export default function Home() {
                 </section>
                 {/* ── Още инструменти: видими, не само в менюто ── */}
                 <section className="hp-tools" aria-labelledby="hp-tools">
-                    <h2 id="hp-tools" className="hp-kicker">Още инструменти</h2>
+                    <h2 id="hp-tools" className="hp-kicker"><Sticker name="backpack" size={28} />Още инструменти</h2>
                     <ul>
-                        {MORE_TOOLS.map(({ name, desc, path, icon: Icon }) => (
+                        {MORE_TOOLS.map(({ name, desc, path, sticker }) => (
                             <li key={path}>
                                 <Link to={path}>
-                                    <span className="hp-tools__icon"><Icon size={20} strokeWidth={1.75} aria-hidden="true" /></span>
+                                    <Sticker name={sticker} size={48} className="hp-tools__st" />
                                     <span><b>{name}</b><small>{desc}</small></span>
                                 </Link>
                             </li>
@@ -217,6 +238,16 @@ export default function Home() {
                     <div>
                         <h2 id="hp-trust" className="hp-h2">Откъде са данните</h2>
                         <p className="hp-side">UniПът е независим проект. Не сме част от МОН и не представляваме университетите — събираме публикуваната от тях информация и показваме откъде е.</p>
+                        <img
+                            className="hp-trust__art"
+                            src="/illustrations/data-sources-960.webp"
+                            srcSet="/illustrations/data-sources-480.webp 480w, /illustrations/data-sources-960.webp 960w"
+                            sizes="(min-width: 1000px) 420px, 80vw"
+                            width="960" height="720"
+                            alt=""
+                            loading="lazy"
+                            decoding="async"
+                        />
                     </div>
                     <dl className="hp-sources">
                         <div><dt>Формули за бал</dt><dd>Правилниците за прием на университетите.</dd></div>
@@ -241,6 +272,7 @@ export default function Home() {
                     <div>
                         <h2 id="hp-faq" className="hp-h2">Въпроси</h2>
                         <p className="hp-side">Не намираш отговор? <a href="mailto:uniput1000@gmail.com" className="hp-link">Пиши ни</a></p>
+                        <Sticker name="bulb" size={72} className="hp-faq__st" />
                     </div>
                     <div>
                         {FAQ.map((f) => (
@@ -379,4 +411,37 @@ const CSS = `
 .hp-faq__item p { margin: 8px 0 0; font-size: 16px; line-height: 1.6; color: var(--ink-muted); max-width: 65ch; }
 
 @media (prefers-reduced-motion: reduce) { .hp-route svg, .hp-tools a { transition: none; } .hp-tools a:hover { transform: none; } }
+
+/* ── Стикери: цвят и характер, разпръснати, но никога върху текст ── */
+.hp-grid { position: relative; }
+.hp-intro { position: relative; }
+.hp-sticker { display: inline-block; flex-shrink: 0; object-fit: contain; user-select: none; pointer-events: none; }
+.hp-deco { position: absolute; z-index: 0; height: auto; transform: rotate(var(--r, 0deg)); animation: hp-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+@keyframes hp-pop { from { opacity: 0; transform: rotate(var(--r, 0deg)) scale(0.6); } to { opacity: 1; transform: rotate(var(--r, 0deg)) scale(1); } }
+.hp-deco--plane { --r: -8deg; right: 0; bottom: 2px; width: 56px; animation-delay: 0.25s; }
+.hp-deco--flag, .hp-deco--ruler, .hp-deco--puzzle { display: none; }
+@media (min-width: 1100px) and (max-width: 1279px) { .hp-deco--plane { display: none; } }
+@media (min-width: 1100px) {
+  .hp-deco--flag { display: block; --r: 10deg; top: calc(var(--header-h) + 52px); left: 51%; width: 50px; animation-delay: 0.1s; }
+}
+@media (min-width: 1360px) {
+  .hp-deco--ruler { display: block; --r: -14deg; left: 2px; top: 52%; width: 54px; animation-delay: 0.35s; }
+  .hp-deco--puzzle { display: block; --r: 12deg; right: 2px; top: 46%; width: 50px; animation-delay: 0.45s; }
+}
+.hp-kicker { display: flex; align-items: center; gap: 8px; }
+.hp-route { justify-content: flex-start; }
+.hp-route__text { flex: 1; min-width: 0; }
+.hp-route__st { width: 44px; height: 44px; transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.hp-route:hover .hp-route__st { transform: rotate(-8deg) scale(1.06); }
+.hp-tools a { align-items: center; }
+.hp-tools__st { width: 48px; height: 48px; margin: -4px 0; transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.hp-tools a:hover .hp-tools__st { transform: rotate(6deg) scale(1.06); }
+.hp-trust__art { display: block; width: min(420px, 88%); height: auto; margin-top: 28px; }
+.hp-faq__st { display: block; margin-top: 20px; transform: rotate(-10deg); }
+@media (max-width: 999px) { .hp-faq__st { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .hp-deco { animation: none; }
+  .hp-route__st, .hp-tools__st { transition: none; }
+  .hp-route:hover .hp-route__st, .hp-tools a:hover .hp-tools__st { transform: none; }
+}
 `;

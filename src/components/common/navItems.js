@@ -12,8 +12,8 @@ export const MAIN_NAV = [
 ];
 
 export const MORE_TOOLS = [
-    { name: "ДЗИ Стратег", desc: "Кой втори ДЗИ държи повече специалности отворени", path: "/dzi-strateg/", icon: Brain },
-    { name: "Календар", desc: "Срокове за прием с източник и година", path: "/calendar/", icon: CalendarDays },
-    { name: "Общежития", desc: `${DORMITORIES} общежития в ${DORMITORY_CITIES} града`, path: "/dormitories/", icon: Building2 },
-    { name: "Прием след 7. клас", desc: "Балове за гимназиите в София", path: "/priem-7-klas/", icon: School },
+    { name: "ДЗИ Стратег", desc: "Кой втори ДЗИ държи повече специалности отворени", path: "/dzi-strateg/", sticker: "target", icon: Brain },
+    { name: "Календар", desc: "Срокове за прием с източник и година", path: "/calendar/", sticker: "calendar", icon: CalendarDays },
+    { name: "Общежития", desc: `${DORMITORIES} общежития в ${DORMITORY_CITIES} града`, path: "/dormitories/", sticker: "cup", icon: Building2 },
+    { name: "Прием след 7. клас", desc: "Балове за гимназиите в София", path: "/priem-7-klas/", sticker: "books-sprout", icon: School },
 ];
