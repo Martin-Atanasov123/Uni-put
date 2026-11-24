@@ -1,30 +1,24 @@
 import { useState } from "react";
-import { m } from "motion/react";
 import { supabase } from "@/lib/supabase";
-import {
-    Mail,
-    Lock,
-    LogIn,
-    AlertCircle,
-    CheckCircle2,
-    Loader2,
-    Eye,
-    EyeOff,
-    GraduationCap,
-} from "lucide-react";
+import { Mail, Lock, Loader2, ArrowRight } from "lucide-react";
 import { Link, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import Seo from "@/components/common/Seo";
+import { ACCOUNT_ITEMS } from "./accountItems";
+import { AuthShell, AuthAside, AuthCard, AuthAlert, GoogleButton, Field, Divider, PasswordToggle } from "./AuthShell";
+
+// Field и Divider се ползват и от ForgotPassword / UpdatePassword.
+export { Field, Divider };
 
 const SAFE_ORIGIN = import.meta.env.VITE_APP_URL || window.location.origin;
 
 const safeAuthError = msg => {
     const map = {
-        "Invalid login credentials": "Невалиден имейл или парола.",
+        "Invalid login credentials": "Грешен имейл или парола. Пробвай пак или възстанови паролата си.",
         "Email not confirmed": "Потвърди имейла си — изпратихме ти линк.",
         "Too many requests": "Твърде много опити. Опитай пак след малко.",
     };
-    return map[msg] || "Нещо се обърка. Опитай пак.";
+    return map[msg] || "Нещо се обърка. Провери връзката и опитай пак.";
 };
 
 const Login = () => {
@@ -37,11 +31,7 @@ const Login = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { user } = useAuth();
-    // Bug fix: преди беше `?.pathname + (?.search || "") || "/calculator"`.
-    // Когато няма state.from (потребител отива директно на /login), pathname
-    // връща undefined, конкатенацията дава "undefined" (string!), което
-    // falsy fallback пропуска → navigate("undefined") → /undefined → 404.
-    // User вижда NotFound и мисли че логинът е fail-нал.
+    // Без state.from pathname е undefined — тогава отиваме в калкулатора, не на "/undefined".
     const fromPath = location.state?.from?.pathname;
     const fromSearch = location.state?.from?.search || "";
     const from = fromPath ? `${fromPath}${fromSearch}` : "/calculator";
@@ -60,280 +50,71 @@ const Login = () => {
         setLoading(true);
         setError(null);
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) { setError(safeAuthError(error.message)); setLoading(false); }
-        else { navigate(from); }
         setLoading(false);
+        if (error) setError(safeAuthError(error.message));
+        else navigate(from);
     };
 
     // Вече влязъл потребител няма какво да прави на страницата за вход.
     if (user) return <Navigate to={fromPath ? from : "/profile"} replace />;
 
     return (
-        <div
-            style={{
-                minHeight: "100vh",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "var(--brand-bg)",
-                padding: "6rem 1.5rem 3rem",
-                color: "var(--brand-text)",
-                position: "relative",
-                overflow: "hidden",
-            }}
+        <AuthShell
+            aside={
+                <AuthAside
+                    eyebrow="Твоят профил"
+                    title="Всичко, което запази, те чака тук"
+                    art={{ name: "calculator-score", height: 694 }}
+                    items={ACCOUNT_ITEMS}
+                />
+            }
         >
             <Seo title="Вход" path="/login" noindex />
-            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            <AuthCard title="Влез в профила си" lead="Продължи от там, където спря — с любимите специалности и оценките си.">
+                {accountDeleted && !error && <AuthAlert kind="ok">Акаунтът и данните ти бяха изтрити.</AuthAlert>}
+                {error && <AuthAlert>{error}</AuthAlert>}
 
-            {/* ambient glows */}
+                <GoogleButton onClick={handleGoogleLogin}>Влез с Google</GoogleButton>
+                <Divider label="или с имейл" />
 
-            <m.div
-                initial={{ opacity: 0, y: 24, scale: 0.97 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                style={{
-                    width: "100%",
-                    maxWidth: "440px",
-                    background: "var(--brand-surface)",
-                    backdropFilter: "blur(16px)",
-                    border: "1px solid var(--brand-card-border)",
-                    borderRadius: "1.5rem",
-                    padding: "2.5rem 2rem",
-                    boxShadow: "0 24px 60px var(--brand-shadow)",
-                    position: "relative",
-                }}
-            >
-                {/* Header */}
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem", marginBottom: "2rem" }}>
-                    <div
-                        style={{
-                            width: "3.5rem",
-                            height: "3.5rem",
-                            borderRadius: "1rem",
-                            background: "var(--brand-accent)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            boxShadow: "0 16px 40px rgba(23,86,217,0.35)",
-                        }}
-                    >
-                        <GraduationCap size={28} color="#FFFFFF" />
-                    </div>
-                    <div style={{ textAlign: "center" }}>
-                        <h1 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--brand-text)", textWrap: "balance" }}>
-                            Добре дошъл отново
-                        </h1>
-                        <p style={{ margin: "0.4rem 0 0", fontSize: "13px", color: "var(--brand-muted)" }}>
-                            Влез в УниПът, за да управляваш своите балове.
-                        </p>
-                    </div>
-                </div>
-
-                {accountDeleted && !error && (
-                    <div
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "0.5rem",
-                            padding: "0.75rem 0.875rem",
-                            background: "rgba(34,197,94,0.08)",
-                            border: "1px solid rgba(34,197,94,0.3)",
-                            borderRadius: "0.625rem",
-                            color: "var(--success)",
-                            fontSize: "13px",
-                            fontWeight: 500,
-                            marginBottom: "1.25rem",
-                        }}
-                    >
-                        <CheckCircle2 size={16} style={{ flexShrink: 0 }} />
-                        <span>Акаунтът и данните ти бяха изтрити.</span>
-                    </div>
-                )}
-
-                {error && (
-                    <div
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "0.5rem",
-                            padding: "0.75rem 0.875rem",
-                            background: "rgba(248,113,113,0.08)",
-                            border: "1px solid rgba(248,113,113,0.3)",
-                            borderRadius: "0.625rem",
-                            color: "var(--danger)",
-                            fontSize: "13px",
-                            fontWeight: 500,
-                            marginBottom: "1.25rem",
-                        }}
-                    >
-                        <AlertCircle size={16} style={{ flexShrink: 0 }} />
-                        <span>{error}</span>
-                    </div>
-                )}
-
-                {/* CLAUDE.md: "Регистрирай се с Google if OAuth is ever added should be the FIRST option" */}
-                <button
-                    type="button"
-                    onClick={handleGoogleLogin}
-                    style={{
-                        width: "100%", height: "3rem",
-                        display: "flex", alignItems: "center", justifyContent: "center", gap: "0.75rem",
-                        background: "var(--brand-input-bg)", border: "1px solid var(--brand-input-border)",
-                        borderRadius: "0.75rem", color: "var(--brand-text)", fontSize: "14px",
-                        fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-                        transition: "border-color 0.2s, background 0.2s",
-                        marginBottom: "0.25rem",
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(23,86,217,0.35)"; e.currentTarget.style.background = "var(--brand-surface)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--brand-input-border)"; e.currentTarget.style.background = "var(--brand-input-bg)"; }}
-                >
-                    <svg width="18" height="18" viewBox="0 0 24 24">
-                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
-                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-                    </svg>
-                    Влез с Google
-                </button>
-
-                <Divider label="Или с имейл" />
-
-                <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                <form className="au-form" onSubmit={handleLogin}>
                     <Field
                         label="Имейл"
                         icon={Mail}
                         type="email"
-                        placeholder="ivan@mail.com"
+                        name="email"
+                        autoComplete="email"
+                        placeholder="ivan@mail.bg"
                         value={email}
                         onChange={e => setEmail(e.target.value)}
                     />
-
-                    <div>
-                        <Field
-                            label="Парола"
-                            icon={Lock}
-                            type={showPassword ? "text" : "password"}
-                            placeholder="••••••••"
-                            value={password}
-                            // Silent strip на whitespace — потребители случайно
-                            // натискат space, виждат „grешна парола" и не разбират защо.
-                            onChange={e => setPassword(e.target.value.replace(/\s/g, ""))}
-                            right={
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(v => !v)}
-                                    style={{ background: "none", border: "none", color: "var(--brand-muted)", cursor: "pointer", padding: "0.25rem", display: "flex", alignItems: "center" }}
-                                >
-                                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                                </button>
-                            }
-                        />
-                        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "0.4rem" }}>
-                            <Link to="/forgot-password" style={{ fontSize: "11px", color: "var(--brand-cyan)", fontWeight: 600, textDecoration: "none" }}>
-                                Забравена парола?
-                            </Link>
-                        </div>
+                    <Field
+                        label="Парола"
+                        icon={Lock}
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        autoComplete="current-password"
+                        value={password}
+                        // Интервалите се махат тихо — иначе „грешна парола“ без видима причина.
+                        onChange={e => setPassword(e.target.value.replace(/\s/g, ""))}
+                        right={<PasswordToggle shown={showPassword} onToggle={() => setShowPassword(v => !v)} />}
+                    />
+                    <div className="au-row-end">
+                        <Link to="/forgot-password" className="au-link au-link--pad">Забравена парола?</Link>
                     </div>
-
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        style={{
-                            marginTop: "0.75rem",
-                            padding: "0.875rem 1rem",
-                            background: loading ? "rgba(148,163,184,0.15)" : "var(--brand-accent)",
-                            border: "none",
-                            borderRadius: "0.75rem",
-                            color: "var(--brand-accent-ink)",
-                            fontSize: "14px",
-                            fontWeight: 800,
-                            cursor: loading ? "not-allowed" : "pointer",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            gap: "0.5rem",
-                            boxShadow: loading ? "none" : "0 12px 30px rgba(23,86,217,0.3)",
-                            fontFamily: "inherit",
-                            transition: "transform 0.15s",
-                        }}
-                        onMouseDown={e => !loading && (e.currentTarget.style.transform = "scale(0.98)")}
-                        onMouseUp={e => (e.currentTarget.style.transform = "scale(1)")}
-                        onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
-                    >
-                        {loading ? (
-                            <>
-                                <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} />
-                                Влизане...
-                            </>
-                        ) : (
-                            <>
-                                <LogIn size={16} /> Влез в профила
-                            </>
-                        )}
+                    <button type="submit" className="au-btn au-btn--primary" disabled={loading}>
+                        {loading
+                            ? <><Loader2 size={18} className="au-spin" aria-hidden="true" /> Влизане…</>
+                            : <>Влез в профила <ArrowRight size={18} strokeWidth={1.75} aria-hidden="true" /></>}
                     </button>
                 </form>
 
-                <p style={{ margin: "1.75rem 0 0", textAlign: "center", fontSize: "13px", color: "var(--brand-muted)" }}>
-                    Нямаш профил?{" "}
-                    <Link to="/register" style={{ color: "var(--brand-cyan)", fontWeight: 700, textDecoration: "none" }}>
-                        Регистрирай се
-                    </Link>
+                <p className="au-foot">
+                    Нямаш профил? <Link to="/register" state={location.state} className="au-link">Създай безплатен профил</Link>
                 </p>
-            </m.div>
-        </div>
+            </AuthCard>
+        </AuthShell>
     );
 };
-
-export function Field({ label, icon: Icon, right, ...inputProps }) {
-    return (
-        <label style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                {label}
-            </span>
-            <div
-                style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.625rem",
-                    padding: "0 0.875rem",
-                    background: "var(--brand-input-bg)",
-                    border: "1px solid var(--brand-input-border)",
-                    borderRadius: "0.625rem",
-                    transition: "border-color 0.2s, box-shadow 0.2s",
-                }}
-                onFocusCapture={e => { e.currentTarget.style.borderColor = "rgba(23,86,217,0.5)"; e.currentTarget.style.boxShadow = "0 0 0 3px rgba(23,86,217,0.08)"; }}
-                onBlurCapture={e => { e.currentTarget.style.borderColor = "var(--brand-input-border)"; e.currentTarget.style.boxShadow = "none"; }}
-            >
-                {Icon && <Icon size={16} style={{ color: "var(--brand-muted)", flexShrink: 0 }} />}
-                <input
-                    {...inputProps}
-                    required
-                    style={{
-                        flex: 1,
-                        height: "2.75rem",
-                        background: "transparent",
-                        border: "none",
-                        outline: "none",
-                        color: "var(--brand-text)",
-                        fontSize: "14px",
-                        fontWeight: 500,
-                        fontFamily: "inherit",
-                    }}
-                />
-                {right}
-            </div>
-        </label>
-    );
-}
-
-export function Divider({ label }) {
-    return (
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", margin: "1.5rem 0 1.25rem" }}>
-            <div style={{ flex: 1, height: "1px", background: "var(--brand-border)" }} />
-            <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "var(--brand-muted)", textTransform: "uppercase", opacity: 0.6 }}>{label}</span>
-            <div style={{ flex: 1, height: "1px", background: "var(--brand-border)" }} />
-        </div>
-    );
-}
 
 export default Login;

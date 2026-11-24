@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { Mail, ArrowLeft, Loader2, AlertCircle, CheckCircle2, KeyRound } from "lucide-react";
+import { Mail, ArrowLeft, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Field } from "./Login";
 import Seo from "@/components/common/Seo";
+import { AuthShell, AuthCard, AuthAlert, Field } from "./AuthShell";
 
 const SAFE_ORIGIN = import.meta.env.VITE_APP_URL || window.location.origin;
 
@@ -25,182 +25,40 @@ const ForgotPassword = () => {
             if (error) throw error;
             setSuccess(true);
         } catch {
-            setError("Нещо се обърка. Опитай пак.");
+            setError("Нещо се обърка. Провери връзката и опитай пак.");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div
-            style={{
-                minHeight: "100vh",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "var(--brand-bg)",
-                padding: "6rem 1.5rem 3rem",
-                color: "var(--brand-text)",
-                position: "relative",
-                overflow: "hidden",
-            }}
-        >
+        <AuthShell>
             <Seo title="Забравена парола" path="/forgot-password" noindex />
-            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-
-
-            <div
-                style={{
-                    width: "100%",
-                    maxWidth: "440px",
-                    background: "var(--brand-surface)",
-                    backdropFilter: "blur(16px)",
-                    border: "1px solid var(--brand-card-border)",
-                    borderRadius: "1.5rem",
-                    padding: "2.5rem 2rem",
-                    boxShadow: "0 24px 60px var(--brand-shadow)",
-                }}
-            >
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem", marginBottom: "2rem" }}>
-                    <div
-                        style={{
-                            width: "3.5rem",
-                            height: "3.5rem",
-                            borderRadius: "1rem",
-                            background: "var(--brand-accent)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            boxShadow: "0 16px 40px rgba(23,86,217,0.35)",
-                        }}
-                    >
-                        <KeyRound size={28} color="#FFFFFF" />
-                    </div>
-                    <div style={{ textAlign: "center" }}>
-                        <h1 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--brand-text)", textWrap: "balance" }}>
-                            Забравена парола?
-                        </h1>
-                        <p style={{ margin: "0.4rem 0 0", fontSize: "13px", color: "var(--brand-muted)" }}>
-                            Въведи своя имейл и ще ти изпратим линк за възстановяване.
-                        </p>
-                    </div>
-                </div>
-
-                {error && (
-                    <Alert kind="error" icon={AlertCircle}>
-                        {error}
-                    </Alert>
-                )}
-
+            <AuthCard title="Забравена парола" lead="Въведи имейла на профила си и ще ти пратим линк за нова парола.">
+                {error && <AuthAlert>{error}</AuthAlert>}
                 {success ? (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "1rem", textAlign: "center" }}>
-                        <Alert kind="success" icon={CheckCircle2}>
-                            Провери своята поща за инструкции!
-                        </Alert>
-                        <Link
-                            to="/login"
-                            style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                gap: "0.5rem",
-                                padding: "0.75rem 1rem",
-                                background: "transparent",
-                                border: "1px solid var(--brand-border)",
-                                borderRadius: "0.625rem",
-                                color: "var(--brand-text)",
-                                fontSize: "13px",
-                                fontWeight: 600,
-                                textDecoration: "none",
-                            }}
-                        >
-                            <ArrowLeft size={14} /> Обратно към вход
+                    <div className="au-form">
+                        <AuthAlert kind="ok">
+                            Пратихме линк на {email}. Ако не е във входящата поща, провери папка „Спам“.
+                        </AuthAlert>
+                        <Link to="/login" className="au-btn au-btn--ghost">
+                            <ArrowLeft size={18} strokeWidth={1.75} aria-hidden="true" /> Обратно към вход
                         </Link>
                     </div>
                 ) : (
-                    <form onSubmit={handleResetRequest} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                        <Field label="Имейл" icon={Mail} type="email" placeholder="ivan@mail.com" value={email} onChange={e => setEmail(e.target.value)} />
-
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            style={{
-                                marginTop: "0.5rem",
-                                padding: "0.875rem 1rem",
-                                background: loading ? "rgba(148,163,184,0.15)" : "var(--brand-accent)",
-                                border: "none",
-                                borderRadius: "0.75rem",
-                                color: "var(--brand-accent-ink)",
-                                fontSize: "14px",
-                                fontWeight: 800,
-                                cursor: loading ? "not-allowed" : "pointer",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                gap: "0.5rem",
-                                boxShadow: loading ? "none" : "0 12px 30px rgba(23,86,217,0.3)",
-                                fontFamily: "inherit",
-                            }}
-                        >
-                            {loading ? (
-                                <>
-                                    <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> Изпращане...
-                                </>
-                            ) : (
-                                "Изпрати линк"
-                            )}
+                    <form className="au-form" onSubmit={handleResetRequest}>
+                        <Field label="Имейл" icon={Mail} type="email" name="email" autoComplete="email" placeholder="ivan@mail.bg" value={email} onChange={e => setEmail(e.target.value)} />
+                        <button type="submit" className="au-btn au-btn--primary" disabled={loading}>
+                            {loading ? <><Loader2 size={18} className="au-spin" aria-hidden="true" /> Изпращане…</> : "Изпрати линк"}
                         </button>
-
-                        <Link
-                            to="/login"
-                            style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                gap: "0.5rem",
-                                padding: "0.75rem 1rem",
-                                background: "transparent",
-                                border: "1px solid var(--brand-input-border)",
-                                borderRadius: "0.625rem",
-                                color: "var(--brand-muted)",
-                                fontSize: "13px",
-                                fontWeight: 600,
-                                textDecoration: "none",
-                            }}
-                        >
-                            <ArrowLeft size={14} /> Върни се към вход
+                        <Link to="/login" className="au-btn au-btn--ghost">
+                            <ArrowLeft size={18} strokeWidth={1.75} aria-hidden="true" /> Обратно към вход
                         </Link>
                     </form>
                 )}
-            </div>
-        </div>
+            </AuthCard>
+        </AuthShell>
     );
 };
-
-export function Alert({ kind, icon: Icon, children }) {
-    const styles = kind === "success"
-        ? { bg: "rgba(34,197,94,0.08)", border: "rgba(34,197,94,0.3)", color: "var(--success)" }
-        : { bg: "rgba(248,113,113,0.08)", border: "rgba(248,113,113,0.3)", color: "var(--danger)" };
-    return (
-        <div
-            style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                padding: "0.75rem 0.875rem",
-                background: styles.bg,
-                border: `1px solid ${styles.border}`,
-                borderRadius: "0.625rem",
-                color: styles.color,
-                fontSize: "13px",
-                fontWeight: 500,
-                marginBottom: "1.25rem",
-            }}
-        >
-            {Icon && <Icon size={16} style={{ flexShrink: 0 }} />}
-            <span>{children}</span>
-        </div>
-    );
-}
 
 export default ForgotPassword;
