@@ -8,6 +8,7 @@ import Seo from "@/components/common/Seo";
 import ErrorState from "@/components/common/ErrorState";
 import JsonLd from "@/components/common/JsonLd";
 import MobileFold from "@/components/common/MobileFold";
+import VersionPicker from "./VersionPicker";
 
 // Quiz schema — Google rich result за интерактивни тестове.
 // Подчертава че е безплатен + достъпен на български → AI Overview eligibility.
@@ -234,17 +235,7 @@ const CareerAdvisor = () => {
                     </MobileFold>
                 </section>
                 <form className="ca-pick" onSubmit={e => { e.preventDefault(); handleVersionSelect(chosen.id); }}>
-                    <fieldset>
-                        <legend>Избери колко време имаш</legend>
-                        {VERSIONS.map(v => (
-                            <label key={v.id} className={"ca-opt" + (v.recommended ? " ca-opt--rec" : "")}>
-                                <input type="radio" name="riasec-version" value={v.id} checked={pickedVersion === v.id} onChange={() => setPickedVersion(v.id)} />
-                                <span className="ca-opt__name">{v.name}{v.recommended && <span className="ca-pill">Препоръчваме</span>}</span>
-                                <span className="ca-opt__desc">{v.desc}</span>
-                                <span className="ca-opt__meta">{v.questions} въпроса<small>{v.time}</small></span>
-                            </label>
-                        ))}
-                    </fieldset>
+                    <VersionPicker versions={VERSIONS} picked={pickedVersion} onPick={setPickedVersion} />
                     <button type="submit" className="ca-go">{chosen.cta} <ChevronRight size={18} strokeWidth={2} aria-hidden="true" /></button>
                     <p className="ca-fine">Без регистрация. Можеш да смениш версията по-късно.</p>
                     <img
@@ -513,7 +504,8 @@ const INTRO_CSS = `
 .ca-opt__desc { grid-area: desc; font-size: 15px; line-height: 1.45; color: var(--ink-muted); }
 .ca-opt__meta { grid-area: meta; text-align: right; font-size: 15px; font-weight: 700; line-height: 1.35; white-space: nowrap; }
 .ca-opt__meta small { display: block; font-size: 14px; font-weight: 500; color: var(--ink-muted); }
-.ca-pill { display: inline-block; padding: 3px 10px; border-radius: 999px; background: var(--signal); color: var(--on-signal); font-size: 12px; font-weight: 750; }
+.ca-pill { display: inline-block; padding: 3px 10px; border-radius: 999px; background: var(--signal); color: var(--on-signal); font-size: 13px; font-weight: 750; }
+.ca-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .ca-go { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; margin-top: 8px; padding: 0 28px; border: 0; border-radius: var(--radius-control); background: var(--brand); color: var(--on-brand); font: inherit; font-size: 16px; font-weight: 700; cursor: pointer; transition: background-color 0.14s ease; }
 .ca-go:hover { background: var(--brand-hover); }
 @media (max-width: 767px) {
@@ -528,7 +520,10 @@ const INTRO_CSS = `
   .ca-types { padding-top: 0; border-top: 0; }
   .ca-types__art { display: none; }
   .ca-opt { min-height: 60px; grid-template-areas: "radio name meta"; margin-bottom: 8px; }
-  .ca-opt__desc { display: none; }
+  /* описанието остава за екранния четец; визуално — само при препоръчаната */
+  .ca-opt__desc { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .ca-opt--rec { grid-template-areas: "radio name meta" "radio desc meta"; }
+  .ca-opt--rec .ca-opt__desc { position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal; font-size: 14px; }
   .ca-opt__name { font-size: 16px; }
   .ca-opt__meta { font-size: 14px; }
 }
