@@ -9,6 +9,7 @@ import {
     XCircle, Search, Inbox
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import AdminMessages from "./AdminMessages";
 
 const STATUS_CONFIG = {
     open: { label: "Отворен", color: "badge-warning", icon: Clock },
@@ -327,6 +328,10 @@ export default function AdminReports() {
                         })}
                     </div>
                 )}
+
+                <div className="pt-6 border-t border-base-200">
+                    <AdminMessages />
+                </div>
             </div>
         </div>
     );

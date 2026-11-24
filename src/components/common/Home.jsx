@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { m, useReducedMotion } from "motion/react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Search, ExternalLink } from "lucide-react";
 import Seo from "@/components/common/Seo";
@@ -6,6 +7,7 @@ import JsonLd from "@/components/common/JsonLd";
 import { supabase } from "@/lib/supabase";
 import { slugify } from "@/lib/slugify";
 import { MORE_TOOLS } from "@/components/common/navItems";
+import ContactForm from "@/components/common/ContactForm";
 import { UNIVERSITIES, SPECIALTIES, ADMISSION_YEAR, ADMISSION_YEAR_SHORT } from "@/lib/siteStats";
 
 // Начална страница — посока A „Търсене първо“ (одобрена ноември 2026).
@@ -208,11 +210,11 @@ export default function Home() {
                 <section className="hp-tools" aria-labelledby="hp-tools">
                     <h2 id="hp-tools" className="hp-kicker"><Sticker name="backpack" size={28} />Още инструменти</h2>
                     <ul>
-                        {MORE_TOOLS.map(({ name, desc, path, sticker }) => (
+                        {MORE_TOOLS.map(({ name, path, sticker }) => (
                             <li key={path}>
                                 <Link to={path}>
                                     <Sticker name={sticker} size={48} className="hp-tools__st" />
-                                    <span><b>{name}</b><small>{desc}</small></span>
+                                    <span><b>{name}</b></span>
                                 </Link>
                             </li>
                         ))}
@@ -220,42 +222,17 @@ export default function Home() {
                 </section>
             </div>
 
-            {/* ── Как работи: една компактна линия ── */}
-            <section className="hp-how" aria-labelledby="hp-how">
-                <div className="hp-wrap">
-                    <h2 id="hp-how" className="sr-only">Как работи</h2>
-                    <ol>
-                        <li><b>Открий</b><span>специалност или университет</span></li>
-                        <li><b>Сравни</b><span>предмети, формула и минимален бал</span></li>
-                        <li><b>Планирай</b><span>бала и сроковете за прием</span></li>
-                    </ol>
-                </div>
-            </section>
-
-            {/* ── Отзиви: три колони, които бавно се движат нагоре ── */}
+            {/* ── Отзиви: същият елемент като на uniput.eu — три колони, които се движат нагоре ── */}
             <section className="hp-section hp-stories" aria-labelledby="hp-stories">
                 <div className="hp-wrap">
                     <div className="hp-stories__head">
                         <p className="hp-eyebrow"><Sticker name="star" size={24} />Отзиви</p>
                         <h2 id="hp-stories" className="hp-h2">Ученици, които вече са намерили пътя си</h2>
-                        <p className="hp-stories__lead">Какво ни писаха ученици, родители и учители, които са кандидатствали с UniПът.</p>
                     </div>
                     <div className="hp-marquee" role="region" aria-label="Отзиви на потребители">
-                        {STORY_COLS.map((col, c) => (
-                            <div key={c} className={`hp-marquee__col hp-marquee__col--${c}`}>
-                                <ul className="hp-marquee__track">
-                                    {[0, 1].map((pass) => col.map((t, i) => (
-                                        <li key={`${pass}-${t.name}`} className={`hp-story hp-story--${(c + i) % 3}`} aria-hidden={pass === 1 ? "true" : undefined}>
-                                            <blockquote>{t.text}</blockquote>
-                                            <p className="hp-story__who">
-                                                <span className="hp-story__av" aria-hidden="true">{initials(t.name)}</span>
-                                                <span><b>{t.name}</b><small>{t.role}</small></span>
-                                            </p>
-                                        </li>
-                                    )))}
-                                </ul>
-                            </div>
-                        ))}
+                        <TestimonialsColumn testimonials={STORY_COLS[0]} duration={18} />
+                        <TestimonialsColumn testimonials={STORY_COLS[1]} duration={22} className="hp-marquee__col--md" />
+                        <TestimonialsColumn testimonials={STORY_COLS[2]} duration={20} className="hp-marquee__col--lg" />
                     </div>
                 </div>
             </section>
@@ -265,7 +242,7 @@ export default function Home() {
                 <div className="hp-wrap hp-split">
                     <div>
                         <h2 id="hp-trust" className="hp-h2">Откъде са данните</h2>
-                        <p className="hp-side">UniПът е независим проект. Не сме част от МОН и не представляваме университетите — събираме публикуваната от тях информация и показваме откъде е.</p>
+                        <p className="hp-side">Независим проект — не сме част от МОН и университетите. Показваме откъде е всяко число.</p>
                         <img
                             className="hp-trust__art"
                             src="/illustrations/data-sources-960.webp"
@@ -278,8 +255,8 @@ export default function Home() {
                         />
                     </div>
                     <dl className="hp-sources">
-                        <div><dt>Формули за бал</dt><dd>Правилниците за прием на университетите.</dd></div>
-                        <div><dt>Минимални балове</dt><dd>Публикуваните класирания — винаги с година и етап. Исторически, не гаранция за прием.</dd></div>
+                        <div><dt>Формули за бал</dt><dd>Правилниците за прием.</dd></div>
+                        <div><dt>Минимални балове</dt><dd>Публикуваните класирания, с година и етап.</dd></div>
                         <div>
                             <dt>Университети и акредитация</dt>
                             <dd>
@@ -289,7 +266,7 @@ export default function Home() {
                                 <a href="https://www.neaa.government.bg/akreditirani-institucii/visshi-uchilischa" className="hp-link">НАОА<ExternalLink size={14} aria-hidden="true" /></a>.
                             </dd>
                         </div>
-                        <div><dt>Прием след 7. клас</dt><dd>Данните на РУО – София за паралелките и класиранията.</dd></div>
+                        <div><dt>Прием след 7. клас</dt><dd>Данните на РУО – София.</dd></div>
                     </dl>
                 </div>
             </section>
@@ -299,8 +276,7 @@ export default function Home() {
                 <div className="hp-wrap hp-split">
                     <div>
                         <h2 id="hp-faq" className="hp-h2">Въпроси</h2>
-                        <p className="hp-side">Не намираш отговор? <a href="mailto:uniput1000@gmail.com" className="hp-link">Пиши ни</a></p>
-                        <Sticker name="bulb" size={72} className="hp-faq__st" />
+                        <ContactForm />
                     </div>
                     <div>
                         {FAQ.map((f) => (
@@ -331,12 +307,45 @@ const STORIES = [
 const STORY_COLS = [STORIES.slice(0, 3), STORIES.slice(3, 6), STORIES.slice(6, 9)];
 const initials = (n) => n.split(" ").map((w) => w[0]).join("").slice(0, 2);
 
+// Колона от main: списъкът е два пъти и се плъзга с -50% в безкраен цикъл.
+// При „намалено движение“ стои на място и показва само едно копие.
+function TestimonialsColumn({ testimonials, duration = 15, className = "" }) {
+    const reduce = useReducedMotion();
+    const passes = reduce ? [0] : [0, 1];
+    return (
+        <div className={`hp-marquee__col ${className}`}>
+            <m.ul
+                className="hp-marquee__track"
+                animate={reduce ? undefined : { translateY: "-50%" }}
+                transition={{ duration, repeat: Infinity, ease: "linear", repeatType: "loop" }}
+            >
+                {passes.map((pass) => testimonials.map(({ text, name, role }, i) => (
+                    <m.li
+                        key={`${pass}-${i}`}
+                        className={`hp-story hp-story--${i % 3}`}
+                        aria-hidden={pass === 1 ? "true" : undefined}
+                        whileHover={reduce ? undefined : { scale: 1.03, y: -6, transition: { type: "spring", stiffness: 400, damping: 17 } }}
+                    >
+                        <blockquote>
+                            <p>{text}</p>
+                            <footer className="hp-story__who">
+                                <span className="hp-story__av" aria-hidden="true">{initials(name)}</span>
+                                <span><cite>{name}</cite><small>{role}</small></span>
+                            </footer>
+                        </blockquote>
+                    </m.li>
+                )))}
+            </m.ul>
+        </div>
+    );
+}
+
 const FAQ = [
-    { q: "Безплатен ли е UniПът?", a: "Да. Каталогът, калкулаторът и ориентирането са безплатни. Без акаунт изчисляваш първите три специалности; с безплатен акаунт пазиш списъка си и продължаваш без ограничение." },
-    { q: "Откъде идват формулите и баловете?", a: "Формулите са от правилниците за прием на университетите. Минималните балове са от класиранията, които те публикуват — винаги с година и етап." },
-    { q: "Минималният бал от миналата година гарантира ли прием?", a: "Не. Той е исторически ориентир. Минимумът се мени всяка година според броя кандидати и местата." },
-    { q: "Кариерното ориентиране казва ли ми какво да уча?", a: "Не. Показва кои области отговарят на интересите, които посочи. Решението остава твое." },
-    { q: "Какво да направя, ако липсва моята специалност?", a: "Пиши ни и ще я добавим. Някои университети още не са в базата и работим по тях." },
+    { q: "Безплатен ли е UniПът?", a: "Да. Без акаунт изчисляваш три специалности, с безплатен акаунт — без ограничение." },
+    { q: "Откъде идват формулите и баловете?", a: "От правилниците за прием и публикуваните класирания на университетите." },
+    { q: "Минималният бал от миналата година гарантира ли прием?", a: "Не. Минимумът се мени всяка година според кандидатите и местата." },
+    { q: "Кариерното ориентиране казва ли ми какво да уча?", a: "Не. Показва кои области пасват на интересите ти. Решението е твое." },
+    { q: "Какво да направя, ако липсва моята специалност?", a: "Пиши ни през формата в този раздел и ще я добавим." },
 ];
 
 const CSS = `
@@ -417,24 +426,6 @@ const CSS = `
 .hp-score__cta:hover { background: #DDF8A9; color: var(--on-signal); }
 .hp-score__cta:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
-/* Как работи: една линия */
-.hp-how { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--surface); }
-/* Мотивът ●──●──●: три спирки, свързани с линия (вертикално на телефон, хоризонтално на широк екран) */
-.hp-how ol { list-style: none; margin: 0; padding: 20px 0; display: grid; gap: 14px; }
-.hp-how li { position: relative; padding-left: 26px; font-size: 15px; line-height: 1.45; }
-.hp-how li::before { content: ""; position: absolute; left: 0; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: var(--surface); border: 2px solid var(--ink); z-index: 1; }
-.hp-how li:not(:last-child)::after { content: ""; position: absolute; left: 7px; top: 18px; bottom: -14px; width: 2px; background: var(--ink); }
-.hp-how li:last-child::before { background: var(--signal); }
-.hp-how b { margin-right: 8px; }
-@media (min-width: 1100px) {
-  .hp-how ol { grid-template-columns: repeat(3, 1fr); gap: 32px; padding: 26px 0 24px; }
-  .hp-how li { padding-left: 0; padding-top: 24px; }
-  .hp-how li::before { top: 0; }
-  .hp-how li:not(:last-child)::after { left: 16px; right: -28px; top: 7px; bottom: auto; width: auto; height: 2px; }
-}
-.hp-how b { font-weight: 750; }
-.hp-how span { color: var(--ink-muted); }
-
 .hp-section { padding: clamp(48px, 7vw, 96px) 0; }
 .hp-section--subtle { background: var(--surface-subtle); }
 .hp-h2 { margin: 0; font-size: clamp(25px, 2.6vw, 36px); line-height: 1.2; font-weight: 650; letter-spacing: -0.015em; text-wrap: balance; }
@@ -480,8 +471,6 @@ const CSS = `
 .hp-tools__st { width: 48px; height: 48px; margin: -4px 0; transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .hp-tools a:hover .hp-tools__st { transform: rotate(6deg) scale(1.06); }
 .hp-trust__art { display: block; width: min(420px, 88%); height: auto; margin-top: 28px; }
-.hp-faq__st { display: block; margin-top: 20px; transform: rotate(-10deg); }
-@media (max-width: 999px) { .hp-faq__st { display: none; } }
 @media (prefers-reduced-motion: reduce) {
   .hp-deco { animation: none; }
   .hp-route__st, .hp-tools__st { transition: none; }
@@ -492,36 +481,23 @@ const CSS = `
 .hp-eyebrow { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0 0 8px; font-size: 13px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); }
 .hp-stories__head { text-align: center; }
 .hp-stories__head .hp-h2 { text-wrap: balance; }
-.hp-stories__lead { margin: 12px auto 0; max-width: 46ch; font-size: 17px; line-height: 1.6; color: var(--ink-muted); }
-/* Безкрайна лента: всяка колона съдържа отзивите два пъти и се плъзга с -50% */
-.hp-marquee { display: flex; justify-content: center; gap: 20px; margin-top: 36px; max-height: 680px; overflow: hidden;
+/* Безкрайна лента (както в main): колоните се движат с framer-motion */
+.hp-marquee { display: flex; justify-content: center; gap: 24px; margin-top: 40px; max-height: 720px; overflow: hidden;
   -webkit-mask-image: linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent);
           mask-image: linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent); }
-.hp-marquee__col { flex: 1 1 0; max-width: 340px; min-width: 0; }
-.hp-marquee__col--1, .hp-marquee__col--2 { display: none; }
-@media (min-width: 768px) { .hp-marquee__col--1 { display: block; } }
-@media (min-width: 1100px) { .hp-marquee__col--2 { display: block; } }
-.hp-marquee__track { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 20px; animation: hp-marquee 38s linear infinite; }
-.hp-marquee__col--1 .hp-marquee__track { animation-duration: 46s; }
-.hp-marquee__col--2 .hp-marquee__track { animation-duration: 42s; }
-.hp-marquee:hover .hp-marquee__track { animation-play-state: paused; }
-/* Копието започва на половината височина плюс половин gap */
-@keyframes hp-marquee { to { transform: translateY(calc(-50% - 10px)); } }
-.hp-story { display: flex; flex-direction: column; gap: 18px; padding: 22px; border: 1px solid var(--border); border-radius: var(--radius-feature); background: var(--surface); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease; }
-.hp-story:hover { transform: translateY(-2px); border-color: var(--border-strong); }
+.hp-marquee__col { overflow: hidden; will-change: transform; }
+.hp-marquee__col--md, .hp-marquee__col--lg { display: none; }
+@media (min-width: 768px) { .hp-marquee__col--md { display: block; } }
+@media (min-width: 1024px) { .hp-marquee__col--lg { display: block; } }
+.hp-marquee__track { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 24px; will-change: transform; }
+.hp-story { width: 100%; max-width: 300px; box-sizing: border-box; padding: 24px; border: 1px solid var(--border); border-radius: var(--radius-feature); background: var(--surface); cursor: default; }
 .hp-story--1 { background: var(--surface-subtle); }
 .hp-story--2 .hp-story__av { background: var(--signal); color: var(--on-signal); }
-.hp-story blockquote { margin: 0; font-size: 16px; line-height: 1.6; color: var(--ink); }
-.hp-story blockquote::before { content: "„"; display: block; margin: -10px 0 4px; font-size: 44px; line-height: 1; font-weight: 800; color: var(--brand); }
-.hp-story__who { display: flex; align-items: center; gap: 12px; margin: 0; }
-.hp-story__who b { display: block; font-size: 15px; }
-.hp-story__who small { display: block; font-size: 13px; color: var(--ink-muted); }
-.hp-story__av { display: grid; place-items: center; flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; background: var(--brand); color: var(--on-brand); font-size: 14px; font-weight: 800; }
-/* Без движение: колоните стоят, всичко се вижда, копията се крият */
-@media (prefers-reduced-motion: reduce) {
-  .hp-marquee { max-height: none; -webkit-mask-image: none; mask-image: none; }
-  .hp-marquee__track { animation: none; }
-  .hp-story[aria-hidden="true"] { display: none; }
-  .hp-story { transition: none; } .hp-story:hover { transform: none; }
-}
+.hp-story blockquote { margin: 0; padding: 0; }
+.hp-story p { margin: 0; font-size: 15px; line-height: 1.65; color: var(--ink-muted); }
+.hp-story__who { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+.hp-story__who cite { display: block; font-style: normal; font-size: 14px; font-weight: 700; color: var(--ink); }
+.hp-story__who small { display: block; font-size: 12px; color: var(--ink-muted); }
+.hp-story__av { display: grid; place-items: center; flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--border); background: var(--brand); color: var(--on-brand); font-size: 14px; font-weight: 800; box-sizing: border-box; }
+@media (prefers-reduced-motion: reduce) { .hp-marquee { max-height: none; -webkit-mask-image: none; mask-image: none; } }
 `;
