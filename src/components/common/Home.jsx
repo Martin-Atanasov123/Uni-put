@@ -222,6 +222,18 @@ export default function Home() {
                 </section>
             </div>
 
+            {/* ── Как работи: три думи ── */}
+            <section className="hp-how" aria-labelledby="hp-how">
+                <div className="hp-wrap">
+                    <h2 id="hp-how" className="sr-only">Как работи</h2>
+                    <ol>
+                        <li><b>Открий</b><span>специалност</span></li>
+                        <li><b>Сравни</b><span>бала и формулата</span></li>
+                        <li><b>Планирай</b><span>сроковете</span></li>
+                    </ol>
+                </div>
+            </section>
+
             {/* ── Отзиви: същият елемент като на uniput.eu — три колони, които се движат нагоре ── */}
             <section className="hp-section hp-stories" aria-labelledby="hp-stories">
                 <div className="hp-wrap">
@@ -425,6 +437,24 @@ const CSS = `
 .hp-score__cta { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; margin-top: 16px; border-radius: var(--radius-control); background: var(--signal); color: var(--on-signal); font-weight: 750; text-decoration: none; transition: background-color 0.14s ease; }
 .hp-score__cta:hover { background: #DDF8A9; color: var(--on-signal); }
 .hp-score__cta:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+/* Как работи: една линия */
+.hp-how { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--surface); }
+/* Мотивът ●──●──●: три спирки, свързани с линия (вертикално на телефон, хоризонтално на широк екран) */
+.hp-how ol { list-style: none; margin: 0; padding: 20px 0; display: grid; gap: 14px; }
+.hp-how li { position: relative; padding-left: 26px; font-size: 15px; line-height: 1.45; }
+.hp-how li::before { content: ""; position: absolute; left: 0; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: var(--surface); border: 2px solid var(--ink); z-index: 1; }
+.hp-how li:not(:last-child)::after { content: ""; position: absolute; left: 7px; top: 18px; bottom: -14px; width: 2px; background: var(--ink); }
+.hp-how li:last-child::before { background: var(--signal); }
+.hp-how b { margin-right: 8px; }
+@media (min-width: 1100px) {
+  .hp-how ol { grid-template-columns: repeat(3, 1fr); gap: 32px; padding: 26px 0 24px; }
+  .hp-how li { padding-left: 0; padding-top: 24px; }
+  .hp-how li::before { top: 0; }
+  .hp-how li:not(:last-child)::after { left: 16px; right: -28px; top: 7px; bottom: auto; width: auto; height: 2px; }
+}
+.hp-how b { font-weight: 750; }
+.hp-how span { color: var(--ink-muted); }
 
 .hp-section { padding: clamp(48px, 7vw, 96px) 0; }
 .hp-section--subtle { background: var(--surface-subtle); }
