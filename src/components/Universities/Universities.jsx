@@ -529,8 +529,7 @@ export default function UniversitiesPage() {
     const [selectedCity, setSelectedCity] = useState("Всички");
     const [selectedLevel, setSelectedLevel] = useState("Всички");
     const [cities, setCities] = useState([]);
-    const [suggestions, setSuggestions] = useState([]);
-    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [fuzzyWords, setFuzzyWords] = useState([]);
     const [visibleCount, setVisibleCount] = useState(60);
     const [viewMode, setViewMode] = useState("browse");
     // Real DB-based filters
@@ -580,8 +579,7 @@ export default function UniversitiesPage() {
             selectedLevel !== "Всички";
 
         if (!hasFilters) {
-            setSuggestions([]);
-            setShowSuggestions(false);
+            setFuzzyWords([]);
             return;
         }
 
@@ -596,13 +594,7 @@ export default function UniversitiesPage() {
                     limit: 500,
                 });
                 setUniversities(results);
-                if (searchTerm.trim().length > 1) {
-                    setSuggestions([...new Map(results.map((r) => [r.specialty, r])).values()].slice(0, 5));
-                    setShowSuggestions(true);
-                } else {
-                    setSuggestions([]);
-                    setShowSuggestions(false);
-                }
+                setFuzzyWords(results.fuzzyWords || []);
             } catch (err) {
                 console.error("Universities search failed:", err);
                 setError("Грешка при търсене. Опитай отново.");
@@ -719,7 +711,6 @@ export default function UniversitiesPage() {
     return (
         <div
             style={{ minHeight: "100vh", background: "var(--brand-bg)", paddingTop: "7rem", paddingBottom: "5rem" }}
-            onClick={() => setShowSuggestions(false)}
         >
             <Seo
                 title={`${UNIVERSITIES} университета и ${SPECIALTIES} специалности за прием ${ADMISSION_YEAR_SHORT}`}
@@ -791,39 +782,10 @@ export default function UniversitiesPage() {
                             placeholder="Търси специалност или университет..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            onClick={(e) => e.stopPropagation()}
                             style={{ ...inputStyle, paddingLeft: "2.5rem", paddingRight: "1rem" }}
-                            onFocus={(e) => { e.target.style.borderColor = "rgba(6,182,212,0.5)"; if (searchTerm.length > 1) setShowSuggestions(true); }}
+                            onFocus={(e) => { e.target.style.borderColor = "rgba(6,182,212,0.5)"; }}
                             onBlur={(e) => { e.target.style.borderColor = "rgba(148,163,184,0.12)"; }}
                         />
-                        <AnimatePresence>
-                            {showSuggestions && suggestions.length > 0 && (
-                                <m.div
-                                    initial={{ opacity: 0, y: -6 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -6 }}
-                                    transition={{ duration: 0.15 }}
-                                    onClick={(e) => e.stopPropagation()}
-                                    style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, background: "var(--brand-dropdown-bg)", border: "1px solid var(--brand-border)", borderRadius: "0.875rem", overflow: "hidden", boxShadow: "0 20px 60px var(--brand-shadow)", zIndex: 30 }}
-                                >
-                                    {suggestions.map((s, i) => (
-                                        <div
-                                            key={s.id || i}
-                                            onClick={() => { setSearchTerm(s.specialty); setShowSuggestions(false); }}
-                                            style={{ padding: "0.75rem 1rem", display: "flex", alignItems: "center", gap: "0.625rem", cursor: "pointer", borderBottom: i < suggestions.length - 1 ? "1px solid rgba(148,163,184,0.08)" : "none", transition: "background 0.15s" }}
-                                            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(6,182,212,0.06)")}
-                                            onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                                        >
-                                            <School size={14} style={{ color: "var(--brand-cyan)", flexShrink: 0 }} />
-                                            <div style={{ minWidth: 0 }}>
-                                                <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--brand-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.specialty}</div>
-                                                <div style={{ fontSize: "12px", color: "var(--brand-muted)" }}>{s.university_name}</div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </m.div>
-                            )}
-                        </AnimatePresence>
                     </div>
 
                     <div className="uni-filter-selects">
@@ -1024,6 +986,7 @@ export default function UniversitiesPage() {
                                 {selectedFaculty && <span style={{ color: "var(--brand-cyan)" }}> · {selectedFaculty}</span>}
                                 {activeGroupObj && !selectedFaculty && <span style={{ color: activeGroupObj.accent }}> · {activeGroupObj.name}</span>}
                                 {searchTerm && <span style={{ color: "var(--brand-cyan)" }}> за „{searchTerm}"</span>}
+                {fuzzyWords.length > 0 && <span style={{ color: "var(--brand-muted)", fontWeight: 400 }}> · включва и близки думи: {fuzzyWords.slice(0, 4).join(", ")}</span>}
                             </div>
 
                             {/* Empty */}
