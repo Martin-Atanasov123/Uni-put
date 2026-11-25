@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildVocabulary, editDistance, closestWords, wordHasHit } from "@/lib/fuzzySearch";
+import { buildVocabulary, editDistance, closestWords, wordHasHit, wordSimilarity, matchSpecialtyNames } from "@/lib/fuzzySearch";
 
 const vocab = buildVocabulary([
     "Медицина", "Дентална медицина", "Психология", "Информатика", "Компютърни науки", "Маркетинг",
@@ -51,5 +51,46 @@ describe("wordHasHit", () => {
     it("вярно, когато вариант се съдържа в дума от речника", () => {
         expect(wordHasHit(["психолог"], vocab)).toBe(true);
         expect(wordHasHit(["медицинна"], vocab)).toBe(false);
+    });
+});
+
+describe("wordSimilarity", () => {
+    it("същият корен е близо, различните думи не", () => {
+        expect(wordSimilarity("музикална", "музика")).toBeGreaterThanOrEqual(0.7);
+        expect(wordSimilarity("педагогика", "педагогически")).toBeGreaterThanOrEqual(0.7);
+        expect(wordSimilarity("психлогия", "психология")).toBeGreaterThanOrEqual(0.7);
+        expect(wordSimilarity("музика", "математика")).toBe(0);
+        expect(wordSimilarity("право", "биология")).toBe(0);
+    });
+});
+
+describe("matchSpecialtyNames", () => {
+    const names = [
+        "Музикална педагогика", "Педагогика на обучението по музика", "Музика", "Начална училищна педагогика",
+        "Педагогика на обучението по физика и математика", "Математика", "Информатика", "Психология", "Социална педагогика",
+    ];
+    it("намира сходни специалности независимо от реда и формата на думите", () => {
+        const { names: got } = matchSpecialtyNames("музикална педагогика", names);
+        expect(got).toContain("Музикална педагогика");
+        expect(got).toContain("Педагогика на обучението по музика");
+        expect(got).not.toContain("Социална педагогика");
+        expect(got).not.toContain("Информатика");
+    });
+    it("не се бърка от подредбата на думите", () => {
+        const a = matchSpecialtyNames("педагогика музикална", names).names;
+        const b = matchSpecialtyNames("музикална педагогика", names).names;
+        expect(new Set(a)).toEqual(new Set(b));
+    });
+    it("поправя правописна грешка", () => {
+        expect(matchSpecialtyNames("психлогия", names).names).toEqual(["Психология"]);
+    });
+    it("дума, която не е специалност (град), се връща в ignored и не блокира", () => {
+        const r = matchSpecialtyNames("психология пловдив", names);
+        expect(r.names).toEqual(["Психология"]);
+        expect(r.ignored).toEqual(["пловдив"]);
+    });
+    it("празна или непозната заявка → няма имена", () => {
+        expect(matchSpecialtyNames("", names).names).toEqual([]);
+        expect(matchSpecialtyNames("футбол", names).names).toEqual([]);
     });
 });

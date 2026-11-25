@@ -442,7 +442,7 @@ export default function UniversitiesPage() {
                     limit: 500,
                 });
                 setUniversities(results);
-                setFuzzyWords(results.fuzzyWords || []);
+                setFuzzyWords(results.nearNames || []);
             } catch (err) {
                 console.error("Universities search failed:", err);
                 setError("Грешка при търсене. Опитай отново.");
@@ -815,7 +815,7 @@ export default function UniversitiesPage() {
                                 {selectedFaculty && <span style={{ color: "var(--brand-cyan)" }}> · {selectedFaculty}</span>}
                                 {activeGroupObj && !selectedFaculty && <span style={{ color: activeGroupObj.accent }}> · {activeGroupObj.name}</span>}
                                 {searchTerm && <span style={{ color: "var(--brand-cyan)" }}> за „{searchTerm}"</span>}
-                {fuzzyWords.length > 0 && <span style={{ color: "var(--brand-muted)", fontWeight: 400 }}> · включва и близки думи: {fuzzyWords.slice(0, 4).join(", ")}</span>}
+                {fuzzyWords.length > 0 && <span style={{ color: "var(--brand-muted)", fontWeight: 400 }}> · включва и сходни специалности: {fuzzyWords.slice(0, 3).join(", ")}{fuzzyWords.length > 3 ? "…" : ""}</span>}
                             </div>
 
                             {/* Empty */}
