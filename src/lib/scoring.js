@@ -12,7 +12,8 @@ export const MIN_GRADE = 2;
 export const MAX_GRADE = 6;
 
 export function isValidGradeValue(value) {
-    const n = parseFloat(value);
+    if (typeof value !== "number" && typeof value !== "string") return false;
+    const n = Number(value);
     return !Number.isNaN(n) && n >= MIN_GRADE && n <= MAX_GRADE;
 }
 
@@ -27,8 +28,8 @@ export function calculateScore(coefficients, grades) {
         alts.forEach(alt => {
             if (!alt?.key) return;
             keys.push(alt.key);
-            const val = parseFloat(grades?.[alt.key]);
-            if (!Number.isNaN(val) && val >= MIN_GRADE && val <= MAX_GRADE) {
+            const val = grades?.[alt.key];
+            if (isValidGradeValue(val)) {
                 const product = val * Number(alt.coef);
                 if (best === null || product > best) best = product;
             }

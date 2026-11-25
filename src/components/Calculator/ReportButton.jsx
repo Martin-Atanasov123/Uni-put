@@ -81,8 +81,7 @@ export default function ReportButton({ universityName, specialty }) {
                 .from("reports-screenshots")
                 .upload(fileName, blob, { contentType: "image/jpeg" });
             if (uploadError) return null;
-            const { data: urlData } = supabase.storage.from("reports-screenshots").getPublicUrl(data.path);
-            return urlData?.publicUrl || null;
+            return data.path;
         } catch {
             return null;
         }
@@ -95,14 +94,18 @@ export default function ReportButton({ universityName, specialty }) {
         try {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) { setError("Влез в профила си, за да изпратиш доклад."); setSending(false); return; }
-            const screenshotUrl = await uploadScreenshot(screenshotData, user.id);
+            const screenshotPath = await uploadScreenshot(screenshotData, user.id);
+            if (screenshotData && !screenshotPath) {
+                setError("Снимката не се качи. Опитай отново или я премахни, за да изпратиш сигнала.");
+                return;
+            }
             const { error: insertError } = await supabase.from("reports").insert({
                 user_id: user.id,
                 university_name: universityName || null,
                 specialty: specialty || null,
                 report_type: reportType,
                 description: description.trim(),
-                screenshot_url: screenshotUrl,
+                screenshot_url: screenshotPath,
                 status: "open",
             });
             if (insertError) { setError("Грешка при изпращане: " + insertError.message); setSending(false); return; }

@@ -47,7 +47,8 @@ export function calculateScores(answers, questions = []) {
 
     // Нова логика на базата на въпроси
     questions.forEach(q => {
-        const val = answers[q.id] || 3; // 3 е неутрален (middle of 1-5 scale)
+        const answer = Number(answers?.[q.id]);
+        const val = Number.isInteger(answer) && answer >= 1 && answer <= 5 ? answer : 3; // 3 е неутрален (middle of 1-5 scale)
         if (Object.prototype.hasOwnProperty.call(rawScores, q.type)) {
             rawScores[q.type] += val;
             questionsPerType[q.type] += 1;
@@ -57,7 +58,7 @@ export function calculateScores(answers, questions = []) {
     // Нормализация към скала 0-100 за по-лесно сравнение
     const normalizedScores = {};
     Object.keys(rawScores).forEach(type => {
-        const count = questionsPerType[type] || 1;
+        const count = questionsPerType[type];
         const min = count * 1; // Минимален възможен резултат (всички отговори са 1)
         const max = count * 5; // Максимален възможен резултат (всички отговори са 5)
         const raw = rawScores[type];

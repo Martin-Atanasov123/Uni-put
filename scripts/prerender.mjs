@@ -62,8 +62,8 @@ const STATIC_ROUTES = [
     },
     {
         path: "/calculator",
-        title: "Калкулатор за приемен бал — балообразуване по МОН",
-        description: `Изчисли приемния си бал за ${ADMISSION_YEAR_SHORT} г. Точните коефициенти и формули на МОН за ${UNIVERSITIES} университета и ${SPECIALTIES} специалности. Безплатно, без регистрация.`,
+        title: "Калкулатор за приемен бал — правила на университетите",
+        description: `Изчисли приемния си бал за ${ADMISSION_YEAR_SHORT} г. Условия за прием в каталог с ${UNIVERSITIES} университета и ${SPECIALTIES} специалности. Безплатно, без регистрация.`,
         image: `${SITE_URL}/og/calculator.png`,
     },
     {
@@ -75,7 +75,7 @@ const STATIC_ROUTES = [
     {
         path: "/universities",
         title: `${UNIVERSITIES} университета и ${SPECIALTIES} специалности за прием ${ADMISSION_YEAR_SHORT}`,
-        description: `${UNIVERSITIES} висши училища в България и ${SPECIALTIES} специалности. Филтрирай по град, факултет и степен. Изчисли приемния си бал по коефициентите на МОН.`,
+        description: `${UNIVERSITIES} висши училища в България и ${SPECIALTIES} специалности. Филтрирай по град, факултет и степен. Изчисли приемния си бал по правилата на университетите.`,
         image: `${SITE_URL}/og/universities.png`,
     },
     {
@@ -372,7 +372,7 @@ function buildSpecialtyBody(route) {
         `<p>Специалност ${esc(name)} се предлага в ${uniCount} ` +
         `${plural(uniCount, "университет", "университета")} в ${cities.length} ` +
         `${plural(cities.length, "град", "града")} (${esc(cities.join(", "))}). Всеки университет ` +
-        `прилага собствена формула за балообразуване по официалните коефициенти на МОН.` +
+        `прилага собствена формула за балообразуване по своя правилник за прием.` +
         (minRange
             ? ` Историческите минимални балове се движат между ${minRange.lo.toFixed(2)} и ${minRange.hi.toFixed(2)} т.`
             : "") +
@@ -662,7 +662,7 @@ async function fetchSpecialtyRoutes() {
         const seoTitle = `${sp} — университети и приемен бал ${ADMISSION_YEAR_SHORT}`;
         const description =
             `Къде да учиш ${sp} в България: ${unis.size} ${plural(unis.size, "университет", "университета")} в ` +
-            `${cities.length} ${plural(cities.length, "град", "града")}. Балообразуване по коефициентите на МОН` +
+            `${cities.length} ${plural(cities.length, "град", "града")}. Балообразуване по правилата на университетите` +
             `${minRange ? ", минимални балове от минали години" : ""} и изчисли своя бал безплатно.`;
 
         const schemas = [{

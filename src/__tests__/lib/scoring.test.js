@@ -102,7 +102,7 @@ describe("calculateScore — липсващи и невалидни оценки
     });
 
     it("оценки извън 2.00–6.00 и нечислови се третират като липсващи", () => {
-        for (const bad of ["7", "1.99", "6.01", "abc", "", null, undefined]) {
+        for (const bad of ["7", "1.99", "6.01", "5abc", "abc", "", null, undefined]) {
             const { score, missingSlots } = calculateScore(SU_PRAVO.coefficients, { dzi_bel: bad, diploma: "5" });
             expect(score).toBeCloseTo(5, 10);
             expect(missingSlots).toEqual([["dzi_bel"]]);

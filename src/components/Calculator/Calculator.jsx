@@ -2,7 +2,9 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { m, AnimatePresence } from "motion/react";
 import { supabase } from "@/lib/supabase";
 import { fetchDistinct } from "@/services/universityService";
-import { calculateScore, findSeparateDiplomaKeys } from "@/lib/scoring";
+import { assessFormula } from "@/lib/formulaIntegrity";
+import { admissionSource } from "@/lib/admissionSources";
+import { calculateScore, findSeparateDiplomaKeys, isValidGradeValue } from "@/lib/scoring";
 import { useLocation, Link } from "react-router-dom";
 import Seo from "@/components/common/Seo";
 import JsonLd from "@/components/common/JsonLd";
@@ -15,7 +17,7 @@ const CALCULATOR_SCHEMA = {
     "@context": "https://schema.org",
     "@type": "HowTo",
     name: "Как да изчислиш кандидатстудентския си бал",
-    description: "Стъпки за изчисление на приемен бал по официалните МОН формули за български университет",
+    description: "Стъпки за изчисление на приемен бал по правилата на избрания университет",
     totalTime: "PT2M",
     step: [
         { "@type": "HowToStep", position: 1, name: "Избери факултет", text: "Изберете факултета, в който искате да кандидатствате." },
@@ -58,6 +60,18 @@ import { calcStatsService } from "@/services/calcStatsService";
 import { CALC_HISTORY_KEY, historyKey, nextHistoryPoints, readLocalHistory, CHANCE_BAND_META, CHANCE_TONES } from "@/lib/calcHistory";
 import { copyText, wrapText, roundRect, shareOrCopyLink, shareOrDownloadCanvas } from "@/lib/shareCard";
 import ReportButton from "./ReportButton";
+import PlovdivCalculator from "./PlovdivCalculator";
+import { plovdivProgram } from "@/lib/plovdivScore";
+import VfuCalculator from "./VfuCalculator";
+import { vfuProgram } from "@/lib/vfuScore";
+import NbuCalculator from "./NbuCalculator";
+import { nbuProgram } from "@/lib/nbuScore";
+import UardCalculator from "./UardCalculator";
+import { uardProgram } from "@/lib/uardScore";
+import TourismCollegeCalculator from "./TourismCollegeCalculator";
+import { tourismCollegeProgram } from "@/lib/tourismCollegeScore";
+import NmaCalculator from "./NmaCalculator";
+import { nmaProgram } from "@/lib/nmaScore";
 import { FIELD_LABELS, SLOT_GROUPS } from "@/lib/coefficients_config";
 import { UNIVERSITIES, SPECIALTIES, ADMISSION_YEAR, ADMISSION_YEAR_SHORT, DATA_FRESHNESS_NOTE } from "@/lib/siteStats";
 
@@ -489,6 +503,10 @@ export default function CalculatorPage() {
             setLoadError(null);
             return;
         }
+        let current = true;
+        setAllData([]);
+        setMinScores({});
+        setLoadError(null);
         (async () => {
             const { data, error } = await supabase
                 .from("universities")
@@ -496,6 +514,7 @@ export default function CalculatorPage() {
                 .eq("academic_year", ADMISSION_YEAR)
                 .eq("faculty", selectedFaculty)
                 .limit(500);
+            if (!current) return;
             if (error) {
                 setLoadError("Не успяхме да заредим специалностите за този факултет. Опитай отново.");
                 setAllData([]);
@@ -513,6 +532,7 @@ export default function CalculatorPage() {
                     .from("admission_min_scores")
                     .select("university_id,year,round,min_ball,quota")
                     .in("university_id", ids);
+                if (!current) return;
                 if (!msError && msData?.length) {
                     const byId = {};
                     msData.forEach(r => { (byId[r.university_id] ||= []).push(r); });
@@ -527,7 +547,7 @@ export default function CalculatorPage() {
                         const roundRank = r => (r.round === null ? 99 : r.round);
                         const bestRound = Math.min(...yearRows.map(roundRank));
                         const finalRows = yearRows.filter(r => roundRank(r) === bestRound);
-                        const values = finalRows.map(r => Number(r.min_ball)).filter(v => !Number.isNaN(v));
+                        const values = finalRows.map(r => Number(r.min_ball)).filter(v => Number.isFinite(v) && v > 0);
                         if (!values.length) return;
                         resolved[id] = {
                             minBall: Math.min(...values),          // прагът = най-ниският приет бал
@@ -542,6 +562,7 @@ export default function CalculatorPage() {
             setMinScores(resolvedMin);
             FACULTY_DATA_CACHE.set(selectedFaculty, { rows: data || [], minScores: resolvedMin });
         })();
+        return () => { current = false; };
     }, [selectedFaculty]);
 
     useEffect(() => {
@@ -587,9 +608,52 @@ export default function CalculatorPage() {
         return () => window.removeEventListener("keydown", onKey);
     }, []);
 
-    const rowsForSelectedSpecialty = useMemo(() => {
-        if (!selectedSpecialtyName) return [];
-        return filteredData.filter(d => d.specialty === selectedSpecialtyName);
+    const { rowsForSelectedSpecialty, unavailableRows, nbuRows, plovdivRows, vfuRows, uardRows, tourismCollegeRows, nmaRows } = useMemo(() => {
+        const rowsForSelectedSpecialty = [];
+        const unavailableRows = [];
+        const nbuRows = [];
+        const plovdivRows = [];
+        const vfuRows = [];
+        const uardRows = [];
+        const tourismCollegeRows = [];
+        const nmaRows = [];
+        for (const row of filteredData) {
+            if (row.specialty !== selectedSpecialtyName) continue;
+            const nbu = nbuProgram(row);
+            if (nbu) {
+                nbuRows.push({ row, program: nbu });
+                continue;
+            }
+            const plovdiv = plovdivProgram(row);
+            if (plovdiv) {
+                plovdivRows.push({ row, program: plovdiv });
+                continue;
+            }
+            const vfu = vfuProgram(row);
+            if (vfu) {
+                vfuRows.push({ row, program: vfu });
+                continue;
+            }
+            const uard = uardProgram(row);
+            if (uard) {
+                uardRows.push({ row, program: uard });
+                continue;
+            }
+            const tourismCollege = tourismCollegeProgram(row);
+            if (tourismCollege) {
+                tourismCollegeRows.push({ row, program: tourismCollege });
+                continue;
+            }
+            const nma = nmaProgram(row);
+            if (nma) {
+                nmaRows.push({ row, program: nma });
+                continue;
+            }
+            const { issue } = assessFormula(row);
+            if (issue) unavailableRows.push(row);
+            else rowsForSelectedSpecialty.push(row);
+        }
+        return { rowsForSelectedSpecialty, unavailableRows, nbuRows, plovdivRows, vfuRows, uardRows, tourismCollegeRows, nmaRows };
     }, [filteredData, selectedSpecialtyName]);
 
     const coefficientsForInputs = useMemo(() => {
@@ -633,7 +697,7 @@ export default function CalculatorPage() {
     };
 
     const hasAnyValidGrade = useMemo(() =>
-        Object.values(grades).some(v => { const n = parseFloat(v); return !Number.isNaN(n) && n >= 2 && n <= 6; }),
+        Object.values(grades).some(isValidGradeValue),
         [grades]
     );
 
@@ -650,7 +714,7 @@ export default function CalculatorPage() {
             const chance = minScore ? admissionChanceBand(score, minScore.minBall, maxBall) : null;
             const percentOfMax = !minScore && maxBall && score > 0 ? Math.min((score / maxBall) * 100, 100) : null;
             const hasStarted = score > 0 || hasAnyValidGrade;
-            return { item, score, formatted: Number.isFinite(score) ? score.toFixed(2) : "0.00", minScore, isAbove, marginPts, chance, percentOfMax, maxBall, hasStarted, hasMissing: missingSlots.length > 0, missingSlots };
+            return { item, score, formatted: score.toFixed(2), minScore, isAbove, marginPts, chance, percentOfMax, maxBall, hasStarted, hasMissing: missingSlots.length > 0, missingSlots };
         });
     }, [rowsForSelectedSpecialty, grades, hasAnyValidGrade, minScores]);
 
@@ -751,8 +815,8 @@ export default function CalculatorPage() {
     return (
         <div style={{ minHeight: "100vh", background: "var(--brand-bg)", paddingTop: "7rem", paddingBottom: "5rem" }}>
             <Seo
-                title="Калкулатор за приемен бал — балообразуване по МОН"
-                description={`Изчисли приемния си бал за ${ADMISSION_YEAR_SHORT} г. Точните коефициенти и формули на МОН за ${UNIVERSITIES} университета и ${SPECIALTIES} специалности. Безплатно, без регистрация.`}
+                title="Калкулатор за приемен бал — правила на университетите"
+                description={`Изчисли приемния си бал за ${ADMISSION_YEAR_SHORT} г. Условия за прием в каталог с ${UNIVERSITIES} университета и ${SPECIALTIES} специалности. Безплатно, без регистрация.`}
                 path="/calculator"
                 image="https://uniput.eu/og/calculator.png"
             />
@@ -1201,6 +1265,23 @@ export default function CalculatorPage() {
                     </m.div>
                 )}
 
+                {plovdivRows.map(({ row, program }) => <PlovdivCalculator key={row.id} row={row} program={program} />)}
+                {vfuRows.map(({ row, program }) => <VfuCalculator key={row.id} row={row} program={program} />)}
+                {uardRows.map(({ row, program }) => <UardCalculator key={row.id} row={row} program={program} />)}
+                {tourismCollegeRows.map(({ row, program }) => <TourismCollegeCalculator key={row.id} row={row} program={program} />)}
+                {nmaRows.map(({ row, program }) => <NmaCalculator key={row.id} row={row} program={program} />)}
+                {nbuRows.map(({ row, program }) => <NbuCalculator key={row.id} row={row} program={program} />)}
+                {unavailableRows.map(row => (
+                    <section key={row.id} className="mb-4 rounded-2xl border p-5">
+                        <h3>{row.university_name} · {row.specialty}</h3>
+                        <p>{row.university_name === "Американски университет в България – Благоевград"
+                            ? "Приемът в АУБ разглежда успеха от училище, владеенето на английски, есе, препоръка, постижения и интервю. SAT/ACT е по желание. Университетът не публикува единна числова формула за тези програми."
+                            : row.university_name === "Висше училище по мениджмънт – Варна"
+                            ? "Приемът във ВУМ включва преглед на документи и интервю, а при липса на признат езиков сертификат — онлайн изпит по английски. Не е публикуван един числов максимален бал за тази програма."
+                            : "Автоматичен бал за тази програма не е наличен. Провери условията за прием в правилника на университета."}</p>
+                        {admissionSource(row) && <a className="underline" href={admissionSource(row).url}>{admissionSource(row).label}</a>}
+                    </section>
+                ))}
                 {/* Grade inputs */}
                 <AnimatePresence>
                     {selectedSpecialtyName && rowsForSelectedSpecialty.length > 0 && (

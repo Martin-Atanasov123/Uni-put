@@ -1,8 +1,5 @@
-import { useContext } from "react";
-import { AuthContext } from "./AuthContext";
+import { createContext, useContext } from "react";
 
-/**
- * Хук за лесен достъп до контекста на автентикация и любими.
- * @returns {import("../context/AuthContext").AuthContextType}
- */
+export const AuthContext = createContext({});
+
 export const useAuth = () => useContext(AuthContext);

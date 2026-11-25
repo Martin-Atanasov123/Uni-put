@@ -130,7 +130,7 @@ export default function SpecialtyPage() {
     const seoTitle = `${name} — университети и приемен бал ${ADMISSION_YEAR_SHORT}`;
     const seoDesc =
         `Къде да учиш ${name} в България: ${uniCount} ${uniCount === 1 ? "университет" : "университета"} в ${cities.length} ${cities.length === 1 ? "град" : "града"}. ` +
-        `Балообразуване по коефициентите на МОН${minRange ? `, минимални балове от минали години` : ""} и изчисли своя бал безплатно.`;
+        `Балообразуване по правилата на университетите${minRange ? `, минимални балове от минали години` : ""} и изчисли своя бал безплатно.`;
 
     // Schema.org: всяка програма е Course към EducationalOrganization.
     const courseSchemas = programs.slice(0, 25).map((p) => ({
@@ -209,7 +209,7 @@ export default function SpecialtyPage() {
                         през {ADMISSION_YEAR_SHORT} г. в {uniCount}{" "}
                         {uniCount === 1 ? "университет" : "университета"} в {cities.length}{" "}
                         {cities.length === 1 ? "град" : "града"} ({cities.join(", ")}). Всеки университет прилага
-                        собствена формула за балообразуване по официалните коефициенти на МОН.
+                        собствена формула за балообразуване по своя правилник за прием.
                         {minRange && (
                             <> Историческите минимални балове за прием се движат между{" "}
                                 <strong style={{ color: "var(--brand-text)", fontFamily: "monospace" }}>{minRange.lo.toFixed(2)}</strong> и{" "}

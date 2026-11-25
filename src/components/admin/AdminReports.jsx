@@ -9,6 +9,7 @@ import {
     XCircle, Search, Inbox
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import ReportScreenshot from "./ReportScreenshot";
 
 const STATUS_CONFIG = {
     open: { label: "Отворен", color: "badge-warning", icon: Clock },
@@ -40,7 +41,7 @@ export default function AdminReports() {
             // Bug fix: колоната е `report_type`, не `type`. ReportButton.jsx insert-ва
             // `report_type`. AdminReports query-то използваше грешно `type` → 400 →
             // admin страницата гърмеше при отваряне.
-            .select("id,status,report_type,description,admin_notes,screenshot_url,university_name,specialty,created_at,resolved_at")
+            .select("id,user_id,status,report_type,description,admin_notes,screenshot_url,university_name,specialty,created_at,resolved_at")
             .order("created_at", { ascending: false })
             .limit(200);
 
@@ -226,18 +227,7 @@ export default function AdminReports() {
                                             {report.screenshot_url && (
                                                 <div>
                                                     <p className="text-xs font-black uppercase opacity-30 mb-2">Скрийншот</p>
-                                                    <a
-                                                        href={report.screenshot_url}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="block"
-                                                    >
-                                                        <img
-                                                            src={report.screenshot_url}
-                                                            alt="Report screenshot"
-                                                            className="rounded-xl border border-base-200 max-h-60 object-cover object-top w-full hover:opacity-80 transition-opacity cursor-zoom-in"
-                                                        />
-                                                    </a>
+                                                    <ReportScreenshot reference={report.screenshot_url} userId={report.user_id} />
                                                 </div>
                                             )}
 

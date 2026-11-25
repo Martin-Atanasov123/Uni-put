@@ -6,7 +6,7 @@
 // Две действия:
 //   POST { action: "subscribe", email, university_name?, user_id? }
 //        → записва (service role, bypass RLS) + праща confirm имейл (double opt-in).
-//   POST { action: "send" }  (извиква се от pg_cron дневно; иска x-cron-key ако е зададен CRON_SECRET)
+//   POST { action: "send" }  (извиква се от pg_cron дневно; изисква CRON_SECRET и съответстващ x-cron-key)
 //        → (1) праща confirm имейли на непотвърдените отпреди < 30 дни
 //          (2) праща напомняния на потвърдените за срокове до 7 / 1 дни
 //
@@ -14,7 +14,7 @@
 // { emailPending: true }. Активира се само с добавяне на секрета — нула промени
 // по кода. За да заработи:
 //   1. Resend: домейнът mail.uniput.eu е създаден (eu-west-1); DNS записите са в Netlify DNS
-//   2. supabase secrets set RESEND_API_KEY=re_xxx  (и по избор CRON_SECRET, SITE_URL, MAIL_FROM)
+//   2. supabase secrets set RESEND_API_KEY=re_xxx  (и CRON_SECRET за планираното изпращане; по избор SITE_URL, MAIL_FROM)
 //   3. Приложи migrations/20260911000100_reminder_cron.sql (планира дневния cron)
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
@@ -271,7 +271,8 @@ Deno.serve(async (req) => {
     const action = String(body.action ?? "");
     if (action === "subscribe") return handleSubscribe(body);
     if (action === "send") {
-        if (CRON_SECRET && req.headers.get("x-cron-key") !== CRON_SECRET) return json({ error: "forbidden" }, 403);
+        if (!CRON_SECRET) return json({ error: "scheduler_unconfigured" }, 503);
+        if (req.headers.get("x-cron-key") !== CRON_SECRET) return json({ error: "forbidden" }, 403);
         return handleSend();
     }
     return json({ error: "unknown_action" }, 400);

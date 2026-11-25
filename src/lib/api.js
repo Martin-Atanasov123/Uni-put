@@ -22,6 +22,20 @@ const DORMITORIES_COLS =
     'condition_rating,commute_minutes,distance_to_uni_km,google_maps_url,' +
     'has_private_bathroom,is_renovated,transport_lines';
 
+// Use stable ordering across pages so the PostgREST response limit cannot
+// silently exclude a career or specialty from the comparison.
+async function readMapping(table, columns) {
+    const rows = [];
+    const size = 500;
+    for (let offset = 0; ; offset += size) {
+        const { data, error } = await supabase.from(table).select(columns)
+            .order("id").range(offset, offset + size - 1);
+        if (error) return { error };
+        rows.push(...data);
+        if (data.length < size) return { data: rows };
+    }
+}
+
 /**
  * Matching за специалности и професии на базата на RIASEC резултати.
  * Използва новите таблици specialty_riasec_mapping и careers_riasec_mapping.
@@ -30,14 +44,11 @@ export async function getRiasecMatches(userScores) {
     if (!userScores) return { specialties: [], careers: [] };
 
     try {
-        let { data: specialtiesData, error: specError } = await supabase
-            .from('specialty_riasec_mapping')
-            .select(`${SPECIALTY_RIASEC_COLS}, universities(id, university_name, city, max_ball)`);
+        let { data: specialtiesData, error: specError } = await readMapping(
+            'specialty_riasec_mapping', `${SPECIALTY_RIASEC_COLS}, universities(id, university_name, city, max_ball)`);
 
         if (specError && specError.code === 'PGRST200') {
-            const { data: standaloneSpecs, error: standaloneError } = await supabase
-                .from('specialty_riasec_mapping')
-                .select(SPECIALTY_RIASEC_COLS);
+            const { data: standaloneSpecs, error: standaloneError } = await readMapping('specialty_riasec_mapping', SPECIALTY_RIASEC_COLS);
 
             if (standaloneError) throw standaloneError;
             specialtiesData = standaloneSpecs;
@@ -45,9 +56,7 @@ export async function getRiasecMatches(userScores) {
             throw specError;
         }
 
-        const { data: careersData, error: careerError } = await supabase
-            .from('careers_riasec_mapping')
-            .select(CAREERS_COLS);
+        const { data: careersData, error: careerError } = await readMapping('careers_riasec_mapping', CAREERS_COLS);
 
         if (careerError) {
             throw careerError;

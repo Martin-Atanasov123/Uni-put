@@ -88,6 +88,9 @@ describe("Calculator specialties filtering by faculty", () => {
     expect(optionsA).toContain("Спец A2");
     expect(optionsA).not.toContain("Спец B1");
 
+    fireEvent.change(specialtiesSelect, { target: { value: "Спец A1" } });
+    expect(await screen.findByText(/Автоматичен бал за тази програма не е наличен/)).toBeTruthy();
+
     // Re-open list and choose Факултет B
     fireEvent.click(input);
     const optionB = await screen.findByRole("button", { name: "Факултет B" });

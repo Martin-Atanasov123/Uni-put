@@ -714,7 +714,7 @@ export default function UniversitiesPage() {
         >
             <Seo
                 title={`${UNIVERSITIES} университета и ${SPECIALTIES} специалности за прием ${ADMISSION_YEAR_SHORT}`}
-                description={`${UNIVERSITIES} висши училища в България и ${SPECIALTIES} специалности. Филтрирай по град, факултет и степен. Изчисли приемния си бал по коефициентите на МОН.`}
+                description={`${UNIVERSITIES} висши училища в България и ${SPECIALTIES} специалности. Филтрирай по град, факултет и степен. Изчисли приемния си бал по правилата на университетите.`}
                 path="/universities"
                 image="https://uniput.eu/og/universities.png"
             />

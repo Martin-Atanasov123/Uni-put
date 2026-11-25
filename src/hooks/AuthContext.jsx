@@ -14,11 +14,11 @@
 // Изход: { user, loading, favorites, isFavorite, toggleFavorite }.
 //   toggleFavorite връща { added, anonymous } — UI слоят решава дали да покаже
 //   покана за акаунт (само при анонимно ДОБАВЯНЕ).
-import { createContext, useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { CALC_HISTORY_KEY, readLocalHistory, mergeCalculatorHistory } from "@/lib/calcHistory";
 
-export const AuthContext = createContext({});
+import { AuthContext } from "./useAuth";
 
 const ANON_FAVORITES_KEY = "uniput_anon_favorites";
 const RIASEC_RESULT_KEY = "riasec_result";
@@ -172,9 +172,3 @@ export const AuthProvider = ({ children }) => {
         </AuthContext.Provider>
     );
 };
-
-/**
- * Хук за достъп до контекста на автентикация и любими.
- * @returns {{ user: object|null, loading: boolean, favorites: string[], isFavorite: (id: string) => boolean, toggleFavorite: (id: string) => Promise<{added:boolean,anonymous:boolean}> }}
- */
-export const useAuth = () => useContext(AuthContext);
