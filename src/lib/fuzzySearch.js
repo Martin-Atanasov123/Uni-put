@@ -74,3 +74,52 @@ export function closestWords(word, vocab, max = 4) {
     }
     return scored.sort((a, b) => a.score - b.score || a.cand.localeCompare(b.cand, "bg")).slice(0, max).map((x) => x.cand);
 }
+
+// ── Съвпадане по имена на специалности (независимо от реда и точната форма на думите) ──────────
+const NAME_STOP = new Set(["на", "по", "за", "и", "в", "от", "с", "със", "към", "the", "and"]);
+
+const tokens = (s) => String(s || "").toLowerCase().split(/[^а-яa-z0-9]+/).filter((w) => w.length >= 3 && !NAME_STOP.has(w));
+
+/** Колко добре две думи си приличат (0 = не; 1 = същата дума/форма). Префикс, правописна грешка. */
+export function wordSimilarity(a, b) {
+    if (a === b) return 1;
+    const p = commonPrefix(a, b);
+    const minLen = Math.min(a.length, b.length);
+    // „музикална“ ~ „музика“, „педагогически“ ~ „педагогика“: дълъг общ корен
+    if (p >= Math.max(4, Math.ceil(0.7 * minLen))) return 0.9;
+    if (a.length >= 4 && b.length >= 4 && editDistance(a, b, 2) <= (Math.max(a.length, b.length) <= 5 ? 1 : 2)) {
+        return a[0] === b[0] || editDistance(a, b, 1) <= 1 ? 0.8 : 0;
+    }
+    return 0;
+}
+
+/**
+ * Кои имена на специалности отговарят на заявката, без значение от реда на думите и точните форми.
+ * „музикална педагогика“ → „Педагогика на обучението по музика“. Думи от заявката, които не прилягат на
+ * никое име (град, университет), се връщат в `ignored` — търсят се отделно в базата.
+ * @returns {{names: string[], ignored: string[]}} names най-добрите първи
+ */
+export function matchSpecialtyNames(query, names, { max = 40, minSim = 0.7 } = {}) {
+    const qTokens = [...new Set(tokens(query))];
+    if (!qTokens.length) return { names: [], ignored: [] };
+    const entries = (names || []).map((n) => ({ n, t: tokens(n) }));
+    // Дума от заявката е „специалностна“, само ако прилича на дума в поне едно име
+    const useful = qTokens.filter((q) => entries.some((e) => e.t.some((w) => wordSimilarity(q, w) >= minSim)));
+    const ignored = qTokens.filter((q) => !useful.includes(q));
+    if (!useful.length) return { names: [], ignored };
+    const scored = [];
+    for (const e of entries) {
+        let total = 0;
+        let ok = true;
+        for (const q of useful) {
+            const best = Math.max(0, ...e.t.map((w) => wordSimilarity(q, w)));
+            if (best < minSim) { ok = false; break; }
+            total += best;
+        }
+        if (!ok) continue;
+        // по-кратките имена (по-малко „допълнителни“ думи) са по-близки до търсеното
+        scored.push({ n: e.n, score: total / useful.length - Math.max(0, e.t.length - useful.length) * 0.01 });
+    }
+    scored.sort((a, b) => b.score - a.score || a.n.localeCompare(b.n, "bg"));
+    return { names: scored.slice(0, max).map((x) => x.n), ignored };
+}

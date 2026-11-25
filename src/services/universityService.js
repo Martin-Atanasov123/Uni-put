@@ -7,7 +7,7 @@
 
 import { supabase } from '@/lib/supabase';
 import { ADMISSION_YEAR } from '@/lib/siteStats';
-import { buildVocabulary, closestWords, wordHasHit } from '@/lib/fuzzySearch';
+import { matchSpecialtyNames } from '@/lib/fuzzySearch';
 
 const SLIM_COLS = 'id,university_name,specialty,faculty,city,education_level,max_ball,accreditation_status';
 const PAGE_SIZE_DEFAULT = 200;
@@ -140,16 +140,16 @@ const relevance = (row, terms) => {
 const sanitizeForIlike = (s) =>
     (s || '').replace(/[%_\\,()'"]/g, '').slice(0, 80);
 
-// Речник от думите в имената на специалностите — за „близки думи“. Зарежда се лениво, веднъж
-// (само когато точното търсене дава малко резултати); при грешка остава празен и търсенето работи както преди.
-let vocabPromise = null;
-const getVocabulary = () => {
-    if (!vocabPromise) {
-        vocabPromise = fetchDistinct('specialty').then(buildVocabulary).catch(() => { vocabPromise = null; return new Set(); });
+// Имена на специалностите — за търсене по сходни думи („музикална педагогика“ → „Педагогика на обучението по
+// музика“). Зарежда се лениво, веднъж; при грешка остава празен и търсенето работи както преди.
+let namesPromise = null;
+const getSpecialtyNameList = () => {
+    if (!namesPromise) {
+        namesPromise = fetchDistinct('specialty').catch(() => { namesPromise = null; return []; });
     }
-    return vocabPromise;
+    return namesPromise;
 };
-const FUZZY_THRESHOLD = 5; // под толкова точни резултата пробваме близки думи
+const MAX_NEAR_NAMES = 30;
 
 export const universityService = {
 
@@ -196,41 +196,41 @@ export const universityService = {
         let rows = data || [];
         if (!terms.length) return rows;
 
-        // Малко точни резултати → разширяваме с близки думи (правописна грешка, друга форма на думата).
-        let fuzzy = [];
-        if (rows.length < FUZZY_THRESHOLD) {
-            try {
-                const vocab = await getVocabulary();
-                const expanded = terms.map((t) => {
-                    if (t.university || wordHasHit(t.variants, vocab)) return t;
-                    const near = closestWords(t.word, vocab);
-                    if (near.length) fuzzy = fuzzy.concat(near);
-                    return near.length ? { ...t, variants: [...t.variants, ...near.map(sanitizeForIlike)] } : t;
-                });
-                if (fuzzy.length) {
-                    let q2 = supabase.from('universities').select(SLIM_COLS).eq('academic_year', ADMISSION_YEAR);
-                    for (const t of expanded) {
-                        if (t.university) { q2 = q2.or(`university_name.ilike.${t.university}%`); continue; }
-                        const orParts = t.variants.flatMap((v) => SEARCH_COLUMNS.map((col) => `${col}.ilike.%${v}%`));
-                        if (orParts.length) q2 = q2.or(orParts.join(','));
-                    }
-                    if (city && city !== 'Всички') q2 = q2.eq('city', city);
-                    if (level && level !== 'Всички') q2 = q2.eq('education_level', level);
-                    const { data: more, error: err2 } = await q2.order('university_name', { ascending: true }).range(offset, offset + limit - 1);
-                    if (!err2 && more) {
-                        const seen = new Set(rows.map((r) => r.id));
-                        rows = [...rows, ...more.filter((r) => !seen.has(r.id))];
-                    }
+        // Сходни специалности: търсим по ИМЕНАТА на специалностите, независимо от реда и формата на думите
+        // („музикална педагогика“ показва и „Педагогика на обучението по музика“; „психлогия“ → „Психология“).
+        let nearNames = [];
+        let boost = new Set();
+        try {
+            const allNames = await getSpecialtyNameList();
+            const { names: matched, ignored } = matchSpecialtyNames(query, allNames);
+            boost = new Set(matched);
+            const have = new Set(rows.map((r) => r.specialty));
+            const extra = matched.filter((n) => !have.has(n)).slice(0, MAX_NEAR_NAMES);
+            if (extra.length) {
+                let q2 = supabase.from('universities').select(SLIM_COLS).eq('academic_year', ADMISSION_YEAR).in('specialty', extra);
+                // думите, които не са специалност (град, университет), се прилагат както при точното търсене
+                for (const t of parseQuery(ignored.join(' '))) {
+                    if (t.university) { q2 = q2.or(`university_name.ilike.${t.university}%`); continue; }
+                    const orParts = t.variants.flatMap((v) => SEARCH_COLUMNS.map((col) => `${col}.ilike.%${v}%`));
+                    if (orParts.length) q2 = q2.or(orParts.join(','));
                 }
-            } catch {
-                fuzzy = [];
+                if (city && city !== 'Всички') q2 = q2.eq('city', city);
+                if (level && level !== 'Всички') q2 = q2.eq('education_level', level);
+                const { data: more, error: err2 } = await q2.order('university_name', { ascending: true }).range(offset, offset + limit - 1);
+                if (!err2 && more?.length) {
+                    const seen = new Set(rows.map((r) => r.id));
+                    rows = [...rows, ...more.filter((r) => !seen.has(r.id))];
+                    nearNames = [...new Set(more.map((r) => r.specialty))];
+                }
             }
+        } catch {
+            nearNames = [];
         }
         const out = rows
-            .map((row, i) => ({ row, i, score: relevance(row, terms) }))
+            .map((row, i) => ({ row, i, score: relevance(row, terms) + (boost.has(row.specialty) ? 3 : 0) }))
             .sort((a, b) => b.score - a.score || a.i - b.i)
             .map((x) => x.row);
-        out.fuzzyWords = [...new Set(fuzzy)]; // за UI бележка „показваме и близки резултати“
+        out.nearNames = nearNames; // за UI бележка „показваме и сходни специалности“
         return out;
     },
 
