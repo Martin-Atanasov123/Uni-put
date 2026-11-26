@@ -5,7 +5,7 @@ import { useTheme } from "@/hooks/useTheme";
 import {
     User, LogOut, LayoutDashboard, Menu, X, GraduationCap,
     Calculator, Search, Settings, Building2, Heart, ChevronDown,
-    Brain, ClipboardList, CalendarDays
+    Brain, ClipboardList, CalendarDays, Sun, Moon
 } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 
@@ -52,8 +52,7 @@ export default function Header() {
     const { user } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
-    // useTheme сега принуждава dark mode (light theme премахната). Извикваме за side effect.
-    useTheme();
+    const { theme, toggle: toggleTheme } = useTheme();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
@@ -157,6 +156,20 @@ export default function Header() {
 
                     {/* Right: CTA + auth */}
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        <button
+                            type="button"
+                            onClick={toggleTheme}
+                            aria-label={theme === "dark" ? "Включи светла тема" : "Включи тъмна тема"}
+                            title={theme === "dark" ? "Светла тема" : "Тъмна тема"}
+                            style={{
+                                width: "2.5rem", height: "2.5rem", display: "grid", placeItems: "center",
+                                borderRadius: "0.75rem", background: "var(--brand-surface)",
+                                border: "1px solid var(--brand-border)", color: "var(--brand-text)",
+                                cursor: "pointer", flexShrink: 0,
+                            }}
+                        >
+                            {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
+                        </button>
                         {/* Primary CTA — always visible on desktop */}
                         <Link
                             to="/calculator/"
@@ -282,7 +295,7 @@ export default function Header() {
                                         padding: "0.875rem 1rem", borderRadius: "0.75rem",
                                         fontSize: "14px", fontWeight: 600, textDecoration: "none",
                                         color: active ? "var(--brand-cyan)" : "var(--brand-text)",
-                                        background: active ? "rgba(6,182,212,0.1)" : "rgba(30,41,59,0.5)",
+                                        background: active ? "var(--brand-card-hover)" : "var(--brand-surface-2)",
                                         border: active ? "1px solid rgba(6,182,212,0.25)" : "1px solid rgba(148,163,184,0.08)",
                                     }}>
                                         <Icon size={16} /> {link.name}

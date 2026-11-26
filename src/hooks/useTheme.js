@@ -1,14 +1,28 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-// Light theme премахната по UX решение — продуктът е изцяло dark mode.
-// Hook-ът се запазва за backward compat (компоненти, които still го викат),
-// но винаги връща "dark" и принудително форсира data-theme="dark" на mount.
+const KEY = "uniput_theme";
+
+const current = () => {
+    if (typeof document === "undefined") return "dark";
+    return document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+};
+
 export function useTheme() {
+    const [theme, setTheme] = useState(current);
+
     useEffect(() => {
-        document.documentElement.setAttribute("data-theme", "dark");
-        // Cleanup на стар theme preference от localStorage (ако е "light")
-        try { localStorage.removeItem("uniput_theme"); } catch { /* noop */ }
+        document.documentElement.setAttribute("data-theme", theme);
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute("content", theme === "light" ? "#F6F8F5" : "#0F172A");
+    }, [theme]);
+
+    const toggle = useCallback(() => {
+        setTheme((value) => {
+            const next = value === "dark" ? "light" : "dark";
+            try { localStorage.setItem(KEY, next); } catch { /* preference remains in memory */ }
+            return next;
+        });
     }, []);
 
-    return { theme: "dark", toggle: () => { /* noop — theme toggle премахнат */ } };
+    return { theme, toggle };
 }

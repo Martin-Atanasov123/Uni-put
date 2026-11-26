@@ -1,5 +1,5 @@
 <!doctype html>
-<html data-theme="dark" lang="bg" class="dark">
+<html data-theme="dark" lang="bg">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/university.png" />
@@ -14,10 +14,20 @@
       browser renders coloured pixels as soon as the HTML is parsed.
       The #initial-loader is removed by main.jsx after React's first paint.
     -->
+    <script>
+      (function () {
+        try {
+          var theme = localStorage.getItem("uniput_theme");
+          document.documentElement.setAttribute("data-theme", theme === "light" ? "light" : "dark");
+        } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
+      })();
+    </script>
     <style>
       :root { color-scheme: dark; }
+      [data-theme="light"] { color-scheme: light; }
       *,*::before,*::after { box-sizing: border-box; }
       html, body { margin: 0; background: #0f172a; }
+      [data-theme="light"] body, [data-theme="light"] #initial-loader { background: #f6f8f5; }
       #initial-loader {
         position: fixed; inset: 0;
         display: flex; align-items: center; justify-content: center;
@@ -33,6 +43,7 @@
         border-radius: 50%;
         animation: _il-spin 0.65s linear infinite;
       }
+      [data-theme="light"] #initial-loader > div { border-color: rgba(23,86,217,0.18); border-top-color: #1756d9; }
     </style>
     <link rel="stylesheet" href="/src/index.css" />
     <!--

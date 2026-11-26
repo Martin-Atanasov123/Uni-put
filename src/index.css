@@ -1,10 +1,115 @@
 @import "tailwindcss";
 @plugin "daisyui" {
-  themes: dark --default, dark --prefersdark;
+  themes: light, dark --default --prefersdark;
 };
 
-:root,
+[data-theme="light"] {
+  color-scheme: light;
+  --canvas: #F6F8F5;
+  --surface: #FFFFFF;
+  --surface-subtle: #EAF0EA;
+  --ink: #152B29;
+  --ink-muted: #495D5A;
+  --brand: #1756D9;
+  --brand-hover: #0E43B4;
+  --signal: #C9F27E;
+  --border: #DDE5E0;
+  --border-strong: #7D918A;
+  --focus: #1756D9;
+  --success: #0A6853;
+  --warning: #986100;
+  --danger: #AA2735;
+  --on-brand: #FFFFFF;
+  --on-signal: #152B29;
+  --c-teal: #0E7490;
+  --c-violet: #6D28D9;
+  --c-rust: #9A3412;
+  --c-amber: #7A4E00;
+  --c-pink: #BE185D;
+  --c-orange: #C2410C;
+  --radius-control: 10px;
+  --radius-panel: 16px;
+  --radius-feature: 24px;
+  --header-h: 96px;
+  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+
+  --brand-bg: var(--canvas);
+  --brand-bg-alt: var(--surface-subtle);
+  --brand-surface: var(--surface);
+  --brand-surface-2: var(--surface-subtle);
+  --brand-cyan: var(--brand);
+  --brand-violet: var(--brand);
+  --brand-accent: var(--brand);
+  --brand-accent-ink: #FFFFFF;
+  --brand-accent-text: var(--brand);
+  --brand-text: var(--ink);
+  --brand-muted: var(--ink-muted);
+  --brand-border: var(--border);
+  --brand-input-bg: #FFFFFF;
+  --brand-input-border: var(--border-strong);
+  --brand-dropdown-bg: #FFFFFF;
+  --brand-nav-bg: rgba(246,248,245,0.92);
+  --brand-nav-scrolled: rgba(246,248,245,0.97);
+  --brand-shadow: rgba(21,43,41,0.12);
+  --brand-card-hover: rgba(23,86,217,0.08);
+  --brand-card-border: var(--border);
+  --brand-progress-bg: rgba(246,248,245,0.96);
+
+  --color-base-100: #F6F8F5;
+  --color-base-200: #EAF0EA;
+  --color-base-300: #DDE5E0;
+  --color-base-content: #152B29;
+  --color-primary: #1756D9;
+  --color-primary-content: #FFFFFF;
+  --color-secondary: #152B29;
+  --color-secondary-content: #FFFFFF;
+  --color-accent: #C9F27E;
+  --color-accent-content: #152B29;
+  --color-neutral: #152B29;
+  --color-neutral-content: #FFFFFF;
+  --color-info: #1756D9;
+  --color-info-content: #FFFFFF;
+  --color-success: #0A6853;
+  --color-success-content: #FFFFFF;
+  --color-warning: #986100;
+  --color-warning-content: #FFFFFF;
+  --color-error: #AA2735;
+  --color-error-content: #FFFFFF;
+}
+
 [data-theme="dark"] {
+  color-scheme: dark;
+  --canvas: #0F172A;
+  --surface: #1E293B;
+  --surface-subtle: #131D2E;
+  --ink: #F1F5F9;
+  --ink-muted: #94A3B8;
+  --brand: #06B6D4;
+  --brand-hover: #22D3EE;
+  --signal: #C9F27E;
+  --border: rgba(148,163,184,0.1);
+  --border-strong: rgba(148,163,184,0.4);
+  --focus: #06B6D4;
+  --success: #10B981;
+  --warning: #FBBF24;
+  --danger: #F87171;
+  --on-brand: #0F172A;
+  --on-signal: #152B29;
+  --c-teal: #22D3EE;
+  --c-violet: #A78BFA;
+  --c-rust: #FB923C;
+  --c-amber: #FBBF24;
+  --c-pink: #F472B6;
+  --c-orange: #FB923C;
+  --radius-control: 10px;
+  --radius-panel: 16px;
+  --radius-feature: 24px;
+  --header-h: 96px;
+  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', Consolas, monospace;
   --brand-bg: #0F172A;
   --brand-bg-alt: #0B1120;
   --brand-surface: #1E293B;
@@ -23,6 +128,9 @@
   --brand-card-hover: rgba(139,92,246,0.08);
   --brand-card-border: rgba(148,163,184,0.09);
   --brand-progress-bg: rgba(15,23,42,0.85);
+  --brand-accent: var(--brand-cyan);
+  --brand-accent-ink: #0F172A;
+  --brand-accent-text: var(--brand-cyan);
 
   /* Map DaisyUI v5 tokens to brand palette (admin panel & any DaisyUI components) */
   --color-base-100: #0F172A;
@@ -47,16 +155,13 @@
   --color-error-content: #F1F5F9;
 }
 
-/* Light theme премахната по продуктово решение (юни 2026).
-   Целият продукт е dark-only. data-theme винаги е "dark" (force-set от useTheme).
-   Старият [data-theme="nord"] CSS блок е напълно изтрит за да освободи CSS bundle-а. */
-
 html, body {
   background: var(--brand-bg);
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-body);
+  color: var(--brand-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
@@ -67,6 +172,12 @@ body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
+/* Началният hero пази тъмната фотографска композиция и в светла тема. */
+[data-theme="light"] .landing-page > section:first-of-type {
+  --brand-text: #F1F5F9;
+  --brand-muted: #CBD5E1;
+}
+
 /* ── Global animation keyframes ─────────────────────────────────────────── */
 @keyframes spin {
   to { transform: rotate(360deg); }
@@ -74,7 +185,7 @@ body {
 
 /* ── Focus visible ring — accessibility + premium UX ────────────────────── */
 :focus-visible {
-  outline: 2px solid var(--brand-cyan);
+  outline: 2px solid var(--focus);
   outline-offset: 3px;
   border-radius: 4px;
 }
@@ -98,6 +209,21 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--brand-muted);
 }
+
+html { transition: background-color 0.2s ease; }
+
+/* Secondary content on mobile: collapsed, unchanged on desktop. */
+.mfold { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 0 0 1rem; }
+.mfold + .mfold { margin-top: -1rem; border-top: 0; }
+.mfold__sum { list-style: none; display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 4px 2px; cursor: pointer; font-weight: 700; font-size: 15px; color: var(--ink); }
+.mfold__sum::-webkit-details-marker { display: none; }
+.mfold__title { flex: 1; min-width: 0; }
+.mfold__meta { font-size: 13px; font-weight: 600; color: var(--ink-muted); }
+.mfold__chev { flex: none; color: var(--ink-muted); transition: transform 0.2s ease; }
+.mfold[open] > .mfold__sum .mfold__chev { transform: rotate(180deg); }
+.mfold__body { padding: 0 0 1rem; }
+.mfold__body > * { margin-top: 0 !important; border-top: 0 !important; padding-top: 0 !important; }
+.mfold [data-fold-head] { display: none !important; }
 
 
 
