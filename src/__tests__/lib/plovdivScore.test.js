@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { plovdivProgram, plovdivVariantScores } from "@/lib/plovdivScore";
 
-const row = { university_name: 'Пловдивски университет „Паисий Хилендарски"', city: "Пловдив", specialty: "Биология" };
+const row = { university_name: 'Пловдивски университет „Паисий Хилендарски”', city: "Пловдив", specialty: "Биология" };
 
 describe("Пловдивски университет, отделни начини за балообразуване", () => {
     it("събира само съставките вътре в един вариант", () => {

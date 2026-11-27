@@ -10,6 +10,6 @@ it("triples the specialty grade and applies the theory penalty and threshold", (
 });
 
 it("handles only the four documented programs", () => {
-    expect(nmaProgram({ university_name: 'Национална музикална академия „Проф. Панчо Владигеров"', specialty: "Фолклорно пеене" })).toBeTruthy();
-    expect(nmaProgram({ university_name: 'Национална музикална академия „Проф. Панчо Владигеров"', specialty: "Поп и джаз пеене" })).toBeNull();
+    expect(nmaProgram({ university_name: 'Национална музикална академия „Проф. Панчо Владигеров”', specialty: "Фолклорно пеене" })).toBeTruthy();
+    expect(nmaProgram({ university_name: 'Национална музикална академия „Проф. Панчо Владигеров”', specialty: "Поп и джаз пеене" })).toBeNull();
 });

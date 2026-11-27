@@ -31,7 +31,7 @@ export function hasSpecialSelectionAdmissions(row) {
 export function admissionSource(row) {
     if (row.university_name === "Висше училище по мениджмънт – Варна") return { url: VUM_ADMISSION_URL, label: "Условия за прием във ВУМ" };
     if (row.university_name === "Американски университет в България – Благоевград") return { url: AUBG_ADMISSION_URL, label: "Условия за прием в АУБ" };
-    if (row.university_name === 'Варненски свободен университет „Черноризец Храбър"') return { url: VFU_ADMISSION_URL, label: "Условия за прием във ВСУ" };
+    if (row.university_name === 'Варненски свободен университет „Черноризец Храбър”') return { url: VFU_ADMISSION_URL, label: "Условия за прием във ВСУ" };
     if (row.university_name?.startsWith("Академия на Министерството на вътрешните работи")) return { url: AMVR_ADMISSION_URL, label: "Балообразуване в Академията на МВР" };
     if (row.university_name?.startsWith("Национален военен университет")) return { url: NVU_ADMISSION_URL, label: "Балообразуване в НВУ" };
     if (row.university_name?.startsWith("Висше военноморско училище")) return { url: VVMU_ADMISSION_URL, label: "Прием във ВВМУ" };

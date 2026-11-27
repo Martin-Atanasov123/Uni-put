@@ -79,7 +79,7 @@ const groups = [
 const byName = new Map(groups.flatMap(group => group.names.map(name => [name, group])));
 
 export function plovdivProgram(row) {
-    if (row.university_name !== 'Пловдивски университет „Паисий Хилендарски"' ||
+    if (row.university_name !== 'Пловдивски университет „Паисий Хилендарски”' ||
         row.city !== "Пловдив" || (row.academic_year ?? ADMISSION_YEAR) !== "2026/2027") return null;
     return byName.get(row.specialty) ?? null;
 }

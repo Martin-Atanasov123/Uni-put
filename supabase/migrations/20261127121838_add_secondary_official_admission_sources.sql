@@ -1,0 +1,45 @@
+update public.universities
+set source_url = case
+    when university_name ilike 'Университет по хранителни технологии%' then 'https://uft-plovdiv.bg/site_files/file/KSK2026/%D0%A1%D0%BF%D1%80%D0%B0%D0%B2%D0%BE%D1%87%D0%BD%D0%B8%D0%BA%20%D0%9A%D0%A1%D0%9A_2026.pdf'
+    when university_name ilike 'Варненски свободен университет%' then 'https://ksp.vfu.bg/bakalavar/usloviya_za_priem/'
+    when university_name ilike 'Национална академия за театрално%' then 'https://ksk.natfiz.bg/'
+    when university_name ilike 'Технически университет – Габрово%' then 'https://www.tugab.bg/images/ksp/Pravilnik_priemane_studenti_2026.pdf'
+    when university_name ilike 'Висше транспортно училище%' then 'https://www.vtu.bg/admission-bachelor-2025/'
+    when university_name ilike 'Стопанска академия%' then 'https://www.uni-svishtov.bg/bg/admission/bachelor/bakalavar-obrazuvane-na-bala-za-uchastie-v-klasirane'
+    when university_name ilike 'Медицински университет – София%' then 'https://www.mu-sofia.bg/wp-content/uploads/2026/01/Spravochnik-_2026.pdf'
+    when university_name ilike 'Медицински университет „Проф. д-р Параскев Стоянов%' then 'https://www.mu-varna.bg/bg/baloobrazuvane'
+    when university_name ilike 'Медицински университет – Пловдив%' then 'https://mu-plovdiv.bg/wp-content/uploads/2026/02/SpavochnikBEO_2026_print_compressed.pdf'
+    when university_name ilike 'Медицински университет – Плевен%' then 'https://www.mu-pleven.bg/forms/ksk2026/Pravilnik%20za%20priem%20na%20studenti%202026.pdf'
+    when university_name ilike 'Национална музикална академия%' then 'https://nma.bg/wp-content/uploads/SPRAVOCHNIK_2026-2027-priem-I-kurs-durjdvna-poruchka-sled_sredno_obr-3.pdf'
+    when university_name ilike 'Университет по библиотекознание%' then 'https://www.unibit.bg/apply/apply-bachelor/regular-part-time-bachelor'
+    when university_name ilike 'Университет по архитектура%' then 'https://uacg.bg/upload/editor/pravilnik-za-priemane-na-studenti-2026-27-uasg.pdf'
+    when university_name ilike 'Лесотехнически университет%' then 'https://ltu.bg/%D0%BF%D1%80%D0%B8%D0%B5%D0%BC/%D0%BA%D0%B0%D0%BA-%D0%BC%D0%BE%D0%B6%D0%B5%D1%82%D0%B5-%D0%B4%D0%B0-%D0%BA%D0%B0%D0%BD%D0%B4%D0%B8%D0%B4%D0%B0%D1%82%D1%81%D1%82%D0%B2%D0%B0%D1%82%D0%B5-%D0%B2-%D0%BB%D1%82%D1%83/'
+    when university_name ilike 'Бургаски свободен университет%' then 'https://www.bfu.bg/uploads/pages/2026/za-priem-na-studenti-v-bsu-prez-uchebnata-2026-2027-g.pdf'
+    when university_name ilike 'Висше училище по агробизнес%' then 'https://uard.bg/bg/pages/view/266'
+    when university_name ilike 'Висше училище по мениджмънт%' then 'https://vum.bg/wp-content/uploads/2026/01/4.Application-Steps-at-VUM-Bachelors-Programme.docx.pdf'
+    when university_name ilike 'Национална спортна академия%' then 'https://nsa.bg/documents_/Spravochnik-2026.pdf'
+  end,
+  source_publisher = university_name,
+  retrieved_at = coalesce(retrieved_at, now()),
+  verified_at = now()
+where academic_year='2026/2027'
+and (
+ university_name ilike 'Университет по хранителни технологии%'
+ or university_name ilike 'Варненски свободен университет%'
+ or university_name ilike 'Национална академия за театрално%'
+ or university_name ilike 'Технически университет – Габрово%'
+ or university_name ilike 'Висше транспортно училище%'
+ or university_name ilike 'Стопанска академия%'
+ or university_name ilike 'Медицински университет – София%'
+ or university_name ilike 'Медицински университет „Проф. д-р Параскев Стоянов%'
+ or university_name ilike 'Медицински университет – Пловдив%'
+ or university_name ilike 'Медицински университет – Плевен%'
+ or university_name ilike 'Национална музикална академия%'
+ or university_name ilike 'Университет по библиотекознание%'
+ or university_name ilike 'Университет по архитектура%'
+ or university_name ilike 'Лесотехнически университет%'
+ or university_name ilike 'Бургаски свободен университет%'
+ or university_name ilike 'Висше училище по агробизнес%'
+ or university_name ilike 'Висше училище по мениджмънт%'
+ or university_name ilike 'Национална спортна академия%'
+);

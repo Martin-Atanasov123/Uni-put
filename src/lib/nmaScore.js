@@ -10,7 +10,7 @@ const specialties = new Set([
 ]);
 
 export function nmaProgram(row) {
-    if (row.university_name !== 'Национална музикална академия „Проф. Панчо Владигеров"' || (row.academic_year ?? ADMISSION_YEAR) !== "2026/2027") return null;
+    if (row.university_name !== 'Национална музикална академия „Проф. Панчо Владигеров”' || (row.academic_year ?? ADMISSION_YEAR) !== "2026/2027") return null;
     return specialties.has(row.specialty) ? { url: NMA_ADMISSION_URL } : null;
 }
 

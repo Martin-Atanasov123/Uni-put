@@ -1,6 +1,6 @@
 import { ADMISSION_YEAR } from "./siteStats.js";
 
-const UNIVERSITY = 'Варненски свободен университет „Черноризец Храбър"';
+const UNIVERSITY = 'Варненски свободен университет „Черноризец Храбър”';
 const BASE = "https://ksp.vfu.bg/bakalavar/spetsialnosti";
 const DEFAULT_BONUS = "Провери дали профилът на завършеното училище е сред посочените в официалните условия.";
 

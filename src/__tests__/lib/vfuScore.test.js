@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { vfuProgram, vfuScore } from "../../lib/vfuScore";
 
-const row = { university_name: 'Варненски свободен университет „Черноризец Храбър"', specialty: "Психология", academic_year: "2026/2027" };
+const row = { university_name: 'Варненски свободен университет „Черноризец Храбър”', specialty: "Психология", academic_year: "2026/2027" };
 
 describe("ВСУ 2026/2027", () => {
     it("избира потвърдените правила и отделя Архитектура", () => {
