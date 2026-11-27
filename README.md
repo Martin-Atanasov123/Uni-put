@@ -99,20 +99,23 @@ cd Uni-put
 npm install
 ```
 
-Създай файл `.env` в корена. Ключът по-долу е **публичният** анонимен ключ — същият, който сайтът
-изпраща на всеки браузър. Достъпът до данните се контролира от RLS политиките в базата, затова
-с него се чете само публичното съдържание.
+Копирай `.env.example` като `.env.local` и попълни URL адреса и публичния
+(`publishable`/`anon`) ключ от **Supabase → Project Settings → API**. Никога не
+използвай `service_role` или secret key във Vite променлива — всичко с префикс
+`VITE_` се изпраща към браузъра. Достъпът до данните се контролира от RLS
+политиките в базата.
 
-```env
-VITE_SUPABASE_URL=https://vryaoxncvtnpsngkqteq.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZyeWFveG5jdnRucHNuZ2txdGVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NTA4MzksImV4cCI6MjA3ODUyNjgzOX0.n0nKdy9HuREIhS5oP1XzyBAa1CMKJhdRWwYZ2694ZM0
+```bash
+cp .env.example .env.local
 ```
 
 ```bash
 npm run dev        # http://localhost:5173
 npm run lint       # проверка на кода (ESLint)
 npm run build      # продукционен build
-npx vitest run     # тестове
+npm test           # тестове
+npm run verify:stats     # сверява публичните числа с базата
+npm run verify:formulas  # одитира формулите за приемен бал
 ```
 
 ---

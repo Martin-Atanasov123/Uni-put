@@ -27,6 +27,7 @@ CLAUDE.md
 .env
 .env.local
 .env.*
+!.env.example
 universities_data
 list-tables.js
 sync-local-db.js
@@ -41,3 +42,6 @@ supabase/.temp/
 graphify-out/
 .playwright-mcp/
 
+
+# Local Netlify folder
+.netlify
