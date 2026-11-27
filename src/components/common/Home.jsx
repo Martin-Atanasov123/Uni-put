@@ -454,90 +454,121 @@ const STEPS = [
 ];
 
 function HowItWorksSection() {
+    const [activeStep, setActiveStep] = useState(0);
+    const ActiveIcon = STEPS[activeStep].icon;
+
     return (
         <section
-            className="py-28 px-6 relative overflow-hidden"
-            style={{ background: "var(--brand-bg)" }}
+            className="how-section py-28 px-6 relative overflow-hidden"
+            style={{ background: "var(--brand-bg-alt)" }}
         >
-            <DotsBg cyanOpacity={0.09} violetOpacity={0.06} size={28} />
+            <div className="how-progressive-blur" aria-hidden="true" />
             <div className="max-w-6xl mx-auto" style={{ position: "relative", zIndex: 1 }}>
-                <Reveal className="text-center mb-16">
+                <Reveal className="mb-14 md:mb-20">
                     <p className="text-xs font-bold tracking-widest uppercase mb-4"
                         style={{ color: "var(--brand-cyan)" }}>
                         Как работи
                     </p>
-                    <h2
-                        className="text-3xl md:text-5xl font-bold"
+                    <div className="how-heading-row">
+                      <h2
+                        className="text-3xl md:text-5xl font-bold max-w-2xl"
                         style={{
                             color: "var(--brand-text)",
                             letterSpacing: "-0.02em",
                             textWrap: "balance",
                         }}
-                    >
-                        Три стъпки до правилния избор
-                    </h2>
+                      >
+                          Три стъпки. Един по-ясен избор.
+                      </h2>
+                      <p className="how-intro">От това кой си до конкретна специалност и реален приемен бал — без лутане между десетки сайтове.</p>
+                    </div>
                 </Reveal>
 
-                <m.div
-                    className="grid md:grid-cols-3 gap-7"
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, margin: "-60px" }}
-                    variants={stagger}
-                >
-                    {STEPS.map((step) => {
-                        const Icon = step.icon;
-                        return (
-                            <m.div
-                                key={step.num}
-                                variants={fadeUp}
-                                transition={{ duration: 0.5, ease: EASE }}
-                                whileHover={{ y: -5 }}
-                                className="p-8 rounded-2xl"
-                                style={{
-                                    background: "var(--brand-surface)",
-                                    border: "1px solid var(--brand-card-border)",
-                                    transition: "border-color 0.2s, box-shadow 0.2s",
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.borderColor = "var(--brand-cyan)";
-                                    e.currentTarget.style.boxShadow = "var(--shadow-md)";
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.borderColor = "var(--brand-card-border)";
-                                    e.currentTarget.style.boxShadow = "none";
-                                }}
-                            >
-                                <div className="flex items-start justify-between mb-6">
-                                    <div
-                                        className="p-3 rounded-xl"
-                                        style={{
-                                            background: "var(--brand-subtle)",
-                                        }}
-                                    >
-                                        <Icon size={20} style={{ color: "var(--brand-cyan)" }} />
-                                    </div>
-                                    <span
-                                        className="text-5xl font-black select-none"
-                                        style={{ color: "rgba(148,163,184,0.12)", fontFamily: "monospace" }}
-                                    >
-                                        {step.num}
-                                    </span>
-                                </div>
-                                <h3
-                                    className="text-lg font-semibold mb-3"
-                                    style={{ color: "var(--brand-text)", textWrap: "balance" }}
+                <div className="how-stage">
+                    <div className="how-orbit" aria-hidden="true">
+                        <div className="how-orbit-ring how-orbit-ring-a" />
+                        <div className="how-orbit-ring how-orbit-ring-b" />
+                        <m.div
+                            key={activeStep}
+                            className="how-orbit-core"
+                            initial={{ scale: 0.78, opacity: 0, filter: "blur(10px)" }}
+                            animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
+                            transition={{ duration: 0.55, ease: EASE }}
+                        >
+                            <ActiveIcon size={42} strokeWidth={1.35} />
+                            <span>{STEPS[activeStep].num}</span>
+                        </m.div>
+                        <span className="how-orbit-label">профил → избор → прием</span>
+                    </div>
+
+                    <div className="how-steps" role="list" aria-label="Стъпки в УниПът">
+                        {STEPS.map((step, index) => {
+                            const Icon = step.icon;
+                            const active = activeStep === index;
+                            return (
+                                <m.button
+                                    key={step.num}
+                                    type="button"
+                                    role="listitem"
+                                    className={`how-step ${active ? "is-active" : ""}`}
+                                    onMouseEnter={() => setActiveStep(index)}
+                                    onFocus={() => setActiveStep(index)}
+                                    onClick={() => setActiveStep(index)}
+                                    initial={{ opacity: 0, x: 24 }}
+                                    whileInView={{ opacity: 1, x: 0 }}
+                                    viewport={{ once: true, margin: "-40px" }}
+                                    transition={{ duration: 0.5, delay: index * 0.08, ease: EASE }}
+                                    aria-pressed={active}
                                 >
-                                    {step.title}
-                                </h3>
-                                <p className="text-sm leading-relaxed" style={{ color: "var(--brand-muted)" }}>
-                                    {step.desc}
-                                </p>
-                            </m.div>
-                        );
-                    })}
-                </m.div>
+                                    <span className="how-step-rail" aria-hidden="true"><i /></span>
+                                    <span className="how-step-icon"><Icon size={19} /></span>
+                                    <span className="how-step-copy">
+                                        <small>{step.num}</small>
+                                        <strong>{step.title}</strong>
+                                        <span>{step.desc}</span>
+                                    </span>
+                                    <ArrowRight className="how-step-arrow" size={18} aria-hidden="true" />
+                                </m.button>
+                            );
+                        })}
+                    </div>
+                </div>
             </div>
+            <style>{`
+                .how-section { isolation: isolate; }
+                .how-progressive-blur { position:absolute; inset:auto 0 0; height:42%; pointer-events:none; background:linear-gradient(to bottom, transparent, color-mix(in srgb, var(--brand-bg) 82%, transparent)); backdrop-filter:blur(1px); }
+                .how-heading-row { display:flex; align-items:end; justify-content:space-between; gap:3rem; }
+                .how-intro { max-width:27rem; margin:0 0 .25rem; color:var(--brand-muted); font-size:1rem; line-height:1.7; }
+                .how-stage { display:grid; grid-template-columns:minmax(18rem,.82fr) minmax(24rem,1.18fr); gap:clamp(3rem,7vw,7rem); align-items:center; }
+                .how-orbit { position:relative; aspect-ratio:1; width:min(100%,25rem); margin:auto; display:grid; place-items:center; }
+                .how-orbit::before { content:""; position:absolute; inset:17%; border-radius:50%; background:radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--brand-cyan) 24%, transparent), transparent 62%); filter:blur(18px); }
+                .how-orbit-ring { position:absolute; border:1px solid color-mix(in srgb, var(--brand-cyan) 28%, var(--brand-card-border)); border-radius:50%; }
+                .how-orbit-ring::after { content:""; position:absolute; width:.7rem; height:.7rem; border-radius:50%; background:var(--brand-cyan); box-shadow:0 0 25px color-mix(in srgb, var(--brand-cyan) 80%, transparent); top:12%; left:17%; }
+                .how-orbit-ring-a { inset:8%; animation:orbit-spin 18s linear infinite; }
+                .how-orbit-ring-b { inset:25%; border-color:color-mix(in srgb, var(--brand-violet) 35%, var(--brand-card-border)); animation:orbit-spin 12s linear infinite reverse; }
+                .how-orbit-ring-b::after { background:var(--brand-violet); top:auto; left:auto; right:7%; bottom:26%; }
+                .how-orbit-core { width:8.25rem; height:8.25rem; border-radius:2.25rem; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.55rem; color:var(--brand-text); background:linear-gradient(145deg, color-mix(in srgb, var(--brand-surface) 92%, var(--brand-cyan)), var(--brand-surface)); border:1px solid color-mix(in srgb, var(--brand-cyan) 38%, var(--brand-card-border)); box-shadow:0 24px 70px color-mix(in srgb, var(--brand-cyan) 16%, transparent), inset 0 1px 0 rgba(255,255,255,.12); }
+                .how-orbit-core span { font:800 11px/1 monospace; letter-spacing:.18em; color:var(--brand-cyan); }
+                .how-orbit-label { position:absolute; bottom:2%; font:700 10px/1 monospace; letter-spacing:.16em; text-transform:uppercase; color:var(--brand-muted); }
+                .how-steps { display:flex; flex-direction:column; }
+                .how-step { position:relative; display:grid; grid-template-columns:1.25rem 2.75rem 1fr auto; gap:1rem; align-items:start; width:100%; padding:1.35rem .25rem; border:0; background:transparent; color:inherit; text-align:left; cursor:pointer; }
+                .how-step + .how-step { border-top:1px solid var(--brand-card-border); }
+                .how-step-rail { width:2px; height:100%; min-height:4.6rem; margin:.2rem auto; border-radius:2px; background:var(--brand-card-border); overflow:hidden; }
+                .how-step-rail i { display:block; width:100%; height:0; background:linear-gradient(var(--brand-cyan),var(--brand-violet)); transition:height .5s cubic-bezier(.16,1,.3,1); }
+                .how-step.is-active .how-step-rail i { height:100%; }
+                .how-step-icon { width:2.75rem; height:2.75rem; display:grid; place-items:center; border-radius:.9rem; color:var(--brand-muted); background:var(--brand-surface); border:1px solid var(--brand-card-border); transition:.35s ease; }
+                .how-step.is-active .how-step-icon { color:var(--brand-cyan); border-color:color-mix(in srgb,var(--brand-cyan) 55%,var(--brand-card-border)); transform:rotate(-4deg) scale(1.04); box-shadow:0 12px 30px color-mix(in srgb,var(--brand-cyan) 12%,transparent); }
+                .how-step-copy { display:flex; flex-direction:column; min-width:0; }
+                .how-step-copy small { margin-bottom:.3rem; color:var(--brand-cyan); font:800 10px/1 monospace; letter-spacing:.16em; }
+                .how-step-copy strong { color:var(--brand-text); font-size:1.12rem; letter-spacing:-.015em; }
+                .how-step-copy > span { display:grid; grid-template-rows:0fr; opacity:0; color:var(--brand-muted); font-size:.88rem; line-height:1.65; transition:grid-template-rows .45s ease, opacity .3s ease, margin .45s ease; overflow:hidden; }
+                .how-step.is-active .how-step-copy > span { grid-template-rows:1fr; opacity:1; margin-top:.55rem; }
+                .how-step-arrow { align-self:center; color:var(--brand-muted); opacity:.35; transition:.3s ease; }
+                .how-step.is-active .how-step-arrow { color:var(--brand-cyan); opacity:1; transform:translateX(4px); }
+                @keyframes orbit-spin { to { transform:rotate(360deg); } }
+                @media (max-width:767px) { .how-heading-row { display:block; } .how-intro { margin-top:1rem; } .how-stage { grid-template-columns:1fr; gap:2rem; } .how-orbit { width:min(82vw,20rem); } .how-step { grid-template-columns:.65rem 2.5rem 1fr; gap:.75rem; } .how-step-arrow { display:none; } }
+                @media (prefers-reduced-motion:reduce) { .how-orbit-ring { animation:none; } }
+            `}</style>
         </section>
     );
 }
@@ -573,21 +604,22 @@ const PATH_STAGES = [
 
 function PathSection() {
     return (
-        <section className="py-24 px-6 relative" style={{ background: "var(--brand-bg)" }}>
+        <section className="path-section py-28 px-6 relative overflow-hidden" style={{ background: "var(--brand-bg)" }}>
+            <div className="path-glow" aria-hidden="true" />
             <div className="max-w-6xl mx-auto">
-                <Reveal className="text-center mb-12">
+                <Reveal className="path-heading mb-14">
                     <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{ color: "var(--brand-cyan)" }}>
                         Целият път
                     </p>
                     <h2 className="text-3xl md:text-5xl font-bold" style={{ color: "var(--brand-text)", letterSpacing: "-0.02em", textWrap: "balance" }}>
-                        От седми клас до студентската скамейка
+                        Всяко голямо решение има следваща стъпка
                     </h2>
-                    <p className="mt-4 text-lg max-w-xl mx-auto" style={{ color: "var(--brand-muted)" }}>
+                    <p className="mt-4 text-lg max-w-xl" style={{ color: "var(--brand-muted)" }}>
                         Три решения, които определят образованието ти. УниПът помага за всяко от тях.
                     </p>
                 </Reveal>
                 <m.ol
-                    className="grid md:grid-cols-3 gap-5"
+                    className="path-track"
                     style={{ listStyle: "none", margin: 0, padding: 0 }}
                     initial="hidden"
                     whileInView="visible"
@@ -597,34 +629,27 @@ function PathSection() {
                     {PATH_STAGES.map((s, i) => {
                         const Icon = s.icon;
                         return (
-                            <m.li key={s.to} variants={fadeUp} transition={{ duration: 0.5, ease: EASE }}>
+                            <m.li key={s.to} className="path-stop" variants={fadeUp} transition={{ duration: 0.5, ease: EASE }}>
                                 <Link
                                     to={s.to}
-                                   
-                                    style={{
-                                        display: "flex", flexDirection: "column", height: "100%", padding: "1.5rem",
-                                        background: "var(--brand-surface)", border: "1px solid var(--brand-card-border)",
-                                        borderRadius: "1.25rem", textDecoration: "none", color: "inherit",
-                                        transition: "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease",
-                                    }}
-                                    onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.borderColor = "var(--brand-cyan)"; }}
-                                    onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.borderColor = "var(--brand-card-border)"; }}
+                                    className="path-card"
                                 >
-                                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
-                                        <div className="inline-flex p-3 rounded-xl" style={{ background: "var(--brand-subtle)" }}>
+                                    <span className="path-node" aria-hidden="true"><i /></span>
+                                    <div className="path-card-top">
+                                        <div className="path-icon">
                                             <Icon size={20} strokeWidth={1.5} style={{ color: "var(--brand-cyan)" }} aria-hidden="true" />
                                         </div>
-                                        <span style={{ fontFamily: "monospace", fontSize: "12px", fontWeight: 800, color: "var(--brand-muted)" }}>
-                                            {String(i + 1).padStart(2, "0")} · {s.grade}
+                                        <span className="path-grade">
+                                            етап {String(i + 1).padStart(2, "0")} · {s.grade}
                                         </span>
                                     </div>
-                                    <h3 style={{ margin: "0 0 0.5rem", fontSize: "1.125rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--brand-text)", textWrap: "balance" }}>
+                                    <h3 className="path-title">
                                         {s.title}
                                     </h3>
-                                    <p style={{ margin: "0 0 1.25rem", fontSize: "14px", lineHeight: 1.65, color: "var(--brand-muted)", flex: 1 }}>
+                                    <p className="path-desc">
                                         {s.desc}
                                     </p>
-                                    <span style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", fontSize: "14px", fontWeight: 700, color: "var(--brand-cyan)" }}>
+                                    <span className="path-cta">
                                         {s.cta} <ArrowRight size={15} strokeWidth={1.5} aria-hidden="true" />
                                     </span>
                                 </Link>
@@ -633,6 +658,31 @@ function PathSection() {
                     })}
                 </m.ol>
             </div>
+            <style>{`
+                .path-section { isolation:isolate; }
+                .path-glow { position:absolute; width:34rem; height:34rem; right:-12rem; top:5rem; border-radius:50%; background:color-mix(in srgb,var(--brand-violet) 10%,transparent); filter:blur(90px); pointer-events:none; }
+                .path-heading { display:grid; grid-template-columns:1fr minmax(17rem,.65fr); column-gap:4rem; align-items:end; }
+                .path-heading > p:first-child { grid-column:1/-1; }
+                .path-heading h2 { max-width:45rem; }
+                .path-track { position:relative; display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem; }
+                .path-track::before { content:""; position:absolute; left:5%; right:5%; top:1rem; height:1px; background:linear-gradient(90deg,transparent,var(--brand-cyan),var(--brand-violet),transparent); opacity:.55; }
+                .path-stop { position:relative; padding-top:2.25rem; }
+                .path-card { position:relative; display:flex; flex-direction:column; min-height:22rem; padding:1.6rem; overflow:hidden; background:color-mix(in srgb,var(--brand-surface) 93%,transparent); border:1px solid var(--brand-card-border); border-radius:1.5rem; color:inherit; text-decoration:none; transition:transform .45s cubic-bezier(.16,1,.3,1),border-color .3s ease,box-shadow .45s ease; }
+                .path-card::after { content:""; position:absolute; inset:auto -20% -55% 10%; height:70%; border-radius:50%; background:color-mix(in srgb,var(--brand-cyan) 8%,transparent); filter:blur(35px); transition:.45s ease; }
+                .path-card:hover { transform:translateY(-8px); border-color:color-mix(in srgb,var(--brand-cyan) 55%,var(--brand-card-border)); box-shadow:0 28px 60px color-mix(in srgb,var(--brand-cyan) 10%,transparent); }
+                .path-card:hover::after { transform:translateY(-22%); }
+                .path-node { position:absolute; width:1rem; height:1rem; border-radius:50%; top:-1.8rem; left:50%; transform:translateX(-50%); border:3px solid var(--brand-bg); background:var(--brand-cyan); box-shadow:0 0 0 1px var(--brand-cyan),0 0 22px color-mix(in srgb,var(--brand-cyan) 70%,transparent); }
+                .path-stop:nth-child(2) .path-node { background:color-mix(in srgb,var(--brand-cyan) 45%,var(--brand-violet)); }
+                .path-stop:nth-child(3) .path-node { background:var(--brand-violet); box-shadow:0 0 0 1px var(--brand-violet),0 0 22px color-mix(in srgb,var(--brand-violet) 70%,transparent); }
+                .path-card-top { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:3.25rem; }
+                .path-icon { display:grid; place-items:center; width:3rem; height:3rem; border-radius:1rem; background:var(--brand-subtle); border:1px solid var(--brand-card-border); }
+                .path-grade { color:var(--brand-muted); font:800 10px/1.2 monospace; letter-spacing:.08em; text-transform:uppercase; }
+                .path-title { margin:0 0 .65rem; color:var(--brand-text); font-size:1.4rem; font-weight:750; letter-spacing:-.025em; text-wrap:balance; }
+                .path-desc { margin:0 0 1.5rem; color:var(--brand-muted); font-size:.88rem; line-height:1.7; flex:1; }
+                .path-cta { position:relative; z-index:1; display:inline-flex; align-items:center; gap:.4rem; color:var(--brand-cyan); font-size:.88rem; font-weight:750; }
+                .path-cta svg { transition:transform .3s ease; } .path-card:hover .path-cta svg { transform:translateX(5px); }
+                @media (max-width:767px) { .path-heading { display:block; } .path-track { grid-template-columns:1fr; gap:1rem; padding-left:1.5rem!important; } .path-track::before { top:0; bottom:0; left:.25rem; right:auto; width:1px; height:auto; background:linear-gradient(transparent,var(--brand-cyan),var(--brand-violet),transparent); } .path-stop { padding:0; } .path-node { top:2.2rem; left:-1.25rem; } .path-card { min-height:0; } .path-card-top { margin-bottom:2rem; } }
+            `}</style>
         </section>
     );
 }
@@ -674,8 +724,8 @@ const FEATURES = [
 
 function FeaturesSection() {
     return (
-        <section className="py-28 px-6 relative overflow-hidden" style={{ background: "var(--brand-bg-alt)" }}>
-            <DotsBg cyanOpacity={0.06} violetOpacity={0.09} size={30} />
+        <section className="features-section py-28 px-6 relative overflow-hidden" style={{ background: "var(--brand-bg-alt)" }}>
+            <div className="features-aurora" aria-hidden="true" />
             <div className="max-w-6xl mx-auto" style={{ position: "relative", zIndex: 1 }}>
                 <Reveal className="text-center mb-16">
                     <p className="text-xs font-bold tracking-widest uppercase mb-4"
@@ -698,57 +748,61 @@ function FeaturesSection() {
                 </Reveal>
 
                 <m.div
-                    className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5"
+                    className="feature-bento"
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true, margin: "-60px" }}
                     variants={stagger}
                 >
-                    {FEATURES.map((f) => {
+                    {FEATURES.map((f, index) => {
                         const Icon = f.icon;
                         return (
                             <m.div
                                 key={f.title}
                                 variants={fadeUp}
                                 transition={{ duration: 0.5, ease: EASE }}
-                                whileHover={{ y: -4 }}
-                                className="p-6 rounded-2xl"
-                                style={{
-                                    background: "var(--brand-surface)",
-                                    border: "1px solid var(--brand-card-border)",
-                                    transition: "border-color 0.2s, box-shadow 0.2s",
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.borderColor = "var(--brand-cyan)";
-                                    e.currentTarget.style.boxShadow = "var(--shadow-md)";
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.borderColor = "var(--brand-card-border)";
-                                    e.currentTarget.style.boxShadow = "none";
-                                }}
+                                className={`feature-tile feature-tile-${index + 1}`}
                             >
-                                <div
-                                    className="inline-flex p-3 rounded-xl mb-4"
-                                    style={{
-                                        background: "var(--brand-subtle)",
-                                    }}
-                                >
+                                <span className="feature-index">0{index + 1}</span>
+                                <div className="feature-icon">
                                     <Icon size={20} style={{ color: "var(--brand-violet)" }} />
                                 </div>
                                 <h3
-                                    className="font-semibold mb-2"
-                                    style={{ color: "var(--brand-text)", fontSize: "16px", textWrap: "balance" }}
+                                    className="feature-title"
                                 >
                                     {f.title}
                                 </h3>
-                                <p style={{ color: "var(--brand-muted)", fontSize: "14px", lineHeight: "1.65" }}>
+                                <p className="feature-desc">
                                     {f.desc}
                                 </p>
+                                <div className="feature-shine" aria-hidden="true" />
                             </m.div>
                         );
                     })}
                 </m.div>
             </div>
+            <style>{`
+                .features-section { isolation:isolate; }
+                .features-aurora { position:absolute; inset:8% 5% auto; height:24rem; background:radial-gradient(ellipse at 25% 50%,color-mix(in srgb,var(--brand-cyan) 12%,transparent),transparent 52%),radial-gradient(ellipse at 75% 40%,color-mix(in srgb,var(--brand-violet) 13%,transparent),transparent 50%); filter:blur(55px); pointer-events:none; }
+                .feature-bento { display:grid; grid-template-columns:repeat(4,1fr); grid-auto-rows:minmax(12.5rem,auto); gap:1rem; }
+                .feature-tile { position:relative; display:flex; flex-direction:column; justify-content:flex-end; min-height:13rem; padding:1.5rem; overflow:hidden; background:color-mix(in srgb,var(--brand-surface) 95%,transparent); border:1px solid var(--brand-card-border); border-radius:1.5rem; transition:transform .4s cubic-bezier(.16,1,.3,1),border-color .3s ease,box-shadow .4s ease; }
+                .feature-tile:hover { transform:translateY(-5px); border-color:color-mix(in srgb,var(--brand-violet) 50%,var(--brand-card-border)); box-shadow:0 24px 55px color-mix(in srgb,var(--brand-violet) 9%,transparent); }
+                .feature-tile-1,.feature-tile-4 { grid-column:span 2; }
+                .feature-tile-1 { grid-row:span 2; min-height:26rem; justify-content:flex-end; }
+                .feature-tile-4 { grid-column:3 / span 2; }
+                .feature-index { position:absolute; top:1.2rem; right:1.25rem; color:var(--brand-muted); font:800 10px/1 monospace; letter-spacing:.16em; opacity:.7; }
+                .feature-icon { width:3rem; height:3rem; display:grid; place-items:center; margin-bottom:1.35rem; border-radius:1rem; background:var(--brand-subtle); border:1px solid var(--brand-card-border); transition:transform .4s cubic-bezier(.16,1,.3,1); }
+                .feature-tile:hover .feature-icon { transform:rotate(-7deg) scale(1.08); }
+                .feature-title { position:relative; z-index:1; margin:0 0 .55rem; color:var(--brand-text); font-size:1rem; font-weight:700; text-wrap:balance; }
+                .feature-tile-1 .feature-title { font-size:clamp(1.5rem,2.6vw,2.15rem); max-width:18rem; letter-spacing:-.03em; }
+                .feature-desc { position:relative; z-index:1; margin:0; color:var(--brand-muted); font-size:.87rem; line-height:1.65; max-width:30rem; }
+                .feature-tile-1 .feature-desc { font-size:.95rem; max-width:28rem; }
+                .feature-shine { position:absolute; width:12rem; height:12rem; right:-5rem; top:-5rem; border-radius:50%; background:color-mix(in srgb,var(--brand-violet) 11%,transparent); filter:blur(25px); transition:transform .6s ease; }
+                .feature-tile:nth-child(odd) .feature-shine { background:color-mix(in srgb,var(--brand-cyan) 10%,transparent); }
+                .feature-tile:hover .feature-shine { transform:scale(1.45) translate(-12%,12%); }
+                @media (max-width:900px) { .feature-bento { grid-template-columns:repeat(2,1fr); } .feature-tile-1 { grid-row:span 1; min-height:17rem; } .feature-tile-4 { grid-column:auto; } }
+                @media (max-width:560px) { .feature-bento { grid-template-columns:1fr; } .feature-tile,.feature-tile-1,.feature-tile-4 { grid-column:auto; min-height:13rem; } }
+            `}</style>
         </section>
     );
 }

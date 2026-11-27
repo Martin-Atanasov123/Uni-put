@@ -25,7 +25,7 @@ describe("Home landing page", () => {
 
     it("renders the how it works section", () => {
         render(<MemoryRouter><Home /></MemoryRouter>);
-        expect(screen.getByText(/Три стъпки до правилния избор/i)).toBeTruthy();
+        expect(screen.getByText(/Три стъпки\. Един по-ясен избор/i)).toBeTruthy();
     });
 
     it("renders the features section", () => {
