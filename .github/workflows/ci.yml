@@ -1,5 +1,5 @@
 # Автоматична проверка при всеки push и pull request:
-# ESLint (стандарти на кода) → Vitest (автоматични тестове) → production build.
+# Audit (зависимости) → ESLint → Vitest → production build → browser E2E.
 name: Проверка
 
 on:
@@ -28,6 +28,9 @@ jobs:
 
       - name: Инсталиране на зависимостите
         run: npm ci
+
+      - name: Проверка за уязвими зависимости
+        run: npm audit --audit-level=high
 
       - name: Lint (ESLint)
         run: npm run lint
