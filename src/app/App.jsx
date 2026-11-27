@@ -1,6 +1,6 @@
 import { Route, Routes, useLocation } from "react-router";
 import { Suspense, lazy } from "react";
-import { LazyMotion, domAnimation, m } from "motion/react";
+import { LazyMotion, domAnimation } from "motion/react";
 
 import { AuthProvider } from "@/hooks/AuthContext";
 import ProtectedRoute from "@/routes/ProtectedRoute";
@@ -11,6 +11,7 @@ import GlobalErrorBoundary from "@/components/common/GlobalErrorBoundary";
 
 import AdminRoute from "@/routes/AdminRoute";
 import ScrollToTop from "@/components/common/ScrollToTop";
+import PremiumRouteFrame from "@/components/common/PremiumRouteFrame";
 
 const Home            = lazy(() => import("@/components/common/Home"));
 const NotFound        = lazy(() => import("@/components/common/NotFound"));
@@ -41,14 +42,9 @@ const ReminderAction  = lazy(() => import("@/components/common/ReminderAction"))
 
 function PageWrap({ children }) {
     return (
-        <m.div
-            // Страницата трябва да е видима още при първото изрисуване. Глобална
-            // opacity/blur анимация отлагаше LCP на всяка route страница; локалните
-            // component анимации остават и дават движение без да крият съдържанието.
-            initial={false}
-        >
+        <PremiumRouteFrame>
             {children}
-        </m.div>
+        </PremiumRouteFrame>
     );
 }
 

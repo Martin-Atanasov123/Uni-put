@@ -341,6 +341,118 @@ textarea {
 
 html { transition: background-color 0.2s ease; }
 
+/* ── Premium route atmosphere ─────────────────────────────────────────────
+   Един лек слой за целия продукт. Цветът и геометрията се сменят според
+   задачата на страницата, без да пречат на локалните hero композиции. */
+.premium-route {
+  --route-accent: var(--brand-cyan);
+  --route-accent-2: var(--brand-violet);
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+}
+
+.premium-route--decide { --route-accent: #22d3a7; --route-accent-2: #3b82f6; }
+.premium-route--orient { --route-accent: #8b5cf6; --route-accent-2: #ec4899; }
+.premium-route--workspace { --route-accent: #38bdf8; --route-accent-2: #818cf8; }
+.premium-route--editorial { --route-accent: #60a5fa; --route-accent-2: #a78bfa; }
+.premium-route--auth { --route-accent: #6366f1; --route-accent-2: #22d3ee; }
+
+.premium-route__content { position: relative; z-index: 1; }
+.premium-route__progress {
+  position: fixed;
+  z-index: 10000;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--route-accent), var(--route-accent-2));
+  box-shadow: 0 0 18px color-mix(in srgb, var(--route-accent) 55%, transparent);
+  pointer-events: none;
+}
+
+.premium-route__atmosphere {
+  position: absolute;
+  z-index: 0;
+  inset: 0 0 auto;
+  height: min(54rem, 86vh);
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+}
+
+.premium-route__orb {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  filter: blur(74px);
+  opacity: .105;
+  will-change: transform;
+}
+.premium-route__orb--a {
+  width: clamp(17rem, 38vw, 34rem);
+  height: clamp(17rem, 38vw, 34rem);
+  top: -16%;
+  right: -8%;
+  background: var(--route-accent);
+  animation: route-orbit-a 17s ease-in-out infinite alternate;
+}
+.premium-route__orb--b {
+  width: clamp(13rem, 28vw, 25rem);
+  height: clamp(13rem, 28vw, 25rem);
+  top: 34%;
+  left: -11%;
+  background: var(--route-accent-2);
+  animation: route-orbit-b 21s ease-in-out infinite alternate;
+}
+
+.premium-route__mesh {
+  position: absolute;
+  inset: 0;
+  opacity: .24;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--route-accent) 10%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--route-accent-2) 8%, transparent) 1px, transparent 1px);
+  background-size: 72px 72px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 48% at 75% 5%, #000, transparent);
+  mask-image: radial-gradient(ellipse 70% 48% at 75% 5%, #000, transparent);
+}
+
+.premium-route__signature {
+  position: absolute;
+  top: calc(var(--header-h, 80px) + 1.25rem);
+  right: max(1.5rem, calc((100vw - 76rem) / 2));
+  color: color-mix(in srgb, var(--route-accent) 55%, var(--brand-muted));
+  font: 800 9px/1 monospace;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  opacity: .55;
+}
+
+/* Семантичен характер по групи: различни мотиви, не един фон навсякъде. */
+.premium-route--discover .premium-route__mesh { transform: perspective(700px) rotateX(62deg) translateY(-11%); transform-origin: top; }
+.premium-route--decide .premium-route__mesh { background-size: 48px 48px; transform: rotate(-4deg) scale(1.08); }
+.premium-route--orient .premium-route__mesh { background-image: radial-gradient(circle, color-mix(in srgb, var(--route-accent) 22%, transparent) 1px, transparent 1.5px); background-size: 30px 30px; }
+.premium-route--workspace .premium-route__mesh { background-size: 92px 92px; opacity: .18; }
+.premium-route--editorial .premium-route__mesh,
+.premium-route--auth .premium-route__mesh { opacity: .12; }
+
+@keyframes route-orbit-a { to { transform: translate(-8%, 12%) scale(1.12); } }
+@keyframes route-orbit-b { to { transform: translate(16%, -9%) scale(.9); } }
+
+@media (max-width: 720px) {
+  .premium-route__atmosphere { height: 42rem; }
+  .premium-route__signature { display: none; }
+  .premium-route__mesh { background-size: 48px 48px; }
+  .premium-route__orb { filter: blur(58px); opacity: .085; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .premium-route__orb { animation: none; }
+}
+
 /* Secondary content on mobile: collapsed, unchanged on desktop. */
 .mfold { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 0 0 1rem; }
 .mfold + .mfold { margin-top: -1rem; border-top: 0; }
