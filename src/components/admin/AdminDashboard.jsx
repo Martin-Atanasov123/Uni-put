@@ -89,6 +89,13 @@ const AdminDashboard = () => {
         }
     };
 
+    const [debouncedQuery, setDebouncedQuery] = useState("");
+
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedQuery(query.trim()), 300);
+        return () => clearTimeout(timer);
+    }, [query]);
+
     // --- Data Fetching ---
     const loadData = useCallback(async (opts = {}) => {
         if (!activeTable) return;
@@ -97,8 +104,7 @@ const AdminDashboard = () => {
             const targetPage = opts.page ?? currentPageRef.current;
             const result = await adminService.list(activeTable.table, {
                 page: targetPage,
-                filters: { query },
-                useCache: opts.useCache !== false
+                filters: { query: debouncedQuery }
             });
             setDataPage(result);
             setSelection([]);
@@ -111,7 +117,7 @@ const AdminDashboard = () => {
         } finally {
             setLoading(false);
         }
-    }, [activeTable, query]);
+    }, [activeTable, debouncedQuery]);
 
     useEffect(() => {
         loadAuditLog();
@@ -122,7 +128,7 @@ const AdminDashboard = () => {
         currentPageRef.current = 0;
         setCurrentPage(0);
         loadData({ page: 0 });
-    }, [activeTableId, query, loadData]);
+    }, [activeTableId, debouncedQuery, loadData]);
 
     // --- Real-time Subscription ---
     useEffect(() => {
@@ -136,8 +142,7 @@ const AdminDashboard = () => {
                 "postgres_changes",
                 { event: "*", schema: "public", table: activeTable.table },
                 () => {
-                    // При всяка промяна в БД презареждаме данните, като игнорираме локалния кеш.
-                    loadData({ useCache: false });
+                    loadData();
                 }
             )
             .subscribe();
@@ -153,8 +158,7 @@ const AdminDashboard = () => {
         setRefreshing(true);
         setStatus({ type: null, msg: "" });
         try {
-            // Презареждане на данните чрез изрично прескачане на кеша (useCache: false)
-            await loadData({ useCache: false });
+            await loadData();
             setStatus({ type: "success", msg: "Данните бяха синхронизирани успешно." });
             
             // Автоматично изчистване на съобщението за успех след 3 секунди

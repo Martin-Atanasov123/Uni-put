@@ -4,6 +4,7 @@ export const ADMIN_TABLES = [
     table: "universities",
     label: "Университети и специалности",
     primaryKey: "id",
+    searchFields: ["university_name", "faculty", "specialty", "city", "education_level"],
     fields: [
       { id: "university_name", label: "Университет", type: "text", required: true },
       { id: "faculty", label: "Факултет", type: "text", required: true },
@@ -22,6 +23,7 @@ export const ADMIN_TABLES = [
     table: "dormitories",
     label: "Общежития",
     primaryKey: "id",
+    searchFields: ["block_number", "city"],
     fields: [
       { id: "university_id", label: "Университет (ID или име)", type: "text" },
       { id: "block_number", label: "Блок №", type: "text", required: true },
@@ -42,6 +44,7 @@ export const ADMIN_TABLES = [
     table: "admission_min_scores",
     label: "Минимални балове (класиране)",
     primaryKey: "id",
+    searchFields: ["quota", "source_url"],
     fields: [
       { id: "university_id", label: "Запис от universities (UUID)", type: "text", required: true },
       { id: "year", label: "Година (КСК)", type: "number", step: "1", required: true },
@@ -57,6 +60,7 @@ export const ADMIN_TABLES = [
     table: "admission_events",
     label: "Календар за прием (дати)",
     primaryKey: "id",
+    searchFields: ["university_name", "city", "event_type", "title", "description"],
     fields: [
       { id: "university_name", label: "Университет (точно име от universities)", type: "text", required: true },
       { id: "city", label: "Град", type: "text" },

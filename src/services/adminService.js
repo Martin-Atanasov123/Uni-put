@@ -1,198 +1,89 @@
-// Модул: Административен сервиз (CRUD/кеш/експорт)
-// Описание: Предоставя унифицирани операции върху таблици в Supabase за админ панела,
-//   включително кеширане в localStorage, филтриране, странициране и експорт.
-// Вход: имена на таблици, payload обекти, опции за филтри и странициране
-// Изход: страницирани резултати, създадени/обновени записи или масиви от записи за експорт
-// Бележки: При промени кешът се инвалидира за съответната таблица; грешките се хвърлят към UI.
-//
-// Основни функции:
-// - list(table, options): Чете всички записи, прилага текстов филтър и странициране.
-// - create(table, payload): Създава нов запис и инвалидира кеша.
-// - update(table, idField, id, payload): Обновява запис по идентификатор и инвалидира кеша.
-// - removeMany(table, idField, ids): Масово изтриване на записи по списък от идентификатори.
-// - exportAll(table): Връща всички записи за експорт (CSV/JSON).
-//
-// Вход/Изход:
-// - table: низ с име на таблица в Supabase.
-// - options: { useCache?: boolean, page?: number, filters?: { query?: string } }
-// - payload: обект със стойности за insert/update.
-// - idField / id / ids: поле за идентификатор, стойност на идентификатор, списък от идентификатори.
-//
-// Edge случаи и бележки:
-// - Ако Supabase върне грешка, тя се хвърля (throw), за да може UI да визуализира статуса.
-// - Кешът се държи в localStorage; при обновяване/изтриване се инвалидира за съответната таблица.
-// - Филтърът е прост, пълнотекстов (join на всички стойности), който е достатъчен за малък обем данни.
+// Административен CRUD сервиз. Списъците се филтрират и страницират в PostgreSQL;
+// браузърът никога не изтегля цяла таблица само за да покаже една страница.
 import { supabase } from "@/lib/supabase";
 import { ADMIN_TABLES } from "@/components/admin/adminConfig";
 
-const CACHE_KEY = "admin_cache_v1";
 const PAGE_SIZE = 10;
-const ALLOWED_TABLES = ADMIN_TABLES.map(t => t.table);
+const EXPORT_BATCH_SIZE = 1000;
+const TABLE_CONFIG = new Map(ADMIN_TABLES.map((config) => [config.table, config]));
 
-const assertAllowedTable = (table) => {
-  if (!ALLOWED_TABLES.includes(table)) {
-    throw new Error("Невалидна таблица.");
+const getConfig = (table) => {
+  const config = TABLE_CONFIG.get(table);
+  if (!config) throw new Error("Невалидна таблица.");
+  return config;
+};
+
+const sanitizeSearch = (value) => String(value || "")
+  .trim()
+  .replace(/[%_\\,()'"]/g, "")
+  .slice(0, 100);
+
+// Подреждането по defaultSort (напр. university_name) не е уникално — без второ
+// подреждане по първичния ключ редовете между две страници/партиди могат да се
+// повторят или да изпаднат.
+const applyStableOrder = (request, config) => {
+  let ordered = request;
+  if (config.defaultSort?.field) {
+    ordered = ordered.order(config.defaultSort.field, {
+      ascending: config.defaultSort.direction !== "desc",
+    });
   }
-};
-
-// Прочитане на кеш обекта от localStorage.
-// Връща: {} ако няма валиден кеш.
-const getCache = () => {
-  try {
-    const raw = window.localStorage.getItem(CACHE_KEY);
-    if (!raw) return {};
-    return JSON.parse(raw);
-  } catch {
-    return {};
-  }
-};
-
-const setCache = (cache) => {
-  try {
-    window.localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
-  } catch {
-    return;
-  }
-};
-
-// Инвалидиране на кеша за конкретна таблица.
-const invalidateTableCache = (table) => {
-  const cache = getCache();
-  delete cache[table];
-  setCache(cache);
-};
-
-// Четене на записите от кеш за конкретна таблица.
-const readFromCache = (table) => {
-  const cache = getCache();
-  return cache[table] || null;
-};
-
-// Записване на резултатите в кеш за конкретна таблица.
-const writeToCache = (table, rows) => {
-  const cache = getCache();
-  cache[table] = {
-    timestamp: Date.now(),
-    data: rows
-  };
-  setCache(cache);
-};
-
-// Прилагане на текстови филтри върху резултатите.
-// filters.query: прост пълнотекстов филтър върху всички стойности.
-const applyFilters = (rows, filters) => {
-  if (!filters) return rows;
-  const { query } = filters;
-  if (!query) return rows;
-  const lower = query.toLowerCase();
-  return rows.filter((row) =>
-    Object.values(row)
-      .join(" ")
-      .toLowerCase()
-      .includes(lower)
-  );
-};
-
-const paginate = (rows, page) => {
-  const start = page * PAGE_SIZE;
-  const end = start + PAGE_SIZE;
-  return {
-    page,
-    pageSize: PAGE_SIZE,
-    total: rows.length,
-    pages: Math.ceil(rows.length / PAGE_SIZE),
-    items: rows.slice(start, end)
-  };
+  const pk = config.primaryKey || "id";
+  if (pk !== config.defaultSort?.field) ordered = ordered.order(pk, { ascending: true });
+  return ordered;
 };
 
 export const adminService = {
-  /**
-   * Списък записи със странициране и филтри
-   * @param {string} table - Таблица в Supabase
-   * @param {{ useCache?: boolean, page?: number, filters?: { query?: string } }} options
-   * @returns {{ page: number, pageSize: number, total: number, pages: number, items: any[] }}
-   */
   async list(table, options = {}) {
-    assertAllowedTable(table);
-    const { useCache = true, page = 0, filters } = options;
-    let rows = [];
+    const config = getConfig(table);
+    const page = Math.max(0, Number(options.page) || 0);
+    const start = page * PAGE_SIZE;
+    const queryText = sanitizeSearch(options.filters?.query);
 
-    if (useCache) {
-      const cached = readFromCache(table);
-      if (cached) {
-        rows = cached.data;
-      }
+    let request = supabase.from(table).select("*", { count: "exact" });
+    if (queryText && config.searchFields?.length) {
+      request = request.or(config.searchFields.map((field) => `${field}.ilike.%${queryText}%`).join(","));
     }
+    request = applyStableOrder(request, config);
 
-    if (!rows.length) {
-      const { data, error } = await supabase.from(table).select("*").limit(5000);
-      if (error) {
-        throw error;
-      }
-      rows = data || [];
-      writeToCache(table, rows);
-    }
-
-    const filtered = applyFilters(rows, filters);
-    return paginate(filtered, page);
+    const { data, error, count } = await request.range(start, start + PAGE_SIZE - 1);
+    if (error) throw error;
+    const total = count || 0;
+    return { page, pageSize: PAGE_SIZE, total, pages: Math.ceil(total / PAGE_SIZE), items: data || [] };
   },
 
-  /**
-   * Създаване на нов запис
-   * @param {string} table - Таблица в Supabase
-   * @param {object} payload - Данни за вмъкване
-   * @returns {object|null} - Създаденият запис (ако Supabase го върне), иначе null
-   */
   async create(table, payload) {
-    assertAllowedTable(table);
+    getConfig(table);
     const { data, error } = await supabase.from(table).insert([payload]).select();
     if (error) throw error;
-    invalidateTableCache(table);
-    return data && data[0] ? data[0] : null;
+    return data?.[0] || null;
   },
 
-  /**
-   * Обновяване на запис по идентификатор
-   * @param {string} table - Таблица в Supabase
-   * @param {string} idField - Име на идентификаторното поле
-   * @param {string|number} id - Стойност на идентификатора
-   * @param {object} payload - Данни за обновяване
-   * @returns {object|null} - Обновеният запис (ако Supabase го върне), иначе null
-   */
   async update(table, idField, id, payload) {
-    assertAllowedTable(table);
-    const { data, error } = await supabase
-      .from(table)
-      .update(payload)
-      .eq(idField, id)
-      .select();
+    getConfig(table);
+    const { data, error } = await supabase.from(table).update(payload).eq(idField, id).select();
     if (error) throw error;
-    invalidateTableCache(table);
-    return data && data[0] ? data[0] : null;
+    return data?.[0] || null;
   },
 
-  /**
-   * Масово изтриване на записи
-   * @param {string} table - Таблица в Supabase
-   * @param {string} idField - Име на идентификаторното поле
-   * @param {Array<string|number>} ids - Списък от идентификатори
-   */
   async removeMany(table, idField, ids) {
-    assertAllowedTable(table);
+    getConfig(table);
     const { error } = await supabase.from(table).delete().in(idField, ids);
     if (error) throw error;
-    invalidateTableCache(table);
   },
 
-  /**
-   * Експорт на всички записи (за CSV/JSON/backup)
-   * @param {string} table - Таблица в Supabase
-   * @returns {Array<object>} - Списък от всички записи
-   */
+  // Експортът по дефиниция обхожда всички записи, но на ограничени партиди.
   async exportAll(table) {
-    assertAllowedTable(table);
-    const { data, error } = await supabase.from(table).select("*").limit(10000);
-    if (error) throw error;
-    return data || [];
-  }
+    const config = getConfig(table);
+    const rows = [];
+    for (let start = 0; ; start += EXPORT_BATCH_SIZE) {
+      const request = applyStableOrder(supabase.from(table).select("*"), config);
+      const { data, error } = await request.range(start, start + EXPORT_BATCH_SIZE - 1);
+      if (error) throw error;
+      const batch = data || [];
+      rows.push(...batch);
+      if (batch.length < EXPORT_BATCH_SIZE) break;
+    }
+    return rows;
+  },
 };
