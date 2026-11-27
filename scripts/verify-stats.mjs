@@ -37,12 +37,14 @@ async function loadDotEnvIfPresent(envPath) {
 
 // PostgREST капва на ~1000 реда per request независимо от .limit() — пагинираме,
 // иначе бройките мълчаливо се отрязват (същият капан като в sitemap скрипта).
-async function fetchAll(supabase, table, columns) {
+async function fetchAll(supabase, table, columns, year = null) {
     const PAGE = 1000;
     const rows = [];
     for (let from = 0; ; from += PAGE) {
-        const { data, error } = await supabase
-            .from(table).select(columns).range(from, from + PAGE - 1);
+        let q = supabase.from(table).select(columns);
+        // Сайтът показва само текущия прием — числата се броят за същата година.
+        if (year) q = q.eq("academic_year", year);
+        const { data, error } = await q.order("id", { ascending: true }).range(from, from + PAGE - 1);
         if (error) throw new Error(`${table}: ${error.message}`);
         rows.push(...data);
         if (data.length < PAGE) break;
@@ -64,7 +66,7 @@ async function main() {
         realtime: { transport: WebSocket },
     });
 
-    const unis = await fetchAll(supabase, "universities", "university_name,specialty,city");
+    const unis = await fetchAll(supabase, "universities", "university_name,specialty,city", CLAIMED.ADMISSION_YEAR);
     const riasec = await fetchAll(supabase, "specialty_riasec_mapping", "specialty_base_name");
     const careers = await fetchAll(supabase, "careers_riasec_mapping", "id");
     const dorms = await fetchAll(supabase, "dormitories", "id,city");
