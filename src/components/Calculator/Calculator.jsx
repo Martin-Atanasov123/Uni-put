@@ -601,9 +601,17 @@ export default function CalculatorPage() {
             } else {
                 q = q.ilike("specialty", `%${sp}%`);
             }
-            const { data, error } = await q.limit(1);
+            const { data, error } = await q.limit(uni ? 1 : 200);
             if (error || !data?.length) return;
-            const match = data[0];
+            // Без university: ilike „%Информатика%“ връща и „Геоинформатика“, „Бизнес информатика“…
+            // Предпочитаме точното име, после началото на името, после най-краткото.
+            const wanted = sp.trim().toLocaleLowerCase("bg");
+            const rank = (s) => {
+                const n = s.toLocaleLowerCase("bg");
+                return n === wanted ? 0 : n.startsWith(wanted) ? 1 : 2;
+            };
+            const match = uni ? data[0] : [...data].sort((a, b) =>
+                rank(a.specialty) - rank(b.specialty) || a.specialty.length - b.specialty.length)[0];
             setPendingSpecialty(match.specialty);
             setSelectedFaculty(match.faculty);
             setFacultySearch(match.faculty);
