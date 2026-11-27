@@ -331,6 +331,28 @@ const TIPS = [
 // Кеш в паметта: данни за факултет + минимални балове (живее до презареждане на страницата).
 const FACULTY_DATA_CACHE = new Map();
 
+function AdmissionSourceNote({ row }) {
+    const source = admissionSource(row);
+    if (!source) return null;
+    const verifiedDate = source.verifiedAt
+        ? new Intl.DateTimeFormat("bg-BG", { dateStyle: "medium" }).format(new Date(source.verifiedAt))
+        : null;
+
+    return (
+        <div className="mb-4 flex items-start gap-2 rounded-xl border border-[var(--brand-card-border)] bg-[var(--brand-surface)] px-4 py-3 text-xs text-[var(--brand-muted)]">
+            <ExternalLink size={14} className="mt-0.5 shrink-0 text-[var(--brand-cyan)]" />
+            <div>
+                <a className="font-bold text-[var(--brand-cyan)] underline underline-offset-4" href={source.url} target="_blank" rel="noopener noreferrer">
+                    {source.label}
+                </a>
+                <div className="mt-1">
+                    {verifiedDate ? `Формулата е сверена на ${verifiedDate}.` : "Официален източник е наличен; формулата очаква ръчна проверка."}
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function CalculatorPage() {
     const [allData, setAllData] = useState([]);
     const [minScores, setMinScores] = useState({}); // university_id → {minBall, minBallMax, year, round}
@@ -1265,12 +1287,12 @@ export default function CalculatorPage() {
                     </m.div>
                 )}
 
-                {plovdivRows.map(({ row, program }) => <PlovdivCalculator key={row.id} row={row} program={program} />)}
-                {vfuRows.map(({ row, program }) => <VfuCalculator key={row.id} row={row} program={program} />)}
-                {uardRows.map(({ row, program }) => <UardCalculator key={row.id} row={row} program={program} />)}
-                {tourismCollegeRows.map(({ row, program }) => <TourismCollegeCalculator key={row.id} row={row} program={program} />)}
-                {nmaRows.map(({ row, program }) => <NmaCalculator key={row.id} row={row} program={program} />)}
-                {nbuRows.map(({ row, program }) => <NbuCalculator key={row.id} row={row} program={program} />)}
+                {plovdivRows.map(({ row, program }) => <div key={row.id}><PlovdivCalculator row={row} program={program} /><AdmissionSourceNote row={row} /></div>)}
+                {vfuRows.map(({ row, program }) => <div key={row.id}><VfuCalculator row={row} program={program} /><AdmissionSourceNote row={row} /></div>)}
+                {uardRows.map(({ row, program }) => <div key={row.id}><UardCalculator row={row} program={program} /><AdmissionSourceNote row={row} /></div>)}
+                {tourismCollegeRows.map(({ row, program }) => <div key={row.id}><TourismCollegeCalculator row={row} program={program} /><AdmissionSourceNote row={row} /></div>)}
+                {nmaRows.map(({ row, program }) => <div key={row.id}><NmaCalculator row={row} program={program} /><AdmissionSourceNote row={row} /></div>)}
+                {nbuRows.map(({ row, program }) => <div key={row.id}><NbuCalculator row={row} program={program} /><AdmissionSourceNote row={row} /></div>)}
                 {unavailableRows.map(row => (
                     <section key={row.id} className="mb-4 rounded-2xl border p-5">
                         <h3>{row.university_name} · {row.specialty}</h3>
@@ -1279,7 +1301,7 @@ export default function CalculatorPage() {
                             : row.university_name === "Висше училище по мениджмънт – Варна"
                             ? "Приемът във ВУМ включва преглед на документи и интервю, а при липса на признат езиков сертификат — онлайн изпит по английски. Не е публикуван един числов максимален бал за тази програма."
                             : "Автоматичен бал за тази програма не е наличен. Провери условията за прием в правилника на университета."}</p>
-                        {admissionSource(row) && <a className="underline" href={admissionSource(row).url}>{admissionSource(row).label}</a>}
+                        <AdmissionSourceNote row={row} />
                     </section>
                 ))}
                 {/* Grade inputs */}
