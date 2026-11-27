@@ -848,7 +848,7 @@ export default function CalculatorPage() {
                 title="Калкулатор за приемен бал — правила на университетите"
                 description={`Изчисли приемния си бал за ${ADMISSION_YEAR_SHORT} г. Условия за прием в каталог с ${UNIVERSITIES} университета и ${SPECIALTIES} специалности. Безплатно, без регистрация.`}
                 path="/calculator"
-                image="https://uniput.eu/og/calculator.png"
+                image="https://uniput.eu/og/v2/calculator.png"
             />
             <JsonLd data={CALCULATOR_SCHEMA} />
             <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 1.5rem" }}>

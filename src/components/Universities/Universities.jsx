@@ -716,7 +716,7 @@ export default function UniversitiesPage() {
                 title={`${UNIVERSITIES} университета и ${SPECIALTIES} специалности за прием ${ADMISSION_YEAR_SHORT}`}
                 description={`${UNIVERSITIES} висши училища в България и ${SPECIALTIES} специалности. Филтрирай по град, факултет и степен. Изчисли приемния си бал по правилата на университетите.`}
                 path="/universities"
-                image="https://uniput.eu/og/universities.png"
+                image="https://uniput.eu/og/v2/universities.png"
             />
             <div style={{ maxWidth: "80rem", margin: "0 auto", padding: "0 1.5rem" }}>
 

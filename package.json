@@ -11,7 +11,7 @@
     "test": "vitest run --exclude e2e/**",
     "test:e2e": "playwright test",
     "generate:sitemap": "node scripts/generate-sitemap.mjs",
-    "generate:og": "node scripts/generate-og-images.mjs",
+    "generate:og": "node scripts/og/render-og.mjs",
     "prerender": "node scripts/prerender.mjs",
     "verify:stats": "node scripts/verify-stats.mjs",
     "verify:formulas": "node scripts/verify-formulas.mjs"

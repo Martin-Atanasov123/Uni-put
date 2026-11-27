@@ -313,7 +313,7 @@ const Dormitories = () => {
                 title={`Студентски общежития в България — ${DORMITORIES} блока, цени и условия за ${ADMISSION_YEAR_SHORT}`}
                 description={`Сравни ${DORMITORIES} студентски общежития в ${DORMITORY_CITIES} града. Месечен наем, депозит, разстояние до университета и транспортни линии — на едно място. Данни към ${ADMISSION_YEAR_SHORT} г.`}
                 path="/dormitories"
-                image="https://uniput.eu/og/dormitories.png"
+                image="https://uniput.eu/og/v2/dormitories.png"
             />
             <style>{`@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`}</style>
 

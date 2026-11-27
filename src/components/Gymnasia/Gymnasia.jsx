@@ -511,6 +511,7 @@ export default function Gymnasia() {
                 title={`Прием след 7. клас ${region.in} ${year ? year + 1 : ""} — бал, минимални балове и желания`}
                 description={`Изчисли бала си за всяка паралелка в ${region.name} по формулата от ${region.ruo.replace("РУО – ", "РУО ")}, сравни с минималните балове от последните кампании и подреди желанията си разумно. Безплатно.`}
                 path="/priem-7-klas"
+                image="https://uniput.eu/og/v2/priem-7-klas.png"
             />
             <JsonLd data={{
                 "@context": "https://schema.org", "@type": "HowTo", inLanguage: "bg-BG",

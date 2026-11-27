@@ -174,7 +174,7 @@ const About = () => {
                 title="За нас"
                 description="Защо създадохме УниПът — безплатна платформа, която помага на българските кандидат-студенти да изчислят бал, открият кариера и сравнят университети."
                 path="/about"
-                image="https://uniput.eu/og/about.png"
+                image="https://uniput.eu/og/v2/about.png"
             />
             <div aria-hidden style={{ position: "absolute", top: "-200px", right: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(23,86,217,0.08), transparent 70%)", pointerEvents: "none" }} />
             <div aria-hidden style={{ position: "absolute", bottom: "20%", left: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(23,86,217,0.08), transparent 70%)", pointerEvents: "none" }} />

@@ -2,10 +2,10 @@ import { useEffect } from "react";
 
 const SITE_URL = "https://uniput.eu";
 const SITE_NAME = "УниПът";
-// Default OG e branded 1200×630 шаблон (генериран от scripts/generate-og-images.mjs).
+// Default OG e branded 1200×630 шаблон (шаблон scripts/og/og-cards.html → npm run generate:og).
 // Per-page override-ва се чрез `image` prop. Платформи като Facebook кешират по URL,
 // затова рядко променяме файла; ако се промени дизайнът — нов filename или append ?v=N.
-const DEFAULT_IMAGE = `${SITE_URL}/og/default.png`;
+const DEFAULT_IMAGE = `${SITE_URL}/og/v2/default.png`;
 
 /**
  * Per-страница SEO мета тагове. React 19 ги повдига автоматично в <head>,

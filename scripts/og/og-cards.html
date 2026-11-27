@@ -1,0 +1,212 @@
+<!doctype html>
+<!--
+  Шаблон за Open Graph картинките (1200×630) в тъмната тема на сайта.
+  Генериране: node scripts/og/render-og.mjs  (пуска локален сървър и Playwright,
+  снима всеки <section> и записва public/og/v2/<id>.png).
+  Числата идват от src/lib/siteStats.js — при промяна ги обнови и тук.
+-->
+<html lang="bg">
+<head>
+<meta charset="utf-8">
+<style>
+@font-face { font-family: "InterOG"; font-weight: 100 900; src: url("/node_modules/@fontsource-variable/inter/files/inter-cyrillic-wght-normal.woff2") format("woff2"); unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: "InterOG"; font-weight: 100 900; src: url("/node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2") format("woff2"); }
+* { margin: 0; box-sizing: border-box; }
+body { background: #333; font-family: "InterOG", system-ui, sans-serif; }
+section {
+  width: 1200px; height: 630px; position: relative; overflow: hidden; margin-bottom: 24px;
+  background: radial-gradient(900px 520px at 85% 15%, #12305C 0%, rgba(8,17,31,0) 60%), radial-gradient(700px 420px at 0% 100%, #18301F 0%, rgba(8,17,31,0) 60%), #08111F;
+  color: #F8FBFF; padding: 56px 64px;
+}
+.waves { position: absolute; left: 0; right: 0; bottom: 0; height: 630px; opacity: .32; transform: translateY(120px); }
+.brand { position: absolute; left: 64px; top: 52px; display: flex; align-items: center; gap: 14px; }
+.brand img { width: 64px; height: 54px; object-fit: contain; }
+.brand span { font-size: 26px; font-weight: 800; letter-spacing: -.5px; }
+.left { position: absolute; left: 64px; top: 150px; width: 560px; }
+.eyebrow { font-size: 18px; font-weight: 700; letter-spacing: 3px; color: #C9F27E; text-transform: uppercase; margin-bottom: 18px; }
+h1 { font-size: 62px; line-height: 1.04; font-weight: 800; letter-spacing: -2px; }
+h1 em { font-style: normal; color: #78A7FF; }
+.sub { margin-top: 20px; font-size: 24px; line-height: 1.4; color: #B8C8DE; }
+.cta { position: absolute; left: 64px; bottom: 56px; display: flex; align-items: center; gap: 18px; }
+.btn { background: #78A7FF; color: #101A30; font-size: 24px; font-weight: 800; padding: 16px 28px; border-radius: 14px; box-shadow: 0 10px 30px rgba(120,167,255,.35); }
+.url { font-size: 22px; font-weight: 700; color: #B8C8DE; }
+.free { font-size: 18px; font-weight: 800; color: #152B29; background: #C9F27E; padding: 8px 14px; border-radius: 999px; }
+.panel { position: absolute; right: 64px; top: 120px; width: 470px; background: rgba(15,29,50,.92); border: 2px solid #294567; border-radius: 24px; padding: 30px; box-shadow: 0 30px 80px rgba(0,0,0,.45); }
+.muted { color: #B8C8DE; }
+.mono { font-family: Consolas, ui-monospace, monospace; }
+.pill { display: inline-block; font-size: 17px; font-weight: 800; padding: 7px 14px; border-radius: 999px; }
+.row { display: flex; align-items: center; justify-content: space-between; }
+.field { background: #0D1A2D; border: 2px solid #55759E; border-radius: 12px; padding: 12px 16px; font-size: 22px; font-weight: 700; }
+.lab { font-size: 14px; font-weight: 800; letter-spacing: 1.5px; color: #B8C8DE; margin-bottom: 8px; }
+.bar { height: 14px; border-radius: 8px; background: #172A46; overflow: hidden; display: flex; }
+.cursor { position: absolute; width: 0; height: 0; border-left: 14px solid #F8FBFF; border-top: 9px solid transparent; border-bottom: 9px solid transparent; transform: rotate(-28deg); filter: drop-shadow(0 2px 3px rgba(0,0,0,.6)); }
+</style>
+</head>
+<body>
+
+<!-- общ фон с вълни -->
+<template id="waves">
+<svg class="waves" viewBox="0 0 1200 630" preserveAspectRatio="none">
+  <path d="M-20 420 C 220 300, 420 520, 640 400 S 1000 260, 1240 380" fill="none" stroke="#78A7FF" stroke-width="2"/>
+  <path d="M-20 460 C 240 340, 460 560, 660 430 S 1020 300, 1240 420" fill="none" stroke="#78A7FF" stroke-width="1.4" opacity=".7"/>
+  <path d="M-20 380 C 200 280, 440 470, 700 360 S 1040 220, 1240 330" fill="none" stroke="#C9F27E" stroke-width="2" opacity=".8"/>
+  <path d="M-20 500 C 260 400, 500 600, 720 470 S 1060 360, 1240 460" fill="none" stroke="#C9F27E" stroke-width="1.2" opacity=".5"/>
+</svg>
+</template>
+
+<!-- DEFAULT -->
+<section id="default">
+  <div class="brand"><img src="/public/logo-uniput.png" alt=""><span>УниПът</span></div>
+  <div class="left">
+    <p class="eyebrow">Кандидат-студенти · 2027</p>
+    <h1>Разбери дали <em>ще влезеш</em></h1>
+    <p class="sub">Приемен бал по официалната формула на 1271 програми в 51 университета — преди да кандидатстваш.</p>
+  </div>
+  <div class="panel">
+    <div class="row"><div><p class="muted" style="font-size:17px;">СУ „Св. Климент Охридски“</p><p style="font-size:30px;font-weight:800;margin-top:4px;">Информатика</p></div>
+    <div style="text-align:right;"><p class="mono" style="font-size:64px;font-weight:800;color:#86E0AC;line-height:1;">22.88</p><p style="font-size:14px;font-weight:800;letter-spacing:2px;" class="muted">БАЛ</p></div></div>
+    <div style="margin-top:22px;display:flex;gap:12px;"><div style="flex:1"><p class="lab">ДЗИ МАТЕМАТИКА</p><div class="field mono">5.50</div></div><div style="flex:1"><p class="lab">ДИПЛОМА: МАТ.</p><div class="field mono">5.00</div></div></div>
+    <div style="margin-top:22px;" class="row"><span class="pill" style="background:#173328;color:#86E0AC;">↗ Много добър шанс</span><span class="muted" style="font-size:16px;">мин. бал 2025: 14.07</span></div>
+  </div>
+  <div class="cta"><span class="btn">Изчисли моя бал →</span><span class="free">Безплатно</span><span class="url">uniput.eu</span></div>
+</section>
+
+<!-- CALCULATOR -->
+<section id="calculator">
+  <div class="brand"><img src="/public/logo-uniput.png" alt=""><span>УниПът</span></div>
+  <div class="left">
+    <p class="eyebrow">Калкулатор за приемен бал</p>
+    <h1>Твоят бал по <em>официалната формула</em></h1>
+    <p class="sub">Въвеждаш оценките — балът се смята на живо, с формулата и минималния бал.</p>
+  </div>
+  <div class="panel">
+    <p class="lab">ФОРМУЛА · СУ ИНФОРМАТИКА</p>
+    <p class="mono" style="font-size:22px;font-weight:700;">3.25 × ДЗИ Мат + Мат(д)</p>
+    <div style="margin:22px 0;display:flex;gap:12px;"><div style="flex:1"><p class="lab">ДЗИ МАТЕМАТИКА</p><div class="field mono" style="border-color:#78A7FF;box-shadow:0 0 0 4px rgba(120,167,255,.25);">5.50</div></div><div style="flex:1"><p class="lab">ДИПЛОМА: МАТ.</p><div class="field mono">5.00</div></div></div>
+    <div class="row" style="background:#0D1A2D;border-radius:16px;padding:18px 20px;"><span class="muted" style="font-size:20px;font-weight:700;">Бал</span><span class="mono" style="font-size:56px;font-weight:800;color:#86E0AC;line-height:1;">22.88</span></div>
+  </div>
+  <div class="cta"><span class="btn">Изчисли моя бал →</span><span class="url">uniput.eu/calculator</span></div>
+</section>
+
+<!-- CAREER ADVISOR -->
+<section id="career-advisor">
+  <div class="brand"><img src="/public/logo-uniput.png" alt=""><span>УниПът</span></div>
+  <div class="left">
+    <p class="eyebrow">Кариерен тест · RIASEC</p>
+    <h1>Какво ти <em>подхожда</em> да учиш?</h1>
+    <p class="sub">30, 60 или 90 въпроса — профил по модела на Холанд и подходящи специалности.</p>
+  </div>
+  <div class="panel">
+    <p class="lab">ТВОЯТ ПРОФИЛ</p>
+    <div style="display:flex;flex-direction:column;gap:13px;margin-top:6px;">
+      <div class="row"><span style="width:176px;font-size:19px;font-weight:700;">Изследовател</span><div class="bar" style="flex:1"><div style="width:88%;background:#78A7FF"></div></div></div>
+      <div class="row"><span style="width:176px;font-size:19px;font-weight:700;">Артистичен</span><div class="bar" style="flex:1"><div style="width:72%;background:#C9F27E"></div></div></div>
+      <div class="row"><span style="width:176px;font-size:19px;font-weight:700;">Социален</span><div class="bar" style="flex:1"><div style="width:61%;background:#86E0AC"></div></div></div>
+      <div class="row"><span style="width:176px;font-size:19px;font-weight:700;">Конвенционален</span><div class="bar" style="flex:1"><div style="width:38%;background:#55759E"></div></div></div>
+    </div>
+    <div class="row" style="margin-top:22px;"><span class="muted" style="font-size:18px;">Пример за профил</span><span class="pill" style="background:#17345F;color:#78A7FF;font-size:22px;">I · A · S</span></div>
+  </div>
+  <div class="cta"><span class="btn">Направи теста →</span><span class="free">3 минути</span><span class="url">uniput.eu</span></div>
+</section>
+
+<!-- UNIVERSITIES -->
+<section id="universities">
+  <div class="brand"><img src="/public/logo-uniput.png" alt=""><span>УниПът</span></div>
+  <div class="left">
+    <p class="eyebrow">Университети и специалности</p>
+    <h1><em>861</em> специалности в <em>51</em> университета</h1>
+    <p class="sub">Търсене по име, съкращение и град — с формулите за прием.</p>
+  </div>
+  <div class="panel">
+    <div class="field" style="font-weight:600;color:#B8C8DE;">⌕  информатика софия</div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:18px;">
+      <div style="background:#0D1A2D;border:2px solid #78A7FF;border-radius:14px;padding:14px 16px;"><p style="font-size:21px;font-weight:800;">Информатика</p><p class="muted" style="font-size:16px;margin-top:3px;">СУ „Св. Климент Охридски“ · София</p></div>
+      <div style="background:#0D1A2D;border:2px solid #294567;border-radius:14px;padding:14px 16px;"><p style="font-size:21px;font-weight:800;">Компютърни системи и технологии</p><p class="muted" style="font-size:16px;margin-top:3px;">Технически университет · София</p></div>
+      <div style="background:#0D1A2D;border:2px solid #294567;border-radius:14px;padding:14px 16px;"><p style="font-size:21px;font-weight:800;">Бизнес информатика</p><p class="muted" style="font-size:16px;margin-top:3px;">УНСС · София</p></div>
+    </div>
+  </div>
+  <div class="cta"><span class="btn">Намери специалност →</span><span class="url">uniput.eu</span></div>
+</section>
+
+<!-- DORMITORIES -->
+<section id="dormitories">
+  <div class="brand"><img src="/public/logo-uniput.png" alt=""><span>УниПът</span></div>
+  <div class="left">
+    <p class="eyebrow">Студентски общежития</p>
+    <h1>Къде ще <em>живееш</em>?</h1>
+    <p class="sub">68 общежития в 9 града — наем, депозит и към кой университет са.</p>
+  </div>
+  <div class="panel">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;"><span class="pill" style="background:#78A7FF;color:#101A30;">София</span><span class="pill" style="background:#172A46;">Пловдив</span><span class="pill" style="background:#172A46;">Варна</span><span class="pill" style="background:#172A46;">В. Търново</span></div>
+    <div style="margin-top:20px;background:#0D1A2D;border:2px solid #294567;border-radius:16px;padding:18px 20px;">
+      <p style="font-size:22px;font-weight:800;">Студентски град</p>
+      <p class="muted" style="font-size:17px;margin-top:4px;">София · към кой университет е</p>
+      <div class="row" style="margin-top:16px;"><span class="muted" style="font-size:17px;">наем на месец</span><span class="pill" style="background:#C9F27E;color:#152B29;font-size:19px;">наем · депозит</span></div>
+    </div>
+  </div>
+  <div class="cta"><span class="btn">Виж общежитията →</span><span class="url">uniput.eu</span></div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="brand"><img src="/public/logo-uniput.png" alt=""><span>УниПът</span></div>
+  <div class="left" style="width:1070px;">
+    <p class="eyebrow">За проекта</p>
+    <h1 style="width:900px;">Целият път — от <em>7. клас</em> до <em>университета</em></h1>
+    <p class="sub">Безплатна платформа с отворен код (GNU GPL v3), направена от ученици за ученици.</p>
+  </div>
+  <div style="position:absolute;left:64px;right:64px;bottom:140px;display:flex;gap:20px;">
+    <div style="flex:1;border-top:4px solid #78A7FF;padding-top:14px;"><p class="mono" style="font-size:50px;font-weight:800;">51</p><p class="muted" style="font-size:18px;">университета</p></div>
+    <div style="flex:1;border-top:4px solid #C9F27E;padding-top:14px;"><p class="mono" style="font-size:50px;font-weight:800;">861</p><p class="muted" style="font-size:18px;">специалности</p></div>
+    <div style="flex:1;border-top:4px solid #78A7FF;padding-top:14px;"><p class="mono" style="font-size:50px;font-weight:800;">781</p><p class="muted" style="font-size:18px;">паралелки след 7. клас</p></div>
+    <div style="flex:1;border-top:4px solid #C9F27E;padding-top:14px;"><p class="mono" style="font-size:50px;font-weight:800;">1002</p><p class="muted" style="font-size:18px;">професии в RIASEC</p></div>
+  </div>
+  <div class="cta"><span class="btn">Разгледай УниПът →</span><span class="url">uniput.eu</span></div>
+</section>
+
+<!-- DZI STRATEG -->
+<section id="dzi-strateg">
+  <div class="brand"><img src="/public/logo-uniput.png" alt=""><span>УниПът</span></div>
+  <div class="left">
+    <p class="eyebrow">ДЗИ стратег</p>
+    <h1>Кой втори ДЗИ ти отваря <em>най-много врати</em>?</h1>
+    <p class="sub">Избери специалностите си — виж кой изпит ги държи отворени.</p>
+  </div>
+  <div class="panel">
+    <p class="lab">ВТОРИ ДЗИ</p>
+    <div style="display:flex;flex-direction:column;gap:16px;margin-top:8px;">
+      <div><div class="row" style="margin-bottom:6px;"><span style="font-size:20px;font-weight:800;">Математика</span><span class="pill" style="background:#173328;color:#86E0AC;">най-добър</span></div><div class="bar" style="height:18px;"><div style="width:78%;background:#86E0AC"></div><div style="width:14%;background:#F4C978"></div></div></div>
+      <div><div class="row" style="margin-bottom:6px;"><span style="font-size:20px;font-weight:800;">Информационни технологии</span></div><div class="bar" style="height:18px;"><div style="width:56%;background:#86E0AC"></div><div style="width:22%;background:#F4C978"></div></div></div>
+      <div><div class="row" style="margin-bottom:6px;"><span style="font-size:20px;font-weight:800;">Биология</span></div><div class="bar" style="height:18px;"><div style="width:30%;background:#86E0AC"></div><div style="width:34%;background:#F4C978"></div></div></div>
+    </div>
+    <div style="display:flex;gap:16px;margin-top:18px;font-size:15px;" class="muted"><span>■ <span style="color:#86E0AC">без изпит</span></span><span>■ <span style="color:#F4C978">с изпит</span></span><span>■ затворени</span></div>
+  </div>
+  <div class="cta"><span class="btn">Провери своите →</span><span class="url">uniput.eu/dzi-strateg</span></div>
+</section>
+
+<!-- PRIEM 7 KLAS -->
+<section id="priem-7-klas">
+  <div class="brand"><img src="/public/logo-uniput.png" alt=""><span>УниПът</span></div>
+  <div class="left">
+    <p class="eyebrow">Прием след 7. клас</p>
+    <h1>Виж в кои гимназии <em>влизаш</em></h1>
+    <p class="sub">Бал за всяка паралелка в София, Варна, Бургас и Русе и минимални балове от 4 кампании.</p>
+  </div>
+  <div class="panel">
+    <p class="lab">КЛЮЧОВИ ДАТИ 2027</p>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px;">
+      <div class="row" style="background:#0D1A2D;border-radius:12px;padding:12px 16px;"><span class="mono" style="font-size:20px;font-weight:800;color:#78A7FF;">18 юни</span><span style="font-size:19px;font-weight:700;">НВО по БЕЛ</span></div>
+      <div class="row" style="background:#0D1A2D;border-radius:12px;padding:12px 16px;"><span class="mono" style="font-size:20px;font-weight:800;color:#78A7FF;">21 юни</span><span style="font-size:19px;font-weight:700;">НВО по математика</span></div>
+      <div class="row" style="background:#0D1A2D;border-radius:12px;padding:12px 16px;"><span class="mono" style="font-size:20px;font-weight:800;color:#78A7FF;">9–12 юли</span><span style="font-size:19px;font-weight:700;">Желания · 1. етап</span></div>
+      <div class="row" style="background:#0D1A2D;border:2px solid #C9F27E;border-radius:12px;padding:12px 16px;"><span class="mono" style="font-size:20px;font-weight:800;color:#C9F27E;">14 юли</span><span style="font-size:19px;font-weight:700;">Първо класиране</span></div>
+    </div>
+  </div>
+  <div class="cta"><span class="btn">Изчисли бала след 7. клас →</span></div>
+</section>
+
+<script>
+  const w = document.getElementById("waves").content;
+  document.querySelectorAll("section").forEach(s => s.prepend(w.cloneNode(true)));
+</script>
+</body>
+</html>

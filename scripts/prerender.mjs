@@ -27,7 +27,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST = resolve(__dirname, "..", "dist");
 const SITE_URL = "https://uniput.eu";
 const SITE_NAME = "УниПът";
-const DEFAULT_IMAGE = `${SITE_URL}/og/default.png`;
+const DEFAULT_IMAGE = `${SITE_URL}/og/v2/default.png`;
 const INCLUDE_DYNAMIC = process.env.SITEMAP_DYNAMIC === "1";
 
 // Sitewide structured data (Organization + WebSite). Инжектира се в СУРОВИЯ HTML
@@ -64,19 +64,19 @@ const STATIC_ROUTES = [
         path: "/calculator",
         title: "Калкулатор за приемен бал — правила на университетите",
         description: `Изчисли приемния си бал за ${ADMISSION_YEAR_SHORT} г. Условия за прием в каталог с ${UNIVERSITIES} университета и ${SPECIALTIES} специалности. Безплатно, без регистрация.`,
-        image: `${SITE_URL}/og/calculator.png`,
+        image: `${SITE_URL}/og/v2/calculator.png`,
     },
     {
         path: "/career-advisor",
         title: "Безплатен RIASEC кариерен тест за специалност",
         description: `Безплатен RIASEC кариерен тест — 30 въпроса за 3 минути. Сравняваме профила ти с ${RIASEC_SPECIALTIES} специалности, за да откриеш най-подходящите. Без регистрация.`,
-        image: `${SITE_URL}/og/career-advisor.png`,
+        image: `${SITE_URL}/og/v2/career-advisor.png`,
     },
     {
         path: "/universities",
         title: `${UNIVERSITIES} университета и ${SPECIALTIES} специалности за прием ${ADMISSION_YEAR_SHORT}`,
         description: `${UNIVERSITIES} висши училища в България и ${SPECIALTIES} специалности. Филтрирай по град, факултет и степен. Изчисли приемния си бал по правилата на университетите.`,
-        image: `${SITE_URL}/og/universities.png`,
+        image: `${SITE_URL}/og/v2/universities.png`,
     },
     {
         // Keep in sync с <Seo> props в SpecialtiesIndex.jsx.
@@ -97,21 +97,21 @@ const STATIC_ROUTES = [
         path: "/dormitories",
         title: `${DORMITORIES} студентски общежития в България за ${ADMISSION_YEAR_SHORT}`,
         description: `Сравни ${DORMITORIES} студентски общежития в ${DORMITORY_CITIES} града. Месечен наем, депозит, разстояние до университета и транспортни линии — на едно място. Данни към ${ADMISSION_YEAR_SHORT} г.`,
-        image: `${SITE_URL}/og/dormitories.png`,
+        image: `${SITE_URL}/og/v2/dormitories.png`,
     },
     {
         // Keep in sync с <Seo> props в DziStrategist.jsx.
         path: "/dzi-strateg",
         title: "Кой втори ДЗИ да избера — ДЗИ Стратег",
         description: "Виж кой втори държавен зрелостен изпит отваря най-много специалности в българските университети. Безплатно, по официалните формули за балообразуване.",
-        image: DEFAULT_IMAGE,
+        image: `${SITE_URL}/og/v2/dzi-strateg.png`,
     },
     {
         // Keep in sync с <Seo> props в Gymnasia.jsx.
         path: "/priem-7-klas",
         title: "Прием след 7. клас в София 2027 — бал, минимални балове и желания",
         description: "Изчисли бала си за всяка паралелка в София по формулата от РУО, сравни с минималните балове от последните 4 години и подреди желанията си разумно. Безплатно.",
-        image: DEFAULT_IMAGE,
+        image: `${SITE_URL}/og/v2/priem-7-klas.png`,
     },
     {
         path: "/calendar",
@@ -124,7 +124,7 @@ const STATIC_ROUTES = [
         path: "/about",
         title: "За нас",
         description: "Защо създадохме УниПът — безплатна платформа, която помага на българските кандидат-студенти да изчислят бал, открият кариера и сравнят университети.",
-        image: `${SITE_URL}/og/about.png`,
+        image: `${SITE_URL}/og/v2/about.png`,
     },
     {
         path: "/terms",

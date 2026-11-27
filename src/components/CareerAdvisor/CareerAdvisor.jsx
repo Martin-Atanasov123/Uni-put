@@ -454,7 +454,7 @@ const CareerAdvisor = () => {
                 title="Безплатен RIASEC кариерен тест за специалност"
                 description={`Безплатен RIASEC кариерен тест — 30 въпроса за 3 минути. Сравняваме профила ти с ${RIASEC_SPECIALTIES} специалности, за да откриеш най-подходящите. Без регистрация.`}
                 path="/career-advisor"
-                image="https://uniput.eu/og/career-advisor.png"
+                image="https://uniput.eu/og/v2/career-advisor.png"
             />
             <JsonLd data={RIASEC_SCHEMA} />
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>

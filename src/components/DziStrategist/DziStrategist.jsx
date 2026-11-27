@@ -200,6 +200,7 @@ export default function DziStrategist() {
                 title="Кой втори ДЗИ да избера — ДЗИ Стратег"
                 description="Виж кой втори държавен зрелостен изпит отваря най-много специалности в българските университети. Безплатно, по официалните формули за балообразуване."
                 path="/dzi-strateg"
+                image="https://uniput.eu/og/v2/dzi-strateg.png"
             />
             <JsonLd data={HOWTO_SCHEMA} />
 
