@@ -173,15 +173,15 @@ function HeroSection() {
             className="relative overflow-hidden"
             style={{ background: "var(--brand-bg)", minHeight: "max(100svh, 52rem)" }}
         >
-            {/* Движението живее само в горната половина. Така запазваме
-                атмосферата, без шейдърът да минава зад четимото съдържание. */}
+            {/* Движението е най-силно горе, но продължава много деликатно зад
+                текста. Дългата mask крива избягва видима хоризонтална граница. */}
             <div
                 aria-hidden
                 style={{
-                    position: "absolute", inset: "0 0 auto", height: "54%",
+                    position: "absolute", inset: 0,
                     overflow: "hidden", pointerEvents: "none", zIndex: 0,
-                    WebkitMaskImage: "linear-gradient(to bottom, #000 0%, #000 68%, transparent 100%)",
-                    maskImage: "linear-gradient(to bottom, #000 0%, #000 68%, transparent 100%)",
+                    WebkitMaskImage: "linear-gradient(to bottom, #000 0%, #000 30%, rgba(0,0,0,0.58) 58%, rgba(0,0,0,0.2) 84%, transparent 100%)",
+                    maskImage: "linear-gradient(to bottom, #000 0%, #000 30%, rgba(0,0,0,0.58) 58%, rgba(0,0,0,0.2) 84%, transparent 100%)",
                 }}
             >
                 <DotsBg cyanOpacity={0.07} violetOpacity={0.05} size={32} />
@@ -189,10 +189,10 @@ function HeroSection() {
                 {!enableShader && (
                     <div
                         style={{
-                            position: "absolute", inset: 0, zIndex: 1,
+                            position: "absolute", inset: "-10% 0 0", zIndex: 1,
                             background:
-                                "radial-gradient(ellipse 80% 70% at 20% 25%, var(--hero-glow-1), transparent 62%), " +
-                                "radial-gradient(ellipse 70% 60% at 80% 45%, var(--hero-glow-2), transparent 64%)",
+                                "radial-gradient(ellipse 80% 60% at 20% 24%, var(--hero-glow-1), transparent 64%), " +
+                                "radial-gradient(ellipse 70% 55% at 80% 36%, var(--hero-glow-2), transparent 66%)",
                         }}
                     />
                 )}
@@ -202,7 +202,7 @@ function HeroSection() {
                         <div
                             style={{
                                 position: "absolute", inset: 0, zIndex: 1,
-                                filter: "blur(2.5px)", transform: "scale(1.02)",
+                                filter: "blur(3.5px)", transform: "translateY(-13%) scale(1.08)",
                             }}
                         >
                             <AnoAI style={{ position: "absolute", inset: 0 }} />
@@ -211,14 +211,14 @@ function HeroSection() {
                 )}
             </div>
 
-            {/* Плътният фон започва преди текста и скрива последните следи от
-                анимацията. Използва theme token, затова работи и в light mode. */}
+            {/* Мек локален воал само зад четимата зона — няма ръб и фонът
+                остава видим около него и между отделните елементи. */}
             <div
                 aria-hidden
                 style={{
-                    position: "absolute", inset: "32% 0 0", zIndex: 2,
+                    position: "absolute", inset: 0, zIndex: 2,
                     pointerEvents: "none",
-                    background: "linear-gradient(to bottom, transparent 0%, color-mix(in srgb, var(--brand-bg) 94%, transparent) 22%, var(--brand-bg) 42%, var(--brand-bg) 100%)",
+                    background: "radial-gradient(ellipse 58% 42% at 50% 64%, color-mix(in srgb, var(--brand-bg) 88%, transparent) 0%, color-mix(in srgb, var(--brand-bg) 62%, transparent) 48%, transparent 82%)",
                 }}
             />
 
