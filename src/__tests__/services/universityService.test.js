@@ -264,3 +264,21 @@ describe('universityService.getCities', () => {
         expect(result).toEqual(['Всички', 'Бургас']);
     });
 });
+
+describe('summarizeRows (резервно обобщение на каталога)', () => {
+    it('брои програми, уникални университети, градове и специалности по факултет', async () => {
+        const { summarizeRows } = await import('@/services/universityService');
+        const out = summarizeRows([
+            { faculty: 'ФМИ', specialty: 'Информатика', university_name: 'СУ', city: 'София' },
+            { faculty: 'ФМИ', specialty: 'Информатика', university_name: 'ПУ', city: 'Пловдив' },
+            { faculty: 'ФМИ', specialty: 'Математика', university_name: 'СУ', city: 'София' },
+            { faculty: 'Право', specialty: 'Право', university_name: 'СУ', city: 'София' },
+        ]);
+        const fmi = out.find((f) => f.faculty === 'ФМИ');
+        expect(fmi.programs).toBe(3);
+        expect(fmi.universities.sort()).toEqual(['ПУ', 'СУ']);
+        expect(fmi.cities.sort()).toEqual(['Пловдив', 'София']);
+        expect(fmi.specialty_counts).toEqual({ 'Информатика': 2, 'Математика': 1 });
+        expect(out.find((f) => f.faculty === 'Право').programs).toBe(1);
+    });
+});

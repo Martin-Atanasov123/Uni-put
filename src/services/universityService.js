@@ -1,7 +1,7 @@
 // Модул: universityService
 // Описание: Server-side филтриране на университети/специалности през Supabase.
 //   Заявките се правят с .ilike() / .or() / .eq() на сървъра, не в браузъра.
-// Експорти: searchUniversities, getByIds, getCities
+// Експорти: searchUniversities, listPrograms, getCatalogSummary, getByIds, getCities
 // Бележки: getCities кешира за 24h (рядко се мени). Грешките се хвърлят нагоре,
 //   за да може UI слоят да покаже error state.
 
@@ -151,7 +151,92 @@ const getSpecialtyNameList = () => {
 };
 const MAX_NEAR_NAMES = 30;
 
+// ── Обобщение на каталога (/universities) ───────────────────────────────────
+// По един ред на факултет с бройките, вместо всички програми. Идва от изгледа
+// public.catalog_faculty_summary (миграция 20261127180000). Ако изгледът още
+// не е приложен към базата, обобщението се смята от тънки редове (4 колони) —
+// страницата работи и в двата случая. Кешира се за сесията.
+const SUMMARY_PAGE = 1000;
+let summaryPromise = null;
+
+const summarizeRows = (rows) => {
+    const byFaculty = new Map();
+    for (const r of rows) {
+        const key = r.faculty ?? null;
+        if (!byFaculty.has(key)) byFaculty.set(key, { faculty: key, programs: 0, universities: new Set(), cities: new Set(), specialty_counts: {} });
+        const f = byFaculty.get(key);
+        f.programs++;
+        if (r.university_name) f.universities.add(r.university_name);
+        if (r.city) f.cities.add(r.city);
+        if (r.specialty) f.specialty_counts[r.specialty] = (f.specialty_counts[r.specialty] || 0) + 1;
+    }
+    return [...byFaculty.values()].map((f) => ({ ...f, universities: [...f.universities], cities: [...f.cities] }));
+};
+
+async function loadCatalogSummary() {
+    const { data, error } = await supabase
+        .from('catalog_faculty_summary')
+        .select('faculty,programs,universities,cities,specialty_counts')
+        .eq('academic_year', ADMISSION_YEAR);
+    if (!error) return data || [];
+
+    // Резервен път: изгледът липсва (миграцията не е приложена) — само 4 колони.
+    const rows = [];
+    for (let from = 0; ; from += SUMMARY_PAGE) {
+        const { data: batch, error: err } = await supabase
+            .from('universities')
+            .select('faculty,specialty,university_name,city')
+            .eq('academic_year', ADMISSION_YEAR)
+            .order('id', { ascending: true })
+            .range(from, from + SUMMARY_PAGE - 1);
+        if (err) throw err;
+        rows.push(...(batch || []));
+        if (!batch || batch.length < SUMMARY_PAGE) break;
+    }
+    return summarizeRows(rows);
+}
+
+export { summarizeRows };
+
+// Общите филтри за списъците: факултети (за направление), град, степен.
+const applyListFilters = (q, { faculties, city, level }) => {
+    if (Array.isArray(faculties) && faculties.length) q = q.in('faculty', faculties);
+    if (city && city !== 'Всички') q = q.eq('city', city);
+    if (level && level !== 'Всички') q = q.eq('education_level', level);
+    return q;
+};
+
 export const universityService = {
+
+    /**
+     * Обобщение на каталога по факултет: { faculty, programs, universities[], cities[], specialty_counts{} }.
+     * Едно зареждане на сесия.
+     * @returns {Promise<Array>}
+     */
+    getCatalogSummary() {
+        if (!summaryPromise) {
+            summaryPromise = loadCatalogSummary().catch((err) => { summaryPromise = null; throw err; });
+        }
+        return summaryPromise;
+    },
+
+    /**
+     * Една страница програми без текстово търсене (направление, град, степен или „всички“).
+     * Филтрира, брои и странира в PostgreSQL.
+     * @returns {Promise<{rows: Array, total: number}>}
+     */
+    async listPrograms({ faculties = null, city = 'Всички', level = 'Всички', limit = 60, offset = 0 } = {}) {
+        let q = supabase.from('universities')
+            .select(SLIM_COLS, { count: 'exact' })
+            .eq('academic_year', ADMISSION_YEAR);
+        q = applyListFilters(q, { faculties, city, level });
+        const { data, error, count } = await q
+            .order('university_name', { ascending: true })
+            .order('id', { ascending: true })
+            .range(offset, offset + limit - 1);
+        if (error) throw error;
+        return { rows: data || [], total: count ?? (data || []).length };
+    },
 
     /**
      * Server-side търсене на университети/специалности.
@@ -167,6 +252,7 @@ export const universityService = {
         query = '',
         city = 'Всички',
         level = 'Всички',
+        faculties = null,
         limit = PAGE_SIZE_DEFAULT,
         offset = 0,
     } = {}) {
@@ -185,10 +271,10 @@ export const universityService = {
             if (orParts.length) q = q.or(orParts.join(','));
         }
 
-        if (city && city !== 'Всички') q = q.eq('city', city);
-        if (level && level !== 'Всички') q = q.eq('education_level', level);
+        q = applyListFilters(q, { faculties, city, level });
 
         q = q.order('university_name', { ascending: true })
+             .order('id', { ascending: true })
              .range(offset, offset + limit - 1);
 
         const { data, error } = await q;
@@ -214,8 +300,7 @@ export const universityService = {
                     const orParts = t.variants.flatMap((v) => SEARCH_COLUMNS.map((col) => `${col}.ilike.%${v}%`));
                     if (orParts.length) q2 = q2.or(orParts.join(','));
                 }
-                if (city && city !== 'Всички') q2 = q2.eq('city', city);
-                if (level && level !== 'Всички') q2 = q2.eq('education_level', level);
+                q2 = applyListFilters(q2, { faculties, city, level });
                 const { data: more, error: err2 } = await q2.order('university_name', { ascending: true }).range(offset, offset + limit - 1);
                 if (!err2 && more?.length) {
                     const seen = new Set(rows.map((r) => r.id));

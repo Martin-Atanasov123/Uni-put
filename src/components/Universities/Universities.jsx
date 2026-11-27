@@ -522,7 +522,13 @@ function SpecialtyCard({ uni, isFav, onToggleFav, showUser }) {
 // ─── Main Component ────────────────────────────────────────────────────────
 export default function UniversitiesPage() {
     const { isFavorite, toggleFavorite } = useAuth();
+    // summary: по един ред на факултет (бройки) — за направленията и общите числа.
+    // universities: само текущият списък (резултат от търсене или страници от сървъра).
+    const [summary, setSummary] = useState([]);
     const [universities, setUniversities] = useState([]);
+    const [listTotal, setListTotal] = useState(0);
+    const [listPaged, setListPaged] = useState(false); // true: „Покажи още“ дърпа следваща страница от сървъра
+    const [loadingMore, setLoadingMore] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
@@ -547,19 +553,11 @@ export default function UniversitiesPage() {
         setLoading(true);
         setError(null);
         try {
-            // Сървърът връща най-много 1000 реда на заявка — тегли се на страници,
-            // докато свършат (не фиксирани 2 партиди, които биха отрязали >2000 реда).
-            const loadAll = async () => {
-                const all = [];
-                for (let offset = 0; ; offset += 1000) {
-                    const batch = await universityService.searchUniversities({ limit: 1000, offset });
-                    all.push(...batch);
-                    if (batch.length < 1000) break;
-                }
-                return all;
-            };
-            const [unis, cityList] = await Promise.all([loadAll(), universityService.getCities()]);
-            setUniversities(unis);
+            const [sum, cityList] = await Promise.all([
+                universityService.getCatalogSummary(),
+                universityService.getCities(),
+            ]);
+            setSummary(sum);
             setCities(cityList);
         } catch (err) {
             console.error("Universities initial load failed:", err);
@@ -571,40 +569,74 @@ export default function UniversitiesPage() {
 
     useEffect(() => { loadInitial(); }, []);
 
-    // Debounced server-side text/city/level search
+    // Факултетите на избраното направление (за филтъра на сървъра).
+    const groupFaculties = useMemo(() => {
+        if (selectedFaculty) return [selectedFaculty];
+        if (!selectedGroup) return null;
+        return Object.keys(FACULTY_TO_GROUP).filter((f) => FACULTY_TO_GROUP[f] === selectedGroup);
+    }, [selectedGroup, selectedFaculty]);
+
+    // Списъкът се тегли от сървъра само когато е на екрана (режим „search“).
+    //  • с текст: търсене със сходни думи, до 500 резултата (подредени по релевантност);
+    //  • без текст: страница от 60 реда с точен общ брой и „Покажи още“.
+    // 300 ms изчакване — без заявка при всеки натиснат клавиш.
+    const listRequest = useRef(0);
     useEffect(() => {
-        const hasFilters =
-            searchTerm.trim().length > 1 ||
-            selectedCity !== "Всички" ||
-            selectedLevel !== "Всички";
-
-        if (!hasFilters) {
-            setFuzzyWords([]);
-            return;
-        }
-
+        if (viewMode !== "search") return;
+        const text = searchTerm.trim();
+        const reqId = ++listRequest.current;
         const timer = setTimeout(async () => {
             setLoading(true);
             setError(null);
             try {
-                const results = await universityService.searchUniversities({
-                    query: searchTerm.trim(),
-                    city: selectedCity,
-                    level: selectedLevel,
-                    limit: 500,
-                });
-                setUniversities(results);
-                setFuzzyWords(results.nearNames || []);
+                if (text.length > 1) {
+                    const results = await universityService.searchUniversities({
+                        query: text, city: selectedCity, level: selectedLevel, faculties: groupFaculties, limit: 500,
+                    });
+                    if (reqId !== listRequest.current) return;
+                    setUniversities(results);
+                    setListTotal(results.length);
+                    setListPaged(false);
+                    setFuzzyWords(results.nearNames || []);
+                } else {
+                    const { rows, total } = await universityService.listPrograms({
+                        faculties: groupFaculties, city: selectedCity, level: selectedLevel, limit: 60, offset: 0,
+                    });
+                    if (reqId !== listRequest.current) return;
+                    setUniversities(rows);
+                    setListTotal(total);
+                    setListPaged(true);
+                    setFuzzyWords([]);
+                }
             } catch (err) {
-                console.error("Universities search failed:", err);
-                setError("Грешка при търсене. Опитай отново.");
+                if (reqId !== listRequest.current) return;
+                console.error("Universities list failed:", err);
+                setError("Грешка при зареждане на списъка. Опитай отново.");
             } finally {
-                setLoading(false);
+                if (reqId === listRequest.current) setLoading(false);
             }
         }, 300);
-
         return () => clearTimeout(timer);
-    }, [searchTerm, selectedCity, selectedLevel]);
+    }, [viewMode, searchTerm, selectedCity, selectedLevel, groupFaculties]);
+
+    const loadMore = async () => {
+        if (!listPaged) { setVisibleCount((c) => c + 60); return; }
+        const reqId = listRequest.current;
+        setLoadingMore(true);
+        try {
+            const { rows } = await universityService.listPrograms({
+                faculties: groupFaculties, city: selectedCity, level: selectedLevel, limit: 60, offset: universities.length,
+            });
+            if (reqId !== listRequest.current) return;
+            setUniversities((prev) => [...prev, ...rows]);
+            setVisibleCount((c) => c + rows.length);
+        } catch (err) {
+            console.error("Universities load more failed:", err);
+            setError("Не успяхме да заредим още. Опитай отново.");
+        } finally {
+            setLoadingMore(false);
+        }
+    };
 
     useEffect(() => { setVisibleCount(60); }, [searchTerm, selectedCity, selectedLevel, selectedFaculty, selectedGroup]);
 
@@ -628,13 +660,15 @@ export default function UniversitiesPage() {
             data[g.id] = { total: 0, specialtyCounts: {}, univNames: new Set(), cityNames: new Set() };
         });
 
-        universities.forEach((uni) => {
-            const gid = FACULTY_TO_GROUP[uni.faculty];
+        summary.forEach((f) => {
+            const gid = FACULTY_TO_GROUP[f.faculty];
             if (!gid || !data[gid]) return;
-            data[gid].specialtyCounts[uni.specialty] = (data[gid].specialtyCounts[uni.specialty] || 0) + 1;
-            if (uni.university_name) data[gid].univNames.add(uni.university_name);
-            if (uni.city) data[gid].cityNames.add(uni.city);
-            data[gid].total++;
+            for (const [name, n] of Object.entries(f.specialty_counts || {})) {
+                data[gid].specialtyCounts[name] = (data[gid].specialtyCounts[name] || 0) + n;
+            }
+            (f.universities || []).forEach((u) => data[gid].univNames.add(u));
+            (f.cities || []).forEach((c) => data[gid].cityNames.add(c));
+            data[gid].total += f.programs || 0;
         });
 
         const result = {};
@@ -649,32 +683,21 @@ export default function UniversitiesPage() {
             };
         });
         return result;
-    }, [universities]);
+    }, [summary]);
 
-    // ── Client-side group/faculty filter on top of server results ──────────
-    const displayUnis = useMemo(() => {
-        let result = universities;
-        if (selectedFaculty) {
-            result = result.filter((u) => u.faculty === selectedFaculty);
-        } else if (selectedGroup) {
-            result = result.filter((u) => FACULTY_TO_GROUP[u.faculty] === selectedGroup);
-        }
-        return result;
-    }, [universities, selectedFaculty, selectedGroup]);
+    // Филтрите са на сървъра — тук само показваме полученото.
+    const displayUnis = universities;
 
-    // Stats
-    const totalUniversities = useMemo(
-        () => new Set(universities.map((u) => u.university_name)).size,
-        [universities]
-    );
-    const distinctSpecialties = useMemo(
-        () => new Set(universities.map((u) => u.specialty)).size,
-        [universities]
-    );
-    const totalCities = useMemo(
-        () => new Set(universities.map((u) => u.city).filter(Boolean)).size,
-        [universities]
-    );
+    // Общи числа — от обобщението, не от текущия списък (не се менят при търсене).
+    const { totalUniversities, distinctSpecialties, totalCities } = useMemo(() => {
+        const unis = new Set(), specs = new Set(), cityNames = new Set();
+        summary.forEach((f) => {
+            (f.universities || []).forEach((u) => unis.add(u));
+            (f.cities || []).forEach((c) => cityNames.add(c));
+            Object.keys(f.specialty_counts || {}).forEach((n) => specs.add(n));
+        });
+        return { totalUniversities: unis.size, distinctSpecialties: specs.size, totalCities: cityNames.size };
+    }, [summary]);
     const activeGroupsCount = useMemo(
         () => GROUPS.filter((g) => (groupData[g.id]?.total || 0) > 0).length,
         [groupData]
@@ -687,7 +710,7 @@ export default function UniversitiesPage() {
         setSelectedGroup(null);
         setSelectedFaculty(null);
         setViewMode("browse");
-        loadInitial();
+        setFuzzyWords([]);
     };
 
     const handleGroupSelect = (group) => {
@@ -843,14 +866,14 @@ export default function UniversitiesPage() {
                             {activeGroupObj && (
                                 <span style={{ display: "flex", alignItems: "center", gap: "0.3rem", padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: `${activeGroupObj.accent}18`, color: activeGroupObj.accent, border: `1px solid ${activeGroupObj.accent}33` }}>
                                     {activeGroupObj.name}
-                                    <button onClick={() => { setSelectedGroup(null); if (!hasTextFilters && !selectedFaculty) { setViewMode("browse"); loadInitial(); } }} style={{ background: "none", border: "none", cursor: "pointer", color: "inherit", padding: 0, lineHeight: 1 }}><X size={10} /></button>
+                                    <button onClick={() => { setSelectedGroup(null); if (!hasTextFilters && !selectedFaculty) setViewMode("browse"); }} style={{ background: "none", border: "none", cursor: "pointer", color: "inherit", padding: 0, lineHeight: 1 }}><X size={10} /></button>
                                 </span>
                             )}
                             {/* Faculty chip */}
                             {selectedFaculty && (
                                 <span style={{ display: "flex", alignItems: "center", gap: "0.3rem", padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: "rgba(23,86,217,0.1)", color: "var(--brand-cyan)", border: "1px solid rgba(23,86,217,0.2)" }}>
                                     {selectedFaculty}
-                                    <button onClick={() => { setSelectedFaculty(null); if (!hasTextFilters && !selectedGroup) { setViewMode("browse"); loadInitial(); } }} style={{ background: "none", border: "none", cursor: "pointer", color: "inherit", padding: 0, lineHeight: 1 }}><X size={10} /></button>
+                                    <button onClick={() => { setSelectedFaculty(null); if (!hasTextFilters && !selectedGroup) setViewMode("browse"); }} style={{ background: "none", border: "none", cursor: "pointer", color: "inherit", padding: 0, lineHeight: 1 }}><X size={10} /></button>
                                 </span>
                             )}
                             {searchTerm && (
@@ -982,7 +1005,7 @@ export default function UniversitiesPage() {
 
                             {/* Results label */}
                             <div style={{ fontSize: "13px", color: "var(--brand-muted)", fontWeight: 500, marginBottom: "1.25rem" }}>
-                                {displayUnis.length.toLocaleString("bg-BG")} специалности
+                                {listTotal.toLocaleString("bg-BG")} специалности
                                 {selectedFaculty && <span style={{ color: "var(--brand-cyan)" }}> · {selectedFaculty}</span>}
                                 {activeGroupObj && !selectedFaculty && <span style={{ color: activeGroupObj.accent }}> · {activeGroupObj.name}</span>}
                                 {searchTerm && <span style={{ color: "var(--brand-cyan)" }}> за „{searchTerm}"</span>}
@@ -1024,16 +1047,17 @@ export default function UniversitiesPage() {
                                             />
                                         ))}
                                     </m.div>
-                                    {displayUnis.length > visibleCount && (
+                                    {(listPaged ? displayUnis.length < listTotal : displayUnis.length > visibleCount) && (
                                         <div style={{ display: "flex", justifyContent: "center", marginTop: "2.5rem" }}>
                                             <button
                                                 type="button"
-                                                onClick={() => setVisibleCount((c) => c + 60)}
+                                                onClick={loadMore}
+                                                disabled={loadingMore}
                                                 style={{ padding: "0.75rem 2rem", background: "var(--brand-surface)", border: "1px solid var(--brand-border)", borderRadius: "0.75rem", color: "var(--brand-text)", fontWeight: 600, fontSize: "14px", cursor: "pointer", fontFamily: "inherit" }}
                                                 onMouseEnter={(e) => (e.currentTarget.style.borderColor = "rgba(23,86,217,0.3)")}
                                                 onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--brand-border)")}
                                             >
-                                                Покажи още {Math.min(60, displayUnis.length - visibleCount)}
+                                                {loadingMore ? "Зареждане…" : `Покажи още ${Math.min(60, listPaged ? listTotal - displayUnis.length : displayUnis.length - visibleCount)}`}
                                             </button>
                                         </div>
                                     )}
