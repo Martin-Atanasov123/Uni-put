@@ -115,12 +115,12 @@ const HOW_STEPS = [
 
 // ── DZI points → grade conversion ───────────────────────────────────────────
 const DZI_BANDS = [
-    { min: 0,     max: 29.75, label: "Слаб",        grade_min: 2.00, grade_max: 2.00, color: "#f87171", bg: "rgba(248,113,113,0.08)", border: "rgba(248,113,113,0.25)" },
-    { min: 30,    max: 40.5,  label: "Среден",      grade_min: 3.00, grade_max: 3.99, color: "#F97316", bg: "rgba(249,115,22,0.08)",   border: "rgba(249,115,22,0.25)"   },
-    { min: 40.75, max: 62.25, label: "Добър",       grade_min: 4.00, grade_max: 4.99, color: "#FBBF24", bg: "rgba(251,191,36,0.08)",   border: "rgba(251,191,36,0.25)"   },
-    { min: 62.5,  max: 83.75, label: "Много добър", grade_min: 5.00, grade_max: 5.49, color: "#06B6D4", bg: "rgba(6,182,212,0.08)",    border: "rgba(6,182,212,0.25)"    },
-    { min: 84,    max: 94.75, label: "Отличен",     grade_min: 5.50, grade_max: 5.99, color: "#8B5CF6", bg: "rgba(139,92,246,0.08)",   border: "rgba(139,92,246,0.25)"   },
-    { min: 95,    max: 100,   label: "Отличен 6",   grade_min: 6.00, grade_max: 6.00, color: "#10b981", bg: "rgba(16,185,129,0.08)",   border: "rgba(16,185,129,0.25)"   },
+    { min: 0,     max: 29.75, label: "Слаб",        grade_min: 2.00, grade_max: 2.00, color: "var(--danger)", bg: "var(--danger-bg)", border: "color-mix(in srgb, var(--danger) 34%, transparent)" },
+    { min: 30,    max: 40.5,  label: "Среден",      grade_min: 3.00, grade_max: 3.99, color: "var(--c-rust)", bg: "color-mix(in srgb, var(--c-rust) 10%, transparent)", border: "color-mix(in srgb, var(--c-rust) 32%, transparent)" },
+    { min: 40.75, max: 62.25, label: "Добър",       grade_min: 4.00, grade_max: 4.99, color: "var(--warning)", bg: "var(--warning-bg)", border: "color-mix(in srgb, var(--warning) 34%, transparent)" },
+    { min: 62.5,  max: 83.75, label: "Много добър", grade_min: 5.00, grade_max: 5.49, color: "var(--brand-cyan)", bg: "var(--brand-subtle)", border: "color-mix(in srgb, var(--brand-cyan) 32%, transparent)" },
+    { min: 84,    max: 94.75, label: "Отличен",     grade_min: 5.50, grade_max: 5.99, color: "var(--brand-cyan)", bg: "var(--brand-subtle)", border: "color-mix(in srgb, var(--brand-cyan) 32%, transparent)" },
+    { min: 95,    max: 100,   label: "Отличен 6",   grade_min: 6.00, grade_max: 6.00, color: "var(--success)", bg: "var(--success-bg)", border: "color-mix(in srgb, var(--success) 34%, transparent)" },
 ];
 
 function dziToGrade(pts) {
@@ -220,14 +220,14 @@ function drawCalcResultCard({ university, specialty, score, maxBall, chance, mar
     ctx.fillStyle = "#0F172A";
     ctx.fillRect(0, 0, W, H);
     const glow = ctx.createRadialGradient(W * 0.82, H * 0.16, 0, W * 0.82, H * 0.16, W * 0.85);
-    glow.addColorStop(0, "rgba(6,182,212,0.16)");
-    glow.addColorStop(1, "rgba(6,182,212,0)");
+    glow.addColorStop(0, "rgba(23,86,217,0.16)");
+    glow.addColorStop(1, "rgba(23,86,217,0)");
     ctx.fillStyle = glow;
     ctx.fillRect(0, 0, W, H);
     ctx.textBaseline = "alphabetic";
 
     // Лого
-    ctx.fillStyle = "#06B6D4";
+    ctx.fillStyle = "#1756D9";
     ctx.fillRect(PAD, PAD, 8, 40);
     ctx.fillStyle = "#F1F5F9";
     ctx.font = font(38, 800);
@@ -249,8 +249,8 @@ function drawCalcResultCard({ university, specialty, score, maxBall, chance, mar
     const scoreText = score.toFixed(2);
     const scoreW = ctx.measureText(scoreText).width;
     const grad = ctx.createLinearGradient(PAD, 0, PAD + scoreW, 0);
-    grad.addColorStop(0, "#06B6D4");
-    grad.addColorStop(1, "#8B5CF6");
+    grad.addColorStop(0, "#1756D9");
+    grad.addColorStop(1, "#1756D9");
     ctx.fillStyle = grad;
     ctx.fillText(scoreText, PAD, y);
     if (maxBall) {
@@ -837,7 +837,7 @@ export default function CalculatorPage() {
                     </h1>
 
                     {/* Notice */}
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: "0.625rem", padding: "0.875rem 1rem", background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.2)", borderRadius: "0.875rem", maxWidth: "36rem" }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: "0.625rem", padding: "0.875rem 1rem", background: "rgba(23,86,217,0.08)", border: "1px solid rgba(23,86,217,0.2)", borderRadius: "0.875rem", maxWidth: "36rem" }}>
                         <AlertCircle size={15} style={{ color: "var(--brand-violet)", flexShrink: 0, marginTop: "1px" }} />
                         <p style={{ fontSize: "13px", color: "var(--brand-muted)", margin: 0, lineHeight: 1.5 }}>
                             Калкулаторът има формулите на 51 университета. Ако не намираш своята специалност, пиши ни на uniput1000@gmail.com — ще я добавим.
@@ -908,7 +908,7 @@ export default function CalculatorPage() {
                                     value={facultySearch}
                                     onChange={e => { setFacultySearch(e.target.value); setDropdownShowAll(false); setIsFacultyDropdownOpen(true); }}
                                     onClick={() => { setIsFacultyDropdownOpen(true); setDropdownShowAll(true); }}
-                                    onFocus={e => { setIsFacultyDropdownOpen(true); setDropdownShowAll(true); e.target.style.borderColor = "rgba(139,92,246,0.5)"; }}
+                                    onFocus={e => { setIsFacultyDropdownOpen(true); setDropdownShowAll(true); e.target.style.borderColor = "rgba(23,86,217,0.5)"; }}
                                     onBlur={e => { e.target.style.borderColor = "rgba(148,163,184,0.12)"; }}
                                     style={{ ...S.input, paddingLeft: "1rem", paddingRight: "4.5rem" }}
                                 />
@@ -939,7 +939,7 @@ export default function CalculatorPage() {
                                                     type="button"
                                                     onClick={() => { setSelectedFaculty(f); setFacultySearch(f); setSelectedSpecialtyName(""); setSelectedCity(""); setSelectedUniversity(""); setIsFacultyDropdownOpen(false); setDropdownShowAll(false); }}
                                                     style={{ width: "100%", textAlign: "left", padding: "0.625rem 1rem", fontSize: "13px", fontWeight: 500, color: "var(--brand-text)", background: "none", border: "none", borderBottom: i < filteredFaculties.length - 1 ? "1px solid rgba(148,163,184,0.08)" : "none", cursor: "pointer", fontFamily: "inherit", transition: "background 0.15s" }}
-                                                    onMouseEnter={e => (e.currentTarget.style.background = "rgba(139,92,246,0.08)")}
+                                                    onMouseEnter={e => (e.currentTarget.style.background = "rgba(23,86,217,0.08)")}
                                                     onMouseLeave={e => (e.currentTarget.style.background = "none")}
                                                 >
                                                     {f}
@@ -1013,7 +1013,7 @@ export default function CalculatorPage() {
                                 return (
                                     <div key={step.num} style={{ background: S.surface, backdropFilter: "blur(12px)", border: `1px solid ${S.border}`, borderRadius: "1.25rem", padding: "1.25rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
                                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                                            <div style={{ padding: "0.5rem", borderRadius: "0.625rem", background: "linear-gradient(135deg,rgba(6,182,212,0.12),rgba(139,92,246,0.12))", display: "inline-flex" }}>
+                                            <div style={{ padding: "0.5rem", borderRadius: "0.625rem", background: "linear-gradient(135deg,rgba(23,86,217,0.12),rgba(23,86,217,0.12))", display: "inline-flex" }}>
                                                 <Icon size={18} style={{ color: "var(--brand-cyan)" }} />
                                             </div>
                                             <span style={{ fontSize: "2rem", fontWeight: 900, color: "var(--brand-border)", letterSpacing: "-0.04em" }}>{step.num}</span>
@@ -1042,7 +1042,7 @@ export default function CalculatorPage() {
                             style={{
                                 display: "flex", alignItems: "center", gap: "1rem",
                                 padding: "1.25rem 1.5rem",
-                                background: "linear-gradient(135deg, rgba(6,182,212,0.08), rgba(139,92,246,0.08))",
+                                background: "linear-gradient(135deg, rgba(23,86,217,0.08), rgba(23,86,217,0.08))",
                                 border: "1px solid var(--brand-card-border)",
                                 borderRadius: "1.25rem",
                                 textDecoration: "none",
@@ -1074,7 +1074,7 @@ export default function CalculatorPage() {
                     >
                         {/* Header */}
                         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1.25rem" }}>
-                            <div style={{ padding: "0.375rem", borderRadius: "0.5rem", background: "linear-gradient(135deg,rgba(6,182,212,0.12),rgba(139,92,246,0.12))", display: "inline-flex" }}>
+                            <div style={{ padding: "0.375rem", borderRadius: "0.5rem", background: "linear-gradient(135deg,rgba(23,86,217,0.12),rgba(23,86,217,0.12))", display: "inline-flex" }}>
                                 <Zap size={15} style={{ color: "var(--brand-cyan)" }} />
                             </div>
                             <h2 style={{ fontSize: "14px", fontWeight: 800, color: "var(--brand-text)", margin: 0 }}>
@@ -1103,7 +1103,7 @@ export default function CalculatorPage() {
                                         fontWeight: 700,
                                         borderColor: dziError ? "rgba(248,113,113,0.6)" : undefined,
                                     }}
-                                    onFocus={e => { e.target.style.borderColor = dziError ? "rgba(248,113,113,0.6)" : "rgba(6,182,212,0.5)"; }}
+                                    onFocus={e => { e.target.style.borderColor = dziError ? "rgba(248,113,113,0.6)" : "rgba(23,86,217,0.5)"; }}
                                     onBlur={e => { e.target.style.borderColor = dziError ? "rgba(248,113,113,0.6)" : "var(--brand-input-border)"; }}
                                 />
                                 {dziError && (
@@ -1226,7 +1226,7 @@ export default function CalculatorPage() {
                         style={{ background: S.surface, backdropFilter: "blur(12px)", border: `1px solid ${S.border}`, borderRadius: "1.25rem", padding: "1.25rem", marginBottom: "2rem" }}
                     >
                         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.875rem" }}>
-                            <div style={{ padding: "0.375rem", borderRadius: "0.5rem", background: "linear-gradient(135deg,rgba(139,92,246,0.12),rgba(6,182,212,0.12))", display: "inline-flex" }}>
+                            <div style={{ padding: "0.375rem", borderRadius: "0.5rem", background: "linear-gradient(135deg,rgba(23,86,217,0.12),rgba(23,86,217,0.12))", display: "inline-flex" }}>
                                 <Info size={15} style={{ color: "var(--brand-violet)" }} />
                             </div>
                             <p style={{ fontSize: "13px", fontWeight: 700, color: "var(--brand-text)", margin: 0 }}>Легенда на формулите</p>
@@ -1321,7 +1321,7 @@ export default function CalculatorPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                         style={{
-                            background: "linear-gradient(135deg, rgba(6,182,212,0.08), rgba(139,92,246,0.08))",
+                            background: "linear-gradient(135deg, rgba(23,86,217,0.08), rgba(23,86,217,0.08))",
                             border: "1px solid var(--brand-card-border)",
                             borderRadius: "1.25rem",
                             padding: "2rem 1.75rem",
@@ -1332,7 +1332,7 @@ export default function CalculatorPage() {
                             width: 52, height: 52, borderRadius: "1rem", margin: "0 auto 1.25rem",
                             background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
                             display: "flex", alignItems: "center", justifyContent: "center",
-                            boxShadow: "0 12px 30px rgba(6,182,212,0.3)",
+                            boxShadow: "0 12px 30px rgba(23,86,217,0.3)",
                         }}>
                             <Lock size={24} color="#fff" strokeWidth={2} />
                         </div>
@@ -1421,7 +1421,7 @@ export default function CalculatorPage() {
                                     )}
 
                                     {/* Formula */}
-                                    <div style={{ display: "flex", gap: "0.5rem", padding: "0.75rem", background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.15)", borderRadius: "0.75rem", minWidth: 0 }}>
+                                    <div style={{ display: "flex", gap: "0.5rem", padding: "0.75rem", background: "rgba(23,86,217,0.06)", border: "1px solid rgba(23,86,217,0.15)", borderRadius: "0.75rem", minWidth: 0 }}>
                                         <Info size={14} style={{ color: "var(--brand-violet)", flexShrink: 0, marginTop: "1px" }} />
                                         <p style={{ fontSize: "12px", color: "var(--brand-muted)", margin: 0, lineHeight: 1.5, wordBreak: "break-word", overflowWrap: "anywhere", minWidth: 0 }}>
                                             <strong style={{ color: "var(--brand-text)" }}>Формула:</strong> {item.formula_description}
@@ -1557,12 +1557,12 @@ export default function CalculatorPage() {
                                                         fontSize: "13px", fontWeight: 600,
                                                         color: "var(--brand-cyan)",
                                                         textDecoration: "none",
-                                                        background: "rgba(6,182,212,0.06)",
+                                                        background: "rgba(23,86,217,0.06)",
                                                         transition: "background 0.15s, border-color 0.15s",
                                                         flexShrink: 0,
                                                     }}
-                                                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(6,182,212,0.14)"; e.currentTarget.style.borderColor = "var(--brand-cyan)"; }}
-                                                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(6,182,212,0.06)"; e.currentTarget.style.borderColor = "var(--brand-border)"; }}
+                                                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(23,86,217,0.14)"; e.currentTarget.style.borderColor = "var(--brand-cyan)"; }}
+                                                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(23,86,217,0.06)"; e.currentTarget.style.borderColor = "var(--brand-border)"; }}
                                                 >
                                                     <ExternalLink size={13} strokeWidth={2} />
                                                     Провери в сайта
@@ -1589,7 +1589,7 @@ export default function CalculatorPage() {
                         style={{
                             marginTop: "1.5rem",
                             position: "relative",
-                            background: "linear-gradient(135deg, rgba(6,182,212,0.08), rgba(139,92,246,0.08))",
+                            background: "linear-gradient(135deg, rgba(23,86,217,0.08), rgba(23,86,217,0.08))",
                             border: "1px solid var(--brand-card-border)",
                             borderRadius: "1.25rem",
                             padding: "1.5rem 1.75rem",
@@ -1599,7 +1599,7 @@ export default function CalculatorPage() {
                         {/* Subtle gradient glow accent */}
                         <div aria-hidden style={{
                             position: "absolute", top: 0, right: 0, width: "240px", height: "100%",
-                            background: "radial-gradient(ellipse at right, rgba(139,92,246,0.12), transparent 70%)",
+                            background: "radial-gradient(ellipse at right, rgba(23,86,217,0.12), transparent 70%)",
                             pointerEvents: "none",
                         }} />
 
@@ -1613,7 +1613,7 @@ export default function CalculatorPage() {
                                 position: "absolute", top: "0.75rem", right: "0.75rem",
                                 background: "transparent", border: "none", cursor: "pointer",
                                 padding: "0.375rem", borderRadius: "0.5rem",
-                                color: "var(--brand-muted)", opacity: 0.6,
+                                color: "var(--brand-muted)",
                                 display: "flex", alignItems: "center", justifyContent: "center",
                                 transition: "opacity 0.15s, background 0.15s",
                             }}
@@ -1630,7 +1630,7 @@ export default function CalculatorPage() {
                                 width: "44px", height: "44px", borderRadius: "0.75rem",
                                 background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))",
                                 display: "flex", alignItems: "center", justifyContent: "center",
-                                boxShadow: "0 8px 24px rgba(6,182,212,0.25)",
+                                boxShadow: "0 8px 24px rgba(23,86,217,0.25)",
                             }}>
                                 <Bookmark size={20} color="#fff" strokeWidth={2} fill="#fff" />
                             </div>
@@ -1662,7 +1662,7 @@ export default function CalculatorPage() {
                                             textDecoration: "none",
                                             transition: "transform 0.18s, box-shadow 0.18s",
                                         }}
-                                        onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 8px 20px rgba(6,182,212,0.3)"; }}
+                                        onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 8px 20px rgba(23,86,217,0.3)"; }}
                                         onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
                                     >
                                         <UserPlus size={14} strokeWidth={2} />
@@ -1695,13 +1695,13 @@ export default function CalculatorPage() {
 
             {/* CLAUDE.md: data source trust signal */}
             {calcResults.length > 0 && (
-                <p style={{ marginTop: "1.5rem", fontSize: "11px", color: "var(--brand-muted)", opacity: 0.6, textAlign: "center", letterSpacing: "0.04em" }}>
+                <p style={{ marginTop: "1.5rem", fontSize: "11px", color: "var(--brand-muted)", textAlign: "center", letterSpacing: "0.04em" }}>
                     {DATA_FRESHNESS_NOTE} Средният бал е изчислен от историческия максимален бал.
                 </p>
             )}
 
             <style>{`
-                input[type="text"]::placeholder { color: var(--brand-muted); opacity: 0.6; }
+                input[type="text"]::placeholder { color: var(--brand-muted); opacity: 0.85; }
                 select option { background: var(--brand-dropdown-bg); color: var(--brand-text); }
             `}</style>
         </div>

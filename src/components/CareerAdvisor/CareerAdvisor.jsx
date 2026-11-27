@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 
 import RIASECResults from "./RIASECResults";
-import { InterestsHex, IllustrationStyles } from "@/components/common/Illustrations";
+import { CareerPathsArt, InterestsHex, IllustrationStyles } from "@/components/common/Illustrations";
 import { RIASEC_TYPES } from "@/lib/riasecTypes";
 import { RIASEC_SPECIALTIES } from "@/lib/siteStats";
 
@@ -238,16 +238,7 @@ const CareerAdvisor = () => {
                     <VersionPicker versions={VERSIONS} picked={pickedVersion} onPick={setPickedVersion} />
                     <button type="submit" className="ca-go">{chosen.cta} <ChevronRight size={18} strokeWidth={2} aria-hidden="true" /></button>
                     <p className="ca-fine">Без регистрация. Можеш да смениш версията по-късно.</p>
-                    <img
-                        className="ca-art"
-                        src="/illustrations/career-paths-960.webp"
-                        srcSet="/illustrations/career-paths-480.webp 480w, /illustrations/career-paths-960.webp 960w"
-                        sizes="(min-width: 1000px) 440px, 0px"
-                        width="960" height="680"
-                        alt=""
-                        loading="lazy"
-                        decoding="async"
-                    />
+                    <CareerPathsArt className="ca-art" />
                 </form>
                 <MobileFold title="Шестте типа интереси" className="ca-types-wrap">
                 <section className="ca-types" aria-labelledby="ca-types-h">

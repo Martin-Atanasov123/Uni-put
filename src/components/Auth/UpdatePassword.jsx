@@ -70,8 +70,8 @@ const UpdatePassword = () => {
             <Seo title="Нова парола" path="/update-password" noindex />
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
-            <div aria-hidden style={{ position: "absolute", top: "-200px", left: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(139,92,246,0.1), transparent 70%)", pointerEvents: "none" }} />
-            <div aria-hidden style={{ position: "absolute", bottom: "-200px", right: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(6,182,212,0.1), transparent 70%)", pointerEvents: "none" }} />
+            <div aria-hidden style={{ position: "absolute", top: "-200px", left: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(23,86,217,0.1), transparent 70%)", pointerEvents: "none" }} />
+            <div aria-hidden style={{ position: "absolute", bottom: "-200px", right: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(23,86,217,0.1), transparent 70%)", pointerEvents: "none" }} />
 
             <div
                 style={{
@@ -95,7 +95,7 @@ const UpdatePassword = () => {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            boxShadow: "0 16px 40px rgba(139,92,246,0.35)",
+                            boxShadow: "0 16px 40px rgba(23,86,217,0.35)",
                         }}
                     >
                         <Lock size={28} color="#fff" />
@@ -163,7 +163,7 @@ const UpdatePassword = () => {
                                 alignItems: "center",
                                 justifyContent: "center",
                                 gap: "0.5rem",
-                                boxShadow: loading ? "none" : "0 12px 30px rgba(139,92,246,0.3)",
+                                boxShadow: loading ? "none" : "0 12px 30px rgba(23,86,217,0.3)",
                                 fontFamily: "inherit",
                             }}
                         >

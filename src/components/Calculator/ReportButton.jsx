@@ -330,7 +330,7 @@ export default function ReportButton({ universityName, specialty }) {
                                         fontFamily: "inherit",
                                         transition: "border-color 0.2s, background 0.2s",
                                     }}
-                                    onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(6,182,212,0.4)"; e.currentTarget.style.background = "rgba(6,182,212,0.04)"; }}
+                                    onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(23,86,217,0.4)"; e.currentTarget.style.background = "rgba(23,86,217,0.04)"; }}
                                     onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--brand-border)"; e.currentTarget.style.background = "var(--brand-surface-2)"; }}
                                 >
                                     <Camera size={22} style={{ opacity: 0.5 }} />
@@ -411,7 +411,7 @@ export default function ReportButton({ universityName, specialty }) {
                                         lineHeight: 1.6,
                                     }}
                                 />
-                                <p style={{ margin: "0.3rem 0 0", textAlign: "right", fontSize: "10px", color: "var(--brand-muted)", opacity: 0.55, fontFamily: "monospace" }}>
+                                <p style={{ margin: "0.3rem 0 0", textAlign: "right", fontSize: "10px", color: "var(--brand-muted)", fontFamily: "monospace" }}>
                                     {description.length}/1000
                                 </p>
                             </div>

@@ -31,11 +31,11 @@ const UI_TYPE_COLOR = { R: "var(--c-orange)", I: "var(--c-violet)", A: "var(--c-
 
 const RIASEC_LABELS = {
     R: { name: "Реалистичен",    desc: "Предпочиташ практическа работа с инструменти и машини.",   color: "#C2410C", bg: "rgba(249,115,22,0.1)",   border: "rgba(249,115,22,0.3)"   },
-    I: { name: "Изследователски", desc: "Обичаш да решаваш сложни проблеми и да анализираш данни.", color: "#6D28D9", bg: "rgba(139,92,246,0.1)",   border: "rgba(139,92,246,0.3)"   },
+    I: { name: "Изследователски", desc: "Обичаш да решаваш сложни проблеми и да анализираш данни.", color: "#1756D9", bg: "rgba(23,86,217,0.1)",   border: "rgba(23,86,217,0.3)"   },
     A: { name: "Артистичен",     desc: "Цениш творчеството, изкуството и оригиналността.",         color: "#BE185D", bg: "rgba(236,72,153,0.1)",   border: "rgba(236,72,153,0.3)"   },
     S: { name: "Социален",       desc: "Харесваш да помагаш на хората и да работиш в екип.",       color: "#0A6853", bg: "rgba(16,185,129,0.1)",   border: "rgba(16,185,129,0.3)"   },
     E: { name: "Предприемачески", desc: "Имаш лидерски умения и обичаш да убеждаваш другите.",     color: "#986100", bg: "rgba(245,158,11,0.1)",   border: "rgba(245,158,11,0.3)"   },
-    C: { name: "Конвенционален", desc: "Предпочиташ структурата, детайлите и организацията.",      color: "#0E7490", bg: "rgba(6,182,212,0.1)",    border: "rgba(6,182,212,0.3)"    },
+    C: { name: "Конвенционален", desc: "Предпочиташ структурата, детайлите и организацията.",      color: "#0E7490", bg: "rgba(23,86,217,0.1)",    border: "rgba(23,86,217,0.3)"    },
 };
 
 const S = {
@@ -428,7 +428,7 @@ const RIASECResults = ({ results, onRestart }) => {
                                         >
                                             {spec.compatibility}%
                                         </div>
-                                        <div style={{ fontSize: "9px", fontWeight: 800, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.12em", opacity: 0.6 }}>
+                                        <div style={{ fontSize: "9px", fontWeight: 800, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
                                             съвпадение
                                         </div>
                                     </div>
@@ -573,7 +573,7 @@ const RIASECResults = ({ results, onRestart }) => {
                                         >
                                             {career.compatibility}%
                                         </div>
-                                        <div style={{ fontSize: "8px", fontWeight: 800, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.1em", opacity: 0.6 }}>
+                                        <div style={{ fontSize: "8px", fontWeight: 800, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
                                             съвпадение
                                         </div>
                                     </div>

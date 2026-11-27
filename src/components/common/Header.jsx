@@ -5,7 +5,7 @@ import { useTheme } from "@/hooks/useTheme";
 import {
     User, LogOut, LayoutDashboard, Menu, X, GraduationCap,
     Calculator, Search, Settings, Building2, Heart, ChevronDown,
-    Brain, ClipboardList, CalendarDays, Sun, Moon
+    Brain, ClipboardList, CalendarDays, Sun, Moon, MoreHorizontal, BookOpen
 } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 
@@ -15,13 +15,21 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // 301-redirect-ва /about → /about/, така че връзка без наклонена черта праща
 // Googlebot през излишен redirect и GSC я отчита като "Page with redirect"
 // вместо да индексира директно канoничния URL.
-const NAV_LINKS = [
+const PRIMARY_NAV_LINKS = [
     { name: "Университети",   path: "/universities/",   icon: Search },
     { name: "Калкулатор",     path: "/calculator/",     icon: Calculator },
     { name: "Кариерен тест",  path: "/career-advisor/", icon: Brain },
-    { name: "Календар",       path: "/calendar/",       icon: CalendarDays },
-    { name: "Общежития",      path: "/dormitories/",    icon: Building2 },
-    { name: "За нас",         path: "/about/",          icon: GraduationCap },
+    { name: "Прием след 7. клас", path: "/priem-7-klas/", icon: GraduationCap },
+];
+
+const MORE_LINKS = [
+    { name: "ДЗИ стратег", path: "/dzi-strateg/", icon: Brain, description: "План и подготовка за матурите" },
+    { name: "Специалности", path: "/specialnosti/", icon: BookOpen, description: "Разгледай всички направления" },
+    { name: "Календар", path: "/calendar/", icon: CalendarDays, description: "Срокове и важни дати" },
+    { name: "Общежития", path: "/dormitories/", icon: Building2, description: "Настаняване към университетите" },
+    { name: "Любими", path: "/favorites/", icon: Heart, description: "Запазените ти възможности" },
+    { name: "Моите оценки", path: "/my-grades/", icon: ClipboardList, description: "Оценки и личен напредък" },
+    { name: "За нас", path: "/about/", icon: GraduationCap, description: "Мисията зад УниПът" },
 ];
 
 /**
@@ -55,8 +63,10 @@ export default function Header() {
     const { theme, toggle: toggleTheme } = useTheme();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+    const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const userMenuRef = useRef();
+    const moreMenuRef = useRef();
 
     const isAdmin = user?.app_metadata?.role === "admin";
 
@@ -77,12 +87,27 @@ export default function Header() {
     }, []);
 
     useEffect(() => {
-        const onClick = (e) => { if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setIsUserMenuOpen(false); };
+        const onClick = (e) => {
+            if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setIsUserMenuOpen(false);
+            if (moreMenuRef.current && !moreMenuRef.current.contains(e.target)) setIsMoreMenuOpen(false);
+        };
         window.addEventListener("click", onClick);
         return () => window.removeEventListener("click", onClick);
     }, []);
 
-    useEffect(() => { setIsMenuOpen(false); setIsUserMenuOpen(false); }, [location.pathname]);
+    useEffect(() => {
+        setIsMenuOpen(false);
+        setIsUserMenuOpen(false);
+        setIsMoreMenuOpen(false);
+    }, [location.pathname]);
+
+    useEffect(() => {
+        const onKeyDown = (event) => {
+            if (event.key === "Escape") setIsMoreMenuOpen(false);
+        };
+        window.addEventListener("keydown", onKeyDown);
+        return () => window.removeEventListener("keydown", onKeyDown);
+    }, []);
 
     const handleLogout = useCallback(async () => {
         await sessionService.logout();
@@ -109,7 +134,7 @@ export default function Header() {
                     maxWidth: "80rem", margin: "0 auto",
                     background: scrolled ? "var(--brand-nav-scrolled)" : "var(--brand-nav-bg)",
                     backdropFilter: "blur(16px)",
-                    border: `1px solid ${scrolled ? "rgba(6,182,212,0.2)" : "var(--brand-border)"}`,
+                    border: `1px solid ${scrolled ? "color-mix(in srgb, var(--brand-cyan) 22%, transparent)" : "var(--brand-border)"}`,
                     borderRadius: "1.25rem",
                     padding: scrolled ? "0.5rem 1rem" : "0.75rem 1rem",
                     display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -119,15 +144,17 @@ export default function Header() {
                     {/* Brand */}
                     <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
                         <img
-                            src="/logo-wordmark.png"
+                            src="/logo-uniput.png"
                             alt="УниПът лого"
-                            style={{ height: "70px", width: "auto", objectFit: "contain", borderRadius: "0.5rem"  }}
+                            width="188"
+                            height="160"
+                            style={{ height: scrolled ? "48px" : "56px", width: "auto", objectFit: "contain" }}
                         />
                     </Link>
 
                     {/* Desktop nav */}
                     <div className="uni-nav-desktop" style={{ alignItems: "center", gap: "0.25rem" }}>
-                        {NAV_LINKS.map((link) => {
+                        {PRIMARY_NAV_LINKS.map((link) => {
                             const Icon = link.icon;
                             const active = isActive(link.path);
                             return (
@@ -140,14 +167,50 @@ export default function Header() {
                                 </Link>
                             );
                         })}
+                        <div ref={moreMenuRef} className="uni-more-wrap">
+                            <button
+                                type="button"
+                                className={`uni-nav-link uni-more-btn${MORE_LINKS.some((link) => isActive(link.path)) ? " uni-nav-link--active" : ""}`}
+                                onClick={() => setIsMoreMenuOpen((open) => !open)}
+                                aria-haspopup="menu"
+                                aria-expanded={isMoreMenuOpen}
+                            >
+                                <MoreHorizontal size={14} /> Още функции
+                                <ChevronDown size={13} className={isMoreMenuOpen ? "uni-chevron-open" : ""} />
+                            </button>
+                            {isMoreMenuOpen && (
+                                <div className="uni-more-menu" role="menu" aria-label="Още функции">
+                                    <div className="uni-more-heading">Всички възможности</div>
+                                    <div className="uni-more-grid">
+                                        {MORE_LINKS.map((link) => {
+                                            const Icon = link.icon;
+                                            return (
+                                                <Link
+                                                    key={link.path}
+                                                    to={link.path}
+                                                    role="menuitem"
+                                                    className={`uni-more-item${isActive(link.path) ? " uni-more-item--active" : ""}`}
+                                                >
+                                                    <span className="uni-more-icon"><Icon size={17} /></span>
+                                                    <span>
+                                                        <strong>{link.name}</strong>
+                                                        <small>{link.description}</small>
+                                                    </span>
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                         {isAdmin && (
                             <Link to="/admin" style={{
                                 display: "flex", alignItems: "center", gap: "0.375rem",
                                 padding: "0.5rem 0.875rem", borderRadius: "0.625rem",
                                 fontSize: "13px", fontWeight: 700, textDecoration: "none",
                                 color: "var(--brand-violet)",
-                                background: isActive("/admin") ? "rgba(139,92,246,0.12)" : "transparent",
-                                border: "1px solid rgba(139,92,246,0.25)",
+                                background: isActive("/admin") ? "var(--brand-subtle)" : "transparent",
+                                border: "1px solid color-mix(in srgb, var(--brand-cyan) 28%, transparent)",
                             }}>
                                 <Settings size={14} /> Админ
                             </Link>
@@ -157,6 +220,7 @@ export default function Header() {
                     {/* Right: CTA + auth */}
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                         <button
+                            className="uni-theme-toggle"
                             type="button"
                             onClick={toggleTheme}
                             aria-label={theme === "dark" ? "Включи светла тема" : "Включи тъмна тема"}
@@ -168,7 +232,9 @@ export default function Header() {
                                 cursor: "pointer", flexShrink: 0,
                             }}
                         >
-                            {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
+                            <span key={theme} className="uni-theme-icon" aria-hidden="true">
+                                {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
+                            </span>
                         </button>
                         {/* Primary CTA — always visible on desktop */}
                         <Link
@@ -216,7 +282,7 @@ export default function Header() {
                                         zIndex: 110,
                                     }}>
                                         <div style={{ padding: "0.625rem 0.75rem", marginBottom: "0.25rem",
-                                            background: "rgba(6,182,212,0.06)", borderRadius: "0.625rem" }}>
+                                            background: "color-mix(in srgb, var(--brand-cyan) 7%, transparent)", borderRadius: "0.625rem" }}>
                                             <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Добре дошъл</div>
                                             <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--brand-cyan)", marginTop: "0.125rem", overflow: "hidden", textOverflow: "ellipsis" }}>
                                                 {user.user_metadata?.username || user.email}
@@ -285,8 +351,9 @@ export default function Header() {
                             </button>
                         </div>
 
-                        <div style={{ display: "flex", flexDirection: "column", gap: "0.375rem", flex: 1 }}>
-                            {NAV_LINKS.map((link) => {
+                        <div className="uni-mobile-links">
+                            <div className="uni-mobile-section-label">Основни</div>
+                            {PRIMARY_NAV_LINKS.map((link) => {
                                 const Icon = link.icon;
                                 const active = isActive(link.path);
                                 return (
@@ -296,7 +363,24 @@ export default function Header() {
                                         fontSize: "14px", fontWeight: 600, textDecoration: "none",
                                         color: active ? "var(--brand-cyan)" : "var(--brand-text)",
                                         background: active ? "var(--brand-card-hover)" : "var(--brand-surface-2)",
-                                        border: active ? "1px solid rgba(6,182,212,0.25)" : "1px solid rgba(148,163,184,0.08)",
+                                        border: active ? "1px solid color-mix(in srgb, var(--brand-cyan) 28%, transparent)" : "1px solid var(--brand-border)",
+                                    }}>
+                                        <Icon size={16} /> {link.name}
+                                    </Link>
+                                );
+                            })}
+                            <div className="uni-mobile-section-label uni-mobile-section-label--spaced">Още функции</div>
+                            {MORE_LINKS.map((link) => {
+                                const Icon = link.icon;
+                                const active = isActive(link.path);
+                                return (
+                                    <Link key={link.path} to={link.path} style={{
+                                        display: "flex", alignItems: "center", gap: "0.75rem",
+                                        padding: "0.875rem 1rem", borderRadius: "0.75rem",
+                                        fontSize: "14px", fontWeight: 600, textDecoration: "none",
+                                        color: active ? "var(--brand-cyan)" : "var(--brand-text)",
+                                        background: active ? "var(--brand-card-hover)" : "var(--brand-surface-2)",
+                                        border: active ? "1px solid color-mix(in srgb, var(--brand-cyan) 28%, transparent)" : "1px solid var(--brand-border)",
                                     }}>
                                         <Icon size={16} /> {link.name}
                                     </Link>
@@ -308,8 +392,8 @@ export default function Header() {
                                     padding: "0.875rem 1rem", borderRadius: "0.75rem",
                                     fontSize: "14px", fontWeight: 700, textDecoration: "none",
                                     color: "var(--brand-violet)",
-                                    background: "rgba(139,92,246,0.08)",
-                                    border: "1px solid rgba(139,92,246,0.25)",
+                                    background: "color-mix(in srgb, var(--signal) 10%, transparent)",
+                                    border: "1px solid color-mix(in srgb, var(--signal) 28%, transparent)",
                                 }}>
                                     <Settings size={16} /> Админ панел
                                 </Link>
@@ -321,8 +405,8 @@ export default function Header() {
                             <Link to="/calculator/" style={{
                                 padding: "0.875rem", borderRadius: "0.75rem", textAlign: "center",
                                 fontSize: "14px", fontWeight: 800, textDecoration: "none",
-                                color: "var(--brand-cyan)", border: "1px solid rgba(6,182,212,0.4)",
-                                background: "rgba(6,182,212,0.08)",
+                                color: "var(--brand-cyan)", border: "1px solid color-mix(in srgb, var(--brand-cyan) 40%, transparent)",
+                                background: "color-mix(in srgb, var(--brand-cyan) 9%, transparent)",
                             }}>Изчисли бал →</Link>
 
                             {!user ? (
@@ -359,7 +443,7 @@ export default function Header() {
             <style>{`
                 .uni-nav-desktop { display: none; }
                 .uni-nav-mobile { display: flex; }
-                @media (min-width: 1024px) {
+                @media (min-width: 1320px) {
                     .uni-nav-desktop { display: flex; }
                     .uni-nav-mobile { display: none; }
                 }
@@ -380,21 +464,56 @@ export default function Header() {
                 }
                 .uni-nav-link--active {
                     color: var(--brand-cyan) !important;
-                    background: rgba(6,182,212,0.1);
-                    border-color: rgba(6,182,212,0.25);
+                    background: color-mix(in srgb, var(--brand-cyan) 10%, transparent);
+                    border-color: color-mix(in srgb, var(--brand-cyan) 25%, transparent);
                 }
+
+                .uni-more-wrap { position: relative; }
+                .uni-more-btn { font-family: inherit; cursor: pointer; }
+                .uni-more-btn .lucide-chevron-down { transition: transform 0.2s ease; }
+                .uni-more-btn .uni-chevron-open { transform: rotate(180deg); }
+                .uni-more-menu {
+                    position: absolute; top: calc(100% + 0.75rem); right: 0;
+                    width: min(38rem, calc(100vw - 2rem)); padding: 0.75rem;
+                    background: var(--brand-dropdown-bg); border: 1px solid var(--brand-border);
+                    border-radius: 1rem; box-shadow: 0 24px 70px var(--brand-shadow);
+                    animation: uniMenuIn 0.2s ease-out; transform-origin: top right;
+                }
+                .uni-more-heading {
+                    padding: 0.375rem 0.5rem 0.625rem; color: var(--brand-muted);
+                    font-size: 10px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+                }
+                .uni-more-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.375rem; }
+                .uni-more-item {
+                    display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem;
+                    border: 1px solid transparent; border-radius: 0.75rem; color: var(--brand-text);
+                    text-decoration: none; transition: background 0.2s, border-color 0.2s, transform 0.2s;
+                }
+                .uni-more-item:hover { background: var(--brand-surface-2); border-color: var(--brand-border); transform: translateY(-1px); }
+                .uni-more-item--active { background: color-mix(in srgb, var(--brand-cyan) 9%, transparent); border-color: color-mix(in srgb, var(--brand-cyan) 28%, transparent); }
+                .uni-more-icon {
+                    width: 2.25rem; height: 2.25rem; display: grid; place-items: center; flex-shrink: 0;
+                    border-radius: 0.625rem; color: var(--brand-cyan);
+                    background: color-mix(in srgb, var(--brand-cyan) 10%, var(--brand-surface));
+                }
+                .uni-more-item strong { display: block; font-size: 13px; line-height: 1.25; }
+                .uni-more-item small { display: block; margin-top: 0.2rem; color: var(--brand-muted); font-size: 11px; line-height: 1.3; }
+                .uni-mobile-links { display: flex; flex-direction: column; gap: 0.375rem; flex: 1; overflow-y: auto; padding-right: 0.125rem; }
+                .uni-mobile-section-label { padding: 0 0.25rem 0.25rem; color: var(--brand-muted); font-size: 10px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+                .uni-mobile-section-label--spaced { margin-top: 0.75rem; }
+                @keyframes uniMenuIn { from { opacity: 0; transform: translateY(-6px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
                 /* Calculator CTA button — replaces inline hover handlers */
                 .uni-nav-cta {
                     padding: 0.5rem 1rem; border-radius: 0.625rem;
                     font-size: 13px; font-weight: 700; color: var(--brand-cyan); text-decoration: none;
-                    border: 1px solid rgba(6,182,212,0.4);
-                    background: rgba(6,182,212,0.06);
+                    border: 1px solid color-mix(in srgb, var(--brand-cyan) 40%, transparent);
+                    background: color-mix(in srgb, var(--brand-cyan) 6%, transparent);
                     transition: background 0.2s, border-color 0.2s;
                 }
                 .uni-nav-cta:hover {
-                    background: rgba(6,182,212,0.12);
-                    border-color: rgba(6,182,212,0.7);
+                    background: color-mix(in srgb, var(--brand-cyan) 12%, transparent);
+                    border-color: color-mix(in srgb, var(--brand-cyan) 70%, transparent);
                 }
 
                 /* Dropdown menu item */

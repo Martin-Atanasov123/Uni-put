@@ -5,8 +5,8 @@ import * as THREE from "three";
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const RADIUS = 1.8;
-const CYAN   = "#06B6D4";
-const VIOLET = "#8B5CF6";
+const CYAN   = "#1756D9";
+const VIOLET = "#1756D9";
 
 // ── Utilities ────────────────────────────────────────────────────────────────
 

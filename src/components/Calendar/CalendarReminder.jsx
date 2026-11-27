@@ -101,7 +101,7 @@ export default function CalendarReminder({ universityName = null }) {
             style={{
                 display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1rem",
                 padding: "1rem 1.25rem",
-                background: "linear-gradient(135deg, rgba(6,182,212,0.06), rgba(139,92,246,0.06))",
+                background: "linear-gradient(135deg, rgba(23,86,217,0.06), rgba(23,86,217,0.06))",
                 border: "1px solid var(--brand-card-border)", borderRadius: "1.25rem",
             }}
         >

@@ -5,9 +5,14 @@ import {
     BookOpen,
     FileText,
     GraduationCap,
-    Heart,
     Database,
     Mail,
+    Calculator,
+    Brain,
+    CalendarDays,
+    Building2,
+    ClipboardList,
+    Heart,
 } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 import { DATA_FRESHNESS_NOTE } from "@/lib/siteStats";
@@ -15,29 +20,42 @@ import { m } from "motion/react";
 
 const LINK_COLUMNS = [
     {
-        title: "Официални Ресурси",
+        title: "Основни",
+        links: [
+            { label: "Прием след 7. клас", icon: GraduationCap, href: "/priem-7-klas/" },
+            { label: "Университети", icon: Database, href: "/universities/" },
+            { label: "Специалности", icon: BookOpen, href: "/specialnosti/" },
+            { label: "Калкулатор за бал", icon: Calculator, href: "/calculator/" },
+            { label: "Кариерен тест", icon: Brain, href: "/career-advisor/" },
+        ],
+    },
+    {
+        title: "Инструменти",
+        links: [
+            { label: "ДЗИ стратег", icon: Brain, href: "/dzi-strateg/" },
+            { label: "Календар", icon: CalendarDays, href: "/calendar/" },
+            { label: "Общежития", icon: Building2, href: "/dormitories/" },
+            { label: "Любими", icon: Heart, href: "/favorites/" },
+            { label: "Моите оценки", icon: ClipboardList, href: "/my-grades/" },
+        ],
+    },
+    {
+        title: "Полезни връзки",
         links: [
             { label: "Данни от МОН", icon: Database, href: "https://www.mon.bg", external: true },
             { label: "Информация за ДЗИ", icon: BookOpen, href: "https://www.mon.bg/obshto-obrazovanie/darzhavni-zrelostni-izpiti-dzi", external: true },
             { label: "Новини от МОН", icon: ExternalLink, href: "https://www.mon.bg/novini/", external: true },
-            { label: "Държавни изпити", icon: FileText, href: "https://www.mon.bg/obshto-obrazovanie/darzhavni-zrelostni-izpiti-dzi/izpitni-materiali-za-dzi-po-godini/", external: true },
+            { label: "Изпитни материали", icon: FileText, href: "https://www.mon.bg/obshto-obrazovanie/darzhavni-zrelostni-izpiti-dzi/izpitni-materiali-za-dzi-po-godini/", external: true },
         ],
     },
     {
-        title: "Проектът",
+        title: "За УниПът",
         links: [
             { label: "За нас", icon: Info, href: "/about/" },
-            { label: "Всички специалности", icon: BookOpen, href: "/specialnosti/" },
-            { label: "Всички университети", icon: Database, href: "/universities/" },
-            { label: "Лиценз GNU", icon: ShieldCheck, href: "https://www.gnu.org/licenses/gpl-3.0.html", external: true },
-            { label: "uniput1000@gmail.com", icon: Mail, href: "mailto:uniput1000@gmail.com", mail: true },
-        ],
-    },
-    {
-        title: "Правна част",
-        links: [
             { label: "Условия за ползване", href: "/terms/" },
             { label: "Поверителност", href: "/privacy/" },
+            { label: "Лиценз GNU", icon: ShieldCheck, href: "https://www.gnu.org/licenses/gpl-3.0.html", external: true },
+            { label: "uniput1000@gmail.com", icon: Mail, href: "mailto:uniput1000@gmail.com", mail: true },
         ],
     },
 ];
@@ -104,7 +122,7 @@ const Footer = () => {
                     position: "absolute",
                     top: 0, left: 0, right: 0,
                     height: "1px",
-                    background: "linear-gradient(90deg, transparent, rgba(6,182,212,0.4), rgba(139,92,246,0.4), transparent)",
+                    background: "linear-gradient(90deg, transparent, rgba(23,86,217,0.4), rgba(23,86,217,0.4), transparent)",
                 }}
             />
             <div
@@ -116,7 +134,7 @@ const Footer = () => {
                     transform: "translateX(-50%)",
                     width: "640px",
                     height: "240px",
-                    background: "radial-gradient(ellipse at center, rgba(6,182,212,0.08), transparent 70%)",
+                    background: "radial-gradient(ellipse at center, rgba(23,86,217,0.08), transparent 70%)",
                     pointerEvents: "none",
                 }}
             />
@@ -131,8 +149,8 @@ const Footer = () => {
                 <div
                     style={{
                         display: "grid",
-                        gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-                        gap: "3rem",
+                        gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                        gap: "2.25rem",
                         marginBottom: "3rem",
                     }}
                 >
@@ -147,7 +165,7 @@ const Footer = () => {
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
-                                    boxShadow: "0 8px 24px rgba(6,182,212,0.25)",
+                                    boxShadow: "0 8px 24px rgba(23,86,217,0.25)",
                                 }}
                             >
                                 <GraduationCap size={20} color="#fff" />
@@ -155,9 +173,11 @@ const Footer = () => {
                             </div> */} {/* Brand */}
                     <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
                         <img
-                            src="/logo-wordmark.png"
+                            src="/logo-uniput.png"
                             alt="УниПът лого"
-                            style={{ height: "70px", width: "auto", objectFit: "contain", borderRadius: "0.5rem"  }}
+                            width="188"
+                            height="160"
+                            style={{ height: "58px", width: "auto", objectFit: "contain" }}
                         />
                     </Link>
                             <span
@@ -182,8 +202,8 @@ const Footer = () => {
                                 alignItems: "center",
                                 alignSelf: "flex-start",
                                 padding: "0.3rem 0.625rem",
-                                background: "rgba(139,92,246,0.1)",
-                                border: "1px solid rgba(139,92,246,0.3)",
+                                background: "rgba(23,86,217,0.1)",
+                                border: "1px solid rgba(23,86,217,0.3)",
                                 borderRadius: "999px",
                                 color: "#c4b5fd",
                                 fontSize: "10px",
@@ -241,7 +261,7 @@ const Footer = () => {
                     >
                         © {currentYear} УниПът Bulgaria — Всички права запазени
                     </p>
-                    {/* <p style={{ margin: 0, display: "inline-flex", alignItems: "center", gap: "0.375rem", fontSize: "11px", color: "var(--brand-muted)", opacity: 0.7 }}>
+                    {/* <p style={{ margin: 0, display: "inline-flex", alignItems: "center", gap: "0.375rem", fontSize: "11px", color: "var(--brand-muted)" }}>
                         Направено с <Heart size={11} style={{ color: "#f87171", fill: "#f87171" }} /> в България
                     </p> */}
                 </div>

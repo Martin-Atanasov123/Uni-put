@@ -42,9 +42,10 @@ const ReminderAction  = lazy(() => import("@/components/common/ReminderAction"))
 function PageWrap({ children }) {
     return (
         <m.div
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            // Страницата трябва да е видима още при първото изрисуване. Глобална
+            // opacity/blur анимация отлагаше LCP на всяка route страница; локалните
+            // component анимации остават и дават движение без да крият съдържанието.
+            initial={false}
         >
             {children}
         </m.div>

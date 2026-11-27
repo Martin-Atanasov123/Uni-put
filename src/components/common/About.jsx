@@ -30,8 +30,8 @@ const TEAM = [
 
 function MemberCard({ member, reverse }) {
     const accentColor = member.accent === "cyan" ? "var(--brand-cyan)" : "var(--brand-violet)";
-    const accentBg = member.accent === "cyan" ? "rgba(6,182,212,0.1)" : "rgba(139,92,246,0.1)";
-    const accentBorder = member.accent === "cyan" ? "rgba(6,182,212,0.3)" : "rgba(139,92,246,0.3)";
+    const accentBg = member.accent === "cyan" ? "rgba(23,86,217,0.1)" : "rgba(23,86,217,0.1)";
+    const accentBorder = member.accent === "cyan" ? "rgba(23,86,217,0.3)" : "rgba(23,86,217,0.3)";
     const glowRgb = member.accent === "cyan" ? "6,182,212" : "139,92,246";
 
     return (
@@ -176,8 +176,8 @@ const About = () => {
                 path="/about"
                 image="https://uniput.eu/og/about.png"
             />
-            <div aria-hidden style={{ position: "absolute", top: "-200px", right: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(6,182,212,0.08), transparent 70%)", pointerEvents: "none" }} />
-            <div aria-hidden style={{ position: "absolute", bottom: "20%", left: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(139,92,246,0.08), transparent 70%)", pointerEvents: "none" }} />
+            <div aria-hidden style={{ position: "absolute", top: "-200px", right: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(23,86,217,0.08), transparent 70%)", pointerEvents: "none" }} />
+            <div aria-hidden style={{ position: "absolute", bottom: "20%", left: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(23,86,217,0.08), transparent 70%)", pointerEvents: "none" }} />
 
             <div style={{ maxWidth: "1100px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "5rem", position: "relative" }}>
                 <m.header
@@ -187,7 +187,7 @@ const About = () => {
                     transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                     style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: "1rem" }}
                 >
-                    <div style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.4rem 0.875rem", background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.3)", borderRadius: "999px", color: "var(--brand-cyan)", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 auto" }}>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.4rem 0.875rem", background: "rgba(23,86,217,0.1)", border: "1px solid rgba(23,86,217,0.3)", borderRadius: "999px", color: "var(--brand-cyan)", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 auto" }}>
                         <Users size={12} /> За нас
                     </div>
                     <h1
@@ -227,7 +227,7 @@ const About = () => {
                     style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "3rem", alignItems: "start" }}
                 >
                     <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-                        <div style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.35rem 0.75rem", background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.3)", borderRadius: "999px", color: "var(--brand-violet)", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.18em", width: "fit-content" }}>
+                        <div style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", padding: "0.35rem 0.75rem", background: "rgba(23,86,217,0.1)", border: "1px solid rgba(23,86,217,0.3)", borderRadius: "999px", color: "var(--brand-violet)", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.18em", width: "fit-content" }}>
                             <Lightbulb size={11} /> Защо го изградихме
                         </div>
                         <h2
@@ -246,8 +246,8 @@ const About = () => {
 
                     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                         {[
-                            { icon: Calculator, color: "var(--brand-cyan)", bg: "rgba(6,182,212,0.1)", border: "rgba(6,182,212,0.25)", title: "Точен калкулатор", desc: "Прилагаме официалните коефициенти от наредбите на МОН за всяка специалност поотделно — не приблизителна формула." },
-                            { icon: Brain, color: "var(--brand-violet)", bg: "rgba(139,92,246,0.1)", border: "rgba(139,92,246,0.25)", title: "RIASEC профил", desc: "Научно обоснован метод за съпоставяне на личностни интереси с кариерни пътища и специалности." },
+                            { icon: Calculator, color: "var(--brand-cyan)", bg: "rgba(23,86,217,0.1)", border: "rgba(23,86,217,0.25)", title: "Точен калкулатор", desc: "Прилагаме официалните коефициенти от наредбите на МОН за всяка специалност поотделно — не приблизителна формула." },
+                            { icon: Brain, color: "var(--brand-violet)", bg: "rgba(23,86,217,0.1)", border: "rgba(23,86,217,0.25)", title: "RIASEC профил", desc: "Научно обоснован метод за съпоставяне на личностни интереси с кариерни пътища и специалности." },
                             { icon: BookOpen, color: "#10b981", bg: "rgba(16,185,129,0.1)", border: "rgba(16,185,129,0.25)", title: "Агрегирани данни", desc: "Университети, факултети, общежития и исторически балове на едно място — без да ровиш в отделни сайтове." },
                         ].map(({ icon: Icon, color, bg, border, title, desc }) => (
                             <div key={title} style={{ display: "flex", gap: "1rem", alignItems: "flex-start", padding: "1.25rem", background: "var(--brand-surface)", border: "1px solid var(--brand-card-border)", borderRadius: "1rem" }}>
@@ -272,13 +272,13 @@ const About = () => {
                     transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                     style={{
                         padding: "2rem",
-                        background: "linear-gradient(135deg, rgba(6,182,212,0.05), rgba(139,92,246,0.05))",
+                        background: "linear-gradient(135deg, rgba(23,86,217,0.05), rgba(23,86,217,0.05))",
                         border: "1px solid var(--brand-card-border)",
                         borderRadius: "1.25rem",
                     }}
                 >
                     <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
-                        <div style={{ width: "2.25rem", height: "2.25rem", borderRadius: "0.625rem", background: "rgba(6,182,212,0.12)", border: "1px solid rgba(6,182,212,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div style={{ width: "2.25rem", height: "2.25rem", borderRadius: "0.625rem", background: "rgba(23,86,217,0.12)", border: "1px solid rgba(23,86,217,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                             <Database size={16} style={{ color: "var(--brand-cyan)" }} />
                         </div>
                         <h2
@@ -305,7 +305,7 @@ const About = () => {
                             </div>
                         ))}
                     </div>
-                    <p style={{ margin: "1.25rem 0 0", fontSize: "12px", color: "var(--brand-muted)", opacity: 0.7, lineHeight: 1.6 }}>
+                    <p style={{ margin: "1.25rem 0 0", fontSize: "12px", color: "var(--brand-muted)", lineHeight: 1.6 }}>
                         Данните се актуализират при публикуване на нови наредби. Признаваме честно когато нещо не е покрито — виж известието в калкулатора. Ако забележиш грешка, използвай бутона „Докладвай грешка" до всеки резултат.
                     </p>
                 </m.section>

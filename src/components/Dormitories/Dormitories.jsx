@@ -80,8 +80,8 @@ function DormCard({ dorm }) {
                 transition: "border-color 0.2s, transform 0.2s, box-shadow 0.2s",
             }}
             onMouseEnter={e => {
-                e.currentTarget.style.borderColor = "rgba(6,182,212,0.35)";
-                e.currentTarget.style.boxShadow = "0 12px 32px rgba(6,182,212,0.08)";
+                e.currentTarget.style.borderColor = "rgba(23,86,217,0.35)";
+                e.currentTarget.style.boxShadow = "0 12px 32px rgba(23,86,217,0.08)";
                 e.currentTarget.style.transform = "translateY(-2px)";
             }}
             onMouseLeave={e => {
@@ -130,7 +130,7 @@ function DormCard({ dorm }) {
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", flexShrink: 0 }}>
                     <RatingStars value={dorm.condition_rating || 0} />
-                    <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", opacity: 0.6, marginTop: "0.25rem" }}>
+                    <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--brand-muted)", marginTop: "0.25rem" }}>
                         {dorm.condition_rating || 0}/5
                     </span>
                 </div>
@@ -140,12 +140,12 @@ function DormCard({ dorm }) {
             {(dorm.is_renovated || dorm.has_private_bathroom) && (
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
                     {dorm.is_renovated && (
-                        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", padding: "0.25rem 0.625rem", background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.3)", borderRadius: "999px", color: "#86efac", fontSize: "11px", fontWeight: 600 }}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", padding: "0.25rem 0.625rem", background: "var(--success-bg)", border: "1px solid color-mix(in srgb, var(--success) 38%, transparent)", borderRadius: "999px", color: "var(--success)", fontSize: "11px", fontWeight: 700 }}>
                             <Hammer size={11} /> Реновиран
                         </span>
                     )}
                     {dorm.has_private_bathroom && (
-                        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", padding: "0.25rem 0.625rem", background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.3)", borderRadius: "999px", color: "var(--brand-cyan)", fontSize: "11px", fontWeight: 600 }}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", padding: "0.25rem 0.625rem", background: "rgba(23,86,217,0.1)", border: "1px solid rgba(23,86,217,0.3)", borderRadius: "999px", color: "var(--brand-cyan)", fontSize: "11px", fontWeight: 600 }}>
                             <Bath size={11} /> Собствена баня
                         </span>
                     )}
@@ -159,14 +159,14 @@ function DormCard({ dorm }) {
                     <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--brand-text)", fontFamily: "monospace" }}>
                         {dorm.distance_to_uni_km != null ? `${dorm.distance_to_uni_km} км` : "—"}
                     </span>
-                    <span style={{ fontSize: "10px", color: "var(--brand-muted)", opacity: 0.6, marginTop: "0.125rem" }}>до университета</span>
+                    <span style={{ fontSize: "10px", color: "var(--brand-muted)", marginTop: "0.125rem" }}>до университета</span>
                 </div>
                 <div style={{ ...S.inset, padding: "0.75rem", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
                     <Clock size={15} style={{ color: "var(--brand-violet)", marginBottom: "0.3rem" }} />
                     <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--brand-text)", fontFamily: "monospace" }}>
                         {dorm.commute_minutes != null ? `${dorm.commute_minutes} мин` : "—"}
                     </span>
-                    <span style={{ fontSize: "10px", color: "var(--brand-muted)", opacity: 0.6, marginTop: "0.125rem" }}>пътуване</span>
+                    <span style={{ fontSize: "10px", color: "var(--brand-muted)", marginTop: "0.125rem" }}>пътуване</span>
                 </div>
             </div>
 
@@ -183,15 +183,15 @@ function DormCard({ dorm }) {
                             </span>
                         ))
                     ) : (
-                        <span style={{ fontSize: "11px", color: "var(--brand-muted)", opacity: 0.5, fontStyle: "italic" }}>Няма информация</span>
+                        <span style={{ fontSize: "11px", color: "var(--brand-muted)", fontStyle: "italic" }}>Няма информация</span>
                     )}
                 </div>
             </div>
 
             {/* Application period */}
             {dorm.application_period ? (
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.625rem 0.75rem", background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.25)", borderRadius: "0.625rem" }}>
-                    <CalendarDays size={14} style={{ color: "#fbbf24", flexShrink: 0 }} />
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.625rem 0.75rem", background: "var(--warning-bg)", border: "1px solid color-mix(in srgb, var(--warning) 36%, transparent)", borderRadius: "0.625rem" }}>
+                    <CalendarDays size={14} style={{ color: "var(--warning)", flexShrink: 0 }} />
                     <div>
                         <span style={{ display: "block", fontSize: "9px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>Кандидатстване</span>
                         <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--brand-text)" }}>{dorm.application_period}</span>
@@ -211,7 +211,7 @@ function DormCard({ dorm }) {
                         <Row label="Сметки (прибл.)" value={`${toEur(utility)} €`} />
                     </div>
                 ) : (
-                    <p style={{ margin: 0, fontSize: "12px", color: "var(--brand-muted)", opacity: 0.5, fontStyle: "italic", textAlign: "center" }}>
+                    <p style={{ margin: 0, fontSize: "12px", color: "var(--brand-muted)", fontStyle: "italic", textAlign: "center" }}>
                         Цените не са посочени
                     </p>
                 )}
@@ -232,8 +232,8 @@ function DormCard({ dorm }) {
                         justifyContent: "center",
                         gap: "0.5rem",
                         padding: "0.625rem 1rem",
-                        background: "rgba(6,182,212,0.08)",
-                        border: "1px solid rgba(6,182,212,0.25)",
+                        background: "rgba(23,86,217,0.08)",
+                        border: "1px solid rgba(23,86,217,0.25)",
                         borderRadius: "0.625rem",
                         color: "var(--brand-cyan)",
                         fontSize: "13px",
@@ -241,8 +241,8 @@ function DormCard({ dorm }) {
                         textDecoration: "none",
                         transition: "background 0.2s, border-color 0.2s",
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(6,182,212,0.15)"; e.currentTarget.style.borderColor = "rgba(6,182,212,0.45)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(6,182,212,0.08)"; e.currentTarget.style.borderColor = "rgba(6,182,212,0.25)"; }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(23,86,217,0.15)"; e.currentTarget.style.borderColor = "rgba(23,86,217,0.45)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(23,86,217,0.08)"; e.currentTarget.style.borderColor = "rgba(23,86,217,0.25)"; }}
                 >
                     <MapPin size={14} />
                     Виж на картата
@@ -256,7 +256,7 @@ function DormCard({ dorm }) {
 function Row({ label, value, strong = false }) {
     return (
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ color: "var(--brand-muted)", opacity: 0.8 }}>{label}</span>
+            <span style={{ color: "var(--brand-muted)" }}>{label}</span>
             <span style={{ fontFamily: "monospace", fontWeight: strong ? 800 : 600, color: strong ? "var(--brand-text)" : "var(--brand-muted)" }}>
                 {value}
             </span>
@@ -326,7 +326,7 @@ const Dormitories = () => {
                     style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}
                 >
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                        <div style={{ width: 8, height: 8, borderRadius: 999, background: "var(--brand-violet)", boxShadow: "0 0 12px rgba(139,92,246,0.6)" }} />
+                        <div style={{ width: 8, height: 8, borderRadius: 999, background: "var(--brand-violet)", boxShadow: "0 0 12px rgba(23,86,217,0.6)" }} />
                         <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--brand-muted)", textTransform: "uppercase", letterSpacing: "0.14em" }}>
                             Жилищна база
                         </span>
@@ -389,8 +389,8 @@ const Dormitories = () => {
                                 alignItems: "center",
                                 gap: "0.3rem",
                                 padding: "0.4rem 0.75rem",
-                                background: "rgba(6,182,212,0.1)",
-                                border: "1px solid rgba(6,182,212,0.3)",
+                                background: "rgba(23,86,217,0.1)",
+                                border: "1px solid rgba(23,86,217,0.3)",
                                 borderRadius: "999px",
                                 color: "var(--brand-cyan)",
                                 fontSize: "12px",
@@ -431,8 +431,8 @@ const Dormitories = () => {
                                 height: "4rem",
                                 margin: "0 auto 1rem",
                                 borderRadius: "1rem",
-                                background: "rgba(6,182,212,0.08)",
-                                border: "1px solid rgba(6,182,212,0.2)",
+                                background: "rgba(23,86,217,0.08)",
+                                border: "1px solid rgba(23,86,217,0.2)",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",

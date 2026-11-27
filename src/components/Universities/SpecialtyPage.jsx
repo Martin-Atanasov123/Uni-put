@@ -23,11 +23,11 @@ const CARD_BORDER = "1px solid var(--brand-card-border)";
 // RIASEC буква → име/цвят. Стабилни цветове (същите като кариерния резултат).
 const RIASEC_LETTER = {
     R: { name: "Реалистичен", color: "#F97316" },
-    I: { name: "Изследователски", color: "#8B5CF6" },
+    I: { name: "Изследователски", color: "#1756D9" },
     A: { name: "Артистичен", color: "#EC4899" },
     S: { name: "Социален", color: "#10B981" },
     E: { name: "Предприемачески", color: "#F59E0B" },
-    C: { name: "Конвенционален", color: "#06B6D4" },
+    C: { name: "Конвенционален", color: "#1756D9" },
 };
 
 function Loader() {
@@ -273,7 +273,7 @@ export default function SpecialtyPage() {
                                 )}
 
                                 {p.formula_description && (
-                                    <div style={{ marginTop: "0.75rem", padding: "0.625rem 0.75rem", background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.15)", borderRadius: "0.625rem", fontSize: "12px", color: "var(--brand-muted)", lineHeight: 1.5, wordBreak: "break-word", overflowWrap: "anywhere" }}>
+                                    <div style={{ marginTop: "0.75rem", padding: "0.625rem 0.75rem", background: "rgba(23,86,217,0.06)", border: "1px solid rgba(23,86,217,0.15)", borderRadius: "0.625rem", fontSize: "12px", color: "var(--brand-muted)", lineHeight: 1.5, wordBreak: "break-word", overflowWrap: "anywhere" }}>
                                         <strong style={{ color: "var(--brand-text)" }}>Формула:</strong> {p.formula_description}
                                     </div>
                                 )}

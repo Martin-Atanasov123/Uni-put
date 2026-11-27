@@ -32,14 +32,14 @@ function GradeField({ label, gradeKey, value, onChange, onBlur }) {
     return (
         <div style={{
             background: "var(--brand-surface)",
-            border: `1px solid ${invalid ? "rgba(248,113,113,0.4)" : filled ? "rgba(6,182,212,0.3)" : "var(--brand-border)"}`,
+            border: `1px solid ${invalid ? "rgba(248,113,113,0.4)" : filled ? "rgba(23,86,217,0.3)" : "var(--brand-border)"}`,
             borderRadius: "0.875rem",
             padding: "0.875rem 1rem",
             display: "flex",
             flexDirection: "column",
             gap: "0.5rem",
             transition: "border-color 0.2s, box-shadow 0.2s",
-            boxShadow: focused && !invalid ? "0 0 0 3px rgba(6,182,212,0.08)" : "none",
+            boxShadow: focused && !invalid ? "0 0 0 3px rgba(23,86,217,0.08)" : "none",
         }}>
             <label style={{
                 fontSize: "11px", fontWeight: 700,
@@ -392,7 +392,7 @@ export default function MyGradesPage() {
                 </div>
 
                 {/* ── Footer note ── */}
-                <p style={{ fontSize: "11px", color: "var(--brand-muted)", opacity: 0.5, textAlign: "center", marginTop: "2.5rem", letterSpacing: "0.04em" }}>
+                <p style={{ fontSize: "11px", color: "var(--brand-muted)", textAlign: "center", marginTop: "2.5rem", letterSpacing: "0.04em" }}>
                     Оценките се записват автоматично при всяка промяна. Калкулаторът ги зарежда автоматично.
                 </p>
             </div>

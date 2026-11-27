@@ -18,6 +18,11 @@ const FS_SOURCE = `
   precision highp float;
   uniform vec2 iResolution;
   uniform float iTime;
+  uniform vec3 uBackgroundStart;
+  uniform vec3 uBackgroundEnd;
+  uniform vec3 uLineStart;
+  uniform vec3 uLineEnd;
+  uniform float uEdgeFade;
 
   const float overallSpeed       = 0.2;
   const float gridSmoothWidth    = 0.015;
@@ -79,10 +84,11 @@ const FS_SOURCE = `
     space.x += random(space.y * warpFrequency + iTime * warpSpeed + 2.0) * warpAmplitude * horizontalFade;
 
     vec4 lines    = vec4(0.0);
-    vec4 bgColor1 = vec4(0.059, 0.090, 0.165, 1.0);
-    vec4 bgColor2 = vec4(0.063, 0.039, 0.137, 1.0);
-    vec4 brandCyan   = vec4(0.024, 0.714, 0.831, 1.0);
-    vec4 brandViolet = vec4(0.545, 0.361, 0.965, 1.0);
+    float lineMask = 0.0;
+    vec4 bgColor1 = vec4(uBackgroundStart, 1.0);
+    vec4 bgColor2 = vec4(uBackgroundEnd, 1.0);
+    vec4 brandCyan   = vec4(uLineStart, 1.0);
+    vec4 brandViolet = vec4(uLineEnd, 1.0);
 
     for (int l = 0; l < linesPerGroup; l++) {
       float normalizedLineIndex = float(l) / float(linesPerGroup);
@@ -103,12 +109,18 @@ const FS_SOURCE = `
       vec4 lineCol = mix(brandCyan, brandViolet, normalizedLineIndex);
       line  += circle;
       lines += line * lineCol * rand * 0.75;
+      lineMask += line * rand * 0.75;
     }
 
     fragColor    = mix(bgColor1, bgColor2, uv.x);
-    fragColor   *= verticalFade;
+    float lightEdge = mix(0.92, 1.0, verticalFade);
+    fragColor.rgb *= mix(lightEdge, verticalFade, uEdgeFade);
     fragColor.a  = 1.0;
-    fragColor   += lines;
+    float visibleLine = clamp(lineMask, 0.0, 0.82);
+    vec3 lineHue = clamp(lines.rgb / max(lineMask, 0.001), 0.0, 1.0);
+    vec3 lightResult = mix(fragColor.rgb, lineHue, visibleLine);
+    vec3 darkResult = fragColor.rgb + lines.rgb;
+    fragColor.rgb = mix(lightResult, darkResult, uEdgeFade);
 
     gl_FragColor = fragColor;
   }
@@ -147,6 +159,27 @@ function createProgram(gl, vsSrc, fsSrc) {
 
 import { useEffect, useRef } from 'react';
 
+const THEME_PALETTES = {
+  dark: {
+    backgroundStart: [12 / 255, 28 / 255, 51 / 255],
+    backgroundEnd: [5 / 255, 11 / 255, 20 / 255],
+    lineStart: [120 / 255, 167 / 255, 255 / 255],
+    lineEnd: [201 / 255, 242 / 255, 126 / 255],
+    edgeFade: 1,
+  },
+  light: {
+    backgroundStart: [246 / 255, 248 / 255, 245 / 255],
+    backgroundEnd: [238 / 255, 242 / 255, 238 / 255],
+    lineStart: [23 / 255, 86 / 255, 217 / 255],
+    lineEnd: [111 / 255, 151 / 255, 48 / 255],
+    edgeFade: 0,
+  },
+};
+
+const COLOR_TRANSITION_MS = 900;
+const mixColor = (from, to, progress) => from.map((value, index) => value + (to[index] - value) * progress);
+const easeOutCubic = (value) => 1 - Math.pow(1 - value, 3);
+
 export default function AnoAI({ style, className }) {
   const canvasRef = useRef(null);
 
@@ -159,6 +192,7 @@ export default function AnoAI({ style, className }) {
     let io;
     let timerId;
     let onVisibilityChange;
+    let themeObserver;
 
     const init = () => {
       const gl = canvas.getContext('webgl');
@@ -178,6 +212,11 @@ export default function AnoAI({ style, className }) {
       const vertexLoc     = gl.getAttribLocation(program,  'aVertexPosition');
       const resolutionLoc = gl.getUniformLocation(program, 'iResolution');
       const timeLoc       = gl.getUniformLocation(program, 'iTime');
+      const backgroundStartLoc = gl.getUniformLocation(program, 'uBackgroundStart');
+      const backgroundEndLoc = gl.getUniformLocation(program, 'uBackgroundEnd');
+      const lineStartLoc = gl.getUniformLocation(program, 'uLineStart');
+      const lineEndLoc = gl.getUniformLocation(program, 'uLineEnd');
+      const edgeFadeLoc = gl.getUniformLocation(program, 'uEdgeFade');
 
       // ── Performance стратегия (анимацията НИКОГА не спира) ──────────────
       // 1) Half-resolution: canvas вътрешно е 50% по-малък, CSS го scale-ва
@@ -217,14 +256,51 @@ export default function AnoAI({ style, className }) {
       let isVisible = true;       // hero в viewport
       let isTabFocused = !document.hidden;
       let isRendering = false;
+      const initialTheme = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+      let currentPalette = THEME_PALETTES[initialTheme];
+      let fromPalette = currentPalette;
+      let targetPalette = currentPalette;
+      let colorTransitionStartedAt = 0;
 
-      const drawFrame = () => {
+      const resolvePalette = (now) => {
+        const rawProgress = colorTransitionStartedAt
+          ? Math.min((now - colorTransitionStartedAt) / COLOR_TRANSITION_MS, 1)
+          : 1;
+        const progress = easeOutCubic(rawProgress);
+        const resolved = {
+          backgroundStart: mixColor(fromPalette.backgroundStart, targetPalette.backgroundStart, progress),
+          backgroundEnd: mixColor(fromPalette.backgroundEnd, targetPalette.backgroundEnd, progress),
+          lineStart: mixColor(fromPalette.lineStart, targetPalette.lineStart, progress),
+          lineEnd: mixColor(fromPalette.lineEnd, targetPalette.lineEnd, progress),
+          edgeFade: fromPalette.edgeFade + (targetPalette.edgeFade - fromPalette.edgeFade) * progress,
+        };
+        currentPalette = resolved;
+        return resolved;
+      };
+
+      themeObserver = new MutationObserver(() => {
+        const nextTheme = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+        const now = performance.now();
+        fromPalette = resolvePalette(now);
+        targetPalette = THEME_PALETTES[nextTheme];
+        colorTransitionStartedAt = now;
+        startLoop();
+      });
+      themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+      const drawFrame = (now) => {
         const t = (Date.now() - startTime) / 1000;
+        const palette = resolvePalette(now);
         gl.clearColor(0, 0, 0, 1);
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.useProgram(program);
         gl.uniform2f(resolutionLoc, canvas.width, canvas.height);
         gl.uniform1f(timeLoc, t);
+        gl.uniform3fv(backgroundStartLoc, palette.backgroundStart);
+        gl.uniform3fv(backgroundEndLoc, palette.backgroundEnd);
+        gl.uniform3fv(lineStartLoc, palette.lineStart);
+        gl.uniform3fv(lineEndLoc, palette.lineEnd);
+        gl.uniform1f(edgeFadeLoc, palette.edgeFade);
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
         gl.vertexAttribPointer(vertexLoc, 2, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vertexLoc);
@@ -238,7 +314,7 @@ export default function AnoAI({ style, className }) {
         }
         // 30fps throttle — пропускаме кадри ако не е минал интервалът
         if (now - lastFrameTime >= FRAME_INTERVAL_MS) {
-          drawFrame();
+          drawFrame(now);
           lastFrameTime = now;
         }
         rafId = requestAnimationFrame(renderLoop);
@@ -287,6 +363,7 @@ export default function AnoAI({ style, className }) {
       if (rafId) cancelAnimationFrame(rafId);
       if (ro) ro.disconnect();
       if (io) io.disconnect();
+      if (themeObserver) themeObserver.disconnect();
       if (onVisibilityChange) document.removeEventListener('visibilitychange', onVisibilityChange);
     };
   }, []);

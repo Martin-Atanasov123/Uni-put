@@ -206,7 +206,7 @@ const FavoritesPage = () => {
 
                 {loading ? (
                     <div style={{ display: "flex", justifyContent: "center", padding: "5rem 0" }}>
-                        <div style={{ width: "3rem", height: "3rem", borderRadius: "50%", border: "3px solid rgba(6,182,212,0.2)", borderTopColor: "var(--brand-cyan)", animation: "spin 1s linear infinite" }} />
+                        <div style={{ width: "3rem", height: "3rem", borderRadius: "50%", border: "3px solid rgba(23,86,217,0.2)", borderTopColor: "var(--brand-cyan)", animation: "spin 1s linear infinite" }} />
                         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
                     </div>
                 ) : filtered.length === 0 ? (
@@ -315,9 +315,9 @@ const FavoritesPage = () => {
                                         transition: "transform 0.2s, border-color 0.2s, box-shadow 0.2s",
                                     }}
                                     onMouseEnter={e => {
-                                        e.currentTarget.style.borderColor = "rgba(6,182,212,0.35)";
+                                        e.currentTarget.style.borderColor = "rgba(23,86,217,0.35)";
                                         e.currentTarget.style.transform = "translateY(-2px)";
-                                        e.currentTarget.style.boxShadow = "0 16px 40px rgba(6,182,212,0.1)";
+                                        e.currentTarget.style.boxShadow = "0 16px 40px rgba(23,86,217,0.1)";
                                     }}
                                     onMouseLeave={e => {
                                         e.currentTarget.style.borderColor = "var(--brand-border)";
@@ -334,7 +334,7 @@ const FavoritesPage = () => {
                                             width: "160px",
                                             height: "160px",
                                             borderRadius: "50%",
-                                            background: "radial-gradient(circle, rgba(6,182,212,0.08), transparent 70%)",
+                                            background: "radial-gradient(circle, rgba(23,86,217,0.08), transparent 70%)",
                                             pointerEvents: "none",
                                         }}
                                     />
@@ -354,8 +354,8 @@ const FavoritesPage = () => {
                                                     alignItems: "center",
                                                     gap: "0.3rem",
                                                     padding: "0.3rem 0.55rem",
-                                                    background: compareIds.has(String(uni.id)) ? "rgba(139,92,246,0.12)" : "var(--brand-border)",
-                                                    border: `1px solid ${compareIds.has(String(uni.id)) ? "rgba(139,92,246,0.35)" : "rgba(148,163,184,0.15)"}`,
+                                                    background: compareIds.has(String(uni.id)) ? "rgba(23,86,217,0.12)" : "var(--brand-border)",
+                                                    border: `1px solid ${compareIds.has(String(uni.id)) ? "rgba(23,86,217,0.35)" : "rgba(148,163,184,0.15)"}`,
                                                     borderRadius: "999px",
                                                     color: compareIds.has(String(uni.id)) ? "var(--brand-violet)" : "var(--brand-muted)",
                                                     fontSize: "10px",
@@ -405,8 +405,8 @@ const FavoritesPage = () => {
                                                 alignItems: "center",
                                                 gap: "0.4rem",
                                                 padding: "0.5rem 0.875rem",
-                                                background: "rgba(6,182,212,0.1)",
-                                                border: "1px solid rgba(6,182,212,0.3)",
+                                                background: "rgba(23,86,217,0.1)",
+                                                border: "1px solid rgba(23,86,217,0.3)",
                                                 borderRadius: "0.5rem",
                                                 color: "var(--brand-cyan)",
                                                 fontSize: "12px",
@@ -501,7 +501,7 @@ function ComparisonCard({ uni, entry, onRemove }) {
 
             <Link
                 to={`/calculator/?specialty=${encodeURIComponent(uni.specialty)}&university=${encodeURIComponent(uni.university_name)}`}
-                style={{ marginTop: "auto", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "0.35rem", padding: "0.5rem 0.75rem", background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.3)", borderRadius: "0.5rem", color: "var(--brand-cyan)", fontSize: "12px", fontWeight: 700, textDecoration: "none" }}
+                style={{ marginTop: "auto", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "0.35rem", padding: "0.5rem 0.75rem", background: "rgba(23,86,217,0.1)", border: "1px solid rgba(23,86,217,0.3)", borderRadius: "0.5rem", color: "var(--brand-cyan)", fontSize: "12px", fontWeight: 700, textDecoration: "none" }}
             >
                 <Calculator size={12} /> {entry ? "Изчисли пак" : "Изчисли бал"}
             </Link>

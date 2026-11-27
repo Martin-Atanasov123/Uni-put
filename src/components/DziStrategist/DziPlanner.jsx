@@ -142,7 +142,7 @@ export default function DziPlanner({ specialties }) {
     const remove = (name) => { setChosen((c) => c.filter((x) => x !== name)); setExpanded(null); };
 
     return (
-        <section aria-labelledby="dzi-planner-h" style={{ ...card, background: "linear-gradient(135deg, rgba(6,182,212,0.06), rgba(139,92,246,0.06))", padding: "1.75rem", marginBottom: "2.5rem" }}>
+        <section aria-labelledby="dzi-planner-h" style={{ ...card, background: "linear-gradient(135deg, rgba(23,86,217,0.06), rgba(23,86,217,0.06))", padding: "1.75rem", marginBottom: "2.5rem" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
                 <Sparkles size={16} strokeWidth={1.5} style={{ color: "var(--brand-violet)" }} aria-hidden="true" />
                 <span style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--brand-violet)" }}>Обратен калкулатор</span>
@@ -236,7 +236,7 @@ export default function DziPlanner({ specialties }) {
                             </p>
                         </div>
                     ) : (
-                        <div style={{ ...card, padding: "1.25rem 1.5rem", borderColor: "rgba(6,182,212,0.4)" }}>
+                        <div style={{ ...card, padding: "1.25rem 1.5rem", borderColor: "rgba(23,86,217,0.4)" }}>
                             <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--brand-cyan)", marginBottom: "0.375rem" }}>Най-добър втори ДЗИ за теб</div>
                             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "0.5rem 1rem" }}>
                                 <span style={{ fontSize: "1.5rem", fontWeight: 900, letterSpacing: "-0.03em", background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>{best.label}</span>

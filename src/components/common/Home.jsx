@@ -66,7 +66,7 @@ function DotsBg({ cyanOpacity = 0.1, violetOpacity = 0.07, size = 26 }) {
             aria-hidden
             style={{
                 position: "absolute", inset: 0,
-                backgroundImage: `radial-gradient(circle, rgba(6,182,212,${cyanOpacity}) 1px, transparent 1px), radial-gradient(circle, rgba(139,92,246,${violetOpacity}) 1px, transparent 1px)`,
+                backgroundImage: `radial-gradient(circle, color-mix(in srgb, var(--hero-line-1) ${cyanOpacity * 100}%, transparent) 1px, transparent 1px), radial-gradient(circle, color-mix(in srgb, var(--hero-line-2) ${violetOpacity * 100}%, transparent) 1px, transparent 1px)`,
                 backgroundSize: `${size}px ${size}px, ${size}px ${size}px`,
                 backgroundPosition: `0 0, ${size / 2}px ${size / 2}px`,
                 pointerEvents: "none",
@@ -180,8 +180,8 @@ function HeroSection() {
                         position: "absolute", inset: 0, zIndex: 1,
                         pointerEvents: "none",
                         background:
-                            "radial-gradient(ellipse 80% 60% at 20% 30%, rgba(6,182,212,0.18), transparent 60%), " +
-                            "radial-gradient(ellipse 70% 50% at 80% 70%, rgba(139,92,246,0.18), transparent 60%)",
+                            "radial-gradient(ellipse 80% 60% at 20% 30%, var(--hero-glow-1), transparent 60%), " +
+                            "radial-gradient(ellipse 70% 50% at 80% 70%, var(--hero-glow-2), transparent 60%)",
                     }}
                 />
             )}
@@ -212,17 +212,18 @@ function HeroSection() {
             >
                 <m.div
                     className="flex flex-col items-center"
-                    initial={{ opacity: 0, y: 24 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.9, ease: EASE }}
+                    // Заглавието е LCP елементът. Не го скриваме с opacity при
+                    // първия paint; останалите секции запазват плавните Reveal
+                    // анимации при скрол.
+                    initial={false}
                     style={{ width: "100%", zIndex: 3 }}
                 >
                     {/* Badge — filled with real data */}
                     <div
                         className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 w-fit"
                         style={{
-                            background: "rgba(6,182,212,0.08)",
-                            border: "1px solid rgba(6,182,212,0.28)",
+                            background: "color-mix(in srgb, var(--hero-line-1) 14%, transparent)",
+                            border: "1px solid color-mix(in srgb, var(--hero-line-1) 38%, transparent)",
                             color: "var(--brand-cyan)",
                             fontSize: "11px",
                             fontWeight: 700,
@@ -247,15 +248,6 @@ function HeroSection() {
                     >
                         Открий своя
                         <br /> път към Университета
-                        <span
-                            style={{
-                                background: "linear-gradient(130deg, #06B6D4 0%, #8B5CF6 100%)",
-                                WebkitBackgroundClip: "text",
-                                WebkitTextFillColor: "transparent",
-                            }}
-                        >
-                            {/* път към Университета */}
-                        </span>
                     </h1>
 
                     {/* Subheadline */}
@@ -263,7 +255,7 @@ function HeroSection() {
                         className="mb-10 leading-relaxed"
                         style={{
                             fontSize: "clamp(1rem, 2vw, 1.125rem)",
-                            color: "rgb(203, 213, 225)",
+                            color: "var(--hero-text-secondary)",
                             maxWidth: "540px",
                             lineHeight: 1.7,
                             margin: "0 auto 2.5rem",
@@ -281,15 +273,14 @@ function HeroSection() {
                                 to="/calculator/"
                                 className="inline-flex items-center gap-3 font-semibold"
                                 style={{
-                                    background: "linear-gradient(135deg, #06B6D4, #8B5CF6)",
-                                    color: "#fff",
+                                    background: "var(--hero-line-1)",
+                                    color: "var(--brand-accent-ink)",
                                     padding: "0.9rem 1.75rem",
                                     borderRadius: "0.875rem",
                                     fontSize: "0.9375rem",
                                     textDecoration: "none",
-                                    boxShadow:
-                                        "0 0 32px rgba(6,182,212,0.35), 0 4px 16px rgba(0,0,0,0.2)",
-                                    transition: "box-shadow 0.2s",
+                                    boxShadow: "var(--shadow-md)",
+                                    transition: "background-color 180ms ease, box-shadow 220ms ease",
                                 }}
                             >
                                 <Calculator size={18} />
@@ -306,7 +297,7 @@ function HeroSection() {
                                 style={{
                                     border: "1px solid var(--brand-border)",
                                     color: "var(--brand-text)",
-                                    background: "rgba(255,255,255,0.04)",
+                                    background: "color-mix(in srgb, var(--hero-text) 4%, transparent)",
                                     padding: "0.9rem 1.75rem",
                                     borderRadius: "0.875rem",
                                     fontSize: "0.9375rem",
@@ -314,14 +305,14 @@ function HeroSection() {
                                     transition: "border-color 0.2s, color 0.2s, background 0.2s",
                                 }}
                                 onMouseEnter={(e) => {
-                                    e.currentTarget.style.borderColor = "rgba(6,182,212,0.4)";
-                                    e.currentTarget.style.color = "var(--brand-cyan)";
-                                    e.currentTarget.style.background = "rgba(6,182,212,0.04)";
+                                    e.currentTarget.style.borderColor = "var(--hero-line-1)";
+                                    e.currentTarget.style.color = "var(--hero-line-1)";
+                                    e.currentTarget.style.background = "color-mix(in srgb, var(--hero-line-1) 8%, transparent)";
                                 }}
                                 onMouseLeave={(e) => {
                                     e.currentTarget.style.borderColor = "var(--brand-border)";
                                     e.currentTarget.style.color = "var(--brand-text)";
-                                    e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+                                    e.currentTarget.style.background = "color-mix(in srgb, var(--hero-text) 4%, transparent)";
                                 }}
                             >
                                 <Brain size={18} />
@@ -509,8 +500,8 @@ function HowItWorksSection() {
                                     transition: "border-color 0.2s, box-shadow 0.2s",
                                 }}
                                 onMouseEnter={(e) => {
-                                    e.currentTarget.style.borderColor = "rgba(6,182,212,0.4)";
-                                    e.currentTarget.style.boxShadow = "0 0 28px rgba(6,182,212,0.09)";
+                                    e.currentTarget.style.borderColor = "var(--brand-cyan)";
+                                    e.currentTarget.style.boxShadow = "var(--shadow-md)";
                                 }}
                                 onMouseLeave={(e) => {
                                     e.currentTarget.style.borderColor = "var(--brand-card-border)";
@@ -521,7 +512,7 @@ function HowItWorksSection() {
                                     <div
                                         className="p-3 rounded-xl"
                                         style={{
-                                            background: "linear-gradient(135deg, rgba(6,182,212,0.14), rgba(139,92,246,0.14))",
+                                            background: "var(--brand-subtle)",
                                         }}
                                     >
                                         <Icon size={20} style={{ color: "var(--brand-cyan)" }} />
@@ -616,11 +607,11 @@ function PathSection() {
                                         borderRadius: "1.25rem", textDecoration: "none", color: "inherit",
                                         transition: "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease",
                                     }}
-                                    onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.borderColor = "rgba(6,182,212,0.4)"; }}
+                                    onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.borderColor = "var(--brand-cyan)"; }}
                                     onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.borderColor = "var(--brand-card-border)"; }}
                                 >
                                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
-                                        <div className="inline-flex p-3 rounded-xl" style={{ background: "linear-gradient(135deg, rgba(6,182,212,0.12), rgba(139,92,246,0.12))" }}>
+                                        <div className="inline-flex p-3 rounded-xl" style={{ background: "var(--brand-subtle)" }}>
                                             <Icon size={20} strokeWidth={1.5} style={{ color: "var(--brand-cyan)" }} aria-hidden="true" />
                                         </div>
                                         <span style={{ fontFamily: "monospace", fontSize: "12px", fontWeight: 800, color: "var(--brand-muted)" }}>
@@ -728,8 +719,8 @@ function FeaturesSection() {
                                     transition: "border-color 0.2s, box-shadow 0.2s",
                                 }}
                                 onMouseEnter={(e) => {
-                                    e.currentTarget.style.borderColor = "rgba(139,92,246,0.35)";
-                                    e.currentTarget.style.boxShadow = "0 0 24px rgba(139,92,246,0.07)";
+                                    e.currentTarget.style.borderColor = "var(--brand-cyan)";
+                                    e.currentTarget.style.boxShadow = "var(--shadow-md)";
                                 }}
                                 onMouseLeave={(e) => {
                                     e.currentTarget.style.borderColor = "var(--brand-card-border)";
@@ -739,7 +730,7 @@ function FeaturesSection() {
                                 <div
                                     className="inline-flex p-3 rounded-xl mb-4"
                                     style={{
-                                        background: "linear-gradient(135deg, rgba(139,92,246,0.12), rgba(6,182,212,0.12))",
+                                        background: "var(--brand-subtle)",
                                     }}
                                 >
                                     <Icon size={20} style={{ color: "var(--brand-violet)" }} />
@@ -908,7 +899,7 @@ function TrustSection() {
                         style={{ color: "var(--brand-text)", letterSpacing: "-0.03em", textWrap: "balance", lineHeight: 1.1 }}
                     >
                         Ученици, които вече са{" "}
-                        <span style={{ background: "linear-gradient(130deg, #06B6D4, #8B5CF6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                        <span style={{ color: "var(--brand-cyan)" }}>
                             намерили пътя си
                         </span>
                     </h2>
@@ -1030,7 +1021,7 @@ function CTASection() {
                             <br />
                             <span
                                 style={{
-                                    background: "linear-gradient(130deg, #06B6D4, #8B5CF6)",
+                                    background: "var(--brand-cyan)",
                                     WebkitBackgroundClip: "text",
                                     WebkitTextFillColor: "transparent",
                                 }}
@@ -1054,13 +1045,13 @@ function CTASection() {
                                     to="/calculator/"
                                     className="inline-flex items-center gap-3 font-semibold"
                                     style={{
-                                        background: "linear-gradient(135deg, #06B6D4, #8B5CF6)",
-                                        color: "#fff",
+                                        background: "var(--brand-cyan)",
+                                        color: "var(--brand-accent-ink)",
                                         padding: "0.9rem 1.75rem",
                                         borderRadius: "0.875rem",
                                         fontSize: "0.9375rem",
                                         textDecoration: "none",
-                                        boxShadow: "0 0 40px rgba(6,182,212,0.28)",
+                                        boxShadow: "var(--shadow-md)",
                                     }}
                                 >
                                     {user ? "Изчисли моя бал" : "Започни безплатно"}
@@ -1083,9 +1074,9 @@ function CTASection() {
                                         transition: "border-color 0.2s, color 0.2s, background 0.2s",
                                     }}
                                     onMouseEnter={(e) => {
-                                        e.currentTarget.style.borderColor = "rgba(139,92,246,0.4)";
+                                        e.currentTarget.style.borderColor = "var(--brand-cyan)";
                                         e.currentTarget.style.color = "var(--brand-violet)";
-                                        e.currentTarget.style.background = "rgba(139,92,246,0.04)";
+                                        e.currentTarget.style.background = "var(--brand-subtle)";
                                     }}
                                     onMouseLeave={(e) => {
                                         e.currentTarget.style.borderColor = "var(--brand-border)";

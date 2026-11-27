@@ -135,6 +135,39 @@ export function InterestsHex() {
     );
 }
 
+/** Кариерни посоки: theme-aware вектор вместо растер с артефакти. */
+export function CareerPathsArt({ className = "" }) {
+    const goals = [
+        { code: "R", x: 202, y: 34 },
+        { code: "I", x: 248, y: 62 },
+        { code: "A", x: 270, y: 112 },
+        { code: "S", x: 254, y: 164 },
+        { code: "E", x: 210, y: 194 },
+        { code: "C", x: 160, y: 176 },
+    ];
+    return (
+        <svg className={`il ${className}`.trim()} viewBox="0 0 310 225" aria-hidden="true" focusable="false">
+            <rect className="il-plane" x="8" y="10" width="294" height="205" rx="28" />
+            <circle className="il-node" cx="42" cy="112" r="12" />
+            <circle className="il-dot--brand" cx="42" cy="112" r="4" />
+            <path className="il-brand il-draw" d="M54 112 C82 112 86 112 108 112" />
+            <circle className="il-goal" cx="112" cy="112" r="9" />
+            {goals.map((goal, index) => (
+                <g key={goal.code}>
+                    <path
+                        className={index === 2 ? "il-brand" : "il-ink"}
+                        style={{ opacity: index === 2 ? 1 : 0.66, strokeWidth: index === 2 ? 3.5 : 2 }}
+                        d={`M121 112 C150 112 155 ${goal.y} ${goal.x - 18} ${goal.y}`}
+                    />
+                    <circle className={index === 2 ? "il-goal" : "il-node"} cx={goal.x} cy={goal.y} r="15" />
+                    <text x={goal.x} y={goal.y} dy="0.36em" textAnchor="middle" style={{ fontSize: 12, fontWeight: 800, fill: "var(--ink)" }}>{goal.code}</text>
+                </g>
+            ))}
+            <text x="28" y="145" style={{ fontSize: 11, fontWeight: 700, fill: "var(--ink-muted)" }}>ТВОЯТ ПРОФИЛ</text>
+        </svg>
+    );
+}
+
 // ── Илюстрация до заглавието на страница ─────────────────────────────────────
 // Контейнерът получава className="pg-head"; от 1000 px нагоре става две колони:
 // текстът вляво, картината вдясно. На телефон картината се крие — данните са първи.

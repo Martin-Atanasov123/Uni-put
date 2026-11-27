@@ -86,8 +86,8 @@ const Login = () => {
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
             {/* ambient glows */}
-            <div aria-hidden style={{ position: "absolute", top: "-200px", right: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(6,182,212,0.1), transparent 70%)", pointerEvents: "none" }} />
-            <div aria-hidden style={{ position: "absolute", bottom: "-200px", left: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(139,92,246,0.1), transparent 70%)", pointerEvents: "none" }} />
+            <div aria-hidden style={{ position: "absolute", top: "-200px", right: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(23,86,217,0.1), transparent 70%)", pointerEvents: "none" }} />
+            <div aria-hidden style={{ position: "absolute", bottom: "-200px", left: "-150px", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(23,86,217,0.1), transparent 70%)", pointerEvents: "none" }} />
 
             <m.div
                 initial={{ opacity: 0, y: 24, scale: 0.97 }}
@@ -116,7 +116,7 @@ const Login = () => {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            boxShadow: "0 16px 40px rgba(6,182,212,0.35)",
+                            boxShadow: "0 16px 40px rgba(23,86,217,0.35)",
                         }}
                     >
                         <GraduationCap size={28} color="#fff" />
@@ -186,7 +186,7 @@ const Login = () => {
                         transition: "border-color 0.2s, background 0.2s",
                         marginBottom: "0.25rem",
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(6,182,212,0.35)"; e.currentTarget.style.background = "var(--brand-surface)"; }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(23,86,217,0.35)"; e.currentTarget.style.background = "var(--brand-surface)"; }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--brand-input-border)"; e.currentTarget.style.background = "var(--brand-input-bg)"; }}
                 >
                     <svg width="18" height="18" viewBox="0 0 24 24">
@@ -254,7 +254,7 @@ const Login = () => {
                             alignItems: "center",
                             justifyContent: "center",
                             gap: "0.5rem",
-                            boxShadow: loading ? "none" : "0 12px 30px rgba(6,182,212,0.3)",
+                            boxShadow: loading ? "none" : "0 12px 30px rgba(23,86,217,0.3)",
                             fontFamily: "inherit",
                             transition: "transform 0.15s",
                         }}
@@ -303,7 +303,7 @@ export function Field({ label, icon: Icon, right, ...inputProps }) {
                     borderRadius: "0.625rem",
                     transition: "border-color 0.2s, box-shadow 0.2s",
                 }}
-                onFocusCapture={e => { e.currentTarget.style.borderColor = "rgba(6,182,212,0.5)"; e.currentTarget.style.boxShadow = "0 0 0 3px rgba(6,182,212,0.08)"; }}
+                onFocusCapture={e => { e.currentTarget.style.borderColor = "rgba(23,86,217,0.5)"; e.currentTarget.style.boxShadow = "0 0 0 3px rgba(23,86,217,0.08)"; }}
                 onBlurCapture={e => { e.currentTarget.style.borderColor = "var(--brand-input-border)"; e.currentTarget.style.boxShadow = "none"; }}
             >
                 {Icon && <Icon size={16} style={{ color: "var(--brand-muted)", flexShrink: 0 }} />}
@@ -332,7 +332,7 @@ export function Divider({ label }) {
     return (
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", margin: "1.5rem 0 1.25rem" }}>
             <div style={{ flex: 1, height: "1px", background: "var(--brand-border)" }} />
-            <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "var(--brand-muted)", textTransform: "uppercase", opacity: 0.6 }}>{label}</span>
+            <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "var(--brand-muted)", textTransform: "uppercase" }}>{label}</span>
             <div style={{ flex: 1, height: "1px", background: "var(--brand-border)" }} />
         </div>
     );
