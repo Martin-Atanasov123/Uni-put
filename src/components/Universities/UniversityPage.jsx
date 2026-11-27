@@ -11,9 +11,23 @@ import { slugify } from "@/lib/slugify";
 import Seo from "@/components/common/Seo";
 import JsonLd from "@/components/common/JsonLd";
 import AccreditationWarning from "@/components/common/AccreditationWarning";
+import ErrorState from "@/components/common/ErrorState";
 import { UNIVERSITIES, RIASEC_SPECIALTIES, ADMISSION_YEAR_SHORT, DATA_FRESHNESS_NOTE } from "@/lib/siteStats";
 
 const CARD_BORDER = "1px solid var(--brand-card-border)";
+
+function LoadError({ onRetry }) {
+    return (
+        <div style={{ minHeight: "100vh", background: "var(--brand-bg)", padding: "8rem 1.5rem 5rem" }}>
+            <div style={{ maxWidth: "36rem", margin: "0 auto" }}>
+                <ErrorState
+                    message="Не успяхме да заредим страницата. Провери връзката и опитай пак — данните не са изчезнали."
+                    onRetry={onRetry}
+                />
+            </div>
+        </div>
+    );
+}
 
 function Loader() {
     return (
@@ -76,6 +90,7 @@ export default function UniversityPage() {
     const [status, setStatus] = useState("loading"); // loading | ok | notfound | error
     const [uniName, setUniName] = useState("");
     const [rows, setRows] = useState([]);
+    const [attempt, setAttempt] = useState(0); // „Опитай пак“ повтаря заявката
 
     useEffect(() => {
         let cancelled = false;
@@ -98,7 +113,7 @@ export default function UniversityPage() {
             }
         })();
         return () => { cancelled = true; };
-    }, [uniSlug]);
+    }, [uniSlug, attempt]);
 
     // Групиране по факултет + общи метрики
     const { faculties, cities, totalSpecialties } = useMemo(() => {
@@ -123,7 +138,8 @@ export default function UniversityPage() {
 
     if (status === "loading") return <Loader />;
     if (status === "notfound") return <NotFound slug={uniSlug} />;
-    if (status === "error") return <NotFound slug={uniSlug} />;
+    // Грешка при връзката не е „няма такава страница“ — показваме я честно, с повторен опит.
+    if (status === "error") return <LoadError onRetry={() => setAttempt((n) => n + 1)} />;
 
     const primaryCity = cities[0] || "";
     // Статус на акредитация (един за целия университет) — за warning банер.

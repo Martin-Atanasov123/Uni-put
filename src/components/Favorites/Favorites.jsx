@@ -5,6 +5,7 @@ import { universityService } from "@/services/universityService";
 import { Search, MapPin, School, Heart, Calculator, Scale, X, TrendingUp, TrendingDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import SignupPrompt from "@/components/common/SignupPrompt";
+import ErrorState from "@/components/common/ErrorState";
 import { mergeCalculatorHistory, readLocalHistory, CHANCE_BAND_META, CHANCE_TONES } from "@/lib/calcHistory";
 
 const MAX_COMPARE = 3;
@@ -13,6 +14,8 @@ const FavoritesPage = () => {
     const { user, favorites, isFavorite, toggleFavorite } = useAuth();
     const [allFavoritesData, setAllFavoritesData] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(false);
+    const [attempt, setAttempt] = useState(0);
     const [search, setSearch] = useState("");
     const [cityFilter, setCityFilter] = useState("Всички");
     const [calcHistory, setCalcHistory] = useState([]);
@@ -55,19 +58,22 @@ const FavoritesPage = () => {
                 return;
             }
             setLoading(true);
+            setLoadError(false);
             try {
                 // Server-side: дърпаме само записите с тези ID-та (а не цялата таблица)
                 const data = await universityService.getByIds(favorites);
                 setAllFavoritesData(data);
             } catch (err) {
+                // Празен списък би изглеждал като „нямаш любими“ — показваме грешка.
                 console.error("Favorites load failed:", err);
                 setAllFavoritesData([]);
+                setLoadError(true);
             } finally {
                 setLoading(false);
             }
         };
         load();
-    }, [user, favorites]);
+    }, [user, favorites, attempt]);
 
     const cities = useMemo(() => {
         const set = new Set(["Всички"]);
@@ -209,6 +215,11 @@ const FavoritesPage = () => {
                         <div style={{ width: "3rem", height: "3rem", borderRadius: "50%", border: "3px solid rgba(23,86,217,0.2)", borderTopColor: "var(--brand-cyan)", animation: "spin 1s linear infinite" }} />
                         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
                     </div>
+                ) : loadError ? (
+                    <ErrorState
+                        message="Не успяхме да заредим любимите ти специалности. Те са запазени — провери връзката и опитай пак."
+                        onRetry={() => setAttempt((n) => n + 1)}
+                    />
                 ) : filtered.length === 0 ? (
                     <m.div
                         initial={{ opacity: 0, y: 20 }}
