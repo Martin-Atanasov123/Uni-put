@@ -366,18 +366,11 @@ const RIASECResults = ({ results, onRestart }) => {
                     </h3>
                     <m.div
                         style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true, margin: "-40px" }}
-                        variants={{ visible: { transition: { staggerChildren: 0.06 } } }}
                     >
                         {visibleSpecialties.length > 0 ? visibleSpecialties.map((spec, index) => (
                             <m.div
                                 key={spec.id}
-                                variants={{
-                                    hidden: { opacity: 0, y: 16 },
-                                    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } },
-                                }}
+                                data-testid={`riasec-specialty-${spec.id}`}
                                 style={{
                                     ...S.surface,
                                     padding: "1.25rem",
