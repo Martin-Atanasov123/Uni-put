@@ -37,3 +37,6 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Browser E2E тестове
+        run: npm run test:e2e

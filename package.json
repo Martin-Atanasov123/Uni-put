@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:e2e": "playwright test",
     "generate:sitemap": "node scripts/generate-sitemap.mjs",
     "generate:og": "node scripts/generate-og-images.mjs",
     "prerender": "node scripts/prerender.mjs",
@@ -31,6 +32,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
+    "@playwright/test": "^1.65.1",
     "@resvg/resvg-js": "^2.6.2",
     "@testing-library/react": "^16.3.2",
     "@types/react": "^19.1.2",
