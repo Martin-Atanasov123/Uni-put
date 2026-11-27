@@ -9,6 +9,7 @@ import { useUpcomingDeadlines } from "@/hooks/useNextDeadline";
 import { loadGrades, ALL_CATEGORY_KEYS } from "@/lib/gradeStore";
 import CalcStatsOptOut from "@/components/common/CalcStatsOptOut";
 import { historyPoints, mergeCalculatorHistory, readLocalHistory } from "@/lib/calcHistory";
+import { isAdminUser, profileRoleLabel } from "@/lib/profileRole";
 import {
     User,
     Mail,
@@ -38,11 +39,11 @@ import {
 
 const RIASEC_TYPES = {
     R: { label: "Реалист", color: "#F97316", bg: "rgba(249,115,22,0.12)", border: "rgba(249,115,22,0.3)" },
-    I: { label: "Изследовател", color: "#8B5CF6", bg: "rgba(139,92,246,0.12)", border: "rgba(139,92,246,0.3)" },
+    I: { label: "Изследовател", color: "#1756D9", bg: "rgba(23,86,217,0.12)", border: "rgba(23,86,217,0.3)" },
     A: { label: "Артист", color: "#EC4899", bg: "rgba(236,72,153,0.12)", border: "rgba(236,72,153,0.3)" },
     S: { label: "Социален", color: "#10B981", bg: "rgba(16,185,129,0.12)", border: "rgba(16,185,129,0.3)" },
     E: { label: "Предприемач", color: "#F59E0B", bg: "rgba(245,158,11,0.12)", border: "rgba(245,158,11,0.3)" },
-    C: { label: "Конвенционален", color: "#06B6D4", bg: "rgba(6,182,212,0.12)", border: "rgba(6,182,212,0.3)" },
+    C: { label: "Конвенционален", color: "#1756D9", bg: "rgba(23,86,217,0.12)", border: "rgba(23,86,217,0.3)" },
 };
 
 const SURFACE = {
@@ -66,6 +67,7 @@ const Profile = () => {
     const [deletingAccount, setDeletingAccount] = useState(false);
 
     const [user, setUser] = useState(null);
+    const isAdmin = isAdminUser(user);
     const [favoriteDetails, setFavoriteDetails] = useState([]);
     const [calculatorHistory, setCalculatorHistory] = useState([]);
     const [showAllHistory, setShowAllHistory] = useState(false);
@@ -258,7 +260,7 @@ const Profile = () => {
             <div style={{ minHeight: "100vh", background: "var(--brand-bg)", color: "var(--brand-text)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}>
-                    <div style={{ width: "3rem", height: "3rem", borderRadius: "50%", border: "3px solid rgba(6,182,212,0.2)", borderTopColor: "var(--brand-cyan)", animation: "spin 1s linear infinite" }} />
+                    <div style={{ width: "3rem", height: "3rem", borderRadius: "50%", border: "3px solid rgba(23,86,217,0.2)", borderTopColor: "var(--brand-cyan)", animation: "spin 1s linear infinite" }} />
                     <p style={{ margin: 0, fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--brand-muted)" }}>
                         Зареждане на профил...
                     </p>
@@ -287,7 +289,7 @@ const Profile = () => {
                     height: "240px",
                     position: "relative",
                     overflow: "hidden",
-                    background: "linear-gradient(135deg, rgba(6,182,212,0.18), rgba(139,92,246,0.18))",
+                    background: "linear-gradient(135deg, rgba(23,86,217,0.18), rgba(23,86,217,0.18))",
                 }}
             >
                 <div
@@ -295,7 +297,7 @@ const Profile = () => {
                     style={{
                         position: "absolute",
                         inset: 0,
-                        background: "radial-gradient(circle at 30% 30%, rgba(6,182,212,0.25), transparent 50%), radial-gradient(circle at 70% 70%, rgba(139,92,246,0.25), transparent 50%)",
+                        background: "radial-gradient(circle at 30% 30%, rgba(23,86,217,0.25), transparent 50%), radial-gradient(circle at 70% 70%, rgba(23,86,217,0.25), transparent 50%)",
                     }}
                 />
                 <div
@@ -345,8 +347,8 @@ const Profile = () => {
                                 <span
                                     style={{
                                         padding: "0.3rem 0.75rem",
-                                        background: "rgba(6,182,212,0.12)",
-                                        border: "1px solid rgba(6,182,212,0.3)",
+                                        background: "rgba(23,86,217,0.12)",
+                                        border: "1px solid rgba(23,86,217,0.3)",
                                         borderRadius: "999px",
                                         color: "var(--brand-cyan)",
                                         fontSize: "10px",
@@ -355,13 +357,13 @@ const Profile = () => {
                                         letterSpacing: "0.14em",
                                     }}
                                 >
-                                    Кандидат-студент
+                                    {profileRoleLabel(user)}
                                 </span>
                             </div>
                             <p style={{ margin: 0, display: "inline-flex", alignItems: "center", gap: "0.4rem", color: "var(--brand-muted)", fontSize: "13px", fontWeight: 500 }}>
                                 <Mail size={14} style={{ opacity: 0.6 }} /> {user?.email}
                             </p>
-                            <p style={{ margin: 0, fontSize: "13px", color: "var(--brand-muted)", opacity: 0.7, fontStyle: "italic", maxWidth: "480px" }}>
+                            <p style={{ margin: 0, fontSize: "13px", color: "var(--brand-muted)", fontStyle: "italic", maxWidth: "480px" }}>
                                 {formData.bio || "Все още няма добавена биография..."}
                             </p>
                         </div>
@@ -412,8 +414,8 @@ const Profile = () => {
                                         alignItems: "center",
                                         gap: "0.4rem",
                                         padding: "0.6rem 1rem",
-                                        background: active ? "rgba(6,182,212,0.12)" : "transparent",
-                                        border: `1px solid ${active ? "rgba(6,182,212,0.35)" : "transparent"}`,
+                                        background: active ? "rgba(23,86,217,0.12)" : "transparent",
+                                        border: `1px solid ${active ? "rgba(23,86,217,0.35)" : "transparent"}`,
                                         borderRadius: "0.5rem",
                                         color: active ? "var(--brand-cyan)" : "var(--brand-muted)",
                                         fontSize: "12px",
@@ -454,6 +456,51 @@ const Profile = () => {
 
                     {/* OVERVIEW */}
                     {activeTab === "overview" && (() => {
+                        if (isAdmin) {
+                            return (
+                                <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                                    <div style={{ padding: "clamp(1.25rem, 3vw, 2rem)", background: "linear-gradient(135deg, rgba(23,86,217,0.12), rgba(124,58,237,0.1))", border: "1px solid rgba(23,86,217,0.3)", borderRadius: "1.25rem" }}>
+                                        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1.25rem" }}>
+                                            <div style={{ width: "3.25rem", height: "3.25rem", borderRadius: "1rem", background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 12px 30px rgba(23,86,217,0.22)" }}>
+                                                <Shield size={24} color="#fff" strokeWidth={1.7} />
+                                            </div>
+                                            <div style={{ flex: 1, minWidth: "220px" }}>
+                                                <p style={{ margin: 0, fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--brand-cyan)" }}>Администраторски достъп</p>
+                                                <h2 style={{ margin: "0.3rem 0 0", fontSize: "clamp(1.25rem, 3vw, 1.75rem)", fontWeight: 850, color: "var(--brand-text)", letterSpacing: "-0.025em" }}>Управление на УниПът</h2>
+                                                <p style={{ margin: "0.5rem 0 0", maxWidth: "62ch", fontSize: "13px", lineHeight: 1.65, color: "var(--brand-muted)" }}>
+                                                    Поддържай университетите и приемната информация актуални и преглеждай подадените сигнали от едно място.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "1rem" }}>
+                                        <Link to="/admin" style={{ ...SURFACE, padding: "1.25rem", display: "flex", alignItems: "center", gap: "1rem", color: "var(--brand-text)", textDecoration: "none", transition: "transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease" }}>
+                                            <span style={{ width: "2.75rem", height: "2.75rem", borderRadius: "0.75rem", background: "rgba(23,86,217,0.12)", color: "var(--brand-cyan)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                                <Settings size={20} />
+                                            </span>
+                                            <span style={{ flex: 1 }}>
+                                                <strong style={{ display: "block", fontSize: "14px" }}>Админ панел</strong>
+                                                <span style={{ display: "block", marginTop: "0.25rem", fontSize: "12px", lineHeight: 1.45, color: "var(--brand-muted)" }}>Управление на университети и данни</span>
+                                            </span>
+                                            <ArrowRight size={16} style={{ color: "var(--brand-cyan)" }} />
+                                        </Link>
+
+                                        <Link to="/admin/reports" style={{ ...SURFACE, padding: "1.25rem", display: "flex", alignItems: "center", gap: "1rem", color: "var(--brand-text)", textDecoration: "none", transition: "transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease" }}>
+                                            <span style={{ width: "2.75rem", height: "2.75rem", borderRadius: "0.75rem", background: "rgba(124,58,237,0.12)", color: "var(--brand-violet)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                                <AlertCircle size={20} />
+                                            </span>
+                                            <span style={{ flex: 1 }}>
+                                                <strong style={{ display: "block", fontSize: "14px" }}>Доклади и сигнали</strong>
+                                                <span style={{ display: "block", marginTop: "0.25rem", fontSize: "12px", lineHeight: 1.45, color: "var(--brand-muted)" }}>Преглед на обратната връзка от потребители</span>
+                                            </span>
+                                            <ArrowRight size={16} style={{ color: "var(--brand-violet)" }} />
+                                        </Link>
+                                    </div>
+                                </div>
+                            );
+                        }
+
                         const progressSteps = [
                             { label: "Кариерен тест", done: !!riasecType, link: "/career-advisor", sub: riasecType ? `Тип ${RIASEC_TYPES[riasecType]?.label || riasecType}` : "30 въпроса" },
                             { label: "Изчисли бал", done: calculatorHistory.length > 0, link: "/calculator", sub: calculatorHistory.length > 0 ? `${calculatorHistory.length} ${calculatorHistory.length === 1 ? "специалност" : "специалности"}` : "Пробвай калкулатора" },
@@ -471,7 +518,7 @@ const Profile = () => {
                         return (
                             <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                                 {/* Следваща стъпка — едно конкретно действие вместо статичен списък */}
-                                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1rem", padding: "1.25rem 1.5rem", background: "linear-gradient(135deg, rgba(6,182,212,0.08), rgba(139,92,246,0.08))", border: "1px solid rgba(6,182,212,0.25)", borderRadius: "1.25rem" }}>
+                                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1rem", padding: "1.25rem 1.5rem", background: "linear-gradient(135deg, rgba(23,86,217,0.08), rgba(23,86,217,0.08))", border: "1px solid rgba(23,86,217,0.25)", borderRadius: "1.25rem" }}>
                                     <div style={{ width: "2.75rem", height: "2.75rem", borderRadius: "0.75rem", background: "linear-gradient(135deg, var(--brand-cyan), var(--brand-violet))", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                         <Compass size={20} color="#fff" strokeWidth={1.5} />
                                     </div>
@@ -513,7 +560,7 @@ const Profile = () => {
                                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "0.5rem" }}>
                                         {progressSteps.map((step, i) => {
                                             const inner = (
-                                                <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem", padding: "0.625rem", background: step.done ? "rgba(6,182,212,0.06)" : "transparent", border: `1px solid ${step.done ? "rgba(6,182,212,0.2)" : "transparent"}`, borderRadius: "0.75rem", cursor: step.done ? "default" : "pointer", height: "100%" }}>
+                                                <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem", padding: "0.625rem", background: step.done ? "rgba(23,86,217,0.06)" : "transparent", border: `1px solid ${step.done ? "rgba(23,86,217,0.2)" : "transparent"}`, borderRadius: "0.75rem", cursor: step.done ? "default" : "pointer", height: "100%" }}>
                                                     <div style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
                                                         <span style={{ width: "1.125rem", height: "1.125rem", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, background: step.done ? "var(--brand-cyan)" : "var(--brand-border)" }}>
                                                             {step.done ? <Check size={9} color="#fff" strokeWidth={3} /> : <span style={{ fontSize: "8px", fontWeight: 800, color: "var(--brand-muted)" }}>{i + 1}</span>}
@@ -565,7 +612,7 @@ const Profile = () => {
                                         <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}>
                                             {favoriteDetails.length > 0 ? favoriteDetails.map(uni => (
                                                 <div key={uni.id} style={{ display: "flex", alignItems: "center", gap: "0.875rem", padding: "0.75rem", background: "var(--brand-input-bg)", border: "1px solid var(--brand-border)", borderRadius: "0.75rem" }}>
-                                                    <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "0.625rem", background: "rgba(6,182,212,0.1)", color: "var(--brand-cyan)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                                    <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "0.625rem", background: "rgba(23,86,217,0.1)", color: "var(--brand-cyan)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                                         <GraduationCap size={18} />
                                                     </div>
                                                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -580,7 +627,7 @@ const Profile = () => {
                                                 <div style={{ padding: "2rem", textAlign: "center", background: "var(--brand-input-bg)", border: "1px dashed var(--brand-input-border)", borderRadius: "1rem" }}>
                                                     <Heart size={28} style={{ color: "var(--brand-muted)", opacity: 0.3, margin: "0 auto 0.625rem" }} />
                                                     <p style={{ margin: "0 0 0.75rem", fontSize: "12px", color: "var(--brand-muted)", fontStyle: "italic" }}>Нямаш добавени любими специалности</p>
-                                                    <Link to="/universities/" style={{ display: "inline-flex", padding: "0.4rem 0.875rem", background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.3)", borderRadius: "0.5rem", color: "var(--brand-cyan)", fontSize: "11px", fontWeight: 700, textDecoration: "none" }}>
+                                                    <Link to="/universities/" style={{ display: "inline-flex", padding: "0.4rem 0.875rem", background: "rgba(23,86,217,0.1)", border: "1px solid rgba(23,86,217,0.3)", borderRadius: "0.5rem", color: "var(--brand-cyan)", fontSize: "11px", fontWeight: 700, textDecoration: "none" }}>
                                                         Търсене
                                                     </Link>
                                                 </div>
@@ -607,7 +654,7 @@ const Profile = () => {
                                                                 {d.type === "application" ? "Срок за кандидатстване" : "Приемен изпит"} · {new Date(d.deadline).toLocaleDateString("bg-BG", { day: "numeric", month: "long" })}
                                                             </p>
                                                         </div>
-                                                        <span style={{ flexShrink: 0, padding: "0.25rem 0.625rem", borderRadius: "999px", fontSize: "11px", fontWeight: 700, background: d.daysLeft <= 7 ? "rgba(248,113,113,0.12)" : "rgba(6,182,212,0.1)", color: d.daysLeft <= 7 ? "#fca5a5" : "var(--brand-cyan)" }}>
+                                                        <span style={{ flexShrink: 0, padding: "0.25rem 0.625rem", borderRadius: "999px", fontSize: "11px", fontWeight: 700, background: d.daysLeft <= 7 ? "rgba(248,113,113,0.12)" : "rgba(23,86,217,0.1)", color: d.daysLeft <= 7 ? "#fca5a5" : "var(--brand-cyan)" }}>
                                                             {d.daysLeft === 0 ? "днес" : d.daysLeft === 1 ? "утре" : `след ${d.daysLeft} дни`}
                                                         </span>
                                                     </div>
@@ -703,7 +750,7 @@ const Profile = () => {
                                                                 ? (above ? `Над минималния (${Number(h.minBall).toFixed(2)})` : `Под минималния (${Number(h.minBall).toFixed(2)})`)
                                                                 : (h.maxBall > 0 ? `${Math.min((h.score / h.maxBall) * 100, 100).toFixed(0)}% от макс. бал` : "")}
                                                         </span>
-                                                        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.2rem", fontSize: "10px", color: "var(--brand-muted)", opacity: 0.6 }}>
+                                                        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.2rem", fontSize: "10px", color: "var(--brand-muted)" }}>
                                                             <Clock size={9} /> {h.date ? new Date(h.date).toLocaleDateString("bg-BG", { day: "numeric", month: "short" }) : ""}
                                                         </span>
                                                     </div>
@@ -781,7 +828,7 @@ const Profile = () => {
                                         alignItems: "center",
                                         gap: "0.5rem",
                                         fontFamily: "inherit",
-                                        boxShadow: "0 12px 30px rgba(6,182,212,0.3)",
+                                        boxShadow: "0 12px 30px rgba(23,86,217,0.3)",
                                     }}
                                 >
                                     {updating && <Loader2 size={14} style={{ animation: "spin 1s linear infinite" }} />}
@@ -804,8 +851,8 @@ const Profile = () => {
                                         onClick={() => navigate("/forgot-password")}
                                         style={{
                                             padding: "0.55rem 1rem",
-                                            background: "rgba(6,182,212,0.1)",
-                                            border: "1px solid rgba(6,182,212,0.3)",
+                                            background: "rgba(23,86,217,0.1)",
+                                            border: "1px solid rgba(23,86,217,0.3)",
                                             borderRadius: "0.625rem",
                                             color: "var(--brand-cyan)",
                                             fontSize: "11px",
@@ -906,8 +953,8 @@ function ScoreSparkline({ points }) {
 
 function StatCard({ icon: Icon, label, value, color }) {
     const palette = color === "cyan"
-        ? { bg: "rgba(6,182,212,0.08)", border: "rgba(6,182,212,0.25)", color: "var(--brand-cyan)" }
-        : { bg: "rgba(139,92,246,0.08)", border: "rgba(139,92,246,0.25)", color: "var(--brand-violet)" };
+        ? { bg: "rgba(23,86,217,0.08)", border: "rgba(23,86,217,0.25)", color: "var(--brand-cyan)" }
+        : { bg: "rgba(23,86,217,0.08)", border: "rgba(23,86,217,0.25)", color: "var(--brand-violet)" };
     return (
         <div
             style={{
@@ -967,7 +1014,7 @@ function InputGroup({ label, icon: Icon, disabled, ...props }) {
 
 function Section({ icon: Icon, iconColor, title, subtitle, danger, children }) {
     const palette = iconColor === "cyan"
-        ? { bg: "rgba(6,182,212,0.12)", border: "rgba(6,182,212,0.3)", color: "var(--brand-cyan)" }
+        ? { bg: "rgba(23,86,217,0.12)", border: "rgba(23,86,217,0.3)", color: "var(--brand-cyan)" }
         : { bg: "rgba(248,113,113,0.12)", border: "rgba(248,113,113,0.3)", color: "#fca5a5" };
     return (
         <div

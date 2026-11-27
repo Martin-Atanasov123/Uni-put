@@ -30,4 +30,12 @@ it("applies only the verified program and year", () => {
     expect(renamed.weights.exam).toBe(4);
     expect(rule("Приложени чужди езици за администрация и управление (английски и втори чужд)").top).toBe(7);
     expect(rule("Управление на бизнес и предприемачество").top).toBe(7);
+    expect(rule("Кино и телевизия").top).toBe(7);
+    expect(rule("Счетоводство и контролинг").top).toBe(7);
+    const jointProgram = nbuProgram({
+        university_name: "Нов български университет",
+        specialty: "Английски език и професионална комуникация (Съвместна програма с университета Йорк)",
+    });
+    expect(jointProgram.externalAdmission).toBe(true);
+    expect(jointProgram.weights).toBeUndefined();
 });

@@ -13,6 +13,17 @@ describe("Проверка на скалата на университетски
     it("отделя програма с различна скала", () => {
         expect(assessFormula({ ...row, max_ball: 1000 }).issue).toBe("scale");
     });
+    it("третира бонификацията като фиксирана точка, а не оценка до 6", () => {
+        const withBonus = {
+            max_ball: 25,
+            coefficients: [
+                { alternatives: [{ key: "exam", coef: 2 }] },
+                { alternatives: [{ key: "obsht_uspeh", coef: 2 }] },
+                { alternatives: [{ key: "bonifikaciq", coef: 1 }] },
+            ],
+        };
+        expect(assessFormula(withBonus)).toEqual({ maximum: 25, issue: null });
+    });
     it("отхвърля липсващи слотове и повредени тежести", () => {
         for (const coefficients of [[], [null], [{ alternatives: [] }], [{ alternatives: [{ key: "exam", coef: "abc" }] }]]) {
             expect(assessFormula({ ...row, coefficients }).issue).toBeTruthy();

@@ -26,10 +26,18 @@ export function nbuProgram(row) {
     const entry = programs[row.specialty];
     if (!entry?.rule) return { url: NBU_RULES_URL };
     const faculty = ["law", "architecture"].includes(entry.rule) ? 4 : 3;
+    const url = `https://ecatalog.nbu.bg/default.asp?V_Year=2026&PageShow=programpresent&P_Menu=admission&Fac_ID=${faculty}&M_PHD=0&P_ID=${entry.id}&TabIndex=${faculty === 4 ? 2 : 1}&l=0`;
+    if (entry.rule === "external") {
+        return {
+            officialName: entry.officialName,
+            url,
+            externalAdmission: true,
+        };
+    }
     return {
         weights: weights[entry.rule],
         officialName: entry.officialName,
-        url: `https://ecatalog.nbu.bg/default.asp?V_Year=2026&PageShow=programpresent&P_Menu=admission&Fac_ID=${faculty}&M_PHD=0&P_ID=${entry.id}&TabIndex=${faculty === 4 ? 2 : 1}&l=0`,
+        url,
     };
 }
 

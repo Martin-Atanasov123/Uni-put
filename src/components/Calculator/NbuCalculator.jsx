@@ -21,7 +21,9 @@ export default function NbuCalculator({ row, program }) {
                     })}
                 </div>
                 <p className="my-3 font-semibold" role="status">{result.message ?? `Бал: ${result.score.toLocaleString("bg-BG", { maximumFractionDigits: 2 })} от 1000 точки`}</p>
-            </> : <p className="my-3">За тази програма условията изискват отделна проверка в НБУ.</p>}
+            </> : <p className="my-3">{program.externalAdmission
+                ? "Това е съвместна програма с University of York Europe Campus. Официалната страница не публикува единен числов бал; кандидатстването се проверява по отделните условия на партньорите."
+                : "За тази програма условията изискват отделна проверка в НБУ."}</p>}
             <a className="underline" href={program.url}>Официални условия за прием</a>
             {program.weights && <> · <a className="underline" href={NBU_RULES_URL}>Как НБУ преобразува оценките в точки</a></>}
         </section>

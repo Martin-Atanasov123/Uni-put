@@ -53,6 +53,7 @@ async function fetchAll(supabase, table, columns) {
 const uniq = (rows, fn) => new Set(rows.map(fn).filter(Boolean)).size;
 
 async function main() {
+    await loadDotEnvIfPresent(resolve(ROOT, ".env.local"));
     await loadDotEnvIfPresent(resolve(ROOT, ".env"));
     const url = process.env.VITE_SUPABASE_URL;
     const key = process.env.VITE_SUPABASE_ANON_KEY;

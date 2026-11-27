@@ -1,4 +1,6 @@
-/** Check whether a 2–6 grade model reproduces the program's published maximum. */
+const maximumInputFor = key => key === "bonifikaciq" ? 1 : 6;
+
+/** Check whether the structured inputs reproduce the program's published maximum. */
 export function assessFormula({ coefficients, max_ball }) {
     let maximum = 0;
     if (!Array.isArray(coefficients) || !coefficients.length) return { issue: "missing" };
@@ -9,9 +11,9 @@ export function assessFormula({ coefficients, max_ball }) {
             if (typeof alt?.key !== "string" || !alt.key.trim()) return { issue: "invalid" };
             const coef = Number(alt.coef);
             if (!["number", "string"].includes(typeof alt.coef) || !Number.isFinite(coef) || coef <= 0) return { issue: "invalid" };
-            largest = Math.max(largest, coef);
+            largest = Math.max(largest, coef * maximumInputFor(alt.key));
         }
-        maximum += 6 * largest;
+        maximum += largest;
     }
     const published = Number(max_ball);
     if (!Number.isFinite(published) || published <= 0) return { maximum, issue: "unknown-maximum" };

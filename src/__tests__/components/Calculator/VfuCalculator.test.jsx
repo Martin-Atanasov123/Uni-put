@@ -17,4 +17,12 @@ describe("VfuCalculator", () => {
         fireEvent.click(screen.getByRole("checkbox"));
         expect(screen.getByRole("status").textContent).toContain("17.00");
     });
+
+    it("uses the doubled diploma rule for engineering programs", () => {
+        const row = { university_name: 'Варненски свободен университет „Черноризец Храбър"', specialty: "Строителен инженеринг" };
+        render(<VfuCalculator row={row} program={vfuProgram(row)} />);
+        fireEvent.change(screen.getByLabelText("Призната конкурсна оценка"), { target: { value: "6" } });
+        fireEvent.change(screen.getByLabelText("Среден успех от дипломата"), { target: { value: "6" } });
+        expect(screen.getByRole("status").textContent).toContain("24.00 от 25");
+    });
 });
