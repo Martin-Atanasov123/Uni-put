@@ -15,6 +15,7 @@ describe("Home landing page", () => {
     it("renders the main headline", () => {
         render(<MemoryRouter><Home /></MemoryRouter>);
         expect(screen.getAllByText(/Открий своя/i).length).toBeGreaterThan(0);
+        expect(screen.queryByText(/Готови за прием/i)).toBeNull();
     });
 
     it("renders RIASEC CTA button", () => {

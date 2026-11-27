@@ -47,7 +47,6 @@ import {
     Calculator,
     BookMarked,
     Smartphone,
-    Zap,
     CheckCircle,
     School,
     Compass,
@@ -171,51 +170,62 @@ function HeroSection() {
     return (
         <section
             data-testid="hero-section"
-            className="relative min-h-screen overflow-hidden"
-            style={{ background: "var(--brand-bg)" }}
+            className="relative overflow-hidden"
+            style={{ background: "var(--brand-bg)", minHeight: "max(100svh, 52rem)" }}
         >
-            <DotsBg cyanOpacity={0.07} violetOpacity={0.05} size={32} />
+            {/* Движението живее само в горната половина. Така запазваме
+                атмосферата, без шейдърът да минава зад четимото съдържание. */}
+            <div
+                aria-hidden
+                style={{
+                    position: "absolute", inset: "0 0 auto", height: "54%",
+                    overflow: "hidden", pointerEvents: "none", zIndex: 0,
+                    WebkitMaskImage: "linear-gradient(to bottom, #000 0%, #000 68%, transparent 100%)",
+                    maskImage: "linear-gradient(to bottom, #000 0%, #000 68%, transparent 100%)",
+                }}
+            >
+                <DotsBg cyanOpacity={0.07} violetOpacity={0.05} size={32} />
 
-            {/* ── Layer 0a: статичен gradient fallback (mobile / reduced-motion) ──
-                Заместване на Three.js шейдъра за phone виewport-и. Чисто CSS,
-                нула JS, нула main-thread cost. Двата radial-gradient-а имитират
-                cyan→violet aurora ефекта без 730 KB Three.js парсване. */}
-            {!enableShader && (
-                <div
-                    aria-hidden
-                    style={{
-                        position: "absolute", inset: 0, zIndex: 1,
-                        pointerEvents: "none",
-                        background:
-                            "radial-gradient(ellipse 80% 60% at 20% 30%, var(--hero-glow-1), transparent 60%), " +
-                            "radial-gradient(ellipse 70% 50% at 80% 70%, var(--hero-glow-2), transparent 60%)",
-                    }}
-                />
-            )}
-
-            {/* ── Layer 0b: AnoAI shader — desktop only, deferred until after first paint ── */}
-            {enableShader && anoaiReady && (
-                <Suspense fallback={null}>
+                {!enableShader && (
                     <div
-                        aria-hidden
                         style={{
-                            position: "absolute",
-                            top: "0%", bottom: 0, left: 0, right: 0,
-                            zIndex: 1,
-                            pointerEvents: "none",
-                            filter: "blur(2.5px)",
-                            transform: "scale(1.02)",
+                            position: "absolute", inset: 0, zIndex: 1,
+                            background:
+                                "radial-gradient(ellipse 80% 70% at 20% 25%, var(--hero-glow-1), transparent 62%), " +
+                                "radial-gradient(ellipse 70% 60% at 80% 45%, var(--hero-glow-2), transparent 64%)",
                         }}
-                    >
-                        <AnoAI style={{ position: "absolute", inset: 0 }} />
-                    </div>
-                </Suspense>
-            )}
+                    />
+                )}
+
+                {enableShader && anoaiReady && (
+                    <Suspense fallback={null}>
+                        <div
+                            style={{
+                                position: "absolute", inset: 0, zIndex: 1,
+                                filter: "blur(2.5px)", transform: "scale(1.02)",
+                            }}
+                        >
+                            <AnoAI style={{ position: "absolute", inset: 0 }} />
+                        </div>
+                    </Suspense>
+                )}
+            </div>
+
+            {/* Плътният фон започва преди текста и скрива последните следи от
+                анимацията. Използва theme token, затова работи и в light mode. */}
+            <div
+                aria-hidden
+                style={{
+                    position: "absolute", inset: "32% 0 0", zIndex: 2,
+                    pointerEvents: "none",
+                    background: "linear-gradient(to bottom, transparent 0%, color-mix(in srgb, var(--brand-bg) 94%, transparent) 22%, var(--brand-bg) 42%, var(--brand-bg) 100%)",
+                }}
+            />
 
             {/* ── Layer 2: centred hero text ── */}
             <div
-                className="relative max-w-5xl mx-auto px-6 flex flex-col items-center justify-center min-h-screen text-center"
-                style={{ zIndex: 3 }}
+                className="relative max-w-5xl mx-auto px-6 flex flex-col items-center text-center"
+                style={{ zIndex: 3, minHeight: "max(100svh, 52rem)", paddingTop: "clamp(20rem, 48vh, 28rem)", paddingBottom: "7rem" }}
             >
                 <m.div
                     className="flex flex-col items-center"
@@ -225,23 +235,6 @@ function HeroSection() {
                     initial={false}
                     style={{ width: "100%", zIndex: 3 }}
                 >
-                    {/* Badge — filled with real data */}
-                    <div
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 w-fit"
-                        style={{
-                            background: "color-mix(in srgb, var(--hero-line-1) 14%, transparent)",
-                            border: "1px solid color-mix(in srgb, var(--hero-line-1) 38%, transparent)",
-                            color: "var(--brand-cyan)",
-                            fontSize: "11px",
-                            fontWeight: 700,
-                            letterSpacing: "0.04em",
-                            textTransform: "uppercase",
-                        }}
-                    >
-                        <Zap size={11} />
-                        Готови за прием {ADMISSION_YEAR_SHORT} г.
-                    </div>
-
                     {/* Headline */}
                     <h1
                         className="font-bold leading-tight mb-6"
