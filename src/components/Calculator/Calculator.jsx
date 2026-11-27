@@ -510,7 +510,7 @@ export default function CalculatorPage() {
         (async () => {
             const { data, error } = await supabase
                 .from("universities")
-                .select("id,faculty,specialty,university_name,city,coefficients,formula_description,max_ball,website_url,accreditation_status")
+                .select("id,faculty,specialty,university_name,city,coefficients,formula_description,max_ball,website_url,accreditation_status,source_url,source_publisher,verified_at")
                 .eq("academic_year", ADMISSION_YEAR)
                 .eq("faculty", selectedFaculty)
                 .limit(500);
@@ -1427,6 +1427,27 @@ export default function CalculatorPage() {
                                             <strong style={{ color: "var(--brand-text)" }}>Формула:</strong> {item.formula_description}
                                         </p>
                                     </div>
+
+                                    {(() => {
+                                        const source = admissionSource(item);
+                                        if (!source) return null;
+                                        const verifiedDate = source.verifiedAt
+                                            ? new Intl.DateTimeFormat("bg-BG", { dateStyle: "medium" }).format(new Date(source.verifiedAt))
+                                            : null;
+                                        return (
+                                            <div style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem", fontSize: "11px", color: "var(--brand-muted)" }}>
+                                                <ExternalLink size={13} style={{ flexShrink: 0, marginTop: "2px", color: "var(--brand-cyan)" }} />
+                                                <div>
+                                                    <a href={source.url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--brand-cyan)", fontWeight: 700, textDecoration: "underline", textUnderlineOffset: "3px" }}>
+                                                        {source.label}
+                                                    </a>
+                                                    <div style={{ marginTop: "0.2rem" }}>
+                                                        {verifiedDate ? `Формулата е сверена на ${verifiedDate}.` : "Официален източник е наличен; формулата очаква ръчна проверка."}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })()}
 
                                     {/* Status */}
                                     <div style={{ paddingTop: "0.75rem", borderTop: "1px solid rgba(148,163,184,0.08)", display: "flex", flexDirection: "column", gap: "0.5rem" }}>

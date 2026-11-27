@@ -8,7 +8,7 @@ describe("specialized military admissions", () => {
             specialty: "Гранична полиция",
         };
         const nvu = {
-            university_name: 'Национален военен университет „Васил Левски" – Велико Търново',
+            university_name: 'Национален военен университет „Васил Левски” – Велико Търново',
             specialty: "Организация и управление на военни формирования на тактическо ниво",
         };
 
@@ -20,5 +20,18 @@ describe("specialized military admissions", () => {
 
     it("does not classify ordinary university formulas as military selection", () => {
         expect(hasSpecialSelectionAdmissions({ university_name: "Софийски университет", specialty: "Право" })).toBe(false);
+    });
+
+    it("prefers the verified database source over a generic fallback", () => {
+        const source = admissionSource({
+            university_name: "Висше училище по мениджмънт – Варна",
+            source_url: "https://vum.bg/official-2026.pdf",
+            source_publisher: "Висше училище по мениджмънт – Варна",
+            verified_at: "2026-11-27T12:00:00Z",
+        });
+
+        expect(source.url).toBe("https://vum.bg/official-2026.pdf");
+        expect(source.label).toContain("Официален източник");
+        expect(source.verifiedAt).toBe("2026-11-27T12:00:00Z");
     });
 });
