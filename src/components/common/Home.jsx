@@ -91,7 +91,14 @@ const stagger = {
 };
 
 function useMediaQuery(query) {
-    const [matches, setMatches] = useState(false);
+    // В браузъра четем media query още при първия render. Ако започнем винаги
+    // с false, мобилен екран временно се разпознава като desktop и успява да
+    // задейства lazy import-а на Three.js преди effect-ът да коригира стойността.
+    const [matches, setMatches] = useState(() =>
+        typeof window !== "undefined" && typeof window.matchMedia === "function"
+            ? window.matchMedia(query).matches
+            : false
+    );
     useEffect(() => {
         const mq = window.matchMedia(query);
         setMatches(mq.matches);

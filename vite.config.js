@@ -36,15 +36,24 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-react':  ['react', 'react-dom', 'react-router-dom'],
-          // Three.js split into two chunks so each can be cached independently.
-          // No modulepreload hint (filtered above) — loads lazily after first paint.
-          'vendor-three-core':  ['three'],
-          'vendor-three-fiber': ['@react-three/fiber'],
-          'vendor-motion': ['motion'],
-          'vendor-ui':     ['lucide-react'],
-          'vendor-supa':   ['@supabase/supabase-js'],
+        // Function-based grouping keeps shared React internals (especially
+        // react/jsx-runtime) out of the Three.js chunk. The object form let
+        // Rollup attach that shared module to @react-three/fiber, which made
+        // ordinary JSX pages download the full 3D dependency chain at startup.
+        manualChunks(id) {
+          if (!id.includes('/node_modules/')) return undefined
+          if (
+            id.includes('/node_modules/react/') ||
+            id.includes('/node_modules/react-dom/') ||
+            id.includes('/node_modules/react-router') ||
+            id.includes('/node_modules/scheduler/')
+          ) return 'vendor-react'
+          if (id.includes('/node_modules/@react-three/fiber/')) return 'vendor-three-fiber'
+          if (id.includes('/node_modules/three/')) return 'vendor-three-core'
+          if (id.includes('/node_modules/motion/')) return 'vendor-motion'
+          if (id.includes('/node_modules/lucide-react/')) return 'vendor-ui'
+          if (id.includes('/node_modules/@supabase/')) return 'vendor-supa'
+          return undefined
         },
       },
     },
