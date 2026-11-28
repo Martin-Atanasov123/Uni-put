@@ -17,78 +17,82 @@ import { UNIVERSITIES, SPECIALTIES, ADMISSION_YEAR_SHORT } from "@/lib/siteStats
 
 // ─── rsvu.mon.bg High-level groups ──────────────────────────────────────────
 // Matches the official МОН classification 
+// Цветът на всяко направление е CSS променлива (--dir-*) със стойност за светлата и
+// тъмната тема (src/index.css); прозрачните варианти се правят с color-mix.
+const tint = (color, pct) => `color-mix(in srgb, ${color} ${pct}%, transparent)`;
+
 const GROUPS = [
     {
         id: "social",
         name: "Социални, стопански и правни науки",
         icon: Briefcase,
-        accent: "#1756D9",
-        bg: "rgba(23,86,217,0.08)",
-        border: "rgba(23,86,217,0.18)",
+        accent: "var(--dir-social)",
+        bg: tint("var(--dir-social)", 8),
+        border: tint("var(--dir-social)", 18),
     },
     {
         id: "tech",
         name: "Технически науки",
         icon: Wrench,
-        accent: "#1756D9",
-        bg: "rgba(23,86,217,0.08)",
-        border: "rgba(23,86,217,0.18)",
+        accent: "var(--dir-tech)",
+        bg: tint("var(--dir-tech)", 8),
+        border: tint("var(--dir-tech)", 18),
     },
     {
         id: "nat",
         name: "Природни науки, математика и информатика",
         icon: FlaskConical,
-        accent: "#10b981",
-        bg: "rgba(16,185,129,0.08)",
-        border: "rgba(16,185,129,0.18)",
+        accent: "var(--dir-nat)",
+        bg: tint("var(--dir-nat)", 8),
+        border: tint("var(--dir-nat)", 18),
     },
     {
         id: "health",
         name: "Здравеопазване и спорт",
         icon: HeartPulse,
-        accent: "#ec4899",
-        bg: "rgba(236,72,153,0.08)",
-        border: "rgba(236,72,153,0.18)",
+        accent: "var(--dir-health)",
+        bg: tint("var(--dir-health)", 8),
+        border: tint("var(--dir-health)", 18),
     },
     {
         id: "hum",
         name: "Хуманитарни науки",
         icon: Globe,
-        accent: "#FBBF24",
-        bg: "rgba(251,191,36,0.08)",
-        border: "rgba(251,191,36,0.18)",
+        accent: "var(--dir-hum)",
+        bg: tint("var(--dir-hum)", 8),
+        border: tint("var(--dir-hum)", 18),
     },
     {
         id: "ped",
         name: "Педагогически науки",
         icon: GraduationCap,
-        accent: "#f97316",
-        bg: "rgba(249,115,22,0.08)",
-        border: "rgba(249,115,22,0.18)",
+        accent: "var(--dir-ped)",
+        bg: tint("var(--dir-ped)", 8),
+        border: tint("var(--dir-ped)", 18),
     },
     {
         id: "agr",
         name: "Аграрни науки и ветеринарна медицина",
         icon: Leaf,
-        accent: "#22c55e",
-        bg: "rgba(34,197,94,0.08)",
-        border: "rgba(34,197,94,0.18)",
+        accent: "var(--dir-agr)",
+        bg: tint("var(--dir-agr)", 8),
+        border: tint("var(--dir-agr)", 18),
     },
     {
         id: "arts",
         name: "Изкуства",
         icon: Palette,
-        accent: "#a855f7",
-        bg: "rgba(168,85,247,0.08)",
-        border: "rgba(168,85,247,0.18)",
+        accent: "var(--dir-arts)",
+        bg: tint("var(--dir-arts)", 8),
+        border: tint("var(--dir-arts)", 18),
     },
     {
         id: "sec",
         name: "Сигурност и отбрана",
         icon: Shield,
-        accent: "#64748b",
-        bg: "rgba(100,116,139,0.08)",
-        border: "rgba(100,116,139,0.18)",
+        accent: "var(--dir-sec)",
+        bg: tint("var(--dir-sec)", 8),
+        border: tint("var(--dir-sec)", 18),
     },
 ];
 
@@ -274,14 +278,14 @@ function GroupCard({ group, total, specialties, univCount, cityCount, onSelect, 
             onClick={() => onSelect(group)}
             style={{
                 background: "var(--brand-surface)",
-                border: `1px solid ${hovered ? group.accent + "55" : "var(--brand-card-border)"}`,
+                border: `1px solid ${hovered ? tint(group.accent, 33) : "var(--brand-card-border)"}`,
                 borderRadius: "1.25rem",
                 overflow: "hidden",
                 cursor: "pointer",
                 transition: "border-color 0.22s, transform 0.22s cubic-bezier(0.16,1,0.3,1), box-shadow 0.22s",
                 transform: hovered ? "translateY(-4px)" : "translateY(0)",
                 boxShadow: hovered
-                    ? `0 20px 48px rgba(0,0,0,0.18), 0 0 0 1px ${group.accent}33`
+                    ? `0 20px 48px rgba(0,0,0,0.18), 0 0 0 1px ${tint(group.accent, 20)}`
                     : "0 2px 8px rgba(0,0,0,0.06)",
             }}
         >
@@ -302,7 +306,7 @@ function GroupCard({ group, total, specialties, univCount, cityCount, onSelect, 
                 {/* Ambient glow */}
                 <div style={{
                     position: "absolute", inset: 0,
-                    background: `radial-gradient(ellipse at 80% 50%, ${group.accent}18 0%, transparent 70%)`,
+                    background: `radial-gradient(ellipse at 80% 50%, ${tint(group.accent, 9)} 0%, transparent 70%)`,
                     pointerEvents: "none",
                 }} />
 
@@ -313,7 +317,7 @@ function GroupCard({ group, total, specialties, univCount, cityCount, onSelect, 
                     border: `1px solid ${group.border}`,
                     borderRadius: "0.75rem",
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    boxShadow: `0 4px 16px ${group.accent}22`,
+                    boxShadow: `0 4px 16px ${tint(group.accent, 13)}`,
                     position: "relative", zIndex: 1,
                 }}>
                     <Icon size={22} strokeWidth={1.5} style={{ color: group.accent }} />
@@ -333,7 +337,7 @@ function GroupCard({ group, total, specialties, univCount, cityCount, onSelect, 
                     <div style={{
                         fontSize: "1.5rem", fontWeight: 900,
                         fontFamily: "monospace", lineHeight: 1,
-                        background: `linear-gradient(135deg, ${group.accent}, ${group.accent}bb)`,
+                        background: `linear-gradient(135deg, ${group.accent}, ${tint(group.accent, 73)})`,
                         WebkitBackgroundClip: "text",
                         WebkitTextFillColor: "transparent",
                     }}>
@@ -393,7 +397,7 @@ function GroupCard({ group, total, specialties, univCount, cityCount, onSelect, 
                                 whiteSpace: "nowrap",
                             }}
                             onMouseEnter={(e) => {
-                                e.currentTarget.style.background = group.accent + "22";
+                                e.currentTarget.style.background = tint(group.accent, 13);
                                 e.currentTarget.style.transform = "scale(1.04)";
                             }}
                             onMouseLeave={(e) => {
@@ -408,9 +412,9 @@ function GroupCard({ group, total, specialties, univCount, cityCount, onSelect, 
                         <span style={{
                             padding: "0.2rem 0.6rem", borderRadius: "999px",
                             fontSize: "11px", fontWeight: 600,
-                            background: "var(--brand-surface-2)",
-                            color: "var(--brand-muted)",
-                            border: "1px solid var(--brand-border)",
+                            background: "transparent",
+                            color: group.accent,
+                            border: `1px dashed ${tint(group.accent, 40)}`,
                         }}>
                             +{specialties.length - 5} още
                         </span>
@@ -864,7 +868,7 @@ export default function UniversitiesPage() {
                         >
                             {/* Group chip */}
                             {activeGroupObj && (
-                                <span style={{ display: "flex", alignItems: "center", gap: "0.3rem", padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: `${activeGroupObj.accent}18`, color: activeGroupObj.accent, border: `1px solid ${activeGroupObj.accent}33` }}>
+                                <span style={{ display: "flex", alignItems: "center", gap: "0.3rem", padding: "0.2rem 0.625rem", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: tint(activeGroupObj.accent, 9), color: activeGroupObj.accent, border: `1px solid ${tint(activeGroupObj.accent, 20)}` }}>
                                     {activeGroupObj.name}
                                     <button onClick={() => { setSelectedGroup(null); if (!hasTextFilters && !selectedFaculty) setViewMode("browse"); }} style={{ background: "none", border: "none", cursor: "pointer", color: "inherit", padding: 0, lineHeight: 1 }}><X size={10} /></button>
                                 </span>

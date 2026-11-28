@@ -34,6 +34,17 @@
   --c-amber: #7A4E00;
   --c-pink: #BE185D;
   --c-orange: #C2410C;
+  /* Професионални направления (/universities) — уникален цвят за всяко, без сиво.
+     Светлата тема: ≥4,5:1 контраст върху бяло. */
+  --dir-social: #1756D9;  /* право, икономика — синьо */
+  --dir-tech: #C2410C;    /* инженерство — оранжево */
+  --dir-nat: #0E7490;     /* природни науки, информатика — циан */
+  --dir-health: #B91C1C;  /* медицина — червено */
+  --dir-hum: #A16207;     /* хуманитарни — златисто */
+  --dir-ped: #BE185D;     /* педагогика — розово */
+  --dir-agr: #15803D;     /* аграрни — зелено */
+  --dir-arts: #7E22CE;    /* изкуства — лилаво */
+  --dir-sec: #4D7C0F;     /* сигурност и отбрана — маслинено */
   --radius-control: 10px;
   --radius-panel: 16px;
   --radius-feature: 24px;
@@ -145,6 +156,15 @@
   --c-amber: #FBBF24;
   --c-pink: #F472B6;
   --c-orange: #FB923C;
+  --dir-social: #78A7FF;
+  --dir-tech: #FB923C;
+  --dir-nat: #22D3EE;
+  --dir-health: #F87171;
+  --dir-hum: #FBBF24;
+  --dir-ped: #F472B6;
+  --dir-agr: #4ADE80;
+  --dir-arts: #C084FC;
+  --dir-sec: #A3E635;
   --radius-control: 10px;
   --radius-panel: 16px;
   --radius-feature: 24px;
